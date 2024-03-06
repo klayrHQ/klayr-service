@@ -1,24 +1,24 @@
-# Lisk Service API Documentation
+# Klayr Service API Documentation
 
-Lisk Service is a middleware web application that interacts with the entire Lisk ecosystem in various aspects, such as accessing blockchain data (both on-chain and off-chain information), retrieving and storing market data, and exporting account history.
+Klayr Service is a middleware web application that interacts with the entire Klayr ecosystem in various aspects, such as accessing blockchain data (both on-chain and off-chain information), retrieving and storing market data, and exporting account history.
 
-The main focus of this project is to provide data to Lisk blockchain users by serving them in a standardized JSON format and exposing a public RESTful API. The project is split into several smaller components (microservices) each focused on serving a single specific purpose.
+The main focus of this project is to provide data to Klayr blockchain users by serving them in a standardized JSON format and exposing a public RESTful API. The project is split into several smaller components (microservices) each focused on serving a single specific purpose.
 
-As a pure backend project, it is designed to meet the requirements of front-end developers, especially Lisk Desktop and Lisk Mobile.
+As a pure backend project, it is designed to meet the requirements of front-end developers, especially Klayr Desktop and Klayr Mobile.
 
-The API is accessible at `https://service.lisk.com`.
-It is also possible to access the Testnet network at `https://testnet-service.lisk.com`.
+The API is accessible at `https://service.klayr.com`.
+It is also possible to access the Testnet network at `https://testnet-service.klayr.com`.
 
-The Lisk Service API is compatible with RESTful guidelines. The specification below contains numerous examples of how to use the API in practice.
+The Klayr Service API is compatible with RESTful guidelines. The specification below contains numerous examples of how to use the API in practice.
 
 ## Table of Contents
 
-- [Lisk Service API Documentation](#lisk-service-api-documentation)
+- [Klayr Service API Documentation](#klayr-service-api-documentation)
   - [Endpoint logic](#endpoint-logic)
   - [Response format](#response-format)
   - [API Base URL](#api-base-url)
   - [API Status and Readiness](#api-status-and-readiness)
-- [Lisk Blockchain-related Endpoints](#lisk-blockchain-related-endpoints)
+- [Klayr Blockchain-related Endpoints](#klayr-blockchain-related-endpoints)
   - [Blocks](#blocks)
     - [Block search](#block-search)
     - [Block Assets search](#block-assets-search)
@@ -110,18 +110,18 @@ The error responses adhere to the following structure:
 
 ## API Base URL
 
-The base URL for the Lisk Service v3 API is `/api/v3`. All the RESTful endpoints specified below follow the base URL.
-<br/>*Example*: https://service.lisk.com/api/v3/spec
+The base URL for the Klayr Service v3 API is `/api/v3`. All the RESTful endpoints specified below follow the base URL.
+<br/>*Example*: https://service.klayr.com/api/v3/spec
 
 The WS-RPC endpoints however are available to query under the `/rpc-v3` namespace.
-<br/>*Example*: https://service.lisk.com/api/rpc-v3
+<br/>*Example*: https://service.klayr.com/api/rpc-v3
 
 ## API Status and Readiness
 
-Lisk Service offers `/status` and `/ready` endpoints to check the current deployment and high-level service readiness statuses respectively. These endpoints must be queried without the API versioning.
-<br/>*Example*: https://service.lisk.com/api/status, https://service.lisk.com/api/ready
+Klayr Service offers `/status` and `/ready` endpoints to check the current deployment and high-level service readiness statuses respectively. These endpoints must be queried without the API versioning.
+<br/>*Example*: https://service.klayr.com/api/status, https://service.klayr.com/api/ready
 
-# Lisk Blockchain-related Endpoints
+# Klayr Blockchain-related Endpoints
 
 ## Blocks
 
@@ -143,7 +143,7 @@ _Supports pagination._
 | blockID | String | `/^\b(?:[A-Fa-f0-9]){64}\b$/` | *(empty)* |  |
 | height | String | `/^(?:(?:\d+)\|(?::(?:\d+))\|(?:(?:\d+):(?:\d+)?))$/` | *(empty)* | Query by height or a height range. Can be expressed as an interval i.e. `1:20` or `1:` or `:20`. Specified values are inclusive. |
 | timestamp | String | `/^(?:(?:\d+)\|(?::(?:\d+))\|(?:(?:\d+):(?:\d+)?))$/` | *(empty)* | Query by timestamp or a timestamp range. Can be expressed as an interval i.e. `1000000:2000000` or `1000000:` or `:2000000`. Specified values are inclusive. |
-| generatorAddress | String | `/^lsk[a-hjkm-z2-9]{38}$/` | *(empty)* |  |
+| generatorAddress | String | `/^kly[a-hjkm-z2-9]{38}$/` | *(empty)* |  |
 | limit | Number | `[1,100]` | 10 |  |
 | offset | Number | `[0,Inf)` | 0 |  |
 | sort | Enum | `["height:asc", "height:desc", "timestamp:asc", "timestamp:desc"]` | height:desc |  |
@@ -162,7 +162,7 @@ _Supports pagination._
       "timestamp": 85944650,
       "previousBlockId": "827080df7829cd2757501a85f80a0767fcb40615304b701c2890dbbaf214bb89",
       "generator": {
-        "address": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+        "address": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
         "name": "genesis_3",
         "publicKey": "32ddb97e8d7e607a14fef8449c2a2180cd74a51f67b04a50a4b1917d3ca8a52e"
       },
@@ -209,12 +209,12 @@ _Supports pagination._
 
 Get blocks by blockID
 ```
-https://service.lisk.com/api/v3/blocks?blockID=01967dba384998026fe028119bd099ecf073c05c045381500a93d1a7c7307e5b
+https://service.klayr.com/api/v3/blocks?blockID=01967dba384998026fe028119bd099ecf073c05c045381500a93d1a7c7307e5b
 ```
 
 Get blocks by height
 ```
-https://service.lisk.com/api/v3/blocks?height=9
+https://service.klayr.com/api/v3/blocks?height=9
 ```
 
 ### Block Assets Search
@@ -283,12 +283,12 @@ _Supports pagination._
 
 Get block assets by block ID
 ```
-https://service.lisk.com/api/v3/blocks/assets?blockID=f7b2066f73a71b1cbfd777e2c172a29f1b59017d3b0e6c22a11bec7318050bed
+https://service.klayr.com/api/v3/blocks/assets?blockID=f7b2066f73a71b1cbfd777e2c172a29f1b59017d3b0e6c22a11bec7318050bed
 ```
 
 Get blocks by height
 ```
-https://service.lisk.com/api/v3/block/assets?height=9
+https://service.klayr.com/api/v3/block/assets?height=9
 ```
 
 ## Transactions
@@ -310,9 +310,9 @@ _Supports pagination._
 | --------- | ---- | ---------- | ------- | ------- |
 | transactionID | String | `/^\b(?:[A-Fa-f0-9]){64}\b$/` | *(empty)* |  |
 | moduleCommand | String | `/^[a-zA-Z][\w]{0,31}:[a-zA-Z][\w]{0,31}$/` | *(empty)* |  |
-| senderAddress | String | `/^lsk[a-hjkm-z2-9]{38}$/` | *(empty)* |  |
-| recipientAddress | String | `/^lsk[a-hjkm-z2-9]{38}$/` | *(empty)* |  |
-| address | String | `/^lsk[a-hjkm-z2-9]{38}$/` | *(empty)* | Resolves for both senderAddress and recipientAddress. |
+| senderAddress | String | `/^kly[a-hjkm-z2-9]{38}$/` | *(empty)* |  |
+| recipientAddress | String | `/^kly[a-hjkm-z2-9]{38}$/` | *(empty)* |  |
+| address | String | `/^kly[a-hjkm-z2-9]{38}$/` | *(empty)* | Resolves for both senderAddress and recipientAddress. |
 | blockID | String | `/^\b(?:[A-Fa-f0-9]){64}\b$/` | *(empty)* |  |
 | height | String | `/^(?:(?:\d+)\|(?::(?:\d+))\|(?:(?:\d+):(?:\d+)?))$/` | *(empty)* | Query by height or a height range. Can be expressed as an interval i.e. `1:20` or `1:` or `:20`. Specified values are inclusive. |
 | timestamp | String | `/^(?:(?:\d+)\|(?::(?:\d+))\|(?:(?:\d+):(?:\d+)?))$/` | *(empty)* | Query by timestamp or a timestamp range. Can be expressed as an interval i.e. `1000000:2000000` or `1000000:` or `:2000000`. Specified values are inclusive. |
@@ -344,14 +344,14 @@ _Supports pagination._
         "isFinal": true
       },
       "sender": {
-        "address": "lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo",
+        "address": "klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo",
         "publicKey": "475697e34ae02b394721020d38677a072dbd5c03d61c1c8fdd6563eb66160fa3",
         "name": "genesis_0"
       },
       "params": {
         "tokenID": "0400000100000000",
         "amount": "10000000000",
-        "recipientAddress": "lskezo8pcrbsoceuuu64rpc8w2qkont2ec3n772yu",
+        "recipientAddress": "klyezo8pcrbsoceuuu64rpc8w2qkont2ec3n772yu",
         "data": ""
       },
       "signatures": [
@@ -361,7 +361,7 @@ _Supports pagination._
       "index": 0,
       "meta": {
         "recipient": {
-          "address": "lskezo8pcrbsoceuuu64rpc8w2qkont2ec3n772yu",
+          "address": "klyezo8pcrbsoceuuu64rpc8w2qkont2ec3n772yu",
           "publicKey": null,
           "name": null
         }
@@ -390,13 +390,13 @@ _Supports pagination._
 Get transaction by transactionID
 
 ```
-https://service.lisk.com/api/v3/transactions?transactionID=65c28137c130c6609a67fccfcd9d0f7c3df3577324f8d33134326d653ded613f
+https://service.klayr.com/api/v3/transactions?transactionID=65c28137c130c6609a67fccfcd9d0f7c3df3577324f8d33134326d653ded613f
 ```
 
-Get the last 25 transactions for account `lsk24cd35u4jdq8szo3pnsqe5dsxwrnazyqqqg5eu`
+Get the last 25 transactions for account `kly24cd35u4jdq8szo3pnsqe5dsxwrnazyqqqg5eu`
 
 ```
-https://service.lisk.com/api/v3/transactions?address=lsk24cd35u4jdq8szo3pnsqe5dsxwrnazyqqqg5eu
+https://service.klayr.com/api/v3/transactions?address=kly24cd35u4jdq8szo3pnsqe5dsxwrnazyqqqg5eu
 ```
 
 ### Transaction Dryrun
@@ -430,7 +430,7 @@ Request payload:
       "48425002226745847e155cf5480478c2336a43bb178439e9058cc2b50e26335cf7c8360b6c6a49793d7ae8d087bc746cab9618655e6a0adba4694cce2015b50f"
     ],
     "params": {
-      "recipientAddress": "lskz4upsnrwk75wmfurf6kbxsne2nkjqd3yzwdaup",
+      "recipientAddress": "klyz4upsnrwk75wmfurf6kbxsne2nkjqd3yzwdaup",
       "amount": "10000000000",
       "tokenID": "0000000000000000",
       "data": "Token transfer tx"
@@ -462,19 +462,19 @@ or
     "events": [
       {
         "data": {
-          "senderAddress": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+          "senderAddress": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
           "tokenID": "0000000000000000",
           "amount": "100003490",
-          "recipientAddress": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99"
+          "recipientAddress": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99"
         },
         "index": 0,
         "module": "token",
         "name": "transferEvent",
         "topics": [
           "86afcdd640846bf41525481938653ee942be3fac1ecbcff08e98f9aeda3a9583",
-          "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+          "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
           "0000000000000000",
-          "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99"
+          "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99"
         ],
         "height": 10
       }
@@ -524,7 +524,7 @@ Request payload:
     "nonce": "0",
     "senderPublicKey": "a3f96c50d0446220ef2f98240898515cbba8155730679ca35326d98dcfb680f0",
     "params": {
-      "recipientAddress": "lskz4upsnrwk75wmfurf6kbxsne2nkjqd3yzwdaup",
+      "recipientAddress": "klyz4upsnrwk75wmfurf6kbxsne2nkjqd3yzwdaup",
       "receivingChainID": "00000001",
       "amount": "10000000000",
       "tokenID": "0000000000000000",
@@ -732,13 +732,13 @@ _Supports pagination._
 Get transaction statistics for the past 7 days.
 
 ```
-https://service.lisk.com/api/v3/transactions​/statistics​?interval=day&limit=7`
+https://service.klayr.com/api/v3/transactions​/statistics​?interval=day&limit=7`
 ```
 
 Get transaction statistics for the past 12 months.
 
 ```
-https://service.lisk.com/api/v3/transactions​/statistics​?interval=month&limit=12`
+https://service.klayr.com/api/v3/transactions​/statistics​?interval=month&limit=12`
 ```
 
 ## Events
@@ -760,8 +760,8 @@ _Supports pagination._
 | Parameter | Type | Validation | Default | Comment |
 | --------- | ---- | ---------- | ------- | ------- |
 | transactionID | String | `/^\b(?:[A-Fa-f0-9]){64}\b$/` | *(empty)* |  |
-| senderAddress | String | `/^lsk[a-hjkm-z2-9]{38}$/` | *(empty)* |  |
-| topic | String | `/^\b(?:(?:04\|05)?[0-9a-fA-F]{64}\|lsk[a-hjkm-z2-9]{38})(?:,(?:(?:04\|05)?[0-9a-fA-F]{64}\|lsk[a-hjkm-z2-9]{38}))*\b$/` | *(empty)* | Can be expressed as a CSV. For performance reasons, we do not allow users to query default topics such as `03`. |
+| senderAddress | String | `/^kly[a-hjkm-z2-9]{38}$/` | *(empty)* |  |
+| topic | String | `/^\b(?:(?:04\|05)?[0-9a-fA-F]{64}\|kly[a-hjkm-z2-9]{38})(?:,(?:(?:04\|05)?[0-9a-fA-F]{64}\|kly[a-hjkm-z2-9]{38}))*\b$/` | *(empty)* | Can be expressed as a CSV. For performance reasons, we do not allow users to query default topics such as `03`. |
 | blockID | String | `/^\b(?:[A-Fa-f0-9]){64}\b$/` | *(empty)* |  |
 | height | String | `/^(?:(?:\d+)\|(?::(?:\d+))\|(?:(?:\d+):(?:\d+)?))$/` | *(empty)* | Query by height or a height range. Can be expressed as an interval i.e. `1:20` or `1:` or `:20`. Specified values are inclusive. |
 | timestamp | String | `/^(?:(?:\d+)\|(?::(?:\d+))\|(?:(?:\d+):(?:\d+)?))$/` | *(empty)* | Query by timestamp or a timestamp range. Can be expressed as an interval i.e. `1000000:2000000` or `1000000:` or `:2000000`. Specified values are inclusive. |
@@ -787,7 +787,7 @@ _Supports pagination._
       },
       "topics": [
         "03",
-        "lsksod8bj35gmndy94yehxm25nybg5os6ycysejsm"
+        "klysod8bj35gmndy94yehxm25nybg5os6ycysejsm"
       ],
       "index": 0,
       "block": {
@@ -817,12 +817,12 @@ _Supports pagination._
 
 Get events by blockID
 ```
-https://service.lisk.com/api/v3/events?blockID=01967dba384998026fe028119bd099ecf073c05c045381500a93d1a7c7307e5b
+https://service.klayr.com/api/v3/events?blockID=01967dba384998026fe028119bd099ecf073c05c045381500a93d1a7c7307e5b
 ```
 
 Get events by topic
 ```
-https://service.lisk.com/api/v3/events?topic=lsksod8bj35gmndy94yehxm25nybg5os6ycysejsm
+https://service.klayr.com/api/v3/events?topic=klysod8bj35gmndy94yehxm25nybg5os6ycysejsm
 ```
 
 
@@ -855,7 +855,7 @@ _Supports pagination._
 {
   "data": [
     {
-      "address": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+      "address": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
       "name": "genesis_84",
       "publicKey": "b1d6bc6c7edd0673f5fed0681b73de6eb70539c21278b300f07ade277e1962cd",
       "nextForgingTime": 1616058987,
@@ -882,7 +882,7 @@ _Supports pagination._
 
 Get generators
 ```
-https://service.lisk.com/api/v3/generators
+https://service.klayr.com/api/v3/generators
 ```
 
 ## Auth
@@ -900,7 +900,7 @@ Retrieves user-specific details from the Auth module.
 
 | Parameter | Type | Validation | Default | Comment |
 | --------- | ---- | ---------- | ------- | ------- |
-| address | String | `/^lsk[a-hjkm-z2-9]{38}$/` | *(empty)* | Required. |
+| address | String | `/^kly[a-hjkm-z2-9]{38}$/` | *(empty)* | Required. |
 <!-- | publicKey | String | `/^\b(?:[A-Fa-f0-9]){64}\b$/` | *(empty)* |  | -->
 <!-- | name | String | `/^[a-z0-9!@$&_.]{1,20}$/` | *(empty)* |  | -->
 
@@ -921,7 +921,7 @@ Retrieves user-specific details from the Auth module.
     ]
   },
   "meta": {
-    "address": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+    "address": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
     "publicKey": "b1d6bc6c7edd0673f5fed0681b73de6eb70539c21278b300f07ade277e1962cd",
     "name": "genesis_84"
   }
@@ -940,7 +940,7 @@ Retrieves user-specific details from the Auth module.
 
 Get auth details by address
 ```
-https://service.lisk.com/api/v3/auth?address=lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99
+https://service.klayr.com/api/v3/auth?address=klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99
 ```
 
 ## Validator
@@ -958,7 +958,7 @@ Retrieves user-specific details from the Validator module.
 
 | Parameter | Type | Validation | Default | Comment |
 | --------- | ---- | ---------- | ------- | ------- |
-| address | String | `/^lsk[a-hjkm-z2-9]{38}$/` | *(empty)* | Required. |
+| address | String | `/^kly[a-hjkm-z2-9]{38}$/` | *(empty)* | Required. |
 <!-- | publicKey | String | `/^\b(?:[A-Fa-f0-9]){64}\b$/` | *(empty)* |  | -->
 <!-- | name | String | `/^[a-z0-9!@$&_.]{1,20}$/` | *(empty)* |  | -->
 
@@ -974,7 +974,7 @@ Retrieves user-specific details from the Validator module.
     "proofOfPossession": "abb6c31f5885022765301fbfcc6c34686ef9a9b0eec34cb487433558071ab57fd28852752f81dda00447e69d61f63f48174c10a0a0a2d34d230b9a75d903a0befdef82708e5f869ff75090c1b5ce85565e8a17e5e06c4cae305c5efb1f37d996"
   },
   "meta": {
-    "address": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+    "address": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
     "publicKey": "b1d6bc6c7edd0673f5fed0681b73de6eb70539c21278b300f07ade277e1962cd",
     "name": "genesis_84"
   }
@@ -993,7 +993,7 @@ Retrieves user-specific details from the Validator module.
 
 Get auth details by address
 ```
-https://service.lisk.com/api/v3/validator?address=lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99
+https://service.klayr.com/api/v3/validator?address=klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99
 ```
 
 ### Validate BLS Key
@@ -1057,7 +1057,7 @@ Validates if an entry exists in the Token sub-store for the specified address.
 | Parameter | Type | Validation | Default | Comment |
 | --------- | ---- | ---------- | ------- | ------- |
 | tokenID | String | `/^\b[a-fA-F0-9]{16}\b$/` | *(empty)* | Required. |
-| address | String | `/^lsk[a-hjkm-z2-9]{38}$/` | *(empty)* | One of address, publicKey or name required. |
+| address | String | `/^kly[a-hjkm-z2-9]{38}$/` | *(empty)* | One of address, publicKey or name required. |
 | publicKey | String | `/^\b(?:[A-Fa-f0-9]){64}\b$/` | *(empty)* |  |
 | name | String | `/^[a-z0-9!@$&_.]{1,20}$/` | *(empty)* |  |
 
@@ -1086,7 +1086,7 @@ Validates if an entry exists in the Token sub-store for the specified address.
 
 Get token account exists by address
 ```
-https://service.lisk.com/api/v3/token/account/exists?tokenID=0400000000000000&address=lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99
+https://service.klayr.com/api/v3/token/account/exists?tokenID=0400000000000000&address=klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99
 ```
 
 ### Token Balances
@@ -1102,7 +1102,7 @@ Retrieves the balances from the Token sub-store for the specified address.
 
 | Parameter | Type | Validation | Default | Comment |
 | --------- | ---- | ---------- | ------- | ------- |
-| address | String | `/^lsk[a-hjkm-z2-9]{38}$/` | *(empty)* | Required. |
+| address | String | `/^kly[a-hjkm-z2-9]{38}$/` | *(empty)* | Required. |
 | tokenID | String | `/^\b[a-fA-F0-9]{16}\b$/` | *(empty)* |  |
 | limit | Number | `[1,100]` | 10 |  |
 | offset | Number | `[0,Inf)` | 0 |  |
@@ -1126,7 +1126,7 @@ Retrieves the balances from the Token sub-store for the specified address.
     ]
   },
   "meta": {
-    "address": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+    "address": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
     "count": 10,
     "offset": 10,
     "total": 100
@@ -1146,7 +1146,7 @@ Retrieves the balances from the Token sub-store for the specified address.
 
 Get token balances by address
 ```
-https://service.lisk.com/api/v3/token/balances?address=lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99
+https://service.klayr.com/api/v3/token/balances?address=klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99
 ```
 
 ### Module Constants
@@ -1190,7 +1190,7 @@ No parameters are required.
 
 Get module constants from the Token module
 ```
-https://service.lisk.com/api/v3/token/constants
+https://service.klayr.com/api/v3/token/constants
 ```
 
 ### Token Summary
@@ -1254,7 +1254,7 @@ No parameters are required.
 
 Get module summary from the Token module
 ```
-https://service.lisk.com/api/v3/token/summary
+https://service.klayr.com/api/v3/token/summary
 ```
 
 ### Token Available IDs
@@ -1305,7 +1305,7 @@ Retrieves all the available token identifiers.
 
 Get available token identifiers from the Token module
 ```
-https://service.lisk.com/api/v3/token/available-ids
+https://service.klayr.com/api/v3/token/available-ids
 ```
 
 ### Top Token Balances
@@ -1336,7 +1336,7 @@ Retrieves top token balances for a token ID.
   "data": {
     "0000000000000000": [
       {
-        "address": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+        "address": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
         "publicKey": "b1d6bc6c7edd0673f5fed0681b73de6eb70539c21278b300f07ade277e1962cd",
         "name": "genesis_84",
         "balance": "10000000",
@@ -1367,7 +1367,7 @@ Retrieves top token balances for a token ID.
 
 Get top token balances from the Token module
 ```
-https://service.lisk.com/api/v3/token/balances/top?tokenID=0000000000000000
+https://service.klayr.com/api/v3/token/balances/top?tokenID=0000000000000000
 ```
 
 ## Dynamic Fees
@@ -1425,7 +1425,7 @@ No parameters are required.
 #### Examples
 
 ```
-https://service.lisk.com/api/v3/fees
+https://service.klayr.com/api/v3/fees
 ```
 
 
@@ -1446,7 +1446,7 @@ _Supports pagination._
 
 | Parameter | Type | Validation | Default | Comment |
 | --------- | ---- | ---------- | ------- | ------- |
-| address   | String | `/^lsk[a-hjkm-z2-9]{38}$/` | *(empty)* | One of address, publicKey or name required. |
+| address   | String | `/^kly[a-hjkm-z2-9]{38}$/` | *(empty)* | One of address, publicKey or name required. |
 | publicKey | String | `/^\b(?:[A-Fa-f0-9]){64}\b$/` | *(empty)* |  |
 | name | String | `/^[a-z0-9!@$&_.]{1,20}$/` | *(empty)* |  |
 | limit | Number | `[1,100]` | 10 |  |
@@ -1483,7 +1483,7 @@ _Supports pagination._
 #### Examples
 
 ```
-https://service.lisk.com/api/v3/pos/rewards/claimable?address=lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99
+https://service.klayr.com/api/v3/pos/rewards/claimable?address=klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99
 ```
 
 ### Locked rewards
@@ -1501,7 +1501,7 @@ _Supports pagination._
 
 | Parameter | Type | Validation | Default | Comment |
 | --------- | ---- | ---------- | ------- | ------- |
-| address   | String | `/^lsk[a-hjkm-z2-9]{38}$/` | *(empty)* | One of address, publicKey or name required. |
+| address   | String | `/^kly[a-hjkm-z2-9]{38}$/` | *(empty)* | One of address, publicKey or name required. |
 | publicKey | String | `/^\b(?:[A-Fa-f0-9]){64}\b$/` | *(empty)* |  |
 | name | String | `/^[a-z0-9!@$&_.]{1,20}$/` | *(empty)* |  |
 | limit | Number | `[1,100]` | 10 |  |
@@ -1538,7 +1538,7 @@ _Supports pagination._
 #### Examples
 
 ```
-https://service.lisk.com/api/v3/pos/rewards/locked?address=lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99
+https://service.klayr.com/api/v3/pos/rewards/locked?address=klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99
 ```
 
 ### Module constants
@@ -1576,7 +1576,7 @@ No parameters are required.
     "maxBFTWeightCap": 500,
     "commissionIncreasePeriod": 260000,
     "maxCommissionIncreaseRate": 500,
-    "useInvalidBLSKey": false,
+    "useInvalidBKLYey": false,
     "baseStakeAmount": "1000000000",
     "lockingPeriodStaking": 26000,
     "lockingPeriodSelfStaking": 260000,
@@ -1602,7 +1602,7 @@ No parameters are required.
 #### Examples
 
 ```
-https://service.lisk.com/api/v3/pos/stakers
+https://service.klayr.com/api/v3/pos/stakers
 ```
 
 ### Stakers (Received stakes)
@@ -1620,7 +1620,7 @@ _Supports pagination._
 
 | Parameter | Type | Validation | Default | Comment |
 | --------- | ---- | ---------- | ------- | ------- |
-| address   | String | `/^lsk[a-hjkm-z2-9]{38}$/` | *(empty)* | One of address, publicKey or name required. |
+| address   | String | `/^kly[a-hjkm-z2-9]{38}$/` | *(empty)* | One of address, publicKey or name required. |
 | publicKey | String | `/^\b(?:[A-Fa-f0-9]){64}\b$/` | *(empty)* |  |
 | name | String | `/^[a-z0-9!@$&_.]{1,20}$/` | *(empty)* |  |
 | search | String | `/^[\w!@$&.]{1,64}$/` | *(empty)* | Case-insensitive search by name, address or publicKey. Supports both partial and full text search. |
@@ -1636,15 +1636,15 @@ _Supports pagination._
   "data": {
     "stakers": [
       {
-        "address": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+        "address": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
         "amount": "10815000000000",
-        "name": "liskhq"
+        "name": "klayrhq"
       }
     ]
   },
   "meta": {
     "validator": {
-      "address": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+      "address": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
       "publicKey": "b1d6bc6c7edd0673f5fed0681b73de6eb70539c21278b300f07ade277e1962cd",
       "name": "genesis_84"
     },
@@ -1666,7 +1666,7 @@ _Supports pagination._
 #### Examples
 
 ```
-https://service.lisk.com/api/v3/pos/stakers?address=lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99
+https://service.klayr.com/api/v3/pos/stakers?address=klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99
 ```
 
 ### Stakes (Sent stakes)
@@ -1682,7 +1682,7 @@ Retrieves the list of stakes sent by the specified user by their address, public
 
 | Parameter | Type | Validation | Default | Comment |
 | --------- | ---- | ---------- | ------- | ------- |
-| address   | String | `/^lsk[a-hjkm-z2-9]{38}$/` | *(empty)* | One of address, publicKey or name required. |
+| address   | String | `/^kly[a-hjkm-z2-9]{38}$/` | *(empty)* | One of address, publicKey or name required. |
 | publicKey | String | `/^\b(?:[A-Fa-f0-9]){64}\b$/` | *(empty)* |  |
 | name | String | `/^[a-z0-9!@$&_.]{1,20}$/` | *(empty)* |  |
 | search | String | `/^[\w!@$&.]{1,64}$/` | *(empty)* | Case-insensitive search by name, address or publicKey. Supports both partial and full text search. |
@@ -1696,15 +1696,15 @@ Retrieves the list of stakes sent by the specified user by their address, public
   "data": {
     "stakes": [
       {
-        "address": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+        "address": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
         "amount": "10815000000000",
-        "name": "liskhq"
+        "name": "klayrhq"
       }
     ]
   },
   "meta": {
     "staker": {
-      "address": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+      "address": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
       "publicKey": "b1d6bc6c7edd0673f5fed0681b73de6eb70539c21278b300f07ade277e1962cd",
       "name": "genesis_84"
     },
@@ -1724,7 +1724,7 @@ Retrieves the list of stakes sent by the specified user by their address, public
 #### Examples
 
 ```
-https://service.lisk.com/api/v3/pos/stakes?address=lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99
+https://service.klayr.com/api/v3/pos/stakes?address=klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99
 ```
 
 ### Available unlocks
@@ -1742,7 +1742,7 @@ _Supports pagination._
 
 | Parameter | Type | Validation | Default | Comment |
 | --------- | ---- | ---------- | ------- | ------- |
-| address   | String | `/^lsk[a-hjkm-z2-9]{38}$/` | *(empty)* | One of address, publicKey or name required. |
+| address   | String | `/^kly[a-hjkm-z2-9]{38}$/` | *(empty)* | One of address, publicKey or name required. |
 | publicKey | String | `/^\b(?:[A-Fa-f0-9]){64}\b$/` | *(empty)* |  |
 | name | String | `/^[a-z0-9!@$&_.]{1,20}$/` | *(empty)* |  |
 | isLocked | Boolean | `[true, false]` | *(empty)* |  |
@@ -1757,12 +1757,12 @@ _Supports pagination._
 {
   "data": [
     {
-      "address": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+      "address": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
       "publicKey": "b1d6bc6c7edd0673f5fed0681b73de6eb70539c21278b300f07ade277e1962cd",
       "name": "genesis_84",
       "pendingUnlocks": [
         {
-          "validatorAddress": "lsk24cd35u4jdq8szo3pnsqe5dsxwrnazyqqqg5eu",
+          "validatorAddress": "kly24cd35u4jdq8szo3pnsqe5dsxwrnazyqqqg5eu",
           "amount": "1000000000",
           "tokenID": "0000000000000000",
           "unstakeHeight": 10000,
@@ -1792,7 +1792,7 @@ _Supports pagination._
 #### Examples
 
 ```
-https://service.lisk.com/api/v3/pos/unlocks?address=lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99
+https://service.klayr.com/api/v3/pos/unlocks?address=klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99
 ```
 
 ### Validators
@@ -1810,7 +1810,7 @@ _Supports pagination._
 
 | Parameter | Type | Validation | Default | Comment |
 | --------- | ---- | ---------- | ------- | ------- |
-| address   | String | `/^lsk[a-hjkm-z2-9]{38}$/` | *(empty)* | One of address, publicKey or name required. |
+| address   | String | `/^kly[a-hjkm-z2-9]{38}$/` | *(empty)* | One of address, publicKey or name required. |
 | publicKey | String | `/^\b(?:[A-Fa-f0-9]){64}\b$/` | *(empty)* |  |
 | name | String | `/^[a-z0-9!@$&_.]{1,20}$/` | *(empty)* |  |
 | status | String | `/^\b(?:active\|standby\|banned\|punished\|ineligible\|,){0,9}\b$/` | *(empty)* | Can be expressed as a CSV. |
@@ -1831,7 +1831,7 @@ _Supports pagination._
       "totalStake": "109000000000",
       "selfStake": "109000000000",
       "validatorWeight": "109000000000",
-      "address": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+      "address": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
       "publicKey": "b1d6bc6c7edd0673f5fed0681b73de6eb70539c21278b300f07ade277e1962cd",
       "lastGeneratedHeight": 0,
       "status": "active",
@@ -1880,7 +1880,7 @@ _Supports pagination._
 #### Examples
 
 ```
-https://service.lisk.com/api/v3/pos/validators?address=lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99
+https://service.klayr.com/api/v3/pos/validators?address=klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99
 ```
 
 ## (Dynamic) Reward
@@ -1922,7 +1922,7 @@ No parameters are required.
 #### Examples
 
 ```
-https://service.lisk.com/api/v3/reward/constants
+https://service.klayr.com/api/v3/reward/constants
 ```
 
 ### Default Reward
@@ -1965,7 +1965,7 @@ Retrieves expected block reward at a specified height, as per the network config
 #### Examples
 
 ```
-https://service.lisk.com/api/v3/reward/default?height=55000
+https://service.klayr.com/api/v3/reward/default?height=55000
 ```
 
 ### Annual Inflation
@@ -2008,7 +2008,7 @@ Retrieves the annual inflation at a specified height for the Reward token.
 #### Examples
 
 ```
-https://service.lisk.com/api/v3/reward/annual-inflation?height=500
+https://service.klayr.com/api/v3/reward/annual-inflation?height=500
 ```
 
 ## Legacy
@@ -2039,7 +2039,7 @@ Retrieves legacy account details for the specified user publicKey.
     "balance": "10000000"
   },
   "meta": {
-    "address": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+    "address": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
     "publicKey": "b1d6bc6c7edd0673f5fed0681b73de6eb70539c21278b300f07ade277e1962cd"
   }
 }
@@ -2058,7 +2058,7 @@ Retrieves legacy account details for the specified user publicKey.
 Get legacy account details by publicKey
 
 ```
-https://service.lisk.com/api/v3/legacy?publicKey=b1d6bc6c7edd0673f5fed0681b73de6eb70539c21278b300f07ade277e1962cd
+https://service.klayr.com/api/v3/legacy?publicKey=b1d6bc6c7edd0673f5fed0681b73de6eb70539c21278b300f07ade277e1962cd
 ```
 
 ## Network
@@ -2128,7 +2128,7 @@ _Supports pagination._
 Get peer with IP
 
 ```
-https://service.lisk.com/api/v3/network/peers?ip=210.239.23.62
+https://service.klayr.com/api/v3/network/peers?ip=210.239.23.62
 ```
 
 ### Network status
@@ -2189,7 +2189,7 @@ No parameters are required.
       "interoperability:registerSidechain",
       "interoperability:recoverState",
       "interoperability:terminateSidechainForLiveness",
-      "legacy:reclaimLSK",
+      "legacy:reclaimKLY",
       "legacy:registerKeys",
       "pos:registerValidator",
       "pos:reportMisbehavior",
@@ -2235,7 +2235,7 @@ No parameters are required.
 #### Examples
 
 ```
-https://service.lisk.com/api/v3/network/status`
+https://service.klayr.com/api/v3/network/status`
 ```
 
 ### Network statistics
@@ -2286,7 +2286,7 @@ No parameters are required.
 #### Examples
 
 ```
-https://service.lisk.com/api/v3/network/statistics`
+https://service.klayr.com/api/v3/network/statistics`
 ```
 
 ## Schemas
@@ -2366,7 +2366,7 @@ No parameters are required.
                     "generatorAddress": {
                         "dataType": "bytes",
                         "fieldNumber": 5,
-                        "format": "lisk32"
+                        "format": "klayr32"
                     },
                     "transactionRoot": {
                         "dataType": "bytes",
@@ -2469,7 +2469,7 @@ No parameters are required.
         },
         "transaction": {
             "schema": {
-                "$id": "/lisk/transaction",
+                "$id": "/klayr/transaction",
                 "type": "object",
                 "required": [
                     "module",
@@ -2766,12 +2766,12 @@ No parameters are required.
                     "properties": {
                         "senderAddress": {
                             "dataType": "bytes",
-                            "format": "lisk32",
+                            "format": "klayr32",
                             "fieldNumber": 1
                         },
                         "generatorAddress": {
                             "dataType": "bytes",
-                            "format": "lisk32",
+                            "format": "klayr32",
                             "fieldNumber": 2
                         },
                         "burntAmount": {
@@ -2806,7 +2806,7 @@ No parameters are required.
                         },
                         "relayerAddress": {
                             "dataType": "bytes",
-                            "format": "lisk32",
+                            "format": "klayr32",
                             "fieldNumber": 2
                         },
                         "burntAmount": {
@@ -2824,7 +2824,7 @@ No parameters are required.
                 "module": "fee",
                 "name": "insufficientFee",
                 "schema": {
-                    "$id": "/lisk/empty",
+                    "$id": "/klayr/empty",
                     "type": "object",
                     "properties": {}
                 }
@@ -3111,7 +3111,7 @@ No parameters are required.
                 "module": "interoperability",
                 "name": "invalidRegistrationSignature",
                 "schema": {
-                    "$id": "/lisk/empty",
+                    "$id": "/klayr/empty",
                     "type": "object",
                     "properties": {}
                 }
@@ -3180,7 +3180,7 @@ No parameters are required.
                 "module": "interoperability",
                 "name": "invalidCertificateSignature",
                 "schema": {
-                    "$id": "/lisk/empty",
+                    "$id": "/klayr/empty",
                     "type": "object",
                     "properties": {}
                 }
@@ -3189,7 +3189,7 @@ No parameters are required.
                 "module": "legacy",
                 "name": "accountReclaimed",
                 "schema": {
-                    "$id": "lisk/legacy/accountReclaimedEventData",
+                    "$id": "klayr/legacy/accountReclaimedEventData",
                     "type": "object",
                     "required": [
                         "legacyAddress",
@@ -3218,7 +3218,7 @@ No parameters are required.
                 "module": "legacy",
                 "name": "keysRegistered",
                 "schema": {
-                    "$id": "lisk/legacy/keysRegisteredEventData",
+                    "$id": "klayr/legacy/keysRegisteredEventData",
                     "type": "object",
                     "required": [
                         "address",
@@ -3258,7 +3258,7 @@ No parameters are required.
                         "address": {
                             "dataType": "bytes",
                             "fieldNumber": 1,
-                            "format": "lisk32"
+                            "format": "klayr32"
                         },
                         "height": {
                             "dataType": "uint32",
@@ -3281,7 +3281,7 @@ No parameters are required.
                         "address": {
                             "dataType": "bytes",
                             "fieldNumber": 1,
-                            "format": "lisk32"
+                            "format": "klayr32"
                         },
                         "height": {
                             "dataType": "uint32",
@@ -3304,7 +3304,7 @@ No parameters are required.
                         "address": {
                             "dataType": "bytes",
                             "fieldNumber": 1,
-                            "format": "lisk32"
+                            "format": "klayr32"
                         },
                         "name": {
                             "dataType": "string",
@@ -3329,12 +3329,12 @@ No parameters are required.
                         "senderAddress": {
                             "dataType": "bytes",
                             "fieldNumber": 1,
-                            "format": "lisk32"
+                            "format": "klayr32"
                         },
                         "validatorAddress": {
                             "dataType": "bytes",
                             "fieldNumber": 2,
-                            "format": "lisk32"
+                            "format": "klayr32"
                         },
                         "amount": {
                             "dataType": "sint64",
@@ -3361,7 +3361,7 @@ No parameters are required.
                     "properties": {
                         "validatorAddress": {
                             "dataType": "bytes",
-                            "format": "lisk32",
+                            "format": "klayr32",
                             "fieldNumber": 1
                         },
                         "oldCommission": {
@@ -3390,12 +3390,12 @@ No parameters are required.
                     "properties": {
                         "stakerAddress": {
                             "dataType": "bytes",
-                            "format": "lisk32",
+                            "format": "klayr32",
                             "fieldNumber": 1
                         },
                         "validatorAddress": {
                             "dataType": "bytes",
-                            "format": "lisk32",
+                            "format": "klayr32",
                             "fieldNumber": 2
                         },
                         "tokenID": {
@@ -3427,12 +3427,12 @@ No parameters are required.
                     "properties": {
                         "senderAddress": {
                             "dataType": "bytes",
-                            "format": "lisk32",
+                            "format": "klayr32",
                             "fieldNumber": 1
                         },
                         "recipientAddress": {
                             "dataType": "bytes",
-                            "format": "lisk32",
+                            "format": "klayr32",
                             "fieldNumber": 2
                         },
                         "tokenID": {
@@ -3469,12 +3469,12 @@ No parameters are required.
                     "properties": {
                         "senderAddress": {
                             "dataType": "bytes",
-                            "format": "lisk32",
+                            "format": "klayr32",
                             "fieldNumber": 1
                         },
                         "recipientAddress": {
                             "dataType": "bytes",
-                            "format": "lisk32",
+                            "format": "klayr32",
                             "fieldNumber": 2
                         },
                         "tokenID": {
@@ -3517,12 +3517,12 @@ No parameters are required.
                     "properties": {
                         "senderAddress": {
                             "dataType": "bytes",
-                            "format": "lisk32",
+                            "format": "klayr32",
                             "fieldNumber": 1
                         },
                         "recipientAddress": {
                             "dataType": "bytes",
-                            "format": "lisk32",
+                            "format": "klayr32",
                             "fieldNumber": 2
                         },
                         "tokenID": {
@@ -3563,7 +3563,7 @@ No parameters are required.
                     "properties": {
                         "address": {
                             "dataType": "bytes",
-                            "format": "lisk32",
+                            "format": "klayr32",
                             "fieldNumber": 1
                         },
                         "tokenID": {
@@ -3598,7 +3598,7 @@ No parameters are required.
                     "properties": {
                         "address": {
                             "dataType": "bytes",
-                            "format": "lisk32",
+                            "format": "klayr32",
                             "fieldNumber": 1
                         },
                         "tokenID": {
@@ -3634,7 +3634,7 @@ No parameters are required.
                     "properties": {
                         "address": {
                             "dataType": "bytes",
-                            "format": "lisk32",
+                            "format": "klayr32",
                             "fieldNumber": 1
                         },
                         "module": {
@@ -3676,7 +3676,7 @@ No parameters are required.
                     "properties": {
                         "address": {
                             "dataType": "bytes",
-                            "format": "lisk32",
+                            "format": "klayr32",
                             "fieldNumber": 1
                         },
                         "module": {
@@ -3741,7 +3741,7 @@ No parameters are required.
                     "properties": {
                         "address": {
                             "dataType": "bytes",
-                            "format": "lisk32",
+                            "format": "klayr32",
                             "fieldNumber": 1
                         },
                         "tokenID": {
@@ -3860,7 +3860,7 @@ No parameters are required.
                         },
                         "relayerAddress": {
                             "dataType": "bytes",
-                            "format": "lisk32",
+                            "format": "klayr32",
                             "fieldNumber": 3
                         },
                         "result": {
@@ -3905,7 +3905,7 @@ No parameters are required.
                 "module": "token",
                 "name": "allTokensSupported",
                 "schema": {
-                    "$id": "/lisk/empty",
+                    "$id": "/klayr/empty",
                     "type": "object",
                     "properties": {}
                 }
@@ -3914,7 +3914,7 @@ No parameters are required.
                 "module": "token",
                 "name": "allTokensSupportRemoved",
                 "schema": {
-                    "$id": "/lisk/empty",
+                    "$id": "/klayr/empty",
                     "type": "object",
                     "properties": {}
                 }
@@ -4506,7 +4506,7 @@ No parameters are required.
                                 "properties": {
                                     "address": {
                                         "dataType": "bytes",
-                                        "format": "lisk32",
+                                        "format": "klayr32",
                                         "fieldNumber": 1
                                     },
                                     "name": {
@@ -4601,7 +4601,7 @@ No parameters are required.
                                 "properties": {
                                     "address": {
                                         "dataType": "bytes",
-                                        "format": "lisk32",
+                                        "format": "klayr32",
                                         "fieldNumber": 1
                                     },
                                     "stakes": {
@@ -4617,7 +4617,7 @@ No parameters are required.
                                             "properties": {
                                                 "validatorAddress": {
                                                     "dataType": "bytes",
-                                                    "format": "lisk32",
+                                                    "format": "klayr32",
                                                     "fieldNumber": 1
                                                 },
                                                 "amount": {
@@ -4665,7 +4665,7 @@ No parameters are required.
                                                 "validatorAddress": {
                                                     "dataType": "bytes",
                                                     "fieldNumber": 1,
-                                                    "format": "lisk32"
+                                                    "format": "klayr32"
                                                 },
                                                 "amount": {
                                                     "dataType": "uint64",
@@ -4698,7 +4698,7 @@ No parameters are required.
                                     "fieldNumber": 2,
                                     "items": {
                                         "dataType": "bytes",
-                                        "format": "lisk32"
+                                        "format": "klayr32"
                                     }
                                 }
                             }
@@ -4752,7 +4752,7 @@ No parameters are required.
                                 "properties": {
                                     "address": {
                                         "dataType": "bytes",
-                                        "format": "lisk32",
+                                        "format": "klayr32",
                                         "fieldNumber": 1
                                     },
                                     "tokenID": {
@@ -5266,9 +5266,9 @@ No parameters are required.
                 }
             },
             {
-                "moduleCommand": "legacy:reclaimLSK",
+                "moduleCommand": "legacy:reclaimKLY",
                 "schema": {
-                    "$id": "/legacy/command/reclaimLSKParams",
+                    "$id": "/legacy/command/reclaimKLYParams",
                     "type": "object",
                     "required": [
                         "amount"
@@ -5374,7 +5374,7 @@ No parameters are required.
             {
                 "moduleCommand": "pos:unlock",
                 "schema": {
-                    "$id": "/lisk/empty",
+                    "$id": "/klayr/empty",
                     "type": "object",
                     "properties": {}
                 }
@@ -5421,7 +5421,7 @@ No parameters are required.
                                     "validatorAddress": {
                                         "dataType": "bytes",
                                         "fieldNumber": 1,
-                                        "format": "lisk32"
+                                        "format": "klayr32"
                                     },
                                     "amount": {
                                         "dataType": "sint64",
@@ -5453,7 +5453,7 @@ No parameters are required.
             {
                 "moduleCommand": "pos:claimRewards",
                 "schema": {
-                    "$id": "/lisk/empty",
+                    "$id": "/klayr/empty",
                     "type": "object",
                     "properties": {}
                 }
@@ -5461,7 +5461,7 @@ No parameters are required.
             {
                 "moduleCommand": "token:transfer",
                 "schema": {
-                    "$id": "/lisk/transferParams",
+                    "$id": "/klayr/transferParams",
                     "title": "Transfer transaction params",
                     "type": "object",
                     "required": [
@@ -5484,7 +5484,7 @@ No parameters are required.
                         "recipientAddress": {
                             "dataType": "bytes",
                             "fieldNumber": 3,
-                            "format": "lisk32"
+                            "format": "klayr32"
                         },
                         "data": {
                             "dataType": "string",
@@ -5498,7 +5498,7 @@ No parameters are required.
             {
                 "moduleCommand": "token:transferCrossChain",
                 "schema": {
-                    "$id": "/lisk/ccTransferParams",
+                    "$id": "/klayr/ccTransferParams",
                     "type": "object",
                     "required": [
                         "tokenID",
@@ -5529,7 +5529,7 @@ No parameters are required.
                         "recipientAddress": {
                             "dataType": "bytes",
                             "fieldNumber": 4,
-                            "format": "lisk32"
+                            "format": "klayr32"
                         },
                         "data": {
                             "dataType": "string",
@@ -5619,7 +5619,7 @@ No parameters are required.
 
 Get schemas
 ```
-https://service.lisk.com/api/v3/schemas
+https://service.klayr.com/api/v3/schemas
 ```
 
 ## Interoperability
@@ -5654,13 +5654,13 @@ _Supports pagination._
 {
   "data": [
     {
-      "name": "Lisk",
+      "name": "Klayr",
       "chainID": "00000000",
       "status": "activated",
-      "address": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+      "address": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
       "lastCertificateHeight": 160,
       "lastUpdated": 1616008148,
-      "escrowedLSK": "50000000000",
+      "escrowedKLY": "50000000000",
       "escrow": [
         {
           "tokenID": "0000000000000000",
@@ -5688,7 +5688,7 @@ _Supports pagination._
 #### Examples
 
 ```
-https://service.lisk.com/api/v3/blockchain/apps
+https://service.klayr.com/api/v3/blockchain/apps
 ```
 
 ### Interoperable network statistics
@@ -5716,8 +5716,8 @@ No parameters are required.
     "registered": 2503,
     "activated": 2328,
     "terminated": 35,
-    "totalSupplyLSK": "5000000",
-    "totalStakedLSK": "3000000",
+    "totalSupplyKLY": "5000000",
+    "totalStakedKLY": "3000000",
     "currentAnnualInflationRate": "4.50"
   },
   "meta": {}
@@ -5735,7 +5735,7 @@ No parameters are required.
 #### Examples
 
 ```
-https://service.lisk.com/api/v3/blockchain/apps/statistics
+https://service.klayr.com/api/v3/blockchain/apps/statistics
 ```
 
 ## Index Status
@@ -5786,7 +5786,7 @@ No parameters are required.
 
 Get current index status
 ```
-https://service.lisk.com/api/v3/index/status
+https://service.klayr.com/api/v3/index/status
 ```
 
 
@@ -5889,7 +5889,7 @@ Proxy request to directly invoke application endpoint. Returns endpoint response
 Get legacy account details by publicKey
 
 ```
-https://service.lisk.com/api/v3/legacy?publicKey=b1d6bc6c7edd0673f5fed0681b73de6eb70539c21278b300f07ade277e1962cd
+https://service.klayr.com/api/v3/legacy?publicKey=b1d6bc6c7edd0673f5fed0681b73de6eb70539c21278b300f07ade277e1962cd
 ```
 
 # Off-chain Features
@@ -5926,7 +5926,7 @@ _Supports pagination._
 {
   "data": [
     {
-      "chainName": "Lisk",
+      "chainName": "Klayr",
       "chainID": "00000000",
       "networkType": "mainnet"
     }
@@ -5950,7 +5950,7 @@ _Supports pagination._
 #### Examples
 
 ```
-https://service.lisk.com/api/v3/blockchain/apps/meta/list
+https://service.klayr.com/api/v3/blockchain/apps/meta/list
 ```
 
 ### Application metadata details
@@ -5986,38 +5986,38 @@ _Supports pagination._
 {
   "data": [
     {
-      "chainName": "lisk_mainchain",
-      "displayName": "Lisk",
+      "chainName": "klayr_mainchain",
+      "displayName": "Klayr",
       "chainID": "00000000",
-      "title": "Lisk blockchain application",
+      "title": "Klayr blockchain application",
       "status": "activated",
-      "description": "Lisk is a blockchain application platform.",
+      "description": "Klayr is a blockchain application platform.",
       "networkType": "mainnet",
       "isDefault": true,
-      "genesisURL": "https://downloads.lisk.com/lisk/mainnet/genesis_block.json.tar.gz",
-      "projectPage": "https://lisk.com",
+      "genesisURL": "https://downloads.klayr.com/klayr/mainnet/genesis_block.json.tar.gz",
+      "projectPage": "https://klayr.com",
       "serviceURLs": [
         {
-          "http": "https://service.lisk.com",
-          "ws": "wss://service.lisk.com",
+          "http": "https://service.klayr.com",
+          "ws": "wss://service.klayr.com",
           "apiCertificatePublicKey": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtz6qaTSCNwtGrdPJTori\n/CQCG5/ozu6IRIwAwNeB4YpYcUti3a16braLtC+9ElZ5S+S1hPS+nix3hlzuXm2z\ndpsgfHBuw16NO/9Hk1IbNMJOQD3KDY7GTeBebyBSVC9T5JEAQyTBm6elhIGvGlxZ\naQLV2vvZ2nR8T3UhECGOjtBurrCem5bLtJvg+XZXiTn27xQ1nEwUtm0rH1CJgSt7\nhVjQcAerNLaP58f1O521vgHr79UrJWLxqhjdNIccDZ4kWRCBdvnDBaKz2yI6sYhU\nD8OuPxvwXkrT7DX8GvODMOgf6NYqJIb8TD3wjoR/wWJHUG2Bc9v6eQScAFmCc/FL\n+wIDAQAB\n-----END PUBLIC KEY-----"
         }
       ],
       "logo": {
-        "png": "https://downloads.lisk.com/lisk/images/logo.png",
-        "svg": "https://downloads.lisk.com/lisk/images/logo.svg"
+        "png": "https://downloads.klayr.com/klayr/images/logo.png",
+        "svg": "https://downloads.klayr.com/klayr/images/logo.svg"
       },
-      "appPage": "https://lisk.com",
+      "appPage": "https://klayr.com",
       "backgroundColor": "#0981D1",
       "explorers": [
         {
-          "url": "https://lisk.observer",
-          "txnPage": "https://lisk.observer/transactions"
+          "url": "https://klayr.observer",
+          "txnPage": "https://klayr.observer/transactions"
         }
       ],
       "appNodes": [
         {
-          "url": "https://mainnet.lisk.com",
+          "url": "https://mainnet.klayr.com",
           "maintainer": "Lightcurve GmbH",
           "apiCertificatePublicKey": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtz6qaTSCNwtGrdPJTori\n/CQCG5/ozu6IRIwAwNeB4YpYcUti3a16braLtC+9ElZ5S+S1hPS+nix3hlzuXm2z\ndpsgfHBuw16NO/9Hk1IbNMJOQD3KDY7GTeBebyBSVC9T5JEAQyTBm6elhIGvGlxZ\naQLV2vvZ2nR8T3UhECGOjtBurrCem5bLtJvg+XZXiTn27xQ1nEwUtm0rH1CJgSt7\nhVjQcAerNLaP58f1O521vgHr79UrJWLxqhjdNIccDZ4kWRCBdvnDBaKz2yI6sYhU\nD8OuPxvwXkrT7DX8GvODMOgf6NYqJIb8TD3wjoR/wWJHUG2Bc9v6eQScAFmCc/FL\n+wIDAQAB\n-----END PUBLIC KEY-----"
         }
@@ -6043,7 +6043,7 @@ _Supports pagination._
 #### Examples
 
 ```
-https://service.lisk.com/api/v3/blockchain/apps/meta
+https://service.klayr.com/api/v3/blockchain/apps/meta
 ```
 
 ### Application native token metadata details
@@ -6079,26 +6079,26 @@ _Supports pagination._
   "data": [
     {
       "chainID": "00000000",
-      "chainName": "Lisk",
-      "tokenID": "Lisk",
+      "chainName": "Klayr",
+      "tokenID": "Klayr",
       "tokenName": "00000000",
       "networkType": "mainnet",
-      "description": "LSK is the utility token of Lisk",
+      "description": "KLY is the utility token of Klayr",
       "denomUnits": [
         {
-          "denom": "lsk",
+          "denom": "kly",
           "decimals": 8,
           "aliases": [
-            "LISK"
+            "KLAYR"
           ]
         }
       ],
-      "symbol": "LSK",
-      "displayDenom": "LSK",
+      "symbol": "KLY",
+      "displayDenom": "KLY",
       "baseDenom": "beddows",
       "logo": {
-        "png": "https://downloads.lisk.com/lisk/images/logo.png",
-        "svg": "https://downloads.lisk.com/lisk/images/logo.svg"
+        "png": "https://downloads.klayr.com/klayr/images/logo.png",
+        "svg": "https://downloads.klayr.com/klayr/images/logo.svg"
       }
     }
   ],
@@ -6121,7 +6121,7 @@ _Supports pagination._
 #### Examples
 
 ```
-https://service.lisk.com/api/v3/blockchain/apps/meta/tokens
+https://service.klayr.com/api/v3/blockchain/apps/meta/tokens
 ```
 
 ### Application-supported token metadata details
@@ -6153,17 +6153,17 @@ _Supports pagination._
   "data": [
     {
       "chainID": "00000000",
-      "chainName": "Lisk",
+      "chainName": "Klayr",
       "tokenID": "0000000000000000",
-      "tokenName": "Lisk",
+      "tokenName": "Klayr",
       "networkType": "mainnet",
-      "description": "Default token for the entire Lisk ecosystem",
+      "description": "Default token for the entire Klayr ecosystem",
       "logo": {
-        "png": "https://downloads.lisk.com/lisk/images/logo.png",
-        "svg": "https://downloads.lisk.com/lisk/images/logo.svg"
+        "png": "https://downloads.klayr.com/klayr/images/logo.png",
+        "svg": "https://downloads.klayr.com/klayr/images/logo.svg"
       },
-      "symbol": "LSK",
-      "displayDenom": "lsk",
+      "symbol": "KLY",
+      "displayDenom": "kly",
       "baseDenom": "beddows",
       "denomUnits": [
         {
@@ -6174,10 +6174,10 @@ _Supports pagination._
           ]
         },
         {
-          "denom": "lsk",
+          "denom": "kly",
           "decimals": 8,
           "aliases": [
-            "Lisk"
+            "Klayr"
           ]
         }
       ]
@@ -6202,7 +6202,7 @@ _Supports pagination._
 #### Examples
 
 ```
-https://service.lisk.com/api/v3/blockchain/apps/meta/tokens/supported?chainID=00000000
+https://service.klayr.com/api/v3/blockchain/apps/meta/tokens/supported?chainID=00000000
 ```
 
 ## Market Prices
@@ -6273,7 +6273,7 @@ Returns transaction history export scheduling information
 
 | Parameter | Type             | Validation                                                 | Default        | Comment                                |
 | --------- | ---------------- | ---------------------------------------------------------- | -------------- | -------------------------------------- |
-| address   | String           | `/^lsk[a-hjkm-z2-9]{38}$/`                                 | *(empty)*      |  One of address or publicKey required. |
+| address   | String           | `/^kly[a-hjkm-z2-9]{38}$/`                                 | *(empty)*      |  One of address or publicKey required. |
 | publicKey | String           | `/^\b(?:[A-Fa-f0-9]){64}\b$/`                                 | *(empty)*      |
 | interval  | String           | `/^\b(?:(?:\d{4})-(?:(?:1[012])|(?:0?[1-9]))-(?:(?:[012][1-9])|(?:[123]0)|31))(?::(?:(?:\d{4})-(?:(?:1[012])|(?:0?[1-9]))-(?:(?:[012][1-9])|(?:[123]0)|31)))?\b$/`                                                           | *(empty)*      |
 
@@ -6284,7 +6284,7 @@ Schedule transaction export
 ```jsonc
 {
   "data": {
-    "address": "lskkje69szpgmfaefmbf7zvw7ghc6mamdvf9z3cpw",
+    "address": "klykje69szpgmfaefmbf7zvw7ghc6mamdvf9z3cpw",
     "interval": "2023-08-30:2023-08-30",
   },
   "meta": {
@@ -6299,10 +6299,10 @@ The file is ready to export
 ```jsonc
 {
   "data": {
-    "address": "lskkje69szpgmfaefmbf7zvw7ghc6mamdvf9z3cpw",
+    "address": "klykje69szpgmfaefmbf7zvw7ghc6mamdvf9z3cpw",
     "interval": "2023-08-30:2023-08-30",
-    "fileName": "transactions_lskkje69szpgmfaefmbf7zvw7ghc6mamdvf9z3cpw_2023-08-30_2023-08-30.xlsx",
-    "fileUrl": "/api/v3/exports/transactions_00000000_lskkje69szpgmfaefmbf7zvw7ghc6mamdvf9z3cpw_2023-08-30_2023-08-30.xlsx"
+    "fileName": "transactions_klykje69szpgmfaefmbf7zvw7ghc6mamdvf9z3cpw_2023-08-30_2023-08-30.xlsx",
+    "fileUrl": "/api/v3/exports/transactions_00000000_klykje69szpgmfaefmbf7zvw7ghc6mamdvf9z3cpw_2023-08-30_2023-08-30.xlsx"
   },
   "meta": {
     "ready": true
@@ -6323,7 +6323,7 @@ _Invalid parameter_
 #### Examples
 
 ```
-https://service.lisk.com/api/v3/export/transactions?address=lskkje69szpgmfaefmbf7zvw7ghc6mamdvf9z3cpw
+https://service.klayr.com/api/v3/export/transactions?address=klykje69szpgmfaefmbf7zvw7ghc6mamdvf9z3cpw
 ```
 
 ### File retrieval
@@ -6338,7 +6338,7 @@ Returns transaction history
 
 | Parameter | Type             | Validation                                                 | Default        | Comment                                |
 | --------- | ---------------- | ---------------------------------------------------------- | -------------- | -------------------------------------- |
-| filename   | String          | `/^\btransactions_([a-fA-F0-9]{8})_(lsk[a-hjkm-z2-9]{38})_((\d{4})-((1[012])\|(0?[1-9]))-(([012][1-9])\|([123]0)\|31))_((\d{4})-((1[012])\|(0?[1-9]))-(([012][1-9])\|([123]0)\|31))\.xlsx\b$/` | *(empty)*      |                                        |
+| filename   | String          | `/^\btransactions_([a-fA-F0-9]{8})_(kly[a-hjkm-z2-9]{38})_((\d{4})-((1[012])\|(0?[1-9]))-(([012][1-9])\|([123]0)\|31))_((\d{4})-((1[012])\|(0?[1-9]))-(([012][1-9])\|([123]0)\|31))\.xlsx\b$/` | *(empty)*      |                                        |
 
 #### Response example
 Schedule transaction export
@@ -6362,5 +6362,5 @@ _Invalid parameter_
 #### Examples
 
 ```
-https://service.lisk.com/api/v3/export/download?filename=transactions_00000000_lskkje69szpgmfaefmbf7zvw7ghc6mamdvf9z3cpw_2023-08-30_2023-08-30.xlsx
+https://service.klayr.com/api/v3/export/download?filename=transactions_00000000_klykje69szpgmfaefmbf7zvw7ghc6mamdvf9z3cpw_2023-08-30_2023-08-30.xlsx
 ```

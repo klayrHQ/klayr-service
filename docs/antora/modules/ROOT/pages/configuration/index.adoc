@@ -1,4 +1,4 @@
-= Lisk Service Configuration Reference
+= Klayr Service Configuration Reference
 Muhammad Talha <muhammad.talha@lightcurve.io>
 // Settings
 :toc: preamble
@@ -15,26 +15,26 @@ Muhammad Talha <muhammad.talha@lightcurve.io>
 :url_pm2: https://pm2.keymetrics.io/
 
 //TODO: Update the URL to point to the `main` branch once we make the release in production.
-:url_config_file: https://github.com/LiskHQ/lisk-service/blob/release/0.7.0/ecosystem.config.js
-:url_lisk_service_repo: https://github.com/LiskHQ/lisk-service
+:url_config_file: https://github.com/KlayrHQ/klayr-service/blob/release/0.7.0/ecosystem.config.js
+:url_klayr_service_repo: https://github.com/KlayrHQ/klayr-service
 :url_faq: https://moleculer.services/docs/0.14/faq.html#Why-am-I-getting-502-Bad-Gateway-when-api-gateway-is-behind-ALB-on-AWS
 
-On the xref:{url_intro_services}[Introduction to Lisk Service] page, we have discussed the various xref:{url_microservices}[microservices] that combine to form Lisk Service.
+On the xref:{url_intro_services}[Introduction to Klayr Service] page, we have discussed the various xref:{url_microservices}[microservices] that combine to form Klayr Service.
 On this page, we will thoroughly discuss the configuration options available for each service.
 
 == Default configurations
-By default, a Lisk Service installation will have an `ecosystem.config.js` file with all the default configurations that could be used to run and manage the various microservices with {url_pm2}[pm2^].
+By default, a Klayr Service installation will have an `ecosystem.config.js` file with all the default configurations that could be used to run and manage the various microservices with {url_pm2}[pm2^].
 
-NOTE: The actual {url_config_file}[`*ecosystem.config.js*`^] file for Lisk Service can be found in the {url_lisk_service_repo}[lisk-service^] GitHub repository.
+NOTE: The actual {url_config_file}[`*ecosystem.config.js*`^] file for Klayr Service can be found in the {url_klayr_service_repo}[klayr-service^] GitHub repository.
 
 The values of various environment variables are automatically picked by the microservices based on the installation environment.
 Aside from that, many environment variables can be configured to meet the specific requirements, the details of which have been outlined with each microservice.
 
 == Microservice configurations
-In this section, we discuss the common and specific configurations of all the microservices of Lisk Service.
+In this section, we discuss the common and specific configurations of all the microservices of Klayr Service.
 
 === Common configurations
-The common configurations described in this section apply to all the microservices within Lisk Service.
+The common configurations described in this section apply to all the microservices within Klayr Service.
 
 [cols="2,1,~,~m",options="header",stripes="hover"]
 |===
@@ -49,7 +49,7 @@ The common configurations described in this section apply to all the microservic
 *Must be identical for all the microservices.*
 Make sure that all microservices can connect with the message broker.
 This could be a NATS or a Redis instance.
-|redis://lisk:password@127.0.0.1:6379/0
+|redis://klayr:password@127.0.0.1:6379/0
 
 | `SERVICE_BROKER_TIMEOUT`
 | number
@@ -99,11 +99,11 @@ module.exports = {
   apps: [
     // Configuration for other microservices.
     {
-      name: 'lisk-service-gateway',
+      name: 'klayr-service-gateway',
       // [...]
       env: {
         // --- Remember to set the properties below
-        SERVICE_BROKER: 'redis://lisk:password@127.0.0.1:6379/0',
+        SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
         SERVICE_LOG_LEVEL: 'info',
         // SERVICE_BROKER_TIMEOUT: 10,
         // SERVICE_LOG_CONSOLE: 'false',
@@ -114,11 +114,11 @@ module.exports = {
       },
     },
     {
-      name: 'lisk-service-transaction-statistics',
+      name: 'klayr-service-transaction-statistics',
       // [...]
       env: {
         // --- Remember to set the properties below
-        SERVICE_BROKER: 'redis://lisk:password@127.0.0.1:6379/0',
+        SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
         SERVICE_LOG_LEVEL: 'info',
         // SERVICE_BROKER_TIMEOUT: 10,
         // SERVICE_LOG_CONSOLE: 'false',
@@ -145,7 +145,7 @@ module.exports = {
 
 | `PORT`
 | number
-| Port that provides the possibility to connect with Lisk Service.
+| Port that provides the possibility to connect with Klayr Service.
 | 9901
 
 | `HOST`
@@ -156,7 +156,7 @@ module.exports = {
 | `SERVICE_BROKER`
 | string
 | URL of the microservice message broker (NATS or Redis).
-| redis://lisk:password@127.0.0.1:6379/0
+| redis://klayr:password@127.0.0.1:6379/0
 
 | `JSON_RPC_STRICT_MODE`
 | boolean
@@ -181,7 +181,7 @@ Must be listed as comma-separated values.
 | URL of the volatile cache storage (Redis).
 Used to cache RPC requests.
 Required when `ENABLE_REQUEST_CACHING` is enabled.
-| redis://lisk:password@127.0.0.1:6379/5
+| redis://klayr:password@127.0.0.1:6379/5
 
 | `GATEWAY_DEPENDENCIES`
 | string
@@ -192,7 +192,7 @@ The list can be expressed as a CSV.
 | `ENABLE_REVERSE_PROXY_TIMEOUT_SETTINGS`
 | boolean
 |Boolean flag to enforce the `headersTimeout` and `keepAliveTimeout` settings on the API server.
-Enabling this might be helpful when deploying Lisk Service behind a load balancer or a reverse proxy.
+Enabling this might be helpful when deploying Klayr Service behind a load balancer or a reverse proxy.
 Check this {url_faq}[FAQ^] for more information.
 | false
 
@@ -302,13 +302,13 @@ module.exports = {
   apps: [
   // Configuration for other microservices.
     {
-      name: "lisk-service-gateway",
+      name: "klayr-service-gateway",
       // [...]
       env: {
         PORT: 9901,
         // --- Remember to set the properties below
-        SERVICE_BROKER: 'redis://lisk:password@127.0.0.1:6379/0',
-        SERVICE_GATEWAY_REDIS_VOLATILE: 'redis://lisk:password@127.0.0.1:6379/5',
+        SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
+        SERVICE_GATEWAY_REDIS_VOLATILE: 'redis://klayr:password@127.0.0.1:6379/5',
         ENABLE_HTTP_API: 'http-status,http-version3,http-exports',
         ENABLE_WS_API: 'blockchain,rpc-v3',
         GATEWAY_DEPENDENCIES: 'indexer,connector',
@@ -359,46 +359,46 @@ module.exports = {
 | `SERVICE_BROKER`
 | string
 | URL of the microservice message broker (NATS or Redis).
-| redis://lisk:password@127.0.0.1:6379/0
+| redis://klayr:password@127.0.0.1:6379/0
 
-| `LISK_APP_WS`
+| `KLAYR_APP_WS`
 | string
-| URL to connect with the Lisk application node over WebSocket. 
+| URL to connect with the Klayr application node over WebSocket. 
 By default, it is set to `ws://127.0.0.1:7887`.
 | ws://127.0.0.1:7887
 
-| `LISK_APP_HTTP`
+| `KLAYR_APP_HTTP`
 | string
-| URL to connect with the Lisk application node over HTTP(s). 
+| URL to connect with the Klayr application node over HTTP(s). 
 By default, it is set to `http://127.0.0.1:7887`.
 | http://127.0.0.1:7887
 
-| `USE_LISK_HTTP_API`
+| `USE_KLAYR_HTTP_API`
 | boolean
-| Boolean flag to enable HTTP-API based connection to the Lisk application node.
+| Boolean flag to enable HTTP-API based connection to the Klayr application node.
 | true
 
-| `USE_LISK_IPC_CLIENT`
+| `USE_KLAYR_IPC_CLIENT`
 | boolean
-| Boolean flag to enable IPC-based connection to the Lisk application node.
-Requires `LISK_APP_DATA_PATH` to be set.
+| Boolean flag to enable IPC-based connection to the Klayr application node.
+Requires `KLAYR_APP_DATA_PATH` to be set.
 | true
 
-| `LISK_APP_DATA_PATH`
+| `KLAYR_APP_DATA_PATH`
 | string
-| Data path to connect with the Lisk application node over IPC.
-| ~/.lisk/lisk-core
+| Data path to connect with the Klayr application node over IPC.
+| ~/.klayr/klayr-core
 
 | `GEOIP_JSON`
 | string
 | URL of the GeoIP server.
-| https://geoip.lisk.com/json[GeoIP Server's URL^]
+| https://geoip.klayr.com/json[GeoIP Server's URL^]
 
 | `GENESIS_BLOCK_URL`
 | string
-| URL of the Lisk SDK-based application's genesis block.
+| URL of the Klayr SDK-based application's genesis block.
 Only to be used when the genesis block is large enough to be transmitted over API calls within the timeout.
-| https://downloads.lisk.com/lisk/mainnet/genesis_block.json.tar.gz[Genesis block URL^]
+| https://downloads.klayr.com/klayr/mainnet/genesis_block.json.tar.gz[Genesis block URL^]
 
 | `ENABLE_BLOCK_CACHING`
 | boolean
@@ -416,7 +416,7 @@ By default, it is set to `12` hours.
 | `CLIENT_POOL_SIZE`
 | number
 | Number of active API clients to be maintained in the pool.
-Only applicable when using the IPC or WS clients to connect with the Lisk node.
+Only applicable when using the IPC or WS clients to connect with the Klayr node.
 By default, it is set to `10`.
 | 10
 
@@ -488,17 +488,17 @@ module.exports = {
   apps: [
     // Configuration for other microservices.
     {
-      name: "lisk-service-blockchain-connector",
+      name: "klayr-service-blockchain-connector",
       // [...]
       env: {
         // --- Remember to set the properties below
-        SERVICE_BROKER: 'redis://lisk:password@127.0.0.1:6379/0',
-        LISK_APP_WS: 'ws://127.0.0.1:7887',
-        GEOIP_JSON: 'https://geoip.lisk.com/json',
+        SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
+        KLAYR_APP_WS: 'ws://127.0.0.1:7887',
+        GEOIP_JSON: 'https://geoip.klayr.com/json',
         // ENABLE_BLOCK_CACHING: true,
         // EXPIRY_IN_HOURS: 12,
-        // USE_LISK_IPC_CLIENT: true,
-        // LISK_APP_DATA_PATH: '~/.lisk/lisk-core',
+        // USE_KLAYR_IPC_CLIENT: true,
+        // KLAYR_APP_DATA_PATH: '~/.klayr/klayr-core',
         // ENABLE_TESTING_MODE: false,
         // SERVICE_BROKER_TIMEOUT: 10,
         // SERVICE_LOG_LEVEL: 'info',
@@ -507,7 +507,7 @@ module.exports = {
         // SERVICE_LOG_GELF: false,
         // SERVICE_LOG_FILE: false,
         // DOCKER_HOST: 'local',
-        // GENESIS_BLOCK_URL: 'https://downloads.lisk.com/lisk/mainnet/genesis_block.json.tar.gz',
+        // GENESIS_BLOCK_URL: 'https://downloads.klayr.com/klayr/mainnet/genesis_block.json.tar.gz',
         // JOB_INTERVAL_CACHE_CLEANUP: 0,
         // JOB_SCHEDULE_CACHE_CLEANUP: '0 */12 * * *',
         // JOB_INTERVAL_REFRESH_PEERS: 60,
@@ -534,13 +534,13 @@ module.exports = {
 | `SERVICE_BROKER`
 | string
 | URL of the microservice message broker (NATS or Redis).
-| redis://lisk:password@127.0.0.1:6379/0
+| redis://klayr:password@127.0.0.1:6379/0
 
 | `SERVICE_MESSAGE_QUEUE_REDIS`
 | string
 | URL of the Redis instance hosting the job queue to schedule the block indexing jobs.
 Must match the value supplied for the `indexer` microservice.
-| redis://lisk:password@127.0.0.1:6379/3
+| redis://klayr:password@127.0.0.1:6379/3
 
 | `JOB_INTERVAL_INDEX_MISSING_BLOCKS`
 | number
@@ -564,12 +564,12 @@ module.exports = {
   apps: [
     // Configuration for other microservices.
     {
-      name: 'lisk-service-blockchain-coordinator',
+      name: 'klayr-service-blockchain-coordinator',
       // [...]
       env: {
         // --- Remember to set the properties below
-        SERVICE_BROKER: 'redis://lisk:password@127.0.0.1:6379/0',
-        SERVICE_MESSAGE_QUEUE_REDIS: 'redis://lisk:password@127.0.0.1:6379/3',
+        SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
+        SERVICE_MESSAGE_QUEUE_REDIS: 'redis://klayr:password@127.0.0.1:6379/3',
         // SERVICE_BROKER_TIMEOUT: 10,
         // SERVICE_LOG_LEVEL: 'info',
         // SERVICE_LOG_CONSOLE: false,
@@ -600,23 +600,23 @@ module.exports = {
 | `SERVICE_BROKER`
 | string
 | URL of the microservice message broker (NATS or Redis).
-| redis://lisk:password@127.0.0.1:6379/0
+| redis://klayr:password@127.0.0.1:6379/0
 
 | `SERVICE_INDEXER_MYSQL`
 | string
 | Connection string for the primary MySQL (read/write) instance that the microservice connects to.
-| mysql://lisk:password@127.0.0.1:3306/lisk
+| mysql://klayr:password@127.0.0.1:3306/klayr
 
 | `SERVICE_MESSAGE_QUEUE_REDIS`
 | string
 | URL of the job queue to process the scheduled indexing jobs by the Blockchain Coordinator (Redis).
 Must match the value supplied for the `coordinator` microservice.
-| redis://lisk:password@127.0.0.1:6379/3
+| redis://klayr:password@127.0.0.1:6379/3
 
 | `SERVICE_INDEXER_REDIS_VOLATILE`
 | string
 | URL of the volatile cache storage (Redis).
-| redis://lisk:password@127.0.0.1:6379/2
+| redis://klayr:password@127.0.0.1:6379/2
 
 | `ENABLE_DATA_RETRIEVAL_MODE`
 | string
@@ -636,17 +636,17 @@ Must match the value supplied for the `coordinator` microservice.
 | `SERVICE_INDEXER_CACHE_REDIS`
 | string
 | URL of the cache storage (Redis).
-| redis://lisk:password@127.0.0.1:6379/1
+| redis://klayr:password@127.0.0.1:6379/1
 
 | `SERVICE_INDEXER_MYSQL_READ_REPLICA`
 | string
 | Connection string for the replicated MySQL (read-only) instance that the microservice connects to.
-| mysql://lisk:password@127.0.0.1:3306/lisk
+| mysql://klayr:password@127.0.0.1:3306/klayr
 
-| `LISK_STATIC`
+| `KLAYR_STATIC`
 | string
-| URL of Lisk static assets.
-| https://static-data.lisk.com
+| URL of Klayr static assets.
+| https://static-data.klayr.com
 
 | `JOB_INTERVAL_DELETE_SERIALIZED_EVENTS`
 | number
@@ -765,7 +765,7 @@ By default, it is set to `100000`.
 | `MAINCHAIN_SERVICE_URL`
 | string
 | Mainchain service URL for custom deployments.
-| https://service.lisk.com
+| https://service.klayr.com
 
 | `INVOKE_ALLOWED_METHODS`
 | string
@@ -803,7 +803,7 @@ To accelerate the indexing process, the blockchain-indexer microservice also sup
 |`INDEX_SNAPSHOT_URL`
 |string
 |Custom snapshot download URL (expected to end with sql.gz).
-|https://snapshots.lisk.io/mainnet/service.sql.gz
+|https://snapshots.klayr.io/mainnet/service.sql.gz
 
 |`ENABLE_SNAPSHOT_ALLOW_INSECURE_HTTP`
 |boolean
@@ -821,15 +821,15 @@ module.exports = {
   apps: [
     // Configuration for other microservices.
     {
-      name: 'lisk-service-blockchain-indexer',
+      name: 'klayr-service-blockchain-indexer',
       // [...]
       env: {
         // --- Remember to set the properties below
-        SERVICE_BROKER: 'redis://lisk:password@127.0.0.1:6379/0',
-        SERVICE_INDEXER_CACHE_REDIS: 'redis://lisk:password@127.0.0.1:6379/1',
-        SERVICE_INDEXER_REDIS_VOLATILE: 'redis://lisk:password@127.0.0.1:6379/2',
-        SERVICE_MESSAGE_QUEUE_REDIS: 'redis://lisk:password@127.0.0.1:6379/3',
-        SERVICE_INDEXER_MYSQL: 'mysql://lisk:password@127.0.0.1:3306/lisk',
+        SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
+        SERVICE_INDEXER_CACHE_REDIS: 'redis://klayr:password@127.0.0.1:6379/1',
+        SERVICE_INDEXER_REDIS_VOLATILE: 'redis://klayr:password@127.0.0.1:6379/2',
+        SERVICE_MESSAGE_QUEUE_REDIS: 'redis://klayr:password@127.0.0.1:6379/3',
+        SERVICE_INDEXER_MYSQL: 'mysql://klayr:password@127.0.0.1:3306/klayr',
         ENABLE_DATA_RETRIEVAL_MODE: 'true',
         ENABLE_INDEXING_MODE: 'true',
         ENABLE_PERSIST_EVENTS: 'false',
@@ -837,7 +837,7 @@ module.exports = {
         // DURABILITY_VERIFY_FREQUENCY: 1,
         // INDEX_SNAPSHOT_URL: '',
         // ENABLE_SNAPSHOT_ALLOW_INSECURE_HTTP: 'true',
-        // SERVICE_INDEXER_MYSQL_READ_REPLICA: 'mysql://lisk:password@127.0.0.1:3306/lisk',
+        // SERVICE_INDEXER_MYSQL_READ_REPLICA: 'mysql://klayr:password@127.0.0.1:3306/klayr',
         // SERVICE_BROKER_TIMEOUT: 10,
         // SERVICE_LOG_LEVEL: 'info',
         // SERVICE_LOG_CONSOLE: 'false',
@@ -845,9 +845,9 @@ module.exports = {
         // SERVICE_LOG_GELF: 'false',
         // SERVICE_LOG_FILE: 'false',
         // DOCKER_HOST: 'local',
-        // MAINCHAIN_SERVICE_URL: 'https://service.lisk.com',
-        // LISK_STATIC: 'https://static-data.lisk.com',
-        // DEVNET_MAINCHAIN_URL: 'http://devnet-service.liskdev.net:9901',
+        // MAINCHAIN_SERVICE_URL: 'https://service.klayr.com',
+        // KLAYR_STATIC: 'https://static-data.klayr.com',
+        // DEVNET_MAINCHAIN_URL: 'http://devnet-service.klayrdev.net:9901',
         // ESTIMATES_BUFFER_BYTES_LENGTH: 0,
         // ACCOUNT_BALANCE_UPDATE_BATCH_SIZE: 1000,
         // INDEX_BLOCKS_QUEUE_SCHEDULED_JOB_MAX_COUNT: 100000,
@@ -889,12 +889,12 @@ module.exports = {
 | `SERVICE_BROKER`
 | string
 | URL of the microservice message broker (NATS or Redis).
-| redis://lisk:password@127.0.0.1:6379/0
+| redis://klayr:password@127.0.0.1:6379/0
 
 | `SERVICE_APP_REGISTRY_MYSQL`
 | string
 | Connection string of the MySQL instance that the microservice connects to.
-| mysql://lisk:password@127.0.0.1:3306/lisk
+| mysql://klayr:password@127.0.0.1:3306/klayr
 
 | `ENABLE_REBUILD_INDEX_AT_INIT`
 | boolean
@@ -904,8 +904,8 @@ module.exports = {
 | `DEFAULT_APPS`
 | string
 | Default blockchain applications.
-By default, it is set to `lisk_mainchain`.
-| lisk_mainchain
+By default, it is set to `klayr_mainchain`.
+| klayr_mainchain
 
 | `JOB_INTERVAL_DELETE_NON_METADATA_FILES`
 | number
@@ -934,7 +934,7 @@ By default, it is set to run every `10` minutes.
 | `GITHUB_APP_REGISTRY_REPO`
 | string
 | URL of `app-registry` GitHub repository.
-| https://github.com/LiskHQ/app-registry
+| https://github.com/KlayrHQ/app-registry
 
 | `GITHUB_APP_REGISTRY_REPO_BRANCH`
 | string
@@ -951,12 +951,12 @@ module.exports = {
   apps: [
     // Configuration for other microservices.
     {
-      name: 'lisk-service-blockchain-app-registry',
+      name: 'klayr-service-blockchain-app-registry',
       // [...]
       env: {
         // --- Remember to set the properties below
-        SERVICE_BROKER: 'redis://lisk:password@127.0.0.1:6379/0',
-        SERVICE_APP_REGISTRY_MYSQL: 'mysql://lisk:password@127.0.0.1:3306/lisk',
+        SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
+        SERVICE_APP_REGISTRY_MYSQL: 'mysql://klayr:password@127.0.0.1:3306/klayr',
         ENABLE_REBUILD_INDEX_AT_INIT: false,
         // SERVICE_BROKER_TIMEOUT: 10,
         // SERVICE_LOG_LEVEL: 'info',
@@ -965,7 +965,7 @@ module.exports = {
         // SERVICE_LOG_GELF: false,
         // SERVICE_LOG_FILE: false,
         // DOCKER_HOST: 'local',
-        // GITHUB_APP_REGISTRY_REPO: 'https://github.com/LiskHQ/app-registry',
+        // GITHUB_APP_REGISTRY_REPO: 'https://github.com/KlayrHQ/app-registry',
         // GITHUB_APP_REGISTRY_REPO_BRANCH: 'main',
         // JOB_INTERVAL_DELETE_NON_METADATA_FILES: 0,
         // JOB_SCHEDULE_DELETE_NON_METADATA_FILES: '0 0 * * *',
@@ -992,12 +992,12 @@ module.exports = {
 | `SERVICE_BROKER`
 | string
 | URL of the microservice message broker (NATS or Redis).
-| redis://lisk:password@127.0.0.1:6379/0
+| redis://klayr:password@127.0.0.1:6379/0
 
 | `SERVICE_FEE_ESTIMATOR_CACHE`
 | string
 | URL of the cache storage (Redis).
-| redis://lisk:password@127.0.0.1:6379/1
+| redis://klayr:password@127.0.0.1:6379/1
 
 | `ENABLE_FEE_ESTIMATOR_QUICK`
 | boolean
@@ -1046,12 +1046,12 @@ module.exports = {
   apps: [
     // Configuration for other microservices.
     {
-      name: 'lisk-service-fee-estimator',
+      name: 'klayr-service-fee-estimator',
       // [...]
       env: {
         // --- Remember to set the properties below
-        SERVICE_BROKER: 'redis://lisk:password@127.0.0.1:6379/0',
-        SERVICE_FEE_ESTIMATOR_CACHE: 'redis://lisk:password@127.0.0.1:6379/1',
+        SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
+        SERVICE_FEE_ESTIMATOR_CACHE: 'redis://klayr:password@127.0.0.1:6379/1',
         ENABLE_FEE_ESTIMATOR_QUICK: true,
         ENABLE_FEE_ESTIMATOR_FULL: false,
         // FEE_EST_COLD_START_BATCH_SIZE: 1,
@@ -1088,17 +1088,17 @@ module.exports = {
 | `SERVICE_BROKER`
 | string
 | URL of the microservice message broker (NATS or Redis).
-| redis://lisk:password@127.0.0.1:6379/0
+| redis://klayr:password@127.0.0.1:6379/0
 
 | `SERVICE_STATISTICS_MYSQL`
 | string
 | Connection string of the MySQL instance that the microservice connects to.
-| mysql://lisk:password@127.0.0.1:3306/lisk
+| mysql://klayr:password@127.0.0.1:3306/klayr
 
 | `SERVICE_STATISTICS_REDIS`
 | string
 | URL of the cache storage (Redis).
-| redis://lisk:password@127.0.0.1:6379/1
+| redis://klayr:password@127.0.0.1:6379/1
 
 | `TRANSACTION_STATS_HISTORY_LENGTH_DAYS`
 | number
@@ -1108,7 +1108,7 @@ module.exports = {
 | `SERVICE_STATISTICS_MYSQL_READ_REPLICA`
 | string
 | Connection string (read-only) of the replicated MySQL instance that the microservice connects to.
-| mysql://reader:password@127.0.0.1:3307/lisk
+| mysql://reader:password@127.0.0.1:3307/klayr
 
 | `JOB_INTERVAL_REFRESH_TRANSACTION_STATS`
 | number
@@ -1145,15 +1145,15 @@ module.exports = {
   apps: [
     // Configuration for other microservices.
     {
-      name: 'lisk-service-transaction-statistics',
+      name: 'klayr-service-transaction-statistics',
       // [...]
       env: {
         // --- Remember to set the properties below
-        SERVICE_BROKER: 'redis://lisk:password@127.0.0.1:6379/0',
-        SERVICE_STATISTICS_REDIS: 'redis://lisk:password@127.0.0.1:6379/1',
-        SERVICE_STATISTICS_MYSQL: 'mysql://lisk:password@127.0.0.1:3306/lisk',
+        SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
+        SERVICE_STATISTICS_REDIS: 'redis://klayr:password@127.0.0.1:6379/1',
+        SERVICE_STATISTICS_MYSQL: 'mysql://klayr:password@127.0.0.1:3306/klayr',
         TRANSACTION_STATS_HISTORY_LENGTH_DAYS: 366,
-        // SERVICE_STATISTICS_MYSQL_READ_REPLICA: 'mysql://reader:password@127.0.0.1:3307/lisk',
+        // SERVICE_STATISTICS_MYSQL_READ_REPLICA: 'mysql://reader:password@127.0.0.1:3307/klayr',
         // SERVICE_BROKER_TIMEOUT: 10,
         // SERVICE_LOG_LEVEL: 'info',
         // SERVICE_LOG_CONSOLE: false,
@@ -1185,12 +1185,12 @@ module.exports = {
 | `SERVICE_BROKER`
 | string
 | URL of the microservice message broker (NATS or Redis).
-| redis://lisk:password@127.0.0.1:6379/0
+| redis://klayr:password@127.0.0.1:6379/0
 
 | `SERVICE_MARKET_REDIS`
 | string
 | URL of the cache storage (Redis).
-| redis://lisk:password@127.0.0.1:6379/2
+| redis://klayr:password@127.0.0.1:6379/2
 
 | `SERVICE_MARKET_FIAT_CURRENCIES`
 | string
@@ -1202,13 +1202,13 @@ All Fiat currencies used here need to be comma separated.
 | string
 | Exchange rates exposed to the Gateway.
 The values listed here must be comma separated.
-| LSK_BTC,LSK_EUR,BTC_CHF
+| KLY_BTC,KLY_EUR,BTC_CHF
 
 | `EXCHANGERATESAPI_IO_API_KEY`
 | string
 | Optional API key for https://exchangeratesapi.io/.
 The `/market/prices` endpoint will respond with additional data, specifically the exchange rates for various cryptocurrencies in other fiat currencies.
-The free plan would suffice for Lisk Service.
+The free plan would suffice for Klayr Service.
 |
 
 | `JOB_INTERVAL_REFRESH_PRICES_BINANCE`
@@ -1282,14 +1282,14 @@ module.exports = {
   apps: [
     // Configuration for other microservices.
     {
-      name: 'lisk-service-market',
+      name: 'klayr-service-market',
       // [...]
       env: {
         // --- Remember to set the properties below
-        SERVICE_BROKER: 'redis://lisk:password@127.0.0.1:6379/0',
-        SERVICE_MARKET_REDIS: 'redis://lisk:password@127.0.0.1:6379/2',
+        SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
+        SERVICE_MARKET_REDIS: 'redis://klayr:password@127.0.0.1:6379/2',
         SERVICE_MARKET_FIAT_CURRENCIES: 'EUR,USD,CHF,GBP,RUB,PLN,JPY,AUD,GBP,INR',
-        SERVICE_MARKET_TARGET_PAIRS: 'LSK_BTC,LSK_EUR,LSK_USD,LSK_CHF,LSK_PLN,LSK_JPY,LSK_AUD,LSK_GBP,LSK_INR,BTC_EUR,BTC_USD,BTC_CHF',
+        SERVICE_MARKET_TARGET_PAIRS: 'KLY_BTC,KLY_EUR,KLY_USD,KLY_CHF,KLY_PLN,KLY_JPY,KLY_AUD,KLY_GBP,KLY_INR,BTC_EUR,BTC_USD,BTC_CHF',
         // EXCHANGERATESAPI_IO_API_KEY: ''
         // SERVICE_BROKER_TIMEOUT: 10,
         // SERVICE_LOG_LEVEL: 'info',
@@ -1331,17 +1331,17 @@ For the local file system, use `*SERVICE_EXPORT_PARTIALS*` and `*SERVICE_EXPORT_
 | `SERVICE_BROKER`
 | string
 | URL of the microservice message broker (NATS or Redis).
-| redis://lisk:password@127.0.0.1:6379/0
+| redis://klayr:password@127.0.0.1:6379/0
 
 | `SERVICE_EXPORT_REDIS`
 | string
 | URL of the permanent cache storage (Redis).
-| redis://lisk:password@127.0.0.1:6379/3
+| redis://klayr:password@127.0.0.1:6379/3
 
 | `SERVICE_EXPORT_REDIS_VOLATILE`
 | string
 | URL of the volatile cache storage (Redis).
-| redis://lisk:password@127.0.0.1:6379/4
+| redis://klayr:password@127.0.0.1:6379/4
 
 | `SERVICE_EXPORT_PARTIALS`
 | string
@@ -1421,12 +1421,12 @@ module.exports = {
   apps: [
     // Configuration for other microservices.
     {
-      name: 'lisk-service-export',
+      name: 'klayr-service-export',
       // [...]
       env: {
-        SERVICE_BROKER: 'redis://lisk:password@127.0.0.1:6379/0',
-        SERVICE_EXPORT_REDIS: 'redis://lisk:password@127.0.0.1:6379/3',
-        SERVICE_EXPORT_REDIS_VOLATILE: 'redis://lisk:password@127.0.0.1:6379/4',
+        SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
+        SERVICE_EXPORT_REDIS: 'redis://klayr:password@127.0.0.1:6379/3',
+        SERVICE_EXPORT_REDIS_VOLATILE: 'redis://klayr:password@127.0.0.1:6379/4',
         // SERVICE_EXPORT_PARTIALS: './data/partials',
         // EXPORT_S3_BUCKET_NAME_PARTIALS: 'partials',
         // SERVICE_EXPORT_STATIC: './data/static',

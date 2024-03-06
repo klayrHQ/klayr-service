@@ -1,35 +1,35 @@
-= Lisk Service
+= Klayr Service
 Mona Bärenfänger <mona@lightcurve.io>
-:description: Describes the general purpose, architecture and usage of Lisk Service.
+:description: Describes the general purpose, architecture and usage of Klayr Service.
 :toc:
 :idseparator: -
 :idprefix:
 :imagesdir: ../assets/images
 :page-no-previous: true
-:lisk-docs: ROOT::
+:klayr-docs: ROOT::
 
-:url_api_mainnet: https://service.lisk.com/api/v3
-:url_api_testnet: https://testnet-service.lisk.com/api/v3
-:url_rpc_api_mainnet: wss://service.lisk.com/rpc-v3
-:url_rpc_api_testnet: wss://testnet-service.lisk.com/rpc-v3
-:url_subscribe_api_mainnet: wss://service.lisk.com/blockchain
-:url_subscribe_api_testnet: wss://testnet-service.lisk.com/blockchain
+:url_api_mainnet: https://service.klayr.com/api/v3
+:url_api_testnet: https://testnet-service.klayr.com/api/v3
+:url_rpc_api_mainnet: wss://service.klayr.com/rpc-v3
+:url_rpc_api_testnet: wss://testnet-service.klayr.com/rpc-v3
+:url_subscribe_api_mainnet: wss://service.klayr.com/blockchain
+:url_subscribe_api_testnet: wss://testnet-service.klayr.com/blockchain
 :url_electrumx_docs: https://electrumx.readthedocs.io/en/latest/
-:url_github_lisk_explorer: https://github.com/LiskHQ/lisk-explorer
-:url_github_lisk_service: https://github.com/LiskHQ/lisk-service
+:url_github_klayr_explorer: https://github.com/KlayrHQ/klayr-explorer
+:url_github_klayr_service: https://github.com/KlayrHQ/klayr-service
 :url_github_leveldb: https://github.com/google/leveldb
-:url_lisk_wallet: https://lisk.com/wallet
+:url_klayr_wallet: https://klayr.com/wallet
 :url_moleculer: https://moleculer.services/
 :url_nats: http://nats.io/
 :url_redis: http://redis.io
 :url_npm_socketio_client: https://www.npmjs.com/package/socket.io-client
-:url_services_directory: https://github.com/LiskHQ/lisk-service/tree/development/services
-:url_app_registry: https://github.com/LiskHQ/app-registry
-:url_dynamic_fee: https://github.com/LiskHQ/lips/blob/main/proposals/lip-0013.md
-// :url_http_api: https://github.com/LiskHQ/lisk-service/blob/v0.7.0-rc.2/docs/api/version3.md
-:url_http_api: {lisk-docs}api/lisk-service-http.adoc
-:url_websocket_api: https://github.com/LiskHQ/lisk-service/blob/v0.7.0-rc.2/docs/api/version3.md
-:url_subscribe_api: https://github.com/LiskHQ/lisk-service/blob/v0.7.0-rc.2/docs/api/websocket_subscribe_api.md
+:url_services_directory: https://github.com/KlayrHQ/klayr-service/tree/development/services
+:url_app_registry: https://github.com/KlayrHQ/app-registry
+:url_dynamic_fee: https://github.com/KlayrHQ/lips/blob/main/proposals/lip-0013.md
+// :url_http_api: https://github.com/KlayrHQ/klayr-service/blob/v0.7.0-rc.2/docs/api/version3.md
+:url_http_api: {klayr-docs}api/klayr-service-http.adoc
+:url_websocket_api: https://github.com/KlayrHQ/klayr-service/blob/v0.7.0-rc.2/docs/api/version3.md
+:url_subscribe_api: https://github.com/KlayrHQ/klayr-service/blob/v0.7.0-rc.2/docs/api/websocket_subscribe_api.md
 :url_postman: https://www.postman.com/
 :url_curl: https://curl.se/
 :url_httpie: https://httpie.io/
@@ -40,30 +40,30 @@ Mona Bärenfänger <mona@lightcurve.io>
 :url_docker_compose: https://docs.docker.com/compose/install/
 :url_gnu_make: https://www.gnu.org/software/make/
 :url_gnu_tar: https://www.gnu.org/software/tar/
-:url_ubuntu18: https://github.com/LiskHQ/lisk-service/blob/development/docs/prerequisites_docker_ubuntu.md
-:url_ubuntu20: https://github.com/LiskHQ/lisk-service/blob/development/docs/prerequisites_docker_ubuntu.md
-:url_debian: https://github.com/LiskHQ/lisk-service/blob/development/docs/prerequisites_docker_debian.md
-:url_macos: https://github.com/LiskHQ/lisk-service/blob/development/docs/prerequisites_docker_macos.md
-// :url_repo: https://github.com/LiskHQ/lisk-service/releases
-:url_service-source: https://github.com/LiskHQ/lisk-service/blob/development/docs/build_from_source.md
-:url_service_config: https://github.com/LiskHQ/lisk-service/blob/development/docs/config_options.md
-// TODO: update above GH lisk-service links to main when production is released
+:url_ubuntu18: https://github.com/KlayrHQ/klayr-service/blob/development/docs/prerequisites_docker_ubuntu.md
+:url_ubuntu20: https://github.com/KlayrHQ/klayr-service/blob/development/docs/prerequisites_docker_ubuntu.md
+:url_debian: https://github.com/KlayrHQ/klayr-service/blob/development/docs/prerequisites_docker_debian.md
+:url_macos: https://github.com/KlayrHQ/klayr-service/blob/development/docs/prerequisites_docker_macos.md
+// :url_repo: https://github.com/KlayrHQ/klayr-service/releases
+:url_service-source: https://github.com/KlayrHQ/klayr-service/blob/development/docs/build_from_source.md
+:url_service_config: https://github.com/KlayrHQ/klayr-service/blob/development/docs/config_options.md
+// TODO: update above GH klayr-service links to main when production is released
 
-:url_api_http_testnet:  {lisk-docs}api/lisk-service-http-testnet.adoc
-:url_api_http:  {lisk-docs}api/lisk-service-http.adoc
-:url_api_rpc:   {lisk-docs}api/lisk-node-rpc.adoc
-:url_api_subscribe:  {lisk-docs}api/lisk-service-pubsub.adoc
+:url_api_http_testnet:  {klayr-docs}api/klayr-service-http-testnet.adoc
+:url_api_http:  {klayr-docs}api/klayr-service-http.adoc
+:url_api_rpc:   {klayr-docs}api/klayr-node-rpc.adoc
+:url_api_subscribe:  {klayr-docs}api/klayr-service-pubsub.adoc
 :url_config:  configuration/docker.adoc
-// url_protocol:  {lisk-docs}understand-blockchain/lisk-protocol/index.adoc
+// url_protocol:  {klayr-docs}understand-blockchain/klayr-protocol/index.adoc
 :url_setup:  setup/docker.adoc
 
 //TODO: Undo this link when the respective page is read in the beta version.
-// {url_github_lisk_service}[Lisk Service^] is a web application middleware that allows interaction with various blockchain networks based on the xref:{url_protocol}[Lisk] protocol.
-{url_github_lisk_service}[Lisk Service^] is a web application middleware that allows interaction with various blockchain networks based on the Lisk protocol.
+// {url_github_klayr_service}[Klayr Service^] is a web application middleware that allows interaction with various blockchain networks based on the xref:{url_protocol}[Klayr] protocol.
+{url_github_klayr_service}[Klayr Service^] is a web application middleware that allows interaction with various blockchain networks based on the Klayr protocol.
 
 
-The main focus of Lisk Service is to provide data to the UI clients such as {url_lisk_wallet}[Lisk Desktop] and {url_lisk_wallet}[Lisk Mobile].
-Lisk Service makes it possible to access all blockchain live data in a similar way to the regular Lisk SDK API, and in addition provides users with much more detailed in-depth information and endpoints, such as geolocation and various statistics regarding network usage.
+The main focus of Klayr Service is to provide data to the UI clients such as {url_klayr_wallet}[Klayr Desktop] and {url_klayr_wallet}[Klayr Mobile].
+Klayr Service makes it possible to access all blockchain live data in a similar way to the regular Klayr SDK API, and in addition provides users with much more detailed in-depth information and endpoints, such as geolocation and various statistics regarding network usage.
 
 The project implementation is based on <<microservices>>.
 The technical stack is designed to deliver several microservices, and each of them provides one particular functionality.
@@ -76,7 +76,7 @@ image::architecture.png[Architecture][,500 ,align="center"]
 
 === Available Services
 
-Lisk Service consists of various microservices which have been further expanded.
+Klayr Service consists of various microservices which have been further expanded.
 Briefly, microservices can be defined as an architectural style that structures an application as a collection of small, loosely coupled services, whereby each service can run its own process, and offers the user the ability to reduce the complexity into more manageable services that can be developed, and deployed independently.
 //offering the users the ability to build small independent services these enable the user to and are used and possess the ability to run independently of each other.
 The Gateway is required in order to expose the APIs provided by the specific services.
@@ -93,21 +93,21 @@ An overview of each microservice is given in the following table listed below.
 //TODO:Update components list
 
 [cols="1,3", options="header"]
-.The Lisk Service microservices
+.The Klayr Service microservices
 |===
 |Microservice |Description
 
 |*Gateway*
-|The Gateway component exposes the API for Lisk Service users to access and use over HTTP and WS protocols.
-Its main purpose is to proxy API requests from users to other microservice components provided by Lisk Service.
+|The Gateway component exposes the API for Klayr Service users to access and use over HTTP and WS protocols.
+Its main purpose is to proxy API requests from users to other microservice components provided by Klayr Service.
 It provides the users with a **central point of data access** that ensures existing application compatibility is maintained.
-// provides a RESTful xref:{url_api_http}[HTTP API], which all users of Lisk Service can access and use.
-// Its main purpose is to proxy API requests from users to other components provided by Lisk Service.
+// provides a RESTful xref:{url_api_http}[HTTP API], which all users of Klayr Service can access and use.
+// Its main purpose is to proxy API requests from users to other components provided by Klayr Service.
 // It also maintains backwards compatibility when its public API is changed or replaced by a new version.
 // This provides users with a **central point of data access** that never breaks existing application compatibility.
 
 |*Connector*
-|The Blockchain Connector connects with the node running a Lisk protocol-compliant blockchain application.
+|The Blockchain Connector connects with the node running a Klayr protocol-compliant blockchain application.
 It is primarily responsible for data transformation and caching, hence reducing the number of calls made to the node.
 
 |*Indexer*
@@ -117,8 +117,8 @@ In the data service mode it serves user request queries initiated via the RESTfu
 It has the ability to run both the indexer and data service modes simultaneously, which is enabled by default.
 
 |*App Registry*
-|The Blockchain Application Registry service is responsible for regularly synchronizing and providing off-chain metadata information for known blockchain applications within the Lisk ecosystem.
-The metadata is maintained in the Lisk {url_app_registry}[Application Registry^] repository.
+|The Blockchain Application Registry service is responsible for regularly synchronizing and providing off-chain metadata information for known blockchain applications within the Klayr ecosystem.
+The metadata is maintained in the Klayr {url_app_registry}[Application Registry^] repository.
 
 |*Fee Estimator*
 |The Fee Estimator service implements the {url_dynamic_fee}[dynamic fee system^] algorithm to offer users transaction fee recommendations based on the network traffic.
@@ -128,24 +128,24 @@ The metadata is maintained in the Lisk {url_app_registry}[Application Registry^]
 
 |*Market*
 |The Market service allows price data retrieval.
-It supports multiple sources to maintain the current up-to-date Lisk token price, and ensures this is available to the clients in real time.
+It supports multiple sources to maintain the current up-to-date Klayr token price, and ensures this is available to the clients in real time.
 
 |*Export*
 |The Export service enables users to download the transaction history as a CSV file for any given account on the blockchain.
 
 |*Template*
-|All Lisk Service services are derived from the Template service, which is an abstract microservice.
+|All Klayr Service services are derived from the Template service, which is an abstract microservice.
 It allows all services to share a similar interface and design pattern.
 The objective of the Template service is to reduce code duplication and increase consistency between each service, hence simplifying code maintenance and testing.
 |===
 
 [NOTE]
 ====
-* Lisk Service by default attempts to connect to a local node via WebSocket on port `7887` or IPC on `~/.lisk/lisk-core` by default.
+* Klayr Service by default attempts to connect to a local node via WebSocket on port `7887` or IPC on `~/.klayr/klayr-core` by default.
 * The default installation method is based on Docker.
 * Please note that certain token conversion rates in the Market service require their API keys.
-* For the events information to be always available in the API, please set the `system.keepEventsForHeights: -1` in the Lisk application node config.
-* It is highly recommended *NOT* to enable any plugins on the Lisk application node when running Lisk Service against it. Enabling them can cause performance issues in Lisk Service.
+* For the events information to be always available in the API, please set the `system.keepEventsForHeights: -1` in the Klayr application node config.
+* It is highly recommended *NOT* to enable any plugins on the Klayr application node when running Klayr Service against it. Enabling them can cause performance issues in Klayr Service.
 ====
 
 The following diagram below depicts an overview of the microservice architecture.
@@ -158,7 +158,7 @@ image::mservice_architecture.png[]
 
 [[usage]]
 == APIs
-The Gateway service provides the following APIs, which all users of Lisk Service can access and use.
+The Gateway service provides the following APIs, which all users of Klayr Service can access and use.
 
 
 // This section below is commented out and may be used for the new docker setup guide.
@@ -205,30 +205,30 @@ The Gateway service provides the following APIs, which all users of Lisk Service
 
 // [source,bash]
 // ----
-// tar -xf lisk-service-x.y.z.tar.gz
-// cd lisk-service
+// tar -xf klayr-service-x.y.z.tar.gz
+// cd klayr-service
 // ----
 
-// The above commands retrieve the entire source code, however, this does not cover building a custom version of Lisk Service.
-// For more information refer to this document: {url_service-source}[Building Lisk Service from source^].
+// The above commands retrieve the entire source code, however, this does not cover building a custom version of Klayr Service.
+// For more information refer to this document: {url_service-source}[Building Klayr Service from source^].
 
 // ==== Docker image build
 
 // Building a Docker image is optional.
-// However, if you wish to build the local version of Lisk Service execute the following command below:
+// However, if you wish to build the local version of Klayr Service execute the following command below:
 
 // [source,bash]
 // ----
 // make build-images
 // ----
-// Please note, this step is only necessary if you wish to build a custom or pre-release version of Lisk Service that does not have a pre-built Docker image published on the Docker Hub.
+// Please note, this step is only necessary if you wish to build a custom or pre-release version of Klayr Service that does not have a pre-built Docker image published on the Docker Hub.
 // The installation script chooses the last available stable version on the Docker Hub, *unless* there is no local image.
 
 // If you are unsure about any local builds, use the `make clean` command to remove all locally built docker images.
 
 // === Configuration
 
-// The default configuration is sufficient to run Lisk Service against the local node.
+// The default configuration is sufficient to run Klayr Service against the local node.
 
 // Before running the application copy the default docker-compose environment file as shown in the command below:
 
@@ -244,47 +244,47 @@ The Gateway service provides the following APIs, which all users of Lisk Service
 // $EDITOR .env
 // ----
 
-// The example snippet below assumes that the Lisk Core (or any Lisk protocol-compliant blockchain application), node is running on the host machine and not inside of a Docker container.
+// The example snippet below assumes that the Klayr Core (or any Klayr protocol-compliant blockchain application), node is running on the host machine and not inside of a Docker container.
 
 // [source,bash]
 // ----
 // ## Required
-// # The local Lisk Core node WebSocket API port
-// export LISK_APP_WS="ws://host.docker.internal:7667"
+// # The local Klayr Core node WebSocket API port
+// export KLAYR_APP_WS="ws://host.docker.internal:7667"
 // ----
 
 // When running a node inside of a Docker container, the variable needs to refer to the container as shown below:
-// `LISK_APP_WS="ws://<your_docker_container>:7667"`.
+// `KLAYR_APP_WS="ws://<your_docker_container>:7667"`.
 
-// For more information, the configuration options are described here in the {url_service_config}[Lisk Service Configuration Reference^], which may also be helpful with regard to PM2-based installations.
+// For more information, the configuration options are described here in the {url_service_config}[Klayr Service Configuration Reference^], which may also be helpful with regard to PM2-based installations.
 
 
 
 // [[usage]]
 // == APIs & Usage
 
-Once Lisk Service is xref:{url_setup}[set up], xref:{url_config}[configured], and started, it is possible to retrieve data from the blockchain network.
+Once Klayr Service is xref:{url_setup}[set up], xref:{url_config}[configured], and started, it is possible to retrieve data from the blockchain network.
 
-Lisk Service provides the data through several alternative APIs described below:
+Klayr Service provides the data through several alternative APIs described below:
 
 === The HTTP API
 
 The xref:{url_http_api}[HTTP API] is the public RESTful API that provides blockchain data in standardized JSON format.
 
-The HTTP API provides various endpoints that offer more extensive information in comparison to the HTTP API of that of a normal Lisk node.
-This API can be utilized to build powerful wallets and user interfaces for blockchain applications which are built with the Lisk SDK.
+The HTTP API provides various endpoints that offer more extensive information in comparison to the HTTP API of that of a normal Klayr node.
+This API can be utilized to build powerful wallets and user interfaces for blockchain applications which are built with the Klayr SDK.
 
-==== Public Lisk Service APIs
+==== Public Klayr Service APIs
 
-There is a public HTTP API for every public Lisk blockchain network, which can be used to query the desired information from the network.
+There is a public HTTP API for every public Klayr blockchain network, which can be used to query the desired information from the network.
 
-Lisk Mainnet::
+Klayr Mainnet::
 * Public API base URL: `{url_api_mainnet}`
-* API specification: xref:{url_api_http}[Lisk Service HTTP API reference (Mainnet)]
+* API specification: xref:{url_api_http}[Klayr Service HTTP API reference (Mainnet)]
 
-Lisk Testnet::
+Klayr Testnet::
 * Public API base URL: `{url_api_testnet}`
-* API specification: xref:{url_api_http_testnet}[Lisk Service HTTP API reference (Testnet)]
+* API specification: xref:{url_api_http_testnet}[Klayr Service HTTP API reference (Testnet)]
 
 [NOTE]
 ====
@@ -292,8 +292,8 @@ In the Public API base URLs listed above, in order to fetch the required entitie
 
 For example:
 
-* https://service.lisk.com/api/v3/transactions
-* https://testnet-service.lisk.com/api/v3/transactions
+* https://service.klayr.com/api/v3/transactions
+* https://testnet-service.klayr.com/api/v3/transactions
 ====
 
 // ==== Example: Request data with curl
@@ -310,7 +310,7 @@ For example:
 // {
 //   "data": [
 //     {
-//       "address": "lsk2jjg9ob4qh7jokpdbf7hjgqftkaq4b2925f422",
+//       "address": "kly2jjg9ob4qh7jokpdbf7hjgqftkaq4b2925f422",
 //       "name": "genesis_3",
 //       "publicKey": "d16699888782b26c3e4cffd2a94910ec11d59476b2358adc442e010650afe4a9",
 //       "nextAllocatedTime": 1683716840,
@@ -318,7 +318,7 @@ For example:
 //     },
 //     ...
 //     {
-//       "address": "lskx7rscmxc3k9yokbqpxspjj92zz6fue84e2xw92",
+//       "address": "klyx7rscmxc3k9yokbqpxspjj92zz6fue84e2xw92",
 //      "name": "genesis_1",
 //       "publicKey": "44e2b746594f74272d15b6f7d18dffbf83c749bbf1babc5f1d314bdbd08f8215",
 //       "nextAllocatedTime": 1683716850,
@@ -340,17 +340,17 @@ For example:
 
 The {url_websocket_api}[WebSocket JSON-RPC API^] provides blockchain data in standardized JSON format.
 The API uses the Socket.IO library and is compatible with JSON-RPC 2.0 standards.
-This enables efficient and seamless integration within the Lisk blockchain network, coupled with offering a more responsive, and efficient alternative to the traditional HTTP based APIs.
+This enables efficient and seamless integration within the Klayr blockchain network, coupled with offering a more responsive, and efficient alternative to the traditional HTTP based APIs.
 
 The xref:{url_api_rpc}[RPC-API] reference provides an overview of all available RPC requests.
 Almost every HTTP endpoint exposes a corresponding JSON-RPC endpoint to query over WebSocket.
 The only exception is the `/export/download` endpoint.
 
 
-Lisk Mainnet::
+Klayr Mainnet::
 * Public API: `{url_rpc_api_mainnet}`
 
-Lisk Testnet::
+Klayr Testnet::
 * Public API: `{url_rpc_api_testnet}`
 
 // ==== Example: Emit to remote-procedure calls with socket.io
@@ -378,9 +378,9 @@ Lisk Testnet::
 // Use local Service node
 // const WS_RPC_ENDPOINT = 'ws://127.0.0.1:9901/rpc-v3';
 //Use public Service node
-//const WS_RPC_ENDPOINT = "wss://service.lisk.com/rpc-v3";
+//const WS_RPC_ENDPOINT = "wss://service.klayr.com/rpc-v3";
 
-// 2. Connect to Lisk Service via WebSockets
+// 2. Connect to Klayr Service via WebSockets
 // const socket = io(WS_RPC_ENDPOINT, {
 //   forceNew: true,
 //  transports: ['websocket']
@@ -413,10 +413,10 @@ The Subscribe API is particularly useful for providing the user with real-time d
 
 NOTE: Check out the xref:{url_api_subscribe}[] reference for an overview of all available RPC requests.
 
-Lisk Mainnet::
+Klayr Mainnet::
 * Public API: `{url_subscribe_api_mainnet}`
 
-Lisk Testnet::
+Klayr Testnet::
 * Public API: `{url_subscribe_api_testnet}`
 
 //==== Example: Subscribe to events with socket.io
@@ -440,7 +440,7 @@ Lisk Testnet::
 // Uses local Service node
 // const WS_SUBSCRIBE_ENDPOINT = 'ws://127.0.0.1:9901/blockchain';
 // Uses public Service node
-//const WS_SUBSCRIBE_ENDPOINT = "wss://service.lisk.com/blockchain";
+//const WS_SUBSCRIBE_ENDPOINT = "wss://service.klayr.com/blockchain";
 
 // const socket = io(WS_SUBSCRIBE_ENDPOINT, {
 // 	forceNew: true,
