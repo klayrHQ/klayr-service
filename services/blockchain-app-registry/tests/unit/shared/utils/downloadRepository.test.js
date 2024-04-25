@@ -78,7 +78,7 @@ describe('Test getRepoInfoFromURL method', () => {
 	it('should return proper response when url is valid', async () => {
 		const response = getRepoInfoFromURL(config.gitHub.appRegistryRepo);
 		expect(response).toMatchObject({
-			owner: 'KlayrHQ',
+			owner: 'klayrhq',
 			repo: 'app-registry',
 		});
 	});

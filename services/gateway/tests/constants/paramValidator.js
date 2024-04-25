@@ -102,7 +102,7 @@ const parseParamsExpectedResponse = {
 const validateRawInputParams = {
 	network: 'devnet',
 	tokenID: '0400000000000000',
-	tokenName: 'Klayr,Klay,KLY',
+	tokenName: 'Klayr,Klay,Kly',
 };
 const validateRawInputParamsWithInvalidKey = {
 	...validateRawInputParams,
