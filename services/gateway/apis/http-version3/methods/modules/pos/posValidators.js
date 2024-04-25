@@ -27,7 +27,7 @@ module.exports = {
 		address: {
 			optional: true,
 			type: 'string',
-			pattern: regex.ADDRESS_LISK32_CSV,
+			pattern: regex.ADDRESS_KLAYR32_CSV,
 			max: 419,
 			altSwaggerKey: 'addressCsv',
 		},

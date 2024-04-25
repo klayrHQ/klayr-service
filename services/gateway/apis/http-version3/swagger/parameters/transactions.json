@@ -35,7 +35,7 @@
 	"recipientAddress": {
 		"name": "recipientAddress",
 		"in": "query",
-		"description": "Lisk account address.",
+		"description": "Klayr account address.",
 		"type": "string",
 		"minLength": 41,
 		"maxLength": 41
@@ -51,7 +51,7 @@
 	"senderAddress": {
 		"name": "senderAddress",
 		"in": "query",
-		"description": "Lisk account address.",
+		"description": "Klayr account address.",
 		"type": "string",
 		"minLength": 41,
 		"maxLength": 41

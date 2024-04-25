@@ -21,7 +21,7 @@ const {
 		MySQL: { getTableInstance },
 	},
 	Utils: { isEmptyObject },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { DB_CONSTANT, DATE_FORMAT } = require('./utils/constants');
 const { requestIndexer } = require('./utils/request');

@@ -13,7 +13,7 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { HTTP } = require('lisk-service-framework');
+const { HTTP } = require('klayr-service-framework');
 const dataService = require('../../../shared/dataService');
 
 const getBlockchainApps = async params => {

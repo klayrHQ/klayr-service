@@ -17,7 +17,7 @@ const {
 	CacheRedis,
 	Signals,
 	Utils: { isObject },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const config = require('../../config');
 const { requestConnector } = require('./request');

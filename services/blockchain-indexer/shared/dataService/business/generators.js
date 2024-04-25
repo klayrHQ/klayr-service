@@ -14,7 +14,7 @@
  *
  */
 const BluebirdPromise = require('bluebird');
-const { Logger } = require('lisk-service-framework');
+const { Logger } = require('klayr-service-framework');
 
 const { getPosConstants } = require('./pos');
 const { getIndexedAccountInfo } = require('../utils/account');

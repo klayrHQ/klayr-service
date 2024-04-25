@@ -84,7 +84,7 @@ describe('get.blockchain.apps.meta.list', () => {
 	});
 
 	it('should return blockchain applications meta list by chainName', async () => {
-		const response = await getBlockchainApps({ chainName: 'lisk_mainchain' });
+		const response = await getBlockchainApps({ chainName: 'klayr_mainchain' });
 		expect(response).toMap(jsonRpcEnvelopeSchema);
 		const { result } = response;
 		expect(result.data).toBeInstanceOf(Array);
@@ -124,7 +124,7 @@ describe('get.blockchain.apps.meta.list', () => {
 	});
 
 	it('should return blockchain applications meta list by search', async () => {
-		const response = await getBlockchainApps({ search: 'Lisk' });
+		const response = await getBlockchainApps({ search: 'Klayr' });
 		expect(response).toMap(jsonRpcEnvelopeSchema);
 		const { result } = response;
 		expect(result.data).toBeInstanceOf(Array);
@@ -134,7 +134,7 @@ describe('get.blockchain.apps.meta.list', () => {
 	});
 
 	it('should return blockchain applications meta list by case-insensitive search (Upper-case)', async () => {
-		const response = await getBlockchainApps({ search: 'LISK' });
+		const response = await getBlockchainApps({ search: 'KLAYR' });
 		expect(response).toMap(jsonRpcEnvelopeSchema);
 		const { result } = response;
 		expect(result.data).toBeInstanceOf(Array);
@@ -144,7 +144,7 @@ describe('get.blockchain.apps.meta.list', () => {
 	});
 
 	it('should return blockchain applications meta list by case-insensitive search (Lower-case)', async () => {
-		const response = await getBlockchainApps({ search: 'lisk' });
+		const response = await getBlockchainApps({ search: 'klayr' });
 		expect(response).toMap(jsonRpcEnvelopeSchema);
 		const { result } = response;
 		expect(result.data).toBeInstanceOf(Array);

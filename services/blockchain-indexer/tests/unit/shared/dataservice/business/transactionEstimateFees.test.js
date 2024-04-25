@@ -70,8 +70,8 @@ const {
 
 const { requestConnector } = require('../../../../../shared/utils/request');
 
-jest.mock('lisk-service-framework', () => {
-	const actual = jest.requireActual('lisk-service-framework');
+jest.mock('klayr-service-framework', () => {
+	const actual = jest.requireActual('klayr-service-framework');
 	return {
 		...actual,
 		DB: {
@@ -635,7 +635,7 @@ describe('Test transaction fees estimates', () => {
 		const { calcAdditionalFees } = require(mockedTransactionFeeEstimatesFilePath);
 		const { calcMessageFee } = require(mockedTransactionFeeEstimatesFilePath);
 		const { getAuthAccountInfo } = require(mockedAuthFilePath);
-		const { getLisk32AddressFromPublicKey } = require(mockedAccountFilePath);
+		const { getKlayr32AddressFromPublicKey } = require(mockedAccountFilePath);
 		const { getPosConstants } = require(mockedPOSConstantsFilePath);
 		const { getFeeEstimates } = require(mockedFeeEstimateFilePath);
 		const { getNetworkStatus } = require(mockedNetworkFilePath);
@@ -653,7 +653,7 @@ describe('Test transaction fees estimates', () => {
 		}));
 
 		jest.mock(mockedAccountFilePath, () => ({
-			getLisk32AddressFromPublicKey: jest.fn(),
+			getKlayr32AddressFromPublicKey: jest.fn(),
 		}));
 
 		jest.mock(mockedTransactionFeeEstimatesFilePath, () => {
@@ -676,7 +676,7 @@ describe('Test transaction fees estimates', () => {
 
 		it('should calculate transaction fees correctly', async () => {
 			// Mock the return values of the functions
-			getLisk32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
+			getKlayr32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
 			getAuthAccountInfo.mockResolvedValue(mockTxAuthAccountInfo);
 			requestConnector
 				.mockReturnValueOnce(mockTxRequestConnector)
@@ -698,7 +698,7 @@ describe('Test transaction fees estimates', () => {
 			dryRunTransactions.mockReturnValue({
 				data: { events: [{ name: 'ccmSendSuccess', data: { ccm: 'hello' } }] },
 			});
-			getLisk32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
+			getKlayr32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
 			getAuthAccountInfo.mockResolvedValue(mockTxAuthAccountInfo);
 			requestConnector
 				.mockReturnValueOnce(mockAuthAccountInfo)
@@ -721,7 +721,7 @@ describe('Test transaction fees estimates', () => {
 
 		it('should calculate transaction fees correctly for register validator transaction', async () => {
 			// Mock the return values of the functions
-			getLisk32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
+			getKlayr32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
 			getAuthAccountInfo.mockResolvedValue(mockTxAuthAccountInfo);
 			requestConnector
 				.mockReturnValueOnce(mockAuthAccountInfo)
@@ -741,7 +741,7 @@ describe('Test transaction fees estimates', () => {
 
 		it('should throw if empty, undefined or null object is passed', async () => {
 			// Mock the return values of the functions
-			getLisk32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
+			getKlayr32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
 			getAuthAccountInfo.mockResolvedValue(mockTxAuthAccountInfo);
 			requestConnector.mockResolvedValue(mockTxRequestConnector);
 			getFeeEstimates.mockReturnValue(mockTxFeeEstimate);
@@ -759,7 +759,7 @@ describe('Test transaction fees estimates', () => {
 
 		it('should throw when getAuthAccountInfo fails', async () => {
 			// Mock the return values of the functions
-			getLisk32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
+			getKlayr32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
 			requestConnector.mockRejectedValue('Error');
 			getFeeEstimates.mockReturnValue(mockTxFeeEstimate);
 			calcAdditionalFees.mockResolvedValue({});
@@ -774,7 +774,7 @@ describe('Test transaction fees estimates', () => {
 			requestConnector.mockRejectedValue('Error');
 
 			// Mock the return values of the functions
-			getLisk32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
+			getKlayr32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
 			getAuthAccountInfo.mockResolvedValue(mockTxAuthAccountInfo);
 			getFeeEstimates.mockReturnValue(mockTxFeeEstimate);
 			calcAdditionalFees.mockResolvedValue({});
@@ -789,7 +789,7 @@ describe('Test transaction fees estimates', () => {
 			getFeeEstimates.mockReturnValue(new Error('Error'));
 
 			// Mock the return values of the functions
-			getLisk32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
+			getKlayr32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
 			getAuthAccountInfo.mockResolvedValue(mockTxAuthAccountInfo);
 			requestConnector.mockResolvedValue(mockTxRequestConnector);
 			calcAdditionalFees.mockResolvedValue({});
@@ -802,7 +802,7 @@ describe('Test transaction fees estimates', () => {
 
 		it('should throw Validation Exception when TOKEN_ID specified are incorrect', async () => {
 			// Mock the return values of the functions
-			getLisk32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
+			getKlayr32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
 			getAuthAccountInfo.mockResolvedValue(mockTxAuthAccountInfo);
 			requestConnector
 				.mockReturnValueOnce(mockTxRequestConnector)
@@ -822,7 +822,7 @@ describe('Test transaction fees estimates', () => {
 
 		it('should throw Validation Exception when address specified are incorrect', async () => {
 			// Mock the return values of the functions
-			getLisk32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
+			getKlayr32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
 			getAuthAccountInfo.mockResolvedValue(mockTxAuthAccountInfo);
 			requestConnector
 				.mockReturnValueOnce(mockTxRequestConnector)
@@ -855,7 +855,7 @@ describe('Test transaction fees estimates', () => {
 			Object.entries(transactionsMap).forEach(([transactionType, transactionInfo]) => {
 				it(`should calculate transaction fees correctly for ${transactionType} transaction`, async () => {
 					// Mock the return values of the functions
-					getLisk32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
+					getKlayr32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
 					getAuthAccountInfo.mockResolvedValue(mockTxAuthAccountInfo);
 					requestConnector.mockReturnValueOnce(mockTxRequestConnector).mockReturnValue({
 						userAccount: '1',

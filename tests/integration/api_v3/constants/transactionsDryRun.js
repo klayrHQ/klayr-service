@@ -24,7 +24,7 @@ const TRANSACTION_OBJECT_VALID = {
 	],
 	params: {
 		amount: '1000000000000',
-		recipientAddress: 'lskv6v53emsaen6cwbbk226wusdpa6ojdonunka4x',
+		recipientAddress: 'klyv6v53emsaen6cwbbk226wusdpa6ojdonunka4x',
 		data: '',
 		tokenID: '0400000000000000',
 	},
@@ -89,7 +89,7 @@ const UNSIGNED_TRANSACTION_OBJECT = {
 	signatures: [],
 	params: {
 		amount: '1000000000000',
-		recipientAddress: 'lskv6v53emsaen6cwbbk226wusdpa6ojdonunka4x',
+		recipientAddress: 'klyv6v53emsaen6cwbbk226wusdpa6ojdonunka4x',
 		data: '',
 		tokenID: '0400000000000000',
 	},
@@ -103,7 +103,7 @@ const TRANSACTION_OBJECT_VALID_WITH_REQUIRED_PROPS = {
 	senderPublicKey: '3972849f2ab66376a68671c10a00e8b8b67d880434cc65b04c6ed886dfa91c2c',
 	params: {
 		amount: '1000000000000',
-		recipientAddress: 'lskv6v53emsaen6cwbbk226wusdpa6ojdonunka4x',
+		recipientAddress: 'klyv6v53emsaen6cwbbk226wusdpa6ojdonunka4x',
 		data: '',
 		tokenID: '0400000000000000',
 	},

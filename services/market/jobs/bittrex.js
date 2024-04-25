@@ -16,7 +16,7 @@
 const {
 	Exceptions: { ServiceUnavailableException },
 	Logger,
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const config = require('../config');
 const { reload } = require('../shared/market/sources/bittrex');

@@ -27,8 +27,8 @@ beforeEach(() => jest.resetModules());
 
 describe('Test indexTokensMeta method', () => {
 	it('should index token meta in db when called with valid metadata object', async () => {
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			return {
 				...actual,
 				DB: {
@@ -56,8 +56,8 @@ describe('Test indexTokensMeta method', () => {
 
 describe('Test indexAppMeta method', () => {
 	it('should index app meta in db when called with valid metadata object', async () => {
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			return {
 				...actual,
 				DB: {
@@ -84,8 +84,8 @@ describe('Test indexAppMeta method', () => {
 
 describe('Test indexMetadataFromFile method', () => {
 	it('should index app meta in db when called with valid app meta path', async () => {
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			return {
 				...actual,
 				DB: {
@@ -118,8 +118,8 @@ describe('Test indexMetadataFromFile method', () => {
 	});
 
 	it('should index token meta in db when called with valid token meta path', async () => {
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			return {
 				...actual,
 				DB: {
@@ -164,8 +164,8 @@ describe('Test indexMetadataFromFile method', () => {
 
 describe('Test deleteAppMeta method', () => {
 	it('should delete app meta in db when called with valid metadata object', async () => {
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			return {
 				...actual,
 				DB: {
@@ -197,8 +197,8 @@ describe('Test deleteAppMeta method', () => {
 describe('Test deleteTokensMeta method', () => {
 	it('should delete token meta in db when called with valid metadata object', async () => {
 		const tokenIDs = mockTokenMetaObj.tokens.map(token => token.tokenID);
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			return {
 				...actual,
 				DB: {
@@ -225,8 +225,8 @@ describe('Test deleteTokensMeta method', () => {
 
 describe('Test deleteIndexedMetadataFromFile method', () => {
 	it('should delete app meta in db when called with valid app meta path', async () => {
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			return {
 				...actual,
 				DB: {
@@ -263,8 +263,8 @@ describe('Test deleteIndexedMetadataFromFile method', () => {
 	});
 
 	it('should delete token meta in db when called with valid token meta path', async () => {
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			return {
 				...actual,
 				DB: {
@@ -317,12 +317,12 @@ describe('Test indexAllBlockchainAppsMeta method', () => {
 			};
 		});
 
-		jest.mock('lisk-service-framework', () => {
-			const actualLiskServiceFramework = jest.requireActual('lisk-service-framework');
+		jest.mock('klayr-service-framework', () => {
+			const actualKlayrServiceFramework = jest.requireActual('klayr-service-framework');
 			return {
-				...actualLiskServiceFramework,
+				...actualKlayrServiceFramework,
 				DB: {
-					...actualLiskServiceFramework.DB,
+					...actualKlayrServiceFramework.DB,
 					MySQL: {
 						getTableInstance: () => ({
 							upsert: jest.fn(),
@@ -334,10 +334,10 @@ describe('Test indexAllBlockchainAppsMeta method', () => {
 					},
 				},
 				Utils: {
-					...actualLiskServiceFramework.Utils,
+					...actualKlayrServiceFramework.Utils,
 					fs: {
-						...actualLiskServiceFramework.Utils.fs,
-						getDirectories: () => ['Lisk'],
+						...actualKlayrServiceFramework.Utils.fs,
+						getDirectories: () => ['Klayr'],
 						getFiles: () => [mockAppMetaPath, mockTokenMetaPath],
 						read: filePath => {
 							if (filePath === mockAppMetaPath) return JSON.stringify(mockAppMetaObj);

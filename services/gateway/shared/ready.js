@@ -16,7 +16,7 @@
 const {
 	Errors: { MoleculerError, ServiceNotFoundError },
 } = require('moleculer');
-const { Logger } = require('lisk-service-framework');
+const { Logger } = require('klayr-service-framework');
 
 const BluebirdPromise = require('bluebird');
 

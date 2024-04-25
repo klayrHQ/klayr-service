@@ -15,7 +15,7 @@
  */
 const requireAll = require('require-all');
 
-const { Logger } = require('lisk-service-framework');
+const { Logger } = require('klayr-service-framework');
 
 const { requestConnector } = require('../../utils/request');
 const { getDirectoryNamesInPath } = require('../../utils/file');

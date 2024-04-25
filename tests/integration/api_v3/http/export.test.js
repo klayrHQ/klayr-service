@@ -44,8 +44,8 @@ describe('Export API', () => {
 	const startDate = moment('2023-01-10').format(exportConfig.excel.dateFormat);
 	const endDate = moment('2023-11-30').format(exportConfig.excel.dateFormat);
 
-	const mockAddress1 = 'lsk969u84bnws8zc52cu59o8aamvpyg8nw86hpgad';
-	const mockAddress2 = 'lsk2jjg9ob4qh7jokpdbf7hjgqftkaq4b2925f422';
+	const mockAddress1 = 'kly969u84bnws8zc52cu59o8aamvpyg8nw86hpgad';
+	const mockAddress2 = 'kly2jjg9ob4qh7jokpdbf7hjgqftkaq4b2925f422';
 	const mockPublicKey1 = 'ebe2c469275b2eac44f05684c974454f7eecc6d2a8c1b72bf37fffbeb5419ccd';
 	const mockPublicKey2 = '674061bfeea0eddb4c88fc7bc03ef694f5040358b2b14edba99bc8ebddfd7c97';
 
@@ -162,7 +162,7 @@ describe('Export API', () => {
 
 		it('should return 400 BAD REQUEST when scheduling file export with an invalid address', async () => {
 			const response = await api.get(
-				`${baseUrlV3}/export/transactions?address=lsknww5x4dv93x3euds4w72d99ouwnqojyw5qrm`,
+				`${baseUrlV3}/export/transactions?address=klynww5x4dv93x3euds4w72d99ouwnqojyw5qrm`,
 				httpStatus.BAD_REQUEST,
 			);
 			expect(response).toMap(badRequestSchema);
@@ -196,7 +196,7 @@ describe('Export API', () => {
 
 		it('should return 400 BAD REQUEST when scheduling file export with an invalid address and a valid interval', async () => {
 			const response = await api.get(
-				`${baseUrlV3}/export/transactions?address=lsknww5x4dv93x3euds4w72d99ouwnqojyw5qrm&interval=${startDate}:${endDate}`,
+				`${baseUrlV3}/export/transactions?address=klynww5x4dv93x3euds4w72d99ouwnqojyw5qrm&interval=${startDate}:${endDate}`,
 				httpStatus.BAD_REQUEST,
 			);
 			expect(response).toMap(badRequestSchema);

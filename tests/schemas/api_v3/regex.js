@@ -13,7 +13,7 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const ADDRESS_LISK32 = /^lsk[a-hjkm-z2-9]{38}$/;
+const ADDRESS_KLAYR32 = /^kly[a-hjkm-z2-9]{38}$/;
 const IP =
 	/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 const HASH_SHA256 = /^\b([A-Fa-f0-9]){64}\b$/;
@@ -26,9 +26,9 @@ const NAME = /^[a-z0-9!@$&_.]{1,20}$/;
 const DATE_INTERVAL =
 	/^\b((\d{4})-((1[012])|(0?[1-9]))-(([012][1-9])|([123]0)|31))(:((\d{4})-((1[012])|(0?[1-9]))-(([012][1-9])|([123]0)|31)))?\b$/;
 const FILE_NAME =
-	/^\btransactions_([a-fA-F0-9]{8})_(lsk[a-hjkm-z2-9]{38})_((\d{4})-((1[012])|(0?[1-9]))-(([012][1-9])|([123]0)|31))_((\d{4})-((1[012])|(0?[1-9]))-(([012][1-9])|([123]0)|31))\.csv\b$/;
+	/^\btransactions_([a-fA-F0-9]{8})_(kly[a-hjkm-z2-9]{38})_((\d{4})-((1[012])|(0?[1-9]))-(([012][1-9])|([123]0)|31))_((\d{4})-((1[012])|(0?[1-9]))-(([012][1-9])|([123]0)|31))\.csv\b$/;
 const FILE_URL =
-	/^\/api\/v3\/export\/download\?filename=transactions_([a-fA-F0-9]{8})_(lsk[a-hjkm-z2-9]{38})_(\d{4}-\d{2}-\d{2})_(\d{4}-\d{2}-\d{2})\.xlsx$/;
+	/^\/api\/v3\/export\/download\?filename=transactions_([a-fA-F0-9]{8})_(kly[a-hjkm-z2-9]{38})_(\d{4}-\d{2}-\d{2})_(\d{4}-\d{2}-\d{2})\.xlsx$/;
 const NETWORK = /^\b(?:mainnet|testnet|betanet|devnet){1}\b$/;
 const MODULE = /^[0-9a-zA-Z]{1,32}$/;
 const MODULE_COMMAND = /^[0-9a-zA-Z]{1,32}:[0-9a-zA-Z]{1,32}$/;
@@ -43,13 +43,13 @@ const POSITIVE_DIGITS = /^[0-9]+\d*$/;
 const FLOATING_POINT = /^[0-9]+(\.[0-9]+)?$/;
 const VOTE_WEIGHT = /^\b[1-9]\d*000000000\b$/;
 const HEX_STRING = /^\b[0-9a-fA-F]+\b$/;
-const TOPIC = /^\b(?:[0-9a-fA-F]{2,64}|lsk[a-hjkm-z2-9]{38})\b$/;
+const TOPIC = /^\b(?:[0-9a-fA-F]{2,64}|kly[a-hjkm-z2-9]{38})\b$/;
 const EMPTY_STRING = /^$/;
 const POS_VALIDATOR_STATUS = /^\b(?:active|standby|banned|punished|ineligible)\b$/;
 const SWAGGER_RESPONSE_KEY = /^([0-9]{3})$|^(default)$/;
 
 module.exports = {
-	ADDRESS_LISK32,
+	ADDRESS_KLAYR32,
 	IP,
 	HASH_SHA256,
 	HASH_SHA512,

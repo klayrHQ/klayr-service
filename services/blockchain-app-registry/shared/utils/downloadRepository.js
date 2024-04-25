@@ -33,7 +33,7 @@ const {
 		},
 	},
 	Signals,
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { resolveChainNameByNetworkAppDir } = require('./chain');
 const { downloadAndExtractTarball, downloadFile } = require('./download');

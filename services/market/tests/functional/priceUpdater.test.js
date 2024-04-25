@@ -18,12 +18,12 @@ const { marketPriceItemSchema } = require('../schemas/marketPriceItem.schema');
 
 describe('Market prices calculation', () => {
 	it('Target pairs are a direct match within the raw prices', async () => {
-		const targetPairs = ['LSK_BTC', 'LSK_EUR', 'BTC_EUR', 'BTC_USD'];
+		const targetPairs = ['KLY_BTC', 'KLY_EUR', 'BTC_EUR', 'BTC_USD'];
 		const rawPricesBySource = {
 			cryptoExchange1: [
 				{
-					code: 'LSK_BTC',
-					from: 'LSK',
+					code: 'KLY_BTC',
+					from: 'KLY',
 					to: 'BTC',
 					rate: '0.000095',
 					updateTimestamp: 1622414485,
@@ -48,8 +48,8 @@ describe('Market prices calculation', () => {
 					sources: ['cx2'],
 				},
 				{
-					code: 'LSK_EUR',
-					from: 'LSK',
+					code: 'KLY_EUR',
+					from: 'KLY',
 					to: 'BTC',
 					rate: '2.75',
 					updateTimestamp: 1622414485,
@@ -67,10 +67,10 @@ describe('Market prices calculation', () => {
 		});
 
 		// Deep compare the results
-		expect(targetPairPrices.LSK_BTC).toEqual([
+		expect(targetPairPrices.KLY_BTC).toEqual([
 			{
-				code: 'LSK_BTC',
-				from: 'LSK',
+				code: 'KLY_BTC',
+				from: 'KLY',
 				to: 'BTC',
 				rate: '0.00009500',
 				updateTimestamp: 1622414485,
@@ -78,10 +78,10 @@ describe('Market prices calculation', () => {
 			},
 		]);
 
-		expect(targetPairPrices.LSK_EUR).toEqual([
+		expect(targetPairPrices.KLY_EUR).toEqual([
 			{
-				code: 'LSK_EUR',
-				from: 'LSK',
+				code: 'KLY_EUR',
+				from: 'KLY',
 				to: 'BTC',
 				rate: '2.7500',
 				updateTimestamp: 1622414485,
@@ -113,7 +113,7 @@ describe('Market prices calculation', () => {
 	});
 
 	it('Target pairs are a transitive match of two raw prices', async () => {
-		const targetPairs = ['LSK_CHF', 'BTC_CHF'];
+		const targetPairs = ['KLY_CHF', 'BTC_CHF'];
 		const rawPricesBySource = {
 			cryptoExchange1: [
 				{
@@ -127,8 +127,8 @@ describe('Market prices calculation', () => {
 			],
 			cryptoExchange2: [
 				{
-					code: 'LSK_EUR',
-					from: 'LSK',
+					code: 'KLY_EUR',
+					from: 'KLY',
 					to: 'BTC',
 					rate: '2.75',
 					updateTimestamp: 1622414485,
@@ -164,10 +164,10 @@ describe('Market prices calculation', () => {
 		});
 
 		// Deep compare the results
-		expect(targetPairPrices.LSK_CHF).toEqual([
+		expect(targetPairPrices.KLY_CHF).toEqual([
 			{
-				code: 'LSK_CHF',
-				from: 'LSK',
+				code: 'KLY_CHF',
+				from: 'KLY',
 				to: 'CHF',
 				rate: '3.0250',
 				updateTimestamp: 1622414485,
@@ -189,10 +189,10 @@ describe('Market prices calculation', () => {
 
 	it('Target prices are a mixed bag', async () => {
 		const targetPairs = [
-			'LSK_BTC',
-			'LSK_EUR',
-			'LSK_USD',
-			'LSK_CHF',
+			'KLY_BTC',
+			'KLY_EUR',
+			'KLY_USD',
+			'KLY_CHF',
 			'BTC_EUR',
 			'BTC_USD',
 			'BTC_CHF',
@@ -200,8 +200,8 @@ describe('Market prices calculation', () => {
 		const rawPricesBySource = {
 			cryptoExchange1: [
 				{
-					code: 'LSK_BTC',
-					from: 'LSK',
+					code: 'KLY_BTC',
+					from: 'KLY',
 					to: 'BTC',
 					rate: '0.000095',
 					updateTimestamp: 1622414485,
@@ -226,8 +226,8 @@ describe('Market prices calculation', () => {
 					sources: ['cx2'],
 				},
 				{
-					code: 'LSK_EUR',
-					from: 'LSK',
+					code: 'KLY_EUR',
+					from: 'KLY',
 					to: 'BTC',
 					rate: '2.75',
 					updateTimestamp: 1622414485,
@@ -263,10 +263,10 @@ describe('Market prices calculation', () => {
 		});
 
 		// Deep compare the results
-		expect(targetPairPrices.LSK_BTC).toEqual([
+		expect(targetPairPrices.KLY_BTC).toEqual([
 			{
-				code: 'LSK_BTC',
-				from: 'LSK',
+				code: 'KLY_BTC',
+				from: 'KLY',
 				to: 'BTC',
 				rate: '0.00009500',
 				updateTimestamp: 1622414485,
@@ -274,10 +274,10 @@ describe('Market prices calculation', () => {
 			},
 		]);
 
-		expect(targetPairPrices.LSK_EUR).toEqual([
+		expect(targetPairPrices.KLY_EUR).toEqual([
 			{
-				code: 'LSK_EUR',
-				from: 'LSK',
+				code: 'KLY_EUR',
+				from: 'KLY',
 				to: 'BTC',
 				rate: '2.7500',
 				updateTimestamp: 1622414485,
@@ -285,18 +285,18 @@ describe('Market prices calculation', () => {
 			},
 		]);
 
-		expect(targetPairPrices.LSK_USD).toEqual([
+		expect(targetPairPrices.KLY_USD).toEqual([
 			{
-				code: 'LSK_USD',
-				from: 'LSK',
+				code: 'KLY_USD',
+				from: 'KLY',
 				to: 'USD',
 				rate: '3.3250',
 				updateTimestamp: 1622414485,
 				sources: ['cx1', 'cx2'],
 			},
 			{
-				code: 'LSK_USD',
-				from: 'LSK',
+				code: 'KLY_USD',
+				from: 'KLY',
 				to: 'USD',
 				rate: '3.3550',
 				updateTimestamp: 1622414485,
@@ -304,10 +304,10 @@ describe('Market prices calculation', () => {
 			},
 		]);
 
-		expect(targetPairPrices.LSK_CHF).toEqual([
+		expect(targetPairPrices.KLY_CHF).toEqual([
 			{
-				code: 'LSK_CHF',
-				from: 'LSK',
+				code: 'KLY_CHF',
+				from: 'KLY',
 				to: 'CHF',
 				rate: '3.0250',
 				updateTimestamp: 1622414485,

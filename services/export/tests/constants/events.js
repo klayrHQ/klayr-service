@@ -18,7 +18,7 @@ const tokenMintedEvent = {
 	module: 'token',
 	name: 'lock',
 	data: {
-		address: 'lskbrukhb5ctdodhy8z6any4b6u2qrkugz43w78pr',
+		address: 'klybrukhb5ctdodhy8z6any4b6u2qrkugz43w78pr',
 		module: 'fee',
 		tokenID: '0100000000000000',
 		amount: '161000',
@@ -26,7 +26,7 @@ const tokenMintedEvent = {
 	},
 	topics: [
 		'041c425c907ba819e64da0166de38fe50ae9de29d9a3fd2bbeda2e89c045917fe3',
-		'lskbrukhb5ctdodhy8z6any4b6u2qrkugz43w78pr',
+		'klybrukhb5ctdodhy8z6any4b6u2qrkugz43w78pr',
 	],
 };
 
@@ -35,12 +35,12 @@ const tokenLockedEvent = {
 	module: 'token',
 	name: 'mint',
 	data: {
-		address: 'lskywqe2cuw5j9burca4sm6rpfxnxyzksv5r99b9g',
+		address: 'klyywqe2cuw5j9burca4sm6rpfxnxyzksv5r99b9g',
 		tokenID: '0100000000000000',
 		amount: '131000',
 		result: 0,
 	},
-	topics: ['03', 'lskywqe2cuw5j9burca4sm6rpfxnxyzksv5r99b9g'],
+	topics: ['03', 'klyywqe2cuw5j9burca4sm6rpfxnxyzksv5r99b9g'],
 };
 
 const genFeeProcessed = {
@@ -48,15 +48,15 @@ const genFeeProcessed = {
 	module: 'fee',
 	name: 'generatorFeeProcessed',
 	data: {
-		senderAddress: 'lskmv6entvj8cnrhfdoa38ojx34pv4rd9q44788r7',
-		generatorAddress: 'lskme8ohf9geuno8nwpvdqm8wr8bvz5nzguftwpxp',
+		senderAddress: 'klymv6entvj8cnrhfdoa38ojx34pv4rd9q44788r7',
+		generatorAddress: 'klyme8ohf9geuno8nwpvdqm8wr8bvz5nzguftwpxp',
 		burntAmount: '179000',
 		generatorAmount: '21000',
 	},
 	topics: [
 		'04d41e8fbb909fdf44ffccef6f5b0fb5edf853f0dcf699243a0a92403d2a4f1d1d',
-		'lskmv6entvj8cnrhfdoa38ojx34pv4rd9q44788r7',
-		'lskme8ohf9geuno8nwpvdqm8wr8bvz5nzguftwpxp',
+		'klymv6entvj8cnrhfdoa38ojx34pv4rd9q44788r7',
+		'klyme8ohf9geuno8nwpvdqm8wr8bvz5nzguftwpxp',
 	],
 };
 
@@ -65,14 +65,14 @@ const rewardsAssigned = {
 	module: 'pos',
 	name: 'rewardsAssigned',
 	data: {
-		stakerAddress: 'lskmg3sdmjp4smz6x9k2cuyuwags5ehgtexe4w2ds',
-		validatorAddress: 'lsk26s9p9rb74ygzxayuf9cx6x7x5wuvp2v9yrns7',
+		stakerAddress: 'klymg3sdmjp4smz6x9k2cuyuwags5ehgtexe4w2ds',
+		validatorAddress: 'kly26s9p9rb74ygzxayuf9cx6x7x5wuvp2v9yrns7',
 		tokenID: '0100000000000000',
 		amount: '87694485125',
 	},
 	topics: [
 		'04732923c6e8780251c1dcd179e3e657827ae9318a6df920de595d743f1ed70a40',
-		'lskmg3sdmjp4smz6x9k2cuyuwags5ehgtexe4w2ds',
+		'klymg3sdmjp4smz6x9k2cuyuwags5ehgtexe4w2ds',
 	],
 };
 
@@ -82,11 +82,11 @@ const relayerFeeProcessed = {
 	name: 'relayerFeeProcessed',
 	data: {
 		ccmID: 'e6a22f3c4489ceba8e20eeea0ce617d9c385e92aeb9a710a53eb941d34b5f92e',
-		relayerAddress: 'lskmg3sdmjp4smz6x9k2cuyuwags5ehgtexe4w2ds',
+		relayerAddress: 'klymg3sdmjp4smz6x9k2cuyuwags5ehgtexe4w2ds',
 		burntAmount: '10000000',
 		relayerAmount: '50000',
 	},
-	topics: ['lskmg3sdmjp4smz6x9k2cuyuwags5ehgtexe4w2ds'],
+	topics: ['klymg3sdmjp4smz6x9k2cuyuwags5ehgtexe4w2ds'],
 };
 
 const ccmSendSuccess = {
@@ -119,8 +119,8 @@ const transferCrossChain = {
 	module: 'token',
 	name: 'transferCrossChain',
 	data: {
-		senderAddress: 'lsk56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
-		recipientAddress: 'lsk56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
+		senderAddress: 'kly56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
+		recipientAddress: 'kly56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
 		tokenID: '0400000000000000',
 		amount: '100000000',
 		receivingChainID: '04000002',
@@ -128,8 +128,8 @@ const transferCrossChain = {
 	},
 	topics: [
 		'0434548b99aa37a5a450712c7e3f1e13b62be872d65dd7a8c1d54859408ca4914b',
-		'lsk56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
-		'lsk56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
+		'kly56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
+		'kly56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
 		'01000002',
 	],
 };
@@ -139,8 +139,8 @@ const ccmTransfer = {
 	module: 'token',
 	name: 'transferCrossChain',
 	data: {
-		senderAddress: 'lsk56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
-		recipientAddress: 'lsk56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
+		senderAddress: 'kly56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
+		recipientAddress: 'kly56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
 		tokenID: '0400000000000000',
 		amount: '100000000',
 		receivingChainID: '04000002',
@@ -148,8 +148,8 @@ const ccmTransfer = {
 	},
 	topics: [
 		'05d16d1cb5fa32df64988b4ab5de66b7d43c8fbfdaf043aca84d649f914d66189f',
-		'lsk56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
-		'lsk56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
+		'kly56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
+		'kly56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
 	],
 };
 
@@ -159,13 +159,13 @@ const accountReclaimed = {
 	name: 'accountReclaimed',
 	data: {
 		legacyAddress: '15297866638783057016L',
-		address: 'lskqz6gpqfu9tb5yc2jtqmqvqp3x8ze35g99u2zfd',
+		address: 'klyqz6gpqfu9tb5yc2jtqmqvqp3x8ze35g99u2zfd',
 		amount: '100000000',
 	},
 	topics: [
 		'046cff643daaa2bd1112d1b4591abef3e62f9e4f6e37a260fcd7508ce6a06f061c',
 		'15297866638783057016L',
-		'lskqz6gpqfu9tb5yc2jtqmqvqp3x8ze35g99u2zfd',
+		'klyqz6gpqfu9tb5yc2jtqmqvqp3x8ze35g99u2zfd',
 	],
 };
 
@@ -174,12 +174,12 @@ const validatorPunished = {
 	module: 'pos',
 	name: 'validatorPunished',
 	data: {
-		address: 'lskmjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5',
+		address: 'klymjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5',
 		height: 1745,
 	},
 	topics: [
 		'04cd41e8fbb909fdf44ffccef6f5b0fb5edf853f0dcf699243a0a92403d2a4f1d1d',
-		'lskmjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5',
+		'klymjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5',
 	],
 };
 
@@ -188,16 +188,16 @@ const tokenTransfer = {
 	module: 'token',
 	name: 'transfer',
 	data: {
-		senderAddress: 'lskmjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5',
-		recipientAddress: 'lskmjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5',
+		senderAddress: 'klymjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5',
+		recipientAddress: 'klymjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5',
 		tokenID: '0400000000000000',
 		amount: '100000000',
 		result: 0,
 	},
 	topics: [
 		'04ce7082673acce922263e0256e717dc151fe86a88c6827bf53d42038ee387eca1',
-		'lskmjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5',
-		'lskmjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5',
+		'klymjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5',
+		'klymjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5',
 	],
 };
 

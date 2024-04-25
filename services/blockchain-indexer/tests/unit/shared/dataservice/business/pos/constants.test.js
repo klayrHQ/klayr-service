@@ -22,8 +22,8 @@ const posConstantsFilePath = resolve(
 	`${__dirname}/../../../../../../shared/dataService/business/pos/constants`,
 );
 
-jest.mock('lisk-service-framework', () => {
-	const actual = jest.requireActual('lisk-service-framework');
+jest.mock('klayr-service-framework', () => {
+	const actual = jest.requireActual('klayr-service-framework');
 	return {
 		...actual,
 		CacheRedis: jest.fn(() => ({

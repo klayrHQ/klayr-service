@@ -21,7 +21,7 @@ const {
 	KVStore: { configureKeyValueTable, getKeyValueTable },
 } = require('../../../../src/database/mysql');
 
-const CONN_ENDPOINT_DEFAULT = 'mysql://lisk:password@127.0.0.1:3306/lisk';
+const CONN_ENDPOINT_DEFAULT = 'mysql://klayr:password@127.0.0.1:3306/klayr';
 
 const MYSQL_ENDPOINT = CONN_ENDPOINT_DEFAULT;
 

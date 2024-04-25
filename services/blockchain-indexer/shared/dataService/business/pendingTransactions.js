@@ -18,7 +18,7 @@ const {
 	Logger,
 	Exceptions: { ValidationException },
 	Signals,
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const logger = Logger();
 
@@ -26,7 +26,7 @@ const { getCurrentChainID } = require('./interoperability/chain');
 const { normalizeTransaction } = require('./transactions');
 const { getIndexedAccountInfo } = require('../utils/account');
 const { requestConnector } = require('../../utils/request');
-const { getLisk32AddressFromPublicKey } = require('../../utils/account');
+const { getKlayr32AddressFromPublicKey } = require('../../utils/account');
 const { TRANSACTION_STATUS } = require('../../constants');
 const { indexAccountPublicKey } = require('../../indexer/accountIndex');
 
@@ -34,7 +34,7 @@ let pendingTransactionsList = [];
 
 const formatPendingTransaction = async transaction => {
 	const normalizedTransaction = await normalizeTransaction(transaction);
-	const senderAddress = getLisk32AddressFromPublicKey(normalizedTransaction.senderPublicKey);
+	const senderAddress = getKlayr32AddressFromPublicKey(normalizedTransaction.senderPublicKey);
 	const account = await getIndexedAccountInfo({ address: senderAddress }, ['name']);
 
 	normalizedTransaction.sender = {

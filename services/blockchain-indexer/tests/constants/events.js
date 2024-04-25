@@ -66,7 +66,7 @@ const eventsWithFailStatus = [
 const eventsIncludingTokenModule = [
 	{
 		data: {
-			address: 'lskz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk',
+			address: 'klyz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk',
 			module: 'fee',
 			tokenID: '0400000000000000',
 			amount: '1500000000',
@@ -77,7 +77,7 @@ const eventsIncludingTokenModule = [
 		name: 'lock',
 		topics: [
 			'76d4488029f123f8754f5f8182aba8574638ba3ac40a5d4d03c7ff7d2aa31472',
-			'lskz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk',
+			'klyz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk',
 		],
 		height: 8,
 		id: 'fc7a423928dca346a270d09796ef3c1655c0b1e520949b9330a10496ff663d06',
@@ -141,7 +141,7 @@ const eventsIncludingTokenModule = [
 	},
 	{
 		data: {
-			address: 'lskz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk',
+			address: 'klyz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk',
 			module: 'fee',
 			tokenID: '0400000000000000',
 			amount: '1500000000',
@@ -152,15 +152,15 @@ const eventsIncludingTokenModule = [
 		name: 'unlock',
 		topics: [
 			'76d4488029f123f8754f5f8182aba8574638ba3ac40a5d4d03c7ff7d2aa31472',
-			'lskz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk',
+			'klyz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk',
 		],
 		height: 8,
 		id: '91a0a756874af88205dc20e309eb809d2daa425dbb6a678d7e94114909e5179e',
 	},
 	{
 		data: {
-			senderAddress: 'lskz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk',
-			recipientAddress: 'lsk6q3eq5qnahyytpywoxkgarzh8gck396wmd3yeu',
+			senderAddress: 'klyz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk',
+			recipientAddress: 'kly6q3eq5qnahyytpywoxkgarzh8gck396wmd3yeu',
 			tokenID: '0400000000000000',
 			amount: '489382000',
 			result: 0,
@@ -170,15 +170,15 @@ const eventsIncludingTokenModule = [
 		name: 'transfer',
 		topics: [
 			'76d4488029f123f8754f5f8182aba8574638ba3ac40a5d4d03c7ff7d2aa31472',
-			'lskz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk',
-			'lsk6q3eq5qnahyytpywoxkgarzh8gck396wmd3yeu',
+			'klyz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk',
+			'kly6q3eq5qnahyytpywoxkgarzh8gck396wmd3yeu',
 		],
 		height: 8,
 		id: '8c8415ae35592be88130d64e8f1acfa761a87d6c288378c2235c8e2abfde333f',
 	},
 	{
 		data: {
-			address: 'lskz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk',
+			address: 'klyz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk',
 			tokenID: '0400000000000000',
 			amount: '1010618000',
 			result: 0,
@@ -188,15 +188,15 @@ const eventsIncludingTokenModule = [
 		name: 'burn',
 		topics: [
 			'76d4488029f123f8754f5f8182aba8574638ba3ac40a5d4d03c7ff7d2aa31472',
-			'lskz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk',
+			'klyz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk',
 		],
 		height: 8,
 		id: 'd314328148ae956ca3964398cb3cf74b453d58f6115c9f373de27869502e0c64',
 	},
 	{
 		data: {
-			senderAddress: 'lskz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk',
-			generatorAddress: 'lsk6q3eq5qnahyytpywoxkgarzh8gck396wmd3yeu',
+			senderAddress: 'klyz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk',
+			generatorAddress: 'kly6q3eq5qnahyytpywoxkgarzh8gck396wmd3yeu',
 			burntAmount: '1010618000',
 			generatorAmount: '489382000',
 		},
@@ -205,8 +205,8 @@ const eventsIncludingTokenModule = [
 		name: 'generatorFeeProcessed',
 		topics: [
 			'76d4488029f123f8754f5f8182aba8574638ba3ac40a5d4d03c7ff7d2aa31472',
-			'lskz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk',
-			'lsk6q3eq5qnahyytpywoxkgarzh8gck396wmd3yeu',
+			'klyz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk',
+			'kly6q3eq5qnahyytpywoxkgarzh8gck396wmd3yeu',
 		],
 		height: 8,
 		id: 'af42f48aa740a45ab3354d2a0aba271642d7c545dfa3205eee5a59a94af93474',
@@ -230,7 +230,7 @@ const eventsIncludingTokenModule = [
 		index: 9,
 		module: 'dynamicReward',
 		name: 'rewardMinted',
-		topics: ['03', 'lsk6q3eq5qnahyytpywoxkgarzh8gck396wmd3yeu'],
+		topics: ['03', 'kly6q3eq5qnahyytpywoxkgarzh8gck396wmd3yeu'],
 		height: 8,
 		id: '4fe3de569aa98e98a7fb42435e4a8c053b2ef79ed120f0be332b6718a26f8e26',
 	},

@@ -22,13 +22,13 @@ RUN yarn install --frozen-lockfile && \
 FROM node:$NODEJS_VERSION-alpine
 
 RUN apk add --no-cache curl=~8 && \
-    adduser -D lisk
+    adduser -D klayr
 
-USER lisk
-WORKDIR /home/lisk/lisk-service/gateway
+USER klayr
+WORKDIR /home/klayr/klayr-service/gateway
 
-COPY --chown=lisk:lisk ./ .
-COPY --chown=lisk:lisk --from=builder /home/builder/build/ .
+COPY --chown=klayr:klayr ./ .
+COPY --chown=klayr:klayr --from=builder /home/builder/build/ .
 
 EXPOSE 9901
 HEALTHCHECK CMD curl --fail http://localhost:9901/api/status || exit 1

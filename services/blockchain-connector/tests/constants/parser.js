@@ -13,7 +13,7 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const liskAccount = Object.freeze({
+const klayrAccount = Object.freeze({
 	input: {
 		address: '7a74ddeca43fef9d3fbf405039743dc54f0cdc9b',
 		token: {
@@ -226,7 +226,7 @@ const liskAccount = Object.freeze({
 	},
 });
 
-const liskBlock = Object.freeze({
+const klayrBlock = Object.freeze({
 	input: {
 		header: {
 			version: 2,
@@ -287,7 +287,7 @@ const liskBlock = Object.freeze({
 	},
 });
 
-const liskBlockHeader = Object.freeze({
+const klayrBlockHeader = Object.freeze({
 	input: {
 		version: 2,
 		timestamp: 1649419370,
@@ -387,7 +387,7 @@ const liskBlockHeader = Object.freeze({
 	},
 });
 
-const liskBlockHeaderAsset = Object.freeze({
+const klayrBlockHeaderAsset = Object.freeze({
 	input: {
 		initRounds: 3,
 		initDelegates: [
@@ -694,7 +694,7 @@ const liskBlockHeaderAsset = Object.freeze({
 	},
 });
 
-const liskBlockHeaderAssetV3 = Object.freeze({
+const klayrBlockHeaderAssetV3 = Object.freeze({
 	input: {
 		maxHeightPreviouslyForged: 18211671,
 		maxHeightPrevoted: 18211676,
@@ -728,7 +728,7 @@ const liskBlockHeaderAssetV3 = Object.freeze({
 	},
 });
 
-const liskTransaction = Object.freeze({
+const klayrTransaction = Object.freeze({
 	input: {
 		moduleID: 2,
 		assetID: 0,
@@ -768,7 +768,7 @@ const liskTransaction = Object.freeze({
 		id: '17a0904415f7ad9a0e305ae8a43453243a84e2afe176083a0ab33fb12e3bbc25',
 	},
 	schema: {
-		$id: 'lisk/transaction',
+		$id: 'klayr/transaction',
 		type: 'object',
 		required: ['moduleID', 'assetID', 'nonce', 'fee', 'senderPublicKey', 'asset'],
 		properties: {
@@ -810,7 +810,7 @@ const liskTransaction = Object.freeze({
 	},
 });
 
-const liskTransactionAssets = Object.freeze([
+const klayrTransactionAssets = Object.freeze([
 	{
 		moduleID: 2,
 		moduleName: 'token',
@@ -827,7 +827,7 @@ const liskTransactionAssets = Object.freeze([
 			data: 'Happy birthday!',
 		},
 		schema: {
-			$id: 'lisk/transfer-asset',
+			$id: 'klayr/transfer-asset',
 			title: 'Transfer transaction asset',
 			type: 'object',
 			required: ['amount', 'recipientAddress', 'data'],
@@ -869,7 +869,7 @@ const liskTransactionAssets = Object.freeze([
 			optionalKeys: [],
 		},
 		schema: {
-			$id: 'lisk/keys/register',
+			$id: 'klayr/keys/register',
 			type: 'object',
 			required: ['numberOfSignatures', 'optionalKeys', 'mandatoryKeys'],
 			properties: {
@@ -916,7 +916,7 @@ const liskTransactionAssets = Object.freeze([
 			username: 'compa16',
 		},
 		schema: {
-			$id: 'lisk/dpos/register',
+			$id: 'klayr/dpos/register',
 			type: 'object',
 			required: ['username'],
 			properties: {
@@ -975,7 +975,7 @@ const liskTransactionAssets = Object.freeze([
 			],
 		},
 		schema: {
-			$id: 'lisk/dpos/vote',
+			$id: 'klayr/dpos/vote',
 			type: 'object',
 			required: ['votes'],
 			properties: {
@@ -1058,7 +1058,7 @@ const liskTransactionAssets = Object.freeze([
 			],
 		},
 		schema: {
-			$id: 'lisk/dpos/unlock',
+			$id: 'klayr/dpos/unlock',
 			type: 'object',
 			required: ['unlockObjects'],
 			properties: {
@@ -1187,7 +1187,7 @@ const liskTransactionAssets = Object.freeze([
 			},
 		},
 		schema: {
-			$id: 'lisk/dpos/pom',
+			$id: 'klayr/dpos/pom',
 			type: 'object',
 			required: ['header1', 'header2'],
 			properties: {
@@ -1334,7 +1334,7 @@ const liskTransactionAssets = Object.freeze([
 		moduleID: 1000,
 		moduleName: 'legacyAccount',
 		assetID: 0,
-		assetName: 'reclaimLSK',
+		assetName: 'reclaimKLY',
 		input: {
 			amount: '100155104',
 		},
@@ -1342,7 +1342,7 @@ const liskTransactionAssets = Object.freeze([
 			amount: BigInt('100155104'),
 		},
 		schema: {
-			$id: 'lisk/legacyAccount/reclaim',
+			$id: 'klayr/legacyAccount/reclaim',
 			title: 'Reclaim transaction asset',
 			type: 'object',
 			required: ['amount'],
@@ -1357,11 +1357,11 @@ const liskTransactionAssets = Object.freeze([
 ]);
 
 module.exports = {
-	liskAccount,
-	liskBlock,
-	liskBlockHeader,
-	liskBlockHeaderAsset,
-	liskBlockHeaderAssetV3,
-	liskTransaction,
-	liskTransactionAssets,
+	klayrAccount,
+	klayrBlock,
+	klayrBlockHeader,
+	klayrBlockHeaderAsset,
+	klayrBlockHeaderAssetV3,
+	klayrTransaction,
+	klayrTransactionAssets,
 };

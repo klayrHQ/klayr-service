@@ -16,7 +16,7 @@
 const {
 	Logger,
 	Exceptions: { TimeoutException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { getNodeInfo } = require('./endpoints_1');
 const { getGenesisBlockFromFS } = require('./blocksUtils');

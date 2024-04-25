@@ -1,6 +1,6 @@
 = Docker commands
 Mona Bärenfänger <mona@lightcurve.io>
-:description: Describes how to manage Lisk Service with Docker.
+:description: Describes how to manage Klayr Service with Docker.
 :toc:
 :idseparator: -
 :idprefix:
@@ -11,20 +11,20 @@ Mona Bärenfänger <mona@lightcurve.io>
 :url_FLUSHALL: https://redis.io/commands/FLUSHALL
 :url_snapshot_config: configuration/index.adoc
 :url_backups: management/snapshots.adoc
-:url_rel_notes: https://github.com/LiskHQ/lisk-service/releases
-:url_tags: https://github.com/LiskHQ/lisk-service/tags
+:url_rel_notes: https://github.com/KlayrHQ/klayr-service/releases
+:url_tags: https://github.com/KlayrHQ/klayr-service/tags
 
 == Build Docker image
 
-.Inside the lisk-service root folder
+.Inside the klayr-service root folder
 ----
 make build-images
 ----
-This creates the necessary Docker images to start Lisk Service in the containers.
+This creates the necessary Docker images to start Klayr Service in the containers.
 
 == Start
 
-.Inside the lisk-service root folder
+.Inside the klayr-service root folder
 ----
 cp ./docker/example.env .env
 ----
@@ -32,18 +32,18 @@ cp ./docker/example.env .env
 make up
 ----
 
-This will start Lisk Service with the default configuration, which in turn will connect to a Lisk Core Mainnet node.
+This will start Klayr Service with the default configuration, which in turn will connect to a Klayr Core Mainnet node.
 
-In case a different node or network shall be used, xref:{url_config}[configure] Lisk Service accordingly.
+In case a different node or network shall be used, xref:{url_config}[configure] Klayr Service accordingly.
 
 == Stop
 
-.Inside the lisk-service root folder
+.Inside the klayr-service root folder
 ----
 make down
 ----
 
-This will stop Lisk Service.
+This will stop Klayr Service.
 
 == Show the status of Docker containers
 
@@ -51,11 +51,11 @@ This will stop Lisk Service.
 docker ps
 ----
 
-== Reset the Lisk Service database
+== Reset the Klayr Service database
 
-To reset the database of Lisk Service, drop the respective MySQL and Redis databases.
+To reset the database of Klayr Service, drop the respective MySQL and Redis databases.
 
-Before resetting the database, stop Lisk Service:
+Before resetting the database, stop Klayr Service:
 
 ----
 make stop
@@ -66,7 +66,7 @@ Now connect to the Docker container in which you wish to reset the database. If 
 To connect to the interactive shell of the MySQL Docker container in which you wish to reset the MySQL database, execute the following command:
 
 ----
-docker exec -it lisk-service-mysql-primary-1 bash
+docker exec -it klayr-service-mysql-primary-1 bash
 ----
 
 === Drop Database
@@ -76,10 +76,10 @@ docker exec -it lisk-service-mysql-primary-1 bash
 MySQL DB::
 +
 --
-. Login to MySQL with the `lisk` user.
+. Login to MySQL with the `klayr` user.
 +
 ----
-mysql -ulisk -ppassword
+mysql -uklayr -ppassword
 ----
 +
 On successful login, you enter the MYSQL command-line client:
@@ -98,15 +98,15 @@ owners.
 
 Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 ----
-. Drop the `lisk` database.
+. Drop the `klayr` database.
 +
 ----
-mysql> drop database lisk;
+mysql> drop database klayr;
 ----
-. Create a fresh database `lisk`.
+. Create a fresh database `klayr`.
 +
 ----
-mysql> create database lisk;
+mysql> create database klayr;
 ----
 . Log out from MySQL by typing `quit;`
 +
@@ -122,10 +122,10 @@ MariaDB::
 --
 MariaDB also uses the same SQL commands for querying and manipulating the relevant data, including data storage, client libraries, and replication.
 
-. Login to MariaDB with the `lisk` user.
+. Login to MariaDB with the `klayr` user.
 +
 ----
-docker exec -it lisk_mariadb mysql -uroot -p
+docker exec -it klayr_mariadb mysql -uroot -p
 ----
 +
 On successful login, you enter the MariaDB command-line client:
@@ -139,20 +139,20 @@ Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
 
 Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 ----
-. Drop the `lisk` database.
+. Drop the `klayr` database.
 +
 ----
-MariaDB [(none)]> drop database lisk;
+MariaDB [(none)]> drop database klayr;
 ----
 +
 .Result
 ----
 Query OK, 0 rows affected (0.009 sec)
 ----
-. Create a fresh database `lisk`
+. Create a fresh database `klayr`
 +
 ----
-MariaDB [(none)]> create database lisk;
+MariaDB [(none)]> create database klayr;
 ----
 +
 .Result
@@ -175,7 +175,7 @@ Reset the databases for Redis after dropping the MySQL database:
 
 .Execute command in running docker container.
 ----
-sudo docker exec -it lisk-service_redis_core_persistent_1 /bin/sh
+sudo docker exec -it klayr-service_redis_core_persistent_1 /bin/sh
 ----
 
 .Truncate redis database.
@@ -200,15 +200,15 @@ redis-cli -n <db_number> flushdb
 ----
 ====
 
-=== Start Lisk Service
+=== Start Klayr Service
 
-After the databases are reset, start Lisk Service again as usual:
+After the databases are reset, start Klayr Service again as usual:
 
 ----
 make up
 ----
 
-NOTE: When Lisk Service is started again after a database reset, then the process to reindex all the data is initiated.
+NOTE: When Klayr Service is started again after a database reset, then the process to reindex all the data is initiated.
 This can be quite time-consuming when the chain is long, spanning over hours.
 
 == Taking Snapshots
@@ -219,12 +219,12 @@ If you wish to take a snapshot of your Docker installation, the details can be f
 
 The possibility exists here to either use the `docker` commands or the `make` commands to check the logs, and both options are listed here below.
 
-For `docker`, to check the logs for the different microservices of Lisk Service, use the command `docker container logs CONTAINER`, where `CONTAINER` is the respective Docker container that holds the logs you wish to view.
+For `docker`, to check the logs for the different microservices of Klayr Service, use the command `docker container logs CONTAINER`, where `CONTAINER` is the respective Docker container that holds the logs you wish to view.
 
 For example, to see the logs for the Gateway microservice, execute the following command:
 
 ----
-docker container logs lisk-service_gateway_1
+docker container logs klayr-service_gateway_1
 ----
 
 To check the logs for different microservices using the `make` commands, the following commands listed below can be used:
@@ -255,16 +255,16 @@ In the above example, it will display the latest logs only for the `blockchain-c
 Replace the `blockchain-connector` with the specific service name required.
 
 
-== Upgrade Lisk Service
+== Upgrade Klayr Service
 
-To upgrade the Docker container to a desired version, please follow one of the two options below. To find all the tagged versions for Lisk Service, please check the {url_tags}[available tags] on GitHub.
+To upgrade the Docker container to a desired version, please follow one of the two options below. To find all the tagged versions for Klayr Service, please check the {url_tags}[available tags] on GitHub.
 
 [tabs]
 ====
 Option A - Download pre-built images from DockerHub::
 +
 --
-. Stop Lisk Service
+. Stop Klayr Service
 +
 ----
 make stop
@@ -284,43 +284,43 @@ Update specified images with the desired version, for example `0.7.7`.
 [source,yaml]
 ----
 blockchain-app-registry:
-    image: lisk/service_blockchain_app_registry:0.7.7
+    image: klayr/service_blockchain_app_registry:0.7.7
     ...
 
   blockchain-connector:
-    image: lisk/service_blockchain_connector:0.7.7
+    image: klayr/service_blockchain_connector:0.7.7
     ...
 
   blockchain-indexer:
-    image: lisk/service_blockchain_indexer:0.7.7
+    image: klayr/service_blockchain_indexer:0.7.7
     ...
 
   blockchain-coordinator:
-    image: lisk/service_blockchain_coordinator:0.7.7
+    image: klayr/service_blockchain_coordinator:0.7.7
     ...
 
   transaction-statistics:
-    image: lisk/service_transaction_statistics:0.7.7
+    image: klayr/service_transaction_statistics:0.7.7
     ...
 
   fee-estimator:
-    image: lisk/service_fee_estimator:0.7.7
+    image: klayr/service_fee_estimator:0.7.7
     ...
 
   gateway:
-    image: lisk/service_gateway:0.7.7
+    image: klayr/service_gateway:0.7.7
     ...
 
   market:
-    image: lisk/service_market:0.7.7
+    image: klayr/service_market:0.7.7
     ...
 
   export:
-    image: lisk/service_export:0.7.7
+    image: klayr/service_export:0.7.7
 
 ----
 
-. Start Lisk Service in the containers.
+. Start Klayr Service in the containers.
 +
 ----
 make up
@@ -330,9 +330,9 @@ Option B - Build images locally ::
 +
 --
 Build the images locally using the following steps.
-Navigate inside the lisk-service root folder, and execute the following commands.
+Navigate inside the klayr-service root folder, and execute the following commands.
 
-. Stop Lisk Service
+. Stop Klayr Service
 +
 ----
 make stop
@@ -351,7 +351,7 @@ git checkout v0.7.7
 make build-images
 ----
 
-. Start Lisk Service in the containers
+. Start Klayr Service in the containers
 +
 ----
 make up

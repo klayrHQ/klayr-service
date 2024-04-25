@@ -30,7 +30,7 @@ module.exports = {
 			type: 'string',
 			min: 41,
 			max: 41,
-			pattern: regex.ADDRESS_LISK32,
+			pattern: regex.ADDRESS_KLAYR32,
 		},
 		topic: { optional: true, type: 'string', pattern: regex.TOPIC_CSV },
 		module: { optional: true, type: 'string', min: 1, pattern: regex.MODULE },

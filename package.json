@@ -1,22 +1,22 @@
 {
-	"name": "lisk-service",
+	"name": "klayr-service",
 	"version": "0.7.7",
-	"description": "Lisk Service",
+	"description": "Klayr Service",
 	"keywords": [
-		"lisk",
+		"klayr",
 		"service",
 		"blockchain"
 	],
-	"homepage": "https://github.com/LiskHQ/lisk-service",
+	"homepage": "https://github.com/klayrHQ/klayr-service",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/LiskHQ/lisk-service.git"
+		"url": "git+https://github.com/klayrHQ/klayr-service.git"
 	},
 	"bugs": {
-		"url": "https://github.com/LiskHQ/lisk-service/issues"
+		"url": "https://github.com/klayrHQ/klayr-service/issues"
 	},
 	"private": true,
-	"author": "Lisk Foundation <admin@lisk.com>, lightcurve GmbH <admin@lightcurve.io>",
+	"author": "Klayr Holding <admin@klayr.xyz>, Lisk Foundation <admin@lisk.com>, lightcurve GmbH <admin@lightcurve.io>",
 	"license": "Apache-2.0",
 	"main": "app.js",
 	"engines": {
@@ -33,7 +33,7 @@
 	},
 	"devDependencies": {
 		"eslint": "^8.46.0",
-		"eslint-config-lisk-base": "^2.0.1",
+		"eslint-config-klayr-base": "^2.0.3",
 		"eslint-config-prettier": "^9.0.0",
 		"eslint-plugin-import": "^2.26.0",
 		"eslint-plugin-jest": "^26.2.2",

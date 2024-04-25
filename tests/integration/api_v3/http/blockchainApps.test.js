@@ -139,7 +139,7 @@ describe('Blockchain apps API', () => {
 	});
 
 	it('should return bad request for chainName more than 20 characters', async () => {
-		const response = await api.get(`${endpoint}?chainName=llisk_mainchain_used_for_testingi`, 400);
+		const response = await api.get(`${endpoint}?chainName=lklayr_mainchain_used_for_testingi`, 400);
 		expect(response).toMap(badRequestSchema);
 	});
 

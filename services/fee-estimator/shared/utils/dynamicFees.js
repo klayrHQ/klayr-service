@@ -15,7 +15,7 @@
  */
 const BluebirdPromise = require('bluebird');
 
-const { CacheRedis, Logger } = require('lisk-service-framework');
+const { CacheRedis, Logger } = require('klayr-service-framework');
 
 const { getGenesisHeight, getBlockByHeight } = require('./chain');
 const { getEstimateFeePerByteForBlock } = require('./dynamicFeesLIP');

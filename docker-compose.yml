@@ -107,7 +107,7 @@ services:
     environment:
       - SERVICE_BROKER=nats://nats:4222
       - SERVICE_BROKER_TIMEOUT=${SERVICE_BROKER_TIMEOUT}
-      - SERVICE_APP_REGISTRY_MYSQL=mysql://lisk:password@mysql-primary:3306/lisk
+      - SERVICE_APP_REGISTRY_MYSQL=mysql://klayr:password@mysql-primary:3306/klayr
       - SERVICE_LOG_LEVEL=${SERVICE_LOG_LEVEL}
       - SERVICE_LOG_CONSOLE=${SERVICE_LOG_CONSOLE}
       - SERVICE_LOG_STDOUT=${SERVICE_LOG_STDOUT}
@@ -126,7 +126,7 @@ services:
     restart: always
 
   blockchain-connector:
-    image: lisk/service_blockchain_connector
+    image: klayr/service_blockchain_connector
     depends_on:
       nats:
         condition: service_healthy

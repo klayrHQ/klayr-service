@@ -14,9 +14,9 @@
  *
  */
 const {
-	validateLisk32Address,
+	validateKlayr32Address,
 	validatePublicKey,
-	getLisk32AddressFromPublicKey,
+	getKlayr32AddressFromPublicKey,
 	getLegacyAddress,
 } = require('./account');
 
@@ -66,9 +66,9 @@ const {
 } = require('./transaction');
 
 module.exports = {
-	validateLisk32Address,
+	validateKlayr32Address,
 	validatePublicKey,
-	getLisk32AddressFromPublicKey,
+	getKlayr32AddressFromPublicKey,
 	getLegacyAddress,
 
 	getCurrentChainID,

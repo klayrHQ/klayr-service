@@ -19,7 +19,7 @@ const { getNetworkStatus } = require('../network');
 const { getAddressByName } = require('../../utils/validator');
 const { getIndexedAccountInfo } = require('../../utils/account');
 const { requestConnector } = require('../../../utils/request');
-const { getLisk32AddressFromPublicKey } = require('../../../utils/account');
+const { getKlayr32AddressFromPublicKey } = require('../../../utils/account');
 const { indexAccountPublicKey } = require('../../../indexer/accountIndex');
 
 const getPosUnlocks = async params => {
@@ -33,7 +33,7 @@ const getPosUnlocks = async params => {
 	};
 
 	if (params.name) params.address = await getAddressByName(params.name);
-	if (params.publicKey) params.address = await getLisk32AddressFromPublicKey(params.publicKey);
+	if (params.publicKey) params.address = await getKlayr32AddressFromPublicKey(params.publicKey);
 
 	if (!params.address) {
 		return unlocks;

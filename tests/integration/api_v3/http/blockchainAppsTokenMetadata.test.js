@@ -114,7 +114,7 @@ describe('Blockchain application tokens metadata API', () => {
 	});
 
 	it('should return blockchain application off-chain metadata for tokens by chainName', async () => {
-		const response = await api.get(`${endpoint}?chainName=lisk_mainchain`);
+		const response = await api.get(`${endpoint}?chainName=klayr_mainchain`);
 		expect(response).toMap(goodRequestSchema);
 		expect(response.data).toBeInstanceOf(Array);
 		expect(response.data.length).toBeGreaterThanOrEqual(1);
@@ -162,7 +162,7 @@ describe('Blockchain application tokens metadata API', () => {
 	});
 
 	it('should return blockchain application off-chain metadata for tokens by tokenName and chainID', async () => {
-		const response = await api.get(`${endpoint}?tokenName=Lisk&chainID=${curChainID}`);
+		const response = await api.get(`${endpoint}?tokenName=Klayr&chainID=${curChainID}`);
 		expect(response).toMap(goodRequestSchema);
 		expect(response.data).toBeInstanceOf(Array);
 		expect(response.data.length).toBeGreaterThanOrEqual(0);
@@ -174,7 +174,7 @@ describe('Blockchain application tokens metadata API', () => {
 	});
 
 	it('should return blockchain application off-chain metadata for tokens by tokenName and tokenID', async () => {
-		const response = await api.get(`${endpoint}?tokenName=Lisk&tokenID=${defaultToken}`);
+		const response = await api.get(`${endpoint}?tokenName=Klayr&tokenID=${defaultToken}`);
 		expect(response).toMap(goodRequestSchema);
 		expect(response.data).toBeInstanceOf(Array);
 		expect(response.data.length).toBeGreaterThanOrEqual(0);
@@ -187,7 +187,7 @@ describe('Blockchain application tokens metadata API', () => {
 
 	it('should return blockchain application off-chain metadata for tokens by chainID and csv tokenName', async () => {
 		const response = await api.get(
-			`${endpoint}?network=${curNetwork}&tokenName=Lik,Lisk&chainID=${curChainID}`,
+			`${endpoint}?network=${curNetwork}&tokenName=Lik,Klayr&chainID=${curChainID}`,
 		);
 		expect(response).toMap(goodRequestSchema);
 		expect(response.data).toBeInstanceOf(Array);
@@ -200,7 +200,7 @@ describe('Blockchain application tokens metadata API', () => {
 	});
 
 	it('should return blockchain application off-chain metadata for tokens by tokenName', async () => {
-		const response = await api.get(`${endpoint}?tokenName=Lisk`);
+		const response = await api.get(`${endpoint}?tokenName=Klayr`);
 		expect(response).toMap(goodRequestSchema);
 		expect(response.data).toBeInstanceOf(Array);
 		expect(response.data.length).toBeGreaterThanOrEqual(0);
@@ -236,7 +236,7 @@ describe('Blockchain application tokens metadata API', () => {
 	});
 
 	it('should return blockchain applications off-chain metadata for tokens by search', async () => {
-		const response = await api.get(`${endpoint}?search=Lisk`);
+		const response = await api.get(`${endpoint}?search=Klayr`);
 		expect(response).toMap(goodRequestSchema);
 		expect(response.data).toBeInstanceOf(Array);
 		expect(response.data.length).toBeGreaterThanOrEqual(1);
@@ -260,7 +260,7 @@ describe('Blockchain application tokens metadata API', () => {
 	});
 
 	it('should return blockchain applications off-chain metadata for tokens by case-insensitive search (Upper-case)', async () => {
-		const response = await api.get(`${endpoint}?search=LISK`);
+		const response = await api.get(`${endpoint}?search=KLAYR`);
 		expect(response).toMap(goodRequestSchema);
 		expect(response.data).toBeInstanceOf(Array);
 		expect(response.data.length).toBeGreaterThanOrEqual(1);
@@ -272,7 +272,7 @@ describe('Blockchain application tokens metadata API', () => {
 	});
 
 	it('should return blockchain applications off-chain metadata for tokens by case-insensitive search (Lower-case)', async () => {
-		const response = await api.get(`${endpoint}?search=lisk`);
+		const response = await api.get(`${endpoint}?search=klayr`);
 		expect(response).toMap(goodRequestSchema);
 		expect(response.data).toBeInstanceOf(Array);
 		expect(response.data.length).toBeGreaterThanOrEqual(1);

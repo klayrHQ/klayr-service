@@ -11,7 +11,7 @@
 						"type": "string",
 						"format": "address",
 						"example": "3057001998458191401L",
-						"description": "Lisk account address (Legacy address)"
+						"description": "Klayr account address (Legacy address)"
 					},
 					"balance": {
 						"type": "string",
@@ -27,8 +27,8 @@
 					"address": {
 						"type": "string",
 						"format": "address",
-						"example": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
-						"description": "The Lisk Address is the human-readable representation of a blockchain account.\nIt is 41 character long identifier that begins with `lsk`."
+						"example": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+						"description": "The Klayr Address is the human-readable representation of a blockchain account.\nIt is 41 character long identifier that begins with `kly`."
 					},
 					"publicKey": {
 						"type": "string",

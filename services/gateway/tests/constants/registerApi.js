@@ -254,8 +254,8 @@ const dataForTransformResponse = {
 	data: [
 		{
 			tokenID: '0400000000000000',
-			tokenName: 'Lisk',
-			description: 'Default token for the entire Lisk ecosystem',
+			tokenName: 'Klayr',
+			description: 'Default token for the entire Klayr ecosystem',
 			denomUnits: [
 				{
 					denom: 'beddows',
@@ -263,27 +263,27 @@ const dataForTransformResponse = {
 					aliases: ['Beddows'],
 				},
 				{
-					denom: 'lsk',
+					denom: 'kly',
 					decimals: 8,
-					aliases: ['Lisk'],
+					aliases: ['Klayr'],
 				},
 			],
 			baseDenom: 'beddows',
-			displayDenom: 'lsk',
-			symbol: 'LSK',
+			displayDenom: 'kly',
+			symbol: 'KLY',
 			logo: {
 				png: 'https://lisk-qa.ams3.digitaloceanspaces.com/Artboard%201%20copy%2019.png',
 				svg: 'https://lisk-qa.ams3.digitaloceanspaces.com/Logo-20.svg',
 			},
 			chainID: '04000000',
-			chainName: 'Lisk',
+			chainName: 'Klayr',
 			network: 'devnet',
 			otherName: '123',
 		},
 		{
 			tokenID: '0400000000000000',
-			tokenName: 'Lisk',
-			description: 'Default token for the entire Lisk ecosystem',
+			tokenName: 'Klayr',
+			description: 'Default token for the entire Klayr ecosystem',
 			denomUnits: [
 				{
 					denom: 'beddows',
@@ -291,20 +291,20 @@ const dataForTransformResponse = {
 					aliases: ['Beddows'],
 				},
 				{
-					denom: 'lsk',
+					denom: 'kly',
 					decimals: 8,
-					aliases: ['Lisk'],
+					aliases: ['Klayr'],
 				},
 			],
 			baseDenom: 'beddows',
-			displayDenom: 'lsk',
-			symbol: 'LSK',
+			displayDenom: 'kly',
+			symbol: 'KLY',
 			logo: {
 				png: 'https://lisk-qa.ams3.digitaloceanspaces.com/Artboard%201%20copy%2019.png',
 				svg: 'https://lisk-qa.ams3.digitaloceanspaces.com/Logo-20.svg',
 			},
 			chainID: '04000000',
-			chainName: 'Lisk',
+			chainName: 'Klayr',
 			network: 'devnet',
 			otherName: '456',
 		},
@@ -320,17 +320,17 @@ const expectedResponseForTransformResponse = {
 	data: [
 		{
 			chainID: '04000000',
-			chainName: 'Lisk',
+			chainName: 'Klayr',
 			tokenID: '0400000000000000',
-			tokenName: 'Lisk',
+			tokenName: 'Klayr',
 			networkType: 'devnet',
-			description: 'Default token for the entire Lisk ecosystem',
+			description: 'Default token for the entire Klayr ecosystem',
 			logo: {
 				png: 'https://lisk-qa.ams3.digitaloceanspaces.com/Artboard%201%20copy%2019.png',
 				svg: 'https://lisk-qa.ams3.digitaloceanspaces.com/Logo-20.svg',
 			},
-			symbol: 'LSK',
-			displayDenom: 'lsk',
+			symbol: 'KLY',
+			displayDenom: 'kly',
 			baseDenom: 'beddows',
 			denomUnits: [
 				{
@@ -339,26 +339,26 @@ const expectedResponseForTransformResponse = {
 					aliases: ['Beddows'],
 				},
 				{
-					denom: 'lsk',
+					denom: 'kly',
 					decimals: 8,
-					aliases: ['Lisk'],
+					aliases: ['Klayr'],
 				},
 			],
 			customNumber: 123,
 		},
 		{
 			chainID: '04000000',
-			chainName: 'Lisk',
+			chainName: 'Klayr',
 			tokenID: '0400000000000000',
-			tokenName: 'Lisk',
+			tokenName: 'Klayr',
 			networkType: 'devnet',
-			description: 'Default token for the entire Lisk ecosystem',
+			description: 'Default token for the entire Klayr ecosystem',
 			logo: {
 				png: 'https://lisk-qa.ams3.digitaloceanspaces.com/Artboard%201%20copy%2019.png',
 				svg: 'https://lisk-qa.ams3.digitaloceanspaces.com/Logo-20.svg',
 			},
-			symbol: 'LSK',
-			displayDenom: 'lsk',
+			symbol: 'KLY',
+			displayDenom: 'kly',
 			baseDenom: 'beddows',
 			denomUnits: [
 				{
@@ -367,9 +367,9 @@ const expectedResponseForTransformResponse = {
 					aliases: ['Beddows'],
 				},
 				{
-					denom: 'lsk',
+					denom: 'kly',
 					decimals: 8,
-					aliases: ['Lisk'],
+					aliases: ['Klayr'],
 				},
 			],
 			customNumber: 456,
@@ -383,7 +383,7 @@ const expectedResponseForTransformResponse = {
 };
 
 const paramsForTransformRequest = {
-	tokenName: 'Lisk,Lis,Lik',
+	tokenName: 'Klayr,Klay,Kly',
 	tokenIDParam: '0200000000000000,0400000000000000',
 	network: 'betanet,devnet',
 	limit: 10,
@@ -416,7 +416,7 @@ const expectedResponseForTransformRequest = {
 	search: undefined,
 	sort: 'chainName:asc',
 	tokenID: '0200000000000000,0400000000000000',
-	tokenName: 'Lisk,Lis,Lik',
+	tokenName: 'Klayr,Klay,Kly',
 };
 
 const sourceForMapParamWithType = {

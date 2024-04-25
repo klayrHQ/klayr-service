@@ -29,7 +29,7 @@ const {
 		},
 	},
 	Utils: { waitForIt },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { applyTransaction, revertTransaction } = require('./transactionProcessor');
 
@@ -45,7 +45,7 @@ const {
 } = require('../dataService');
 
 const { range } = require('../utils/array');
-const { getLisk32AddressFromPublicKey } = require('../utils/account');
+const { getKlayr32AddressFromPublicKey } = require('../utils/account');
 const { getTransactionExecutionStatus } = require('../utils/transactions');
 const { getEventsInfoToIndex } = require('./utils/events');
 const { calcCommissionAmount, calcSelfStakeReward } = require('./utils/validator');
@@ -240,7 +240,7 @@ const indexBlock = async job => {
 					tx.moduleCommand = `${tx.module}:${tx.command}`;
 					tx.blockID = blockToIndexFromNode.id;
 					tx.height = blockToIndexFromNode.height;
-					tx.senderAddress = getLisk32AddressFromPublicKey(tx.senderPublicKey);
+					tx.senderAddress = getKlayr32AddressFromPublicKey(tx.senderPublicKey);
 					tx.timestamp = blockToIndexFromNode.timestamp;
 					tx.executionStatus = getTransactionExecutionStatus(tx, events);
 

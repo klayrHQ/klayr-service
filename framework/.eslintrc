@@ -1,6 +1,6 @@
 {
 	"extends": [
-		"lisk-base"
+		"klayr-base"
 	],
 	"plugins": [
 		"import"

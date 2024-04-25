@@ -14,14 +14,14 @@
  *
  */
 const {
-	address: { getLisk32AddressFromPublicKey: getLisk32AddressFromPublicKeyHelper },
-} = require('@liskhq/lisk-cryptography');
+	address: { getKlayr32AddressFromPublicKey: getKlayr32AddressFromPublicKeyHelper },
+} = require('@klayr/cryptography');
 
 const {
 	DB: {
 		MySQL: { getTableInstance },
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const accountsTableSchema = require('../database/schema/accounts');
 const config = require('../../config');
@@ -30,8 +30,8 @@ const MYSQL_ENDPOINT = config.endpoints.mysql;
 
 const getAccountsTable = () => getTableInstance(accountsTableSchema, MYSQL_ENDPOINT);
 
-const getLisk32AddressFromPublicKey = publicKey =>
-	getLisk32AddressFromPublicKeyHelper(Buffer.from(publicKey, 'hex'));
+const getKlayr32AddressFromPublicKey = publicKey =>
+	getKlayr32AddressFromPublicKeyHelper(Buffer.from(publicKey, 'hex'));
 
 const updateAccountInfo = async params => {
 	const accountInfo = {};
@@ -46,6 +46,6 @@ const updateAccountInfo = async params => {
 };
 
 module.exports = {
-	getLisk32AddressFromPublicKey,
+	getKlayr32AddressFromPublicKey,
 	updateAccountInfo,
 };

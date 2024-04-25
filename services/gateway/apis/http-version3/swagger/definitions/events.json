@@ -38,7 +38,7 @@
 				"items": {
 					"type": "string"
 				},
-				"example": ["03", "lsksod8bj35gmndy94yehxm25nybg5os6ycysejsm"]
+				"example": ["03", "klysod8bj35gmndy94yehxm25nybg5os6ycysejsm"]
 			},
 			"index": {
 				"type": "number",

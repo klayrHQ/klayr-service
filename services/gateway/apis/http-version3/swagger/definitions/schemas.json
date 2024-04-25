@@ -15,7 +15,7 @@
 						"type": "string",
 						"format": "id",
 						"minLength": 1,
-						"example": "lisk/transfer-asset",
+						"example": "klayr/transfer-asset",
 						"description": "Unique identifier of the transaction schema\n"
 					},
 					"title": {
@@ -292,7 +292,7 @@
 									},
 									"format": {
 										"type": "string",
-										"example": "lisk32"
+										"example": "klayr32"
 									}
 								}
 							},

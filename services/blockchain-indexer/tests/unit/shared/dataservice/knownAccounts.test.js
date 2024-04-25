@@ -29,10 +29,10 @@ const knownAccountsFilePath = resolve(`${__dirname}/../../../../shared/dataServi
 // Mock config
 jest.mock('../../../../config', () => ({
 	endpoints: {
-		liskStatic: 'http://mocked-static-url',
+		klayrStatic: 'http://mocked-static-url',
 	},
 	networks: {
-		Lisk: [
+		Klayr: [
 			{ chainID: '00000000', name: 'mainnet' },
 			{ chainID: '01000000', name: 'testnet' },
 		],
@@ -48,9 +48,9 @@ describe('reloadAccountKnowledge', () => {
 	});
 
 	it('should log the number of entries added to the knowledge object', async () => {
-		// Mock lisk-service-framework
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		// Mock klayr-service-framework
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			const { mockedValidKnowledge } = require(mockedAccountKnowledgeConstantsFilePath);
 			return {
 				...actual,
@@ -77,10 +77,10 @@ describe('reloadAccountKnowledge', () => {
 		await reloadAccountKnowledge();
 	});
 
-	it('should log a warning if the Lisk static URL does not respond with valid data', async () => {
-		// Mock lisk-service-framework
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+	it('should log a warning if the Klayr static URL does not respond with valid data', async () => {
+		// Mock klayr-service-framework
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			return {
 				...actual,
 				HTTP: {
@@ -90,7 +90,7 @@ describe('reloadAccountKnowledge', () => {
 					debug: jest.fn(),
 					info: jest.fn(),
 					warn: async data =>
-						expect(data).toEqual('Lisk static URL did not respond with valid data.'),
+						expect(data).toEqual('Klayr static URL did not respond with valid data.'),
 					error: jest.fn(),
 				}),
 			};
@@ -107,9 +107,9 @@ describe('reloadAccountKnowledge', () => {
 	});
 
 	it('should log an error if an error occurs during the process', async () => {
-		// Mock lisk-service-framework
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		// Mock klayr-service-framework
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			return {
 				...actual,
 				HTTP: {
@@ -136,9 +136,9 @@ describe('reloadAccountKnowledge', () => {
 	});
 
 	it('should log a warning if the chain ID does not exist in the database', async () => {
-		// Mock lisk-service-framework
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		// Mock klayr-service-framework
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			return {
 				...actual,
 				HTTP: {
@@ -167,9 +167,9 @@ describe('reloadAccountKnowledge', () => {
 	});
 
 	it('should update the knowledge object with retrieved known accounts', async () => {
-		// Mock lisk-service-framework
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		// Mock klayr-service-framework
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			const { mockedValidKnowledge } = require(mockedAccountKnowledgeConstantsFilePath);
 			return {
 				...actual,
@@ -196,7 +196,7 @@ describe('reloadAccountKnowledge', () => {
 
 		// fetch and assert account knowledge
 		expect(getAccountKnowledge('address1')).toEqual({
-			owner: 'LiskHQ',
+			owner: 'KlayrHQ',
 			description: 'Initial seed',
 		});
 
@@ -237,9 +237,9 @@ describe('getAccountKnowledge', () => {
 		jest.resetModules();
 		jest.resetAllMocks();
 
-		// Mock lisk-service-framework
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		// Mock klayr-service-framework
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			const { mockedValidKnowledge } = require(mockedAccountKnowledgeConstantsFilePath);
 			return {
 				...actual,
@@ -268,7 +268,7 @@ describe('getAccountKnowledge', () => {
 	it('should return the account knowledge if it exists', () => {
 		const { getAccountKnowledge } = require(knownAccountsFilePath);
 		expect(getAccountKnowledge('address1')).toEqual({
-			owner: 'LiskHQ',
+			owner: 'KlayrHQ',
 			description: 'Initial seed',
 		});
 

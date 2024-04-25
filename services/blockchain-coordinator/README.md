@@ -1,8 +1,8 @@
-# Lisk Service Blockchain Coordinator
+# Klayr Service Blockchain Coordinator
 
 The Blockchain Coordinator service is primarily responsible to verify the index readiness. It regularly monitors the index completion status and schedules jobs to index the missing or newly generated blocks as soon as they're available.
 
-> Note that this installation instruction is required only for development activities. For a regular Lisk Service user the official [documentation](https://lisk.com/documentation/lisk-service/) is sufficient to run an instance. The global readme file present in the root directory covers running all the microservices simultaneously.
+> Note that this installation instruction is required only for development activities. For a regular Klayr Service user the official [documentation](https://klayr.xyz/documentation/klayr-service/) is sufficient to run an instance. The global readme file present in the root directory covers running all the microservices simultaneously.
 
 ## Installation
 
@@ -12,11 +12,11 @@ Please refer to the [README](../../README.md) in the project root directory.
 
 ## Installation
 
-Clone the Lisk Service Repository:
+Clone the Klayr Service Repository:
 
 ```bash
-git clone https://github.com/LiskHQ/lisk-service.git # clone repository
-cd lisk-service/services/blockchain-coordinator # move into blockchain-coordinator microservice directory
+git clone https://github.com/KlayrHQ/klayr-service.git # clone repository
+cd klayr-service/services/blockchain-coordinator # move into blockchain-coordinator microservice directory
 yarn install --frozen-lockfile # install required Node.js dependencies
 ```
 
@@ -38,7 +38,7 @@ A list of the most commonly used environment variables is presented below:
 ### Start
 
 ```bash
-cd lisk-service/services/blockchain-coordinator # move into the root directory of the blockchain-coordinator microservice
+cd klayr-service/services/blockchain-coordinator # move into the root directory of the blockchain-coordinator microservice
 yarn start # start the microservice with running nodes locally
 ```
 
@@ -52,7 +52,7 @@ Press `Ctrl+C` in the terminal to stop the process.
 
 ## Contributors
 
-https://github.com/LiskHQ/lisk-service/graphs/contributors
+https://github.com/KlayrHQ/klayr-service/graphs/contributors
 
 ## License
 
@@ -70,4 +70,4 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-[lisk documentation site]: https://lisk.com/documentation
+[klayr documentation site]: https://klayr.xyz/documentation

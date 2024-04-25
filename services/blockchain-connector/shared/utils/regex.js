@@ -21,7 +21,7 @@ const MODULE = /^[0-9a-zA-Z]{1,32}$/;
 const COMMAND = MODULE;
 const MODULE_CSV = /^(?:[0-9a-zA-Z]{1,32})(?:,[0-9a-zA-Z]{1,32})*$/;
 const COMMAND_CSV = MODULE_CSV;
-const ADDRESS_LISK32 = /^lsk[a-hjkm-z2-9]{38}$/;
+const ADDRESS_KLAYR32 = /^kly[a-hjkm-z2-9]{38}$/;
 const NONCE = /^\d+$/;
 const HEX_STRING = /^([a-fA-F0-9]+)$/;
 
@@ -34,7 +34,7 @@ module.exports = {
 	COMMAND,
 	MODULE_CSV,
 	COMMAND_CSV,
-	ADDRESS_LISK32,
+	ADDRESS_KLAYR32,
 	NONCE,
 	HEX_STRING,
 };

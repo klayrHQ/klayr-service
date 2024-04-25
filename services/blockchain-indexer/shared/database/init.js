@@ -26,7 +26,7 @@ const {
 	},
 	Utils,
 	Signals,
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const logger = Logger();
 

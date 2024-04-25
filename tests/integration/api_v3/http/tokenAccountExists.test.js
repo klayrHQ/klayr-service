@@ -71,7 +71,7 @@ describe('Token account exists API', () => {
 
 		it('should return isExists:false when requested for unknown address', async () => {
 			const response = await api.get(
-				`${endpoint}?address=lskvmcf8bphtskyv49xg866u9a9dm7ftkxremzbkr&tokenID=${refTokenID}`,
+				`${endpoint}?address=klyvmcf8bphtskyv49xg866u9a9dm7ftkxremzbkr&tokenID=${refTokenID}`,
 			);
 			expect(response).toMap(tokenAccountExistsSchema);
 			expect(response.data.isExists).toBe(false);

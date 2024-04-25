@@ -24,16 +24,16 @@ const dataServicePath = resolve(`${__dirname}/../../../../../../shared/dataServi
 beforeEach(() => {
 	jest.resetModules();
 
-	jest.mock('lisk-service-framework', () => {
-		const actualLiskServiceFramework = jest.requireActual('lisk-service-framework');
+	jest.mock('klayr-service-framework', () => {
+		const actualKlayrServiceFramework = jest.requireActual('klayr-service-framework');
 		return {
-			...actualLiskServiceFramework,
+			...actualKlayrServiceFramework,
 			DB: {
-				...actualLiskServiceFramework.DB,
+				...actualKlayrServiceFramework.DB,
 				MySQL: {
-					...actualLiskServiceFramework.DB.MySQL,
+					...actualKlayrServiceFramework.DB.MySQL,
 					KVStore: {
-						...actualLiskServiceFramework.DB.MySQL.KVStore,
+						...actualKlayrServiceFramework.DB.MySQL.KVStore,
 						getKeyValueTable: jest.fn(),
 					},
 				},
@@ -45,8 +45,8 @@ beforeEach(() => {
 });
 
 describe('Test isMainchain method', () => {
-	jest.mock('lisk-service-framework', () => {
-		const actual = jest.requireActual('lisk-service-framework');
+	jest.mock('klayr-service-framework', () => {
+		const actual = jest.requireActual('klayr-service-framework');
 		return {
 			...actual,
 			CacheRedis: jest.fn(),

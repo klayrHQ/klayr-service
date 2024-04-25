@@ -10,7 +10,7 @@
 	"address": {
 		"name": "address",
 		"in": "query",
-		"description": "Lisk account address.",
+		"description": "Klayr account address.",
 		"type": "string",
 		"format": "address",
 		"minLength": 41,
@@ -53,7 +53,7 @@
 		"name": "address",
 		"required": true,
 		"in": "query",
-		"description": "Lisk account address.",
+		"description": "Klayr account address.",
 		"type": "string",
 		"format": "address",
 		"minLength": 41,

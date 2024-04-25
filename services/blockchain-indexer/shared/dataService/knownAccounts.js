@@ -14,7 +14,7 @@
  *
  */
 const util = require('util');
-const { HTTP, Logger } = require('lisk-service-framework');
+const { HTTP, Logger } = require('klayr-service-framework');
 
 const config = require('../../config');
 const { LENGTH_NETWORK_ID } = require('../constants');
@@ -23,7 +23,7 @@ const { getNetworkStatus } = require('./business/network');
 const logger = Logger();
 
 const networkConfig = Object.values(config.networks);
-const staticUrl = config.endpoints.liskStatic;
+const staticUrl = config.endpoints.klayrStatic;
 
 let knowledge = {};
 
@@ -61,7 +61,7 @@ const reloadAccountKnowledge = async () => {
 					);
 				}
 			} else {
-				logger.warn('Lisk static URL did not respond with valid data.');
+				logger.warn('Klayr static URL did not respond with valid data.');
 				logger.debug(`Received: ${util.inspect(res)}.`);
 			}
 		} else {

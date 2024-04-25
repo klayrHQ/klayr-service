@@ -15,7 +15,7 @@
  */
 const { requestConnector } = require('../../../utils/request');
 const { getLegacyAddressFromPublicKey } = require('../../utils/account');
-const { getLisk32AddressFromPublicKey } = require('../../../utils/account');
+const { getKlayr32AddressFromPublicKey } = require('../../../utils/account');
 
 const getLegacyAccountInfo = async ({ publicKey }) => {
 	const legacyAccountInfo = {
@@ -30,7 +30,7 @@ const getLegacyAccountInfo = async ({ publicKey }) => {
 	};
 
 	legacyAccountInfo.meta = {
-		address: getLisk32AddressFromPublicKey(publicKey),
+		address: getKlayr32AddressFromPublicKey(publicKey),
 		publicKey,
 	};
 

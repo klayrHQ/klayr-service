@@ -29,16 +29,16 @@ const { dateFromTimestamp, timeFromTimestamp } = require('../../../shared/helper
 
 const mockedRequestFilePath = resolve(`${__dirname}/../../../shared/helpers/request`);
 
-jest.mock('lisk-service-framework', () => {
-	const actualLiskServiceFramework = jest.requireActual('lisk-service-framework');
+jest.mock('klayr-service-framework', () => {
+	const actualKlayrServiceFramework = jest.requireActual('klayr-service-framework');
 	return {
-		...actualLiskServiceFramework,
+		...actualKlayrServiceFramework,
 		DB: {
-			...actualLiskServiceFramework.DB,
+			...actualKlayrServiceFramework.DB,
 			MySQL: {
-				...actualLiskServiceFramework.DB.MySQL,
+				...actualKlayrServiceFramework.DB.MySQL,
 				KVStore: {
-					...actualLiskServiceFramework.DB.MySQL.KVStore,
+					...actualKlayrServiceFramework.DB.MySQL.KVStore,
 					getKeyValueTable: jest.fn(),
 				},
 			},
@@ -114,7 +114,7 @@ describe('Test formatBlocks method', () => {
 });
 
 describe('Test getBlockRewardEntries method', () => {
-	const address = 'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo';
+	const address = 'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo';
 	it('should return block reward entries when token minted', async () => {
 		jest.mock(mockedRequestFilePath, () => {
 			const actual = jest.requireActual(mockedRequestFilePath);
@@ -154,7 +154,7 @@ describe('Test getBlockRewardEntries method', () => {
 				moduleCommand: null,
 				note: 'Block generation reward (commission + self-stake)',
 				receivingChainID: '04000000',
-				recipientAddress: 'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+				recipientAddress: 'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 				recipientPublicKey: '7fb87fd7fdfef8037d9b6ca705d17000b9f639b4c7aa6f13383d178c783bbdfd',
 				senderAddress: null,
 				senderPublicKey: null,
@@ -207,7 +207,7 @@ describe('Test getBlockRewardEntries method', () => {
 				moduleCommand: null,
 				note: 'Block generation reward (commission + self-stake)',
 				receivingChainID: '04000000',
-				recipientAddress: 'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+				recipientAddress: 'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 				recipientPublicKey: '7fb87fd7fdfef8037d9b6ca705d17000b9f639b4c7aa6f13383d178c783bbdfd',
 				senderAddress: null,
 				senderPublicKey: null,
@@ -225,7 +225,7 @@ describe('Test getBlockRewardEntries method', () => {
 				moduleCommand: null,
 				note: 'Block generation reward (custodial shared rewards locked)',
 				receivingChainID: '04000000',
-				recipientAddress: 'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+				recipientAddress: 'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 				recipientPublicKey: '7fb87fd7fdfef8037d9b6ca705d17000b9f639b4c7aa6f13383d178c783bbdfd',
 				senderAddress: null,
 				senderPublicKey: null,
@@ -253,11 +253,11 @@ describe('Test getChainInfo method', () => {
 					return {
 						data: [
 							{
-								chainName: 'lisk_mainchain',
-								displayName: 'Lisk',
+								chainName: 'klayr_mainchain',
+								displayName: 'Klayr',
 								chainID: '04000000',
-								title: 'Lisk - Devnet',
-								description: 'Metadata configuration for the Lisk blockchain (mainchain) in devnet',
+								title: 'Klayr - Devnet',
+								description: 'Metadata configuration for the Klayr blockchain (mainchain) in devnet',
 								networkType: 'devnet',
 								isDefault: true,
 							},
@@ -271,7 +271,7 @@ describe('Test getChainInfo method', () => {
 
 		const chainInfo = await getChainInfo(validChainID);
 		const expectedResponse = {
-			chainName: 'lisk_mainchain',
+			chainName: 'klayr_mainchain',
 			chainID: '04000000',
 		};
 		expect(chainInfo).toEqual(expectedResponse);
@@ -279,7 +279,7 @@ describe('Test getChainInfo method', () => {
 });
 
 describe('Test getGeneratorFeeEntries method', () => {
-	const address = 'lskme8ohf9geuno8nwpvdqm8wr8bvz5nzguftwpxp';
+	const address = 'klyme8ohf9geuno8nwpvdqm8wr8bvz5nzguftwpxp';
 	it('should return generator fee reward entries', async () => {
 		jest.mock(mockedRequestFilePath, () => {
 			const actual = jest.requireActual(mockedRequestFilePath);
@@ -317,9 +317,9 @@ describe('Test getGeneratorFeeEntries method', () => {
 				moduleCommand: null,
 				note: 'Generator Fee',
 				receivingChainID: '04000000',
-				recipientAddress: 'lskme8ohf9geuno8nwpvdqm8wr8bvz5nzguftwpxp',
+				recipientAddress: 'klyme8ohf9geuno8nwpvdqm8wr8bvz5nzguftwpxp',
 				recipientPublicKey: null,
-				senderAddress: 'lskmv6entvj8cnrhfdoa38ojx34pv4rd9q44788r7',
+				senderAddress: 'klymv6entvj8cnrhfdoa38ojx34pv4rd9q44788r7',
 				senderPublicKey: '1a315a7c7ccfb44ee0730f22cac4370307a7ef29710b938cff52e653cac753ad',
 				sendingChainID: '04000000',
 				time: '11:52:28',
@@ -333,7 +333,7 @@ describe('Test getGeneratorFeeEntries method', () => {
 });
 
 describe('Test getSharedRewardsAssignedEntries method', () => {
-	const address = 'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo';
+	const address = 'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo';
 	it('should return shared reward entries', async () => {
 		jest.mock(mockedRequestFilePath, () => {
 			const actual = jest.requireActual(mockedRequestFilePath);
@@ -373,9 +373,9 @@ describe('Test getSharedRewardsAssignedEntries method', () => {
 				moduleCommand: null,
 				note: 'Custodial shared rewards transfer to the staker',
 				receivingChainID: '04000000',
-				recipientAddress: 'lskmg3sdmjp4smz6x9k2cuyuwags5ehgtexe4w2ds',
+				recipientAddress: 'klymg3sdmjp4smz6x9k2cuyuwags5ehgtexe4w2ds',
 				recipientPublicKey: 'f0fda0461215e4e63a68d12c79d293833c32519cfe3a5e01ca08b0a0a7493de5',
-				senderAddress: 'lsk26s9p9rb74ygzxayuf9cx6x7x5wuvp2v9yrns7',
+				senderAddress: 'kly26s9p9rb74ygzxayuf9cx6x7x5wuvp2v9yrns7',
 				senderPublicKey: null,
 				sendingChainID: '04000000',
 				time: '11:52:28',
@@ -389,7 +389,7 @@ describe('Test getSharedRewardsAssignedEntries method', () => {
 });
 
 describe('Test getMessageFeeEntries method', () => {
-	const address = 'lskme8ohf9geuno8nwpvdqm8wr8bvz5nzguftwpxp';
+	const address = 'klyme8ohf9geuno8nwpvdqm8wr8bvz5nzguftwpxp';
 	const sendingChainID = '04000000';
 	const receivingChainID = '04000000';
 	const messageFeeTokenID = '0400000000000000';
@@ -434,7 +434,7 @@ describe('Test getMessageFeeEntries method', () => {
 				moduleCommand: 'token:transferCrossChain',
 				note: 'Message fee for relayer',
 				receivingChainID: '04000000',
-				recipientAddress: 'lskme8ohf9geuno8nwpvdqm8wr8bvz5nzguftwpxp',
+				recipientAddress: 'klyme8ohf9geuno8nwpvdqm8wr8bvz5nzguftwpxp',
 				recipientPublicKey: null,
 				senderAddress: null,
 				senderPublicKey: null,
@@ -468,7 +468,7 @@ describe('Test getMessageFeeEntries method', () => {
 });
 
 describe('Test getOutgoingTransferCCEntries method', () => {
-	const address = 'lsk56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs';
+	const address = 'kly56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs';
 	it('should return outgoing transfer cross chain entries with amount deducted', async () => {
 		jest.mock(mockedRequestFilePath, () => {
 			const actual = jest.requireActual(mockedRequestFilePath);
@@ -507,9 +507,9 @@ describe('Test getOutgoingTransferCCEntries method', () => {
 				moduleCommand: 'token:transferCrossChain',
 				note: '',
 				receivingChainID: '04000002',
-				recipientAddress: 'lsk56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
+				recipientAddress: 'kly56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
 				recipientPublicKey: '344c75738c096e4bd94459fe81eba45503382181d003a9d2c8be75a2f38b49fa',
-				senderAddress: 'lsk56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
+				senderAddress: 'kly56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
 				senderPublicKey: '344c75738c096e4bd94459fe81eba45503382181d003a9d2c8be75a2f38b49fa',
 				sendingChainID: '04000000',
 				time: '12:34:30',
@@ -527,7 +527,7 @@ describe('Test getOutgoingTransferCCEntries method', () => {
 				receivingChainID: '04000002',
 				recipientAddress: null,
 				recipientPublicKey: null,
-				senderAddress: 'lsk56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
+				senderAddress: 'kly56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
 				senderPublicKey: '344c75738c096e4bd94459fe81eba45503382181d003a9d2c8be75a2f38b49fa',
 				sendingChainID: '04000000',
 				time: '12:34:30',
@@ -558,7 +558,7 @@ describe('Test getIncomingTransferCCEntries method', () => {
 		};
 	});
 
-	const address = 'lsk56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs';
+	const address = 'kly56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs';
 	it('should return incoming transfer cross chain entries with amount added', async () => {
 		const { getIncomingTransferCCEntries } = require('../../../shared/transactionsExport');
 
@@ -579,9 +579,9 @@ describe('Test getIncomingTransferCCEntries method', () => {
 				moduleCommand: null,
 				note: 'Incoming CCM from specified CCU transactionID',
 				receivingChainID: '04000002',
-				recipientAddress: 'lsk56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
+				recipientAddress: 'kly56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
 				recipientPublicKey: null,
-				senderAddress: 'lsk56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
+				senderAddress: 'kly56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
 				senderPublicKey: null,
 				sendingChainID: '04000000',
 				time: '12:34:30',
@@ -607,7 +607,7 @@ describe('Test getIncomingTransferCCEntries method', () => {
 });
 
 describe('Test getLegacyAccountReclaimEntries method', () => {
-	const address = 'lskqz6gpqfu9tb5yc2jtqmqvqp3x8ze35g99u2zfd';
+	const address = 'klyqz6gpqfu9tb5yc2jtqmqvqp3x8ze35g99u2zfd';
 	it('should return generator fee reward entries', async () => {
 		jest.mock(mockedRequestFilePath, () => {
 			const actual = jest.requireActual(mockedRequestFilePath);
@@ -645,7 +645,7 @@ describe('Test getLegacyAccountReclaimEntries method', () => {
 				moduleCommand: null,
 				note: 'Legacy account balance reclaimed',
 				receivingChainID: '04000000',
-				recipientAddress: 'lskqz6gpqfu9tb5yc2jtqmqvqp3x8ze35g99u2zfd',
+				recipientAddress: 'klyqz6gpqfu9tb5yc2jtqmqvqp3x8ze35g99u2zfd',
 				recipientPublicKey: null,
 				senderAddress: null,
 				senderPublicKey: null,
@@ -662,7 +662,7 @@ describe('Test getLegacyAccountReclaimEntries method', () => {
 
 describe('Test getPomEntries method', () => {
 	it('should return PoM entries reward deduction', async () => {
-		const address = 'lskmjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5';
+		const address = 'klymjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5';
 		jest.mock(mockedRequestFilePath, () => {
 			const actual = jest.requireActual(mockedRequestFilePath);
 			return {
@@ -702,9 +702,9 @@ describe('Test getPomEntries method', () => {
 				moduleCommand: null,
 				note: 'PoM punishment validator reward deduction',
 				receivingChainID: '04000000',
-				recipientAddress: 'lskmjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5',
+				recipientAddress: 'klymjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5',
 				recipientPublicKey: null,
-				senderAddress: 'lskmjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5',
+				senderAddress: 'klymjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5',
 				senderPublicKey: null,
 				sendingChainID: '04000000',
 				time: '11:52:28',
@@ -717,7 +717,7 @@ describe('Test getPomEntries method', () => {
 	});
 
 	it('should return PoM entries reward addition', async () => {
-		const address = 'lskqz6gpqfu9tb5yc2jtqmqvqp3x8ze35g99u2zfd';
+		const address = 'klyqz6gpqfu9tb5yc2jtqmqvqp3x8ze35g99u2zfd';
 		jest.mock(mockedRequestFilePath, () => {
 			const actual = jest.requireActual(mockedRequestFilePath);
 			return {
@@ -757,9 +757,9 @@ describe('Test getPomEntries method', () => {
 				moduleCommand: null,
 				note: 'PoM successful report reward',
 				receivingChainID: '04000000',
-				recipientAddress: 'lskmjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5',
+				recipientAddress: 'klymjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5',
 				recipientPublicKey: null,
-				senderAddress: 'lskmjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5',
+				senderAddress: 'klymjt3zuxo6rv3oc9qyanppe76hk22m8ca2ra7h5',
 				senderPublicKey: null,
 				sendingChainID: '04000000',
 				time: '11:52:28',

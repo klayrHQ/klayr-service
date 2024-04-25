@@ -15,7 +15,7 @@
  */
 const {
 	Exceptions: { InvalidParamsException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const dataService = require('../../../shared/dataService');
 

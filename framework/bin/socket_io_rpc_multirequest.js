@@ -25,7 +25,7 @@ if (process.argv.length < 3) {
 	console.log('');
 	console.log('Examples:');
 	console.log('  node socket_io_rpc_multirequest.js ws://127.0.0.1:9901/rpc');
-	console.log('  node socket_io_rpc_multirequest.js wss://service.lisk.com/rpc');
+	console.log('  node socket_io_rpc_multirequest.js wss://mainnet-service.klayr.xyz/rpc');
 	process.exit(1);
 }
 

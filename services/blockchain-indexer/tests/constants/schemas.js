@@ -417,7 +417,7 @@ const schemas = {
 								properties: {
 									address: {
 										dataType: 'bytes',
-										format: 'lisk32',
+										format: 'klayr32',
 										fieldNumber: 1,
 									},
 									name: {
@@ -505,7 +505,7 @@ const schemas = {
 								properties: {
 									address: {
 										dataType: 'bytes',
-										format: 'lisk32',
+										format: 'klayr32',
 										fieldNumber: 1,
 									},
 									stakes: {
@@ -517,7 +517,7 @@ const schemas = {
 											properties: {
 												validatorAddress: {
 													dataType: 'bytes',
-													format: 'lisk32',
+													format: 'klayr32',
 													fieldNumber: 1,
 												},
 												amount: {
@@ -558,7 +558,7 @@ const schemas = {
 												validatorAddress: {
 													dataType: 'bytes',
 													fieldNumber: 1,
-													format: 'lisk32',
+													format: 'klayr32',
 												},
 												amount: {
 													dataType: 'uint64',
@@ -588,7 +588,7 @@ const schemas = {
 									fieldNumber: 2,
 									items: {
 										dataType: 'bytes',
-										format: 'lisk32',
+										format: 'klayr32',
 									},
 								},
 							},
@@ -630,7 +630,7 @@ const schemas = {
 								properties: {
 									address: {
 										dataType: 'bytes',
-										format: 'lisk32',
+										format: 'klayr32',
 										fieldNumber: 1,
 									},
 									tokenID: {
@@ -1083,9 +1083,9 @@ const schemas = {
 				},
 			},
 			{
-				moduleCommand: 'legacy:reclaimLSK',
+				moduleCommand: 'legacy:reclaimKLY',
 				schema: {
-					$id: '/legacy/command/reclaimLSKParams',
+					$id: '/legacy/command/reclaimKLYParams',
 					type: 'object',
 					required: ['amount'],
 					properties: {
@@ -1179,7 +1179,7 @@ const schemas = {
 			{
 				moduleCommand: 'pos:unlock',
 				schema: {
-					$id: '/lisk/empty',
+					$id: '/klayr/empty',
 					type: 'object',
 					properties: {},
 				},
@@ -1219,7 +1219,7 @@ const schemas = {
 									validatorAddress: {
 										dataType: 'bytes',
 										fieldNumber: 1,
-										format: 'lisk32',
+										format: 'klayr32',
 									},
 									amount: {
 										dataType: 'sint64',
@@ -1249,7 +1249,7 @@ const schemas = {
 			{
 				moduleCommand: 'pos:claimRewards',
 				schema: {
-					$id: '/lisk/empty',
+					$id: '/klayr/empty',
 					type: 'object',
 					properties: {},
 				},
@@ -1257,7 +1257,7 @@ const schemas = {
 			{
 				moduleCommand: 'token:transfer',
 				schema: {
-					$id: '/lisk/transferParams',
+					$id: '/klayr/transferParams',
 					title: 'Transfer transaction params',
 					type: 'object',
 					required: ['tokenID', 'amount', 'recipientAddress', 'data'],
@@ -1275,7 +1275,7 @@ const schemas = {
 						recipientAddress: {
 							dataType: 'bytes',
 							fieldNumber: 3,
-							format: 'lisk32',
+							format: 'klayr32',
 						},
 						data: {
 							dataType: 'string',
@@ -1289,7 +1289,7 @@ const schemas = {
 			{
 				moduleCommand: 'token:transferCrossChain',
 				schema: {
-					$id: '/lisk/ccTransferParams',
+					$id: '/klayr/ccTransferParams',
 					type: 'object',
 					required: [
 						'tokenID',
@@ -1320,7 +1320,7 @@ const schemas = {
 						recipientAddress: {
 							dataType: 'bytes',
 							fieldNumber: 4,
-							format: 'lisk32',
+							format: 'klayr32',
 						},
 						data: {
 							dataType: 'string',
@@ -1456,12 +1456,12 @@ const schemas = {
 					properties: {
 						senderAddress: {
 							dataType: 'bytes',
-							format: 'lisk32',
+							format: 'klayr32',
 							fieldNumber: 1,
 						},
 						generatorAddress: {
 							dataType: 'bytes',
-							format: 'lisk32',
+							format: 'klayr32',
 							fieldNumber: 2,
 						},
 						burntAmount: {
@@ -1491,7 +1491,7 @@ const schemas = {
 						},
 						relayerAddress: {
 							dataType: 'bytes',
-							format: 'lisk32',
+							format: 'klayr32',
 							fieldNumber: 2,
 						},
 						burntAmount: {
@@ -1509,7 +1509,7 @@ const schemas = {
 				module: 'fee',
 				name: 'insufficientFee',
 				schema: {
-					$id: '/lisk/empty',
+					$id: '/klayr/empty',
 					type: 'object',
 					properties: {},
 				},
@@ -1780,7 +1780,7 @@ const schemas = {
 				module: 'interoperability',
 				name: 'invalidRegistrationSignature',
 				schema: {
-					$id: '/lisk/empty',
+					$id: '/klayr/empty',
 					type: 'object',
 					properties: {},
 				},
@@ -1841,7 +1841,7 @@ const schemas = {
 				module: 'interoperability',
 				name: 'invalidSMTVerification',
 				schema: {
-					$id: '/lisk/empty',
+					$id: '/klayr/empty',
 					type: 'object',
 					properties: {},
 				},
@@ -1850,7 +1850,7 @@ const schemas = {
 				module: 'interoperability',
 				name: 'invalidRMTVerification',
 				schema: {
-					$id: '/lisk/empty',
+					$id: '/klayr/empty',
 					type: 'object',
 					properties: {},
 				},
@@ -1859,7 +1859,7 @@ const schemas = {
 				module: 'interoperability',
 				name: 'invalidCertificateSignature',
 				schema: {
-					$id: '/lisk/empty',
+					$id: '/klayr/empty',
 					type: 'object',
 					properties: {},
 				},
@@ -1868,7 +1868,7 @@ const schemas = {
 				module: 'legacy',
 				name: 'accountReclaimed',
 				schema: {
-					$id: 'lisk/legacy/accountReclaimedEventData',
+					$id: 'klayr/legacy/accountReclaimedEventData',
 					type: 'object',
 					required: ['legacyAddress', 'address', 'amount'],
 					properties: {
@@ -1893,7 +1893,7 @@ const schemas = {
 				module: 'legacy',
 				name: 'keysRegistered',
 				schema: {
-					$id: 'lisk/legacy/keysRegisteredEventData',
+					$id: 'klayr/legacy/keysRegisteredEventData',
 					type: 'object',
 					required: ['address', 'generatorKey', 'blsKey'],
 					properties: {
@@ -1926,7 +1926,7 @@ const schemas = {
 						address: {
 							dataType: 'bytes',
 							fieldNumber: 1,
-							format: 'lisk32',
+							format: 'klayr32',
 						},
 						height: {
 							dataType: 'uint32',
@@ -1946,7 +1946,7 @@ const schemas = {
 						address: {
 							dataType: 'bytes',
 							fieldNumber: 1,
-							format: 'lisk32',
+							format: 'klayr32',
 						},
 						height: {
 							dataType: 'uint32',
@@ -1966,7 +1966,7 @@ const schemas = {
 						address: {
 							dataType: 'bytes',
 							fieldNumber: 1,
-							format: 'lisk32',
+							format: 'klayr32',
 						},
 						name: {
 							dataType: 'string',
@@ -1986,12 +1986,12 @@ const schemas = {
 						senderAddress: {
 							dataType: 'bytes',
 							fieldNumber: 1,
-							format: 'lisk32',
+							format: 'klayr32',
 						},
 						validatorAddress: {
 							dataType: 'bytes',
 							fieldNumber: 2,
-							format: 'lisk32',
+							format: 'klayr32',
 						},
 						amount: {
 							dataType: 'sint64',
@@ -2014,7 +2014,7 @@ const schemas = {
 					properties: {
 						validatorAddress: {
 							dataType: 'bytes',
-							format: 'lisk32',
+							format: 'klayr32',
 							fieldNumber: 1,
 						},
 						oldCommission: {
@@ -2038,12 +2038,12 @@ const schemas = {
 					properties: {
 						stakerAddress: {
 							dataType: 'bytes',
-							format: 'lisk32',
+							format: 'klayr32',
 							fieldNumber: 1,
 						},
 						validatorAddress: {
 							dataType: 'bytes',
-							format: 'lisk32',
+							format: 'klayr32',
 							fieldNumber: 2,
 						},
 						tokenID: {
@@ -2069,12 +2069,12 @@ const schemas = {
 					properties: {
 						senderAddress: {
 							dataType: 'bytes',
-							format: 'lisk32',
+							format: 'klayr32',
 							fieldNumber: 1,
 						},
 						recipientAddress: {
 							dataType: 'bytes',
-							format: 'lisk32',
+							format: 'klayr32',
 							fieldNumber: 2,
 						},
 						tokenID: {
@@ -2111,12 +2111,12 @@ const schemas = {
 					properties: {
 						senderAddress: {
 							dataType: 'bytes',
-							format: 'lisk32',
+							format: 'klayr32',
 							fieldNumber: 1,
 						},
 						recipientAddress: {
 							dataType: 'bytes',
-							format: 'lisk32',
+							format: 'klayr32',
 							fieldNumber: 2,
 						},
 						tokenID: {
@@ -2159,12 +2159,12 @@ const schemas = {
 					properties: {
 						senderAddress: {
 							dataType: 'bytes',
-							format: 'lisk32',
+							format: 'klayr32',
 							fieldNumber: 1,
 						},
 						recipientAddress: {
 							dataType: 'bytes',
-							format: 'lisk32',
+							format: 'klayr32',
 							fieldNumber: 2,
 						},
 						tokenID: {
@@ -2200,7 +2200,7 @@ const schemas = {
 					properties: {
 						address: {
 							dataType: 'bytes',
-							format: 'lisk32',
+							format: 'klayr32',
 							fieldNumber: 1,
 						},
 						tokenID: {
@@ -2230,7 +2230,7 @@ const schemas = {
 					properties: {
 						address: {
 							dataType: 'bytes',
-							format: 'lisk32',
+							format: 'klayr32',
 							fieldNumber: 1,
 						},
 						tokenID: {
@@ -2260,7 +2260,7 @@ const schemas = {
 					properties: {
 						address: {
 							dataType: 'bytes',
-							format: 'lisk32',
+							format: 'klayr32',
 							fieldNumber: 1,
 						},
 						module: {
@@ -2296,7 +2296,7 @@ const schemas = {
 					properties: {
 						address: {
 							dataType: 'bytes',
-							format: 'lisk32',
+							format: 'klayr32',
 							fieldNumber: 1,
 						},
 						module: {
@@ -2353,7 +2353,7 @@ const schemas = {
 					properties: {
 						address: {
 							dataType: 'bytes',
-							format: 'lisk32',
+							format: 'klayr32',
 							fieldNumber: 1,
 						},
 						tokenID: {
@@ -2457,7 +2457,7 @@ const schemas = {
 						},
 						relayerAddress: {
 							dataType: 'bytes',
-							format: 'lisk32',
+							format: 'klayr32',
 							fieldNumber: 3,
 						},
 						result: {
@@ -2498,7 +2498,7 @@ const schemas = {
 				module: 'token',
 				name: 'allTokensSupported',
 				schema: {
-					$id: '/lisk/empty',
+					$id: '/klayr/empty',
 					type: 'object',
 					properties: {},
 				},
@@ -2507,7 +2507,7 @@ const schemas = {
 				module: 'token',
 				name: 'allTokensSupportRemoved',
 				schema: {
-					$id: '/lisk/empty',
+					$id: '/klayr/empty',
 					type: 'object',
 					properties: {},
 				},
@@ -2680,7 +2680,7 @@ const schemas = {
 					generatorAddress: {
 						dataType: 'bytes',
 						fieldNumber: 5,
-						format: 'lisk32',
+						format: 'klayr32',
 					},
 					transactionRoot: {
 						dataType: 'bytes',
@@ -2776,7 +2776,7 @@ const schemas = {
 		},
 		transaction: {
 			schema: {
-				$id: '/lisk/transaction',
+				$id: '/klayr/transaction',
 				type: 'object',
 				required: ['module', 'command', 'nonce', 'fee', 'senderPublicKey', 'params'],
 				properties: {

@@ -1,14 +1,14 @@
-# Lisk Service Subscribe API Documentation
+# Klayr Service Subscribe API Documentation
 
-The Lisk Service is a web application that interacts with the entire Lisk ecosystem in various aspects. For example, one key aspect is an update about blockchain events.
+The Klayr Service is a web application that interacts with the entire Klayr ecosystem in various aspects. For example, one key aspect is an update about blockchain events.
 
 The Subscribe API is sometimes called publish/subscribe or Event-Driven API. The biggest difference between Event-Driven and regular REST API is not only technical. In practice, a two-way streaming connection is used, which means that not only can the client request the server for a data update, (and also potential updates) but also the server can notify the client about new data instantly as it arrives.
 
-Lisk Service leverages the two-way communication approach by utilizing the WebSocket library responsible for updating users about changes in the blockchain network and markets.
+Klayr Service leverages the two-way communication approach by utilizing the WebSocket library responsible for updating users about changes in the blockchain network and markets.
 
 ## Table of Contents
 
-- [Lisk Service Subscribe API Documentation](#lisk-service-subscribe-api-documentation)
+- [Klayr Service Subscribe API Documentation](#klayr-service-subscribe-api-documentation)
   - [Access paths and compatibility](#access-paths-and-compatibility)
   - [Endpoint Logic](#endpoint-logic)
   - [Payloads](#payloads)
@@ -36,11 +36,11 @@ Lisk Service leverages the two-way communication approach by utilizing the WebSo
 
 ## Access paths and compatibility
 
-The blockchain update API can be accessed by the following path `https://service.lisk.com/blockchain`.
+The blockchain update API can be accessed by the following path `https://service.klayr.xyz/blockchain`.
 
-You might also be interested in accessing the `testnet` network by using the `https://testnet-service.lisk.com/blockchain` endpoint.
+You might also be interested in accessing the `testnet` network by using the `https://testnet-service.klayr.xyz/blockchain` endpoint.
 
-**Important:** The Lisk Service WebSocket API uses the `socket.io` library. This implementation is compatible with version 2.0 of the `socket.io` library. Using the wrong major version might result in a broken connection and events not being passed.
+**Important:** The Klayr Service WebSocket API uses the `socket.io` library. This implementation is compatible with version 2.0 of the `socket.io` library. Using the wrong major version might result in a broken connection and events not being passed.
 
 The specification below contains numerous examples of how to use the API in practice.
 
@@ -69,7 +69,7 @@ All the event payloads are returned in the JSON format - application/json and ad
 
 ```javascript
 const io = require('socket.io-client');
-const connection = io.connect('https://service.lisk.com/blockchain', { transports: ['websocket'] });
+const connection = io.connect('https://service.klayr.xyz/blockchain', { transports: ['websocket'] });
 connection.on('update.block', (block) => { (...) });
 ```
 
@@ -365,9 +365,9 @@ Updates about recent metadata changes.
 
 ```jsonc
 {
-  "mainnet": ["Lisk", "Colecti"],
-  "testnet": ["Lisk", "Enevti"],
-  "betanet": ["Lisk"],
+  "mainnet": ["Klayr", "Colecti"],
+  "testnet": ["Klayr", "Enevti"],
+  "betanet": ["Klayr"],
 }
 ```
 

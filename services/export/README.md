@@ -1,4 +1,4 @@
-# Lisk Service Export
+# Klayr Service Export
 
 The Export service allows users to download the transaction history for a specified user address or publicKey, in a CSV format to aid the auditors.
 
@@ -10,11 +10,11 @@ Please refer to the [README](../../README.md) in the project root directory.
 
 ## Installation
 
-Clone the Lisk Service Repository:
+Clone the Klayr Service Repository:
 
 ```bash
-git clone https://github.com/LiskHQ/lisk-service.git # clone repository
-cd lisk-service/services/export # move into export microservice directory
+git clone https://github.com/KlayrHQ/klayr-service.git # clone repository
+cd klayr-service/services/export # move into export microservice directory
 yarn install --frozen-lockfile # install required Node.js dependencies
 ```
 
@@ -44,7 +44,7 @@ A list of the most commonly used environment variables is presented below:
 ### Start
 
 ```bash
-cd lisk-service/services/export # move into the root directory of the export microservice
+cd klayr-service/services/export # move into the root directory of the export microservice
 yarn start # start the microservice
 ```
 
@@ -58,7 +58,7 @@ Press `Ctrl+C` in the terminal to stop the process.
 
 ## Contributors
 
-https://github.com/LiskHQ/lisk-service/graphs/contributors
+https://github.com/KlayrHQ/klayr-service/graphs/contributors
 
 ## License
 
@@ -76,4 +76,4 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-[lisk documentation site]: https://lisk.com/documentation
+[klayr documentation site]: https://klayr.xyz/documentation

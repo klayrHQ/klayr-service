@@ -15,17 +15,17 @@ start:
 stop:
 	$(compose) stop
 
-restart: 
+restart:
 	$(compose) restart
 
 backup-db:
-	$(compose) exec -T mysql-primary mysqldump --set-gtid-purged=OFF --no-create-db lisk -u root -ppassword > mysql_indexer_index.sql
+	$(compose) exec -T mysql-primary mysqldump --set-gtid-purged=OFF --no-create-db klayr -u root -ppassword > mysql_indexer_index.sql
 
 restore-db:
-	$(compose) exec -T mysql-primary mysql lisk -u root -ppassword < mysql_indexer_index.sql
+	$(compose) exec -T mysql-primary mysql klayr -u root -ppassword < mysql_indexer_index.sql
 
 flush-db:
-	echo "DROP DATABASE lisk; CREATE DATABASE lisk;" | $(compose) exec -T mysql-primary mysql -u root -ppassword
+	echo "DROP DATABASE klayr; CREATE DATABASE klayr;" | $(compose) exec -T mysql-primary mysql -u root -ppassword
 
 stop-%:
 	$(compose) stop $*
@@ -50,7 +50,7 @@ cli-%:
 	$(compose) exec $* /bin/sh
 
 mysql-%:
-	$(compose) exec mysql_$* mysql -u root -ppassword lisk
+	$(compose) exec mysql_$* mysql -u root -ppassword klayr
 
 redis-%:
 	$(compose) exec redis_$* redis-cli
@@ -77,37 +77,37 @@ build-images: build-app-registry build-connector build-indexer build-coordinator
 build-all: build build-template build-tests
 
 build-app-registry:
-	cd ./services/blockchain-app-registry && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=lisk/service_blockchain_app_registry ./
+	cd ./services/blockchain-app-registry && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=klayr/service_blockchain_app_registry ./
 
 build-connector:
-	cd ./services/blockchain-connector && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=lisk/service_blockchain_connector ./
+	cd ./services/blockchain-connector && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=klayr/service_blockchain_connector ./
 
 build-indexer:
-	cd ./services/blockchain-indexer && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=lisk/service_blockchain_indexer ./
+	cd ./services/blockchain-indexer && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=klayr/service_blockchain_indexer ./
 
 build-coordinator:
-	cd ./services/blockchain-coordinator && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=lisk/service_blockchain_coordinator ./
+	cd ./services/blockchain-coordinator && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=klayr/service_blockchain_coordinator ./
 
 build-statistics:
-	cd ./services/transaction-statistics && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=lisk/service_transaction_statistics ./
+	cd ./services/transaction-statistics && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=klayr/service_transaction_statistics ./
 
 build-fees:
-	cd ./services/fee-estimator && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=lisk/service_fee_estimator ./
+	cd ./services/fee-estimator && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=klayr/service_fee_estimator ./
 
 build-market:
-	cd ./services/market && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=lisk/service_market ./
+	cd ./services/market && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=klayr/service_market ./
 
 build-export:
-	cd ./services/export && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=lisk/service_export ./
+	cd ./services/export && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=klayr/service_export ./
 
 build-gateway:
-	cd ./services/gateway && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=lisk/service_gateway ./
+	cd ./services/gateway && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=klayr/service_gateway ./
 
 build-template:
-	cd ./services/template && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=lisk/service_template ./
+	cd ./services/template && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=klayr/service_template ./
 
 build-tests:
-	cd ./tests && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=lisk/service_tests ./
+	cd ./tests && docker buildx build --build-arg NODEJS_VERSION=$(shell cat .nvmrc) --tag=klayr/service_tests ./
 
 build-local:
 	yarn install --frozen-lockfile
@@ -142,17 +142,17 @@ clean-local:
 	cd ./tests && rm -rf node_modules
 
 clean-images:
-	docker rmi lisk/service_gateway \
-	lisk/service_blockchain_app_registry \
-	lisk/service_blockchain_connector \
-	lisk/service_blockchain_indexer \
-	lisk/service_blockchain_coordinator \
-	lisk/service_transaction_statistics \
-	lisk/service_fee_estimator \
-	lisk/service_market \
-	lisk/service_export \
-	lisk/service_template \
-	lisk/service_tests; :
+	docker rmi klayr/service_gateway \
+	klayr/service_blockchain_app_registry \
+	klayr/service_blockchain_connector \
+	klayr/service_blockchain_indexer \
+	klayr/service_blockchain_coordinator \
+	klayr/service_transaction_statistics \
+	klayr/service_fee_estimator \
+	klayr/service_market \
+	klayr/service_export \
+	klayr/service_template \
+	klayr/service_tests; :
 
 audit:
 	yarn audit; :

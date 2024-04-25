@@ -13,7 +13,7 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { Utils } = require('lisk-service-framework');
+const { Utils } = require('klayr-service-framework');
 
 const requestAll = async (fn, method, params, limit) => {
 	const maxAmount = limit || Number.MAX_SAFE_INTEGER;

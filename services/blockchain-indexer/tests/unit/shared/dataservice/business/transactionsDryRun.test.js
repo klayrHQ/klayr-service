@@ -27,8 +27,8 @@ const {
 	mockTransactionsDryRunResult,
 } = require('../../constants/transactionsDryRun');
 
-jest.mock('lisk-service-framework', () => {
-	const actual = jest.requireActual('lisk-service-framework');
+jest.mock('klayr-service-framework', () => {
+	const actual = jest.requireActual('klayr-service-framework');
 	return {
 		...actual,
 		Logger: () => ({

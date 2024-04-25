@@ -20,7 +20,7 @@ const {
 	Utils: {
 		fs: { mkdir, rmdir, write },
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const {
 	indexAppMeta,

@@ -14,8 +14,8 @@
  *
  */
 const {
-	address: { getAddressFromLisk32Address },
-} = require('@liskhq/lisk-cryptography');
+	address: { getAddressFromKlayr32Address },
+} = require('@klayr/cryptography');
 
 const config = require('../../../config');
 const { api } = require('../../../helpers/api');
@@ -81,14 +81,14 @@ describe('pos/validators API', () => {
 					// Should be sorted by address when validator weights are same
 					if (curValidator.rank < nextValidator.rank) {
 						expect(
-							getAddressFromLisk32Address(curValidator.address).compare(
-								getAddressFromLisk32Address(nextValidator.address),
+							getAddressFromKlayr32Address(curValidator.address).compare(
+								getAddressFromKlayr32Address(nextValidator.address),
 							),
 						).toBe(-1);
 					} else {
 						expect(
-							getAddressFromLisk32Address(curValidator.address).compare(
-								getAddressFromLisk32Address(nextValidator.address),
+							getAddressFromKlayr32Address(curValidator.address).compare(
+								getAddressFromKlayr32Address(nextValidator.address),
 							),
 						).toBe(1);
 					}
@@ -302,7 +302,7 @@ describe('pos/validators API', () => {
 
 		it('should return empty when requested for known non-validator address', async () => {
 			const response = await api.get(
-				`${endpoint}?address=lsk99999999999999999999999999999999999999`,
+				`${endpoint}?address=kly99999999999999999999999999999999999999`,
 			);
 			expect(response).toMap(validatorsResponseSchema);
 			expect(response.data.length).toBe(0);

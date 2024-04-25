@@ -31,8 +31,8 @@ const blockchainAppsStatsSchema = {
 	registered: Joi.number().integer().min(0).required(),
 	activated: Joi.number().integer().min(0).required(),
 	terminated: Joi.number().integer().min(0).required(),
-	totalSupplyLSK: Joi.string().required(),
-	totalStakedLSK: Joi.string().required(),
+	totalSupplyKLY: Joi.string().required(),
+	totalStakedKLY: Joi.string().required(),
 	currentAnnualInflationRate: Joi.string().required(),
 };
 
@@ -47,9 +47,9 @@ const dataSchema = {
 	status: Joi.string()
 		.valid(...validStatuses)
 		.required(),
-	address: Joi.string().pattern(regex.ADDRESS_LISK32).required(),
+	address: Joi.string().pattern(regex.ADDRESS_KLAYR32).required(),
 	lastCertificateHeight: Joi.number().integer().min(0).required(),
-	escrowedLSK: Joi.string().pattern(regex.DIGITS).required(),
+	escrowedKLY: Joi.string().pattern(regex.DIGITS).required(),
 	lastUpdated: Joi.number().integer().positive().max(getCurrentTimestamp()).required(),
 	escrow: Joi.array().items(escrow).min(1).required(),
 };

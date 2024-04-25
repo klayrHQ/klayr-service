@@ -15,7 +15,7 @@
  */
 const MessageQueue = require('bull');
 
-const { Logger, Signals } = require('lisk-service-framework');
+const { Logger, Signals } = require('klayr-service-framework');
 
 const config = require('../config');
 

@@ -21,7 +21,7 @@ const {
 	DB: {
 		MySQL: { getTableInstance },
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const logger = Logger();
 
@@ -30,7 +30,7 @@ const config = require('../../config');
 const redis = new Redis(config.endpoints.cache);
 
 const accountsTableSchema = require('../database/schema/accounts');
-const { getLisk32AddressFromPublicKey } = require('../utils/account');
+const { getKlayr32AddressFromPublicKey } = require('../utils/account');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
@@ -41,7 +41,7 @@ const updateAccountInfoPk = async job => {
 
 	try {
 		const account = {
-			address: getLisk32AddressFromPublicKey(publicKey),
+			address: getKlayr32AddressFromPublicKey(publicKey),
 			publicKey,
 		};
 

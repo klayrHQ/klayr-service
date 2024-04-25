@@ -19,7 +19,7 @@ const {
 			KVStore: { getKeyValueTable },
 		},
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 const { getPosTokenID } = require('../dataService/business/pos/constants');
 
 const { KV_STORE_KEY } = require('../constants');

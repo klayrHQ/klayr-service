@@ -23,9 +23,9 @@ const {
 			KVStore: { getKeyValueTable },
 		},
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
-const { getLisk32AddressFromPublicKey } = require('../../../utils/account');
+const { getKlayr32AddressFromPublicKey } = require('../../../utils/account');
 const { KV_STORE_KEY } = require('../../../constants');
 const { getPosTokenID } = require('../../../dataService/business/pos/constants');
 
@@ -50,7 +50,7 @@ const getStakeIndexingInfo = async tx => {
 		async stake => {
 			const stakeEntry = {};
 
-			stakeEntry.stakerAddress = getLisk32AddressFromPublicKey(tx.senderPublicKey);
+			stakeEntry.stakerAddress = getKlayr32AddressFromPublicKey(tx.senderPublicKey);
 			stakeEntry.validatorAddress = stake.validatorAddress;
 			stakeEntry.amount = BigInt(stake.amount);
 			return stakeEntry;

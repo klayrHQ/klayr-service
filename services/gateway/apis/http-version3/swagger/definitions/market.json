@@ -5,11 +5,11 @@
 		"properties": {
 			"code": {
 				"type": "string",
-				"example": "LSK_CHF"
+				"example": "KLY_CHF"
 			},
 			"from": {
 				"type": "string",
-				"example": "LSK",
+				"example": "KLY",
 				"description": "from"
 			},
 			"rate": {

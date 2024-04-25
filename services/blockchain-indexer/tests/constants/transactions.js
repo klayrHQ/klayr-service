@@ -22,7 +22,7 @@ const inputTransaction = {
 		tokenID: '0400000000000000',
 		amount: '100000000000',
 		receivingChainID: '04000001',
-		recipientAddress: 'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+		recipientAddress: 'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 		data: 'Cross chain transfer',
 	},
 };

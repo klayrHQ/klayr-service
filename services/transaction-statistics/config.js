@@ -26,17 +26,17 @@ const config = {
 /**
  * Inter-service message broker
  */
-config.transporter = process.env.SERVICE_BROKER || 'redis://lisk:password@127.0.0.1:6379/0';
+config.transporter = process.env.SERVICE_BROKER || 'redis://klayr:password@127.0.0.1:6379/0';
 config.brokerTimeout = Number(process.env.SERVICE_BROKER_TIMEOUT) || 10; // in seconds
 
 /**
  * External endpoints
  */
 config.endpoints.redis =
-	process.env.SERVICE_STATISTICS_REDIS || 'redis://lisk:password@127.0.0.1:6379/7';
+	process.env.SERVICE_STATISTICS_REDIS || 'redis://klayr:password@127.0.0.1:6379/7';
 // Primary database. Used for both read-write operations.
 config.endpoints.mysql =
-	process.env.SERVICE_STATISTICS_MYSQL || 'mysql://lisk:password@127.0.0.1:3306/lisk';
+	process.env.SERVICE_STATISTICS_MYSQL || 'mysql://klayr:password@127.0.0.1:3306/klayr';
 // DB replicas against the primary. Used for read-only operations.
 config.endpoints.mysqlReplica =
 	process.env.SERVICE_STATISTICS_MYSQL_READ_REPLICA || config.endpoints.mysql;
@@ -82,17 +82,17 @@ config.networks = [
 	{
 		networkName: 'mainnet',
 		chainID: '00000000',
-		serviceUrl: 'https://service.lisk.com',
+		serviceUrl: 'https://service.klayr.xyz',
 	},
 	{
 		networkName: 'testnet',
 		chainID: '01000000',
-		serviceUrl: 'https://testnet-service.lisk.com',
+		serviceUrl: 'https://testnet-service.klayr.xyz',
 	},
 	{
 		networkName: 'betanet',
 		chainID: '02000000',
-		serviceUrl: 'https://betanet-service.lisk.com',
+		serviceUrl: 'https://betanet-service.klayr.xyz',
 	},
 ];
 

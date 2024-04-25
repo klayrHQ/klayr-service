@@ -26,7 +26,7 @@ const MODULE = Object.freeze({
 const COMMAND = Object.freeze({
 	TRANSFER: 'transfer',
 	TRANSFER_CROSS_CHAIN: 'transferCrossChain',
-	RECLAIM_LSK: 'reclaimLSK',
+	RECLAIM_KLY: 'reclaimKLY',
 });
 
 const TRANSACTION_STATUS = Object.freeze({

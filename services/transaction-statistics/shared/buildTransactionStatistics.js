@@ -30,7 +30,7 @@ const {
 		},
 	},
 	Signals,
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { getDistributionByType } = require('./transactionStatistics');
 const { DB_CONSTANT, DATE_FORMAT } = require('./utils/constants');

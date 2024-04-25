@@ -14,11 +14,11 @@
  *
  */
 const util = require('util');
-const { validator } = require('@liskhq/lisk-validator');
+const { validator } = require('@klayr/validator');
 
 const {
 	Exceptions: { ValidationException, ServiceUnavailableException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { requestConnector } = require('../../utils/request');
 const {

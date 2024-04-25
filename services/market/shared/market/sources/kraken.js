@@ -17,7 +17,7 @@ const {
 	HTTP,
 	CacheRedis,
 	Exceptions: { ServiceUnavailableException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const BluebirdPromise = require('bluebird');
 
@@ -32,9 +32,9 @@ const expireMiliseconds = config.ttl.kraken;
 const krakenCache = CacheRedis('kraken', config.endpoints.redis);
 
 const symbolMap = {
-	LSK_USD: 'LSKUSD',
-	LSK_EUR: 'LSKEUR',
-	LSK_BTC: 'LSKBTC',
+	KLY_USD: 'KLYUSD',
+	KLY_EUR: 'KLYEUR',
+	KLY_BTC: 'KLYBTC',
 };
 
 const fetchAllMarketTickers = async () => {
@@ -49,7 +49,7 @@ const fetchAllMarketTickers = async () => {
 
 const standardizeTickers = tickers => {
 	const transformedPrices = Object.entries(symbolMap).map(([k, v]) => {
-		if (v === symbolMap.LSK_BTC) v = 'LSKXBT'; // Kraken API returns LSKBTC as LSKXBT
+		if (v === symbolMap.KLY_BTC) v = 'KLYXBT'; // Kraken API returns LSKBTC as LSKXBT
 		const currentTicker = tickers[v];
 		const [from, to] = k.split('_');
 		const price = {

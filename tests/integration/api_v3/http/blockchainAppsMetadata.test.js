@@ -144,7 +144,7 @@ describe('Blockchain applications metadata API', () => {
 	});
 
 	it('should retrieve blockchain application off-chain metadata by chainName', async () => {
-		const response = await api.get(`${endpoint}?chainName=lisk_mainchain`);
+		const response = await api.get(`${endpoint}?chainName=klayr_mainchain`);
 		expect(response).toMap(goodRequestSchema);
 		expect(response.data).toBeInstanceOf(Array);
 		expect(response.data.length).toBeGreaterThanOrEqual(1);
@@ -154,7 +154,7 @@ describe('Blockchain applications metadata API', () => {
 	});
 
 	it('should retrieve blockchain application off-chain metadata by displayName', async () => {
-		const response = await api.get(`${endpoint}?displayName=Lisk`);
+		const response = await api.get(`${endpoint}?displayName=Klayr`);
 		expect(response).toMap(goodRequestSchema);
 		expect(response.data).toBeInstanceOf(Array);
 		expect(response.data.length).toBeGreaterThanOrEqual(1);
@@ -164,7 +164,7 @@ describe('Blockchain applications metadata API', () => {
 	});
 
 	it('should retrieve blockchain application off-chain metadata by search', async () => {
-		const response = await api.get(`${endpoint}?search=Lisk`);
+		const response = await api.get(`${endpoint}?search=Klayr`);
 		expect(response).toMap(goodRequestSchema);
 		expect(response.data).toBeInstanceOf(Array);
 		expect(response.data.length).toBeGreaterThanOrEqual(1);
@@ -184,7 +184,7 @@ describe('Blockchain applications metadata API', () => {
 	});
 
 	it('should retrieve blockchain application off-chain metadata by case-insensitive search (Upper-case)', async () => {
-		const response = await api.get(`${endpoint}?search=LISK`);
+		const response = await api.get(`${endpoint}?search=KLAYR`);
 		expect(response).toMap(goodRequestSchema);
 		expect(response.data).toBeInstanceOf(Array);
 		expect(response.data.length).toBeGreaterThanOrEqual(1);
@@ -194,7 +194,7 @@ describe('Blockchain applications metadata API', () => {
 	});
 
 	it('should retrieve blockchain application off-chain metadata by case-insensitive search (Lower-case)', async () => {
-		const response = await api.get(`${endpoint}?search=lisk`);
+		const response = await api.get(`${endpoint}?search=klayr`);
 		expect(response).toMap(goodRequestSchema);
 		expect(response.data).toBeInstanceOf(Array);
 		expect(response.data.length).toBeGreaterThanOrEqual(1);

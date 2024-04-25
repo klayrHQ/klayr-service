@@ -278,7 +278,7 @@ describe('get.pos.stakers', () => {
 	});
 
 	it('should return empty when requested for known non-validator address', async () => {
-		const response = await getStakers({ address: 'lsk99999999999999999999999999999999999999' });
+		const response = await getStakers({ address: 'kly99999999999999999999999999999999999999' });
 		expect(response).toMap(jsonRpcEnvelopeSchema);
 		const { result } = response;
 		expect(result).toMap(goodRequestSchema);

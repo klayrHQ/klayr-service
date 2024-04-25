@@ -26,7 +26,7 @@ LoggerConfig(loggerConf);
 
 const app = Microservice({
 	name: 'test-service',
-	transporter: process.env.REDIS_URL || 'redis://lisk:password@127.0.0.1:6379/0',
+	transporter: process.env.REDIS_URL || 'redis://klayr:password@127.0.0.1:6379/0',
 	logger: loggerConf,
 });
 
@@ -136,7 +136,7 @@ describe('Test microservice', () => {
 	describe('requestRpc()', () => {
 		it('should return result when called with registered method name', async () => {
 			const testData = {
-				address: 'lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99',
+				address: 'klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99',
 				balance: '95589969000000',
 			};
 

@@ -24,7 +24,7 @@ const {
 	Logger,
 	LoggerConfig,
 	Signals,
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const config = require('./config');
 

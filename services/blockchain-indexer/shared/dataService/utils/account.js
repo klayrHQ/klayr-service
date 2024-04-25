@@ -14,15 +14,15 @@
  *
  */
 const {
-	address: { getLisk32AddressFromAddress, getAddressFromLisk32Address },
+	address: { getKlayr32AddressFromAddress, getAddressFromKlayr32Address },
 	legacyAddress: { getLegacyAddressFromPublicKey },
-} = require('@liskhq/lisk-cryptography');
+} = require('@klayr/cryptography');
 
 const {
 	DB: {
 		MySQL: { getTableInstance },
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const accountsTableSchema = require('../../database/schema/accounts');
 const config = require('../../../config');
@@ -46,21 +46,21 @@ const getLegacyFormatAddressFromPublicKey = publicKey => {
 	return legacyAddress;
 };
 
-const getLisk32AddressFromHexAddress = address =>
-	getLisk32AddressFromAddress(Buffer.from(address, 'hex'));
+const getKlayr32AddressFromHexAddress = address =>
+	getKlayr32AddressFromAddress(Buffer.from(address, 'hex'));
 
-const getLisk32Address = address =>
-	address.startsWith('lsk') ? address : getLisk32AddressFromHexAddress(address);
+const getKlayr32Address = address =>
+	address.startsWith('kly') ? address : getKlayr32AddressFromHexAddress(address);
 
 const getHexAddress = address =>
-	address.startsWith('lsk') ? getAddressFromLisk32Address(address).toString('hex') : address;
+	address.startsWith('kly') ? getAddressFromKlayr32Address(address).toString('hex') : address;
 
 const isStringType = value => typeof value === 'string';
 
 const parseAddress = address => (isStringType(address) ? address.toUpperCase() : '');
 
-const validateLisk32Address = address =>
-	typeof address === 'string' && regex.ADDRESS_LISK32.test(address);
+const validateKlayr32Address = address =>
+	typeof address === 'string' && regex.ADDRESS_KLAYR32.test(address);
 
 const getCachedAccountBy = async (key, value) => {
 	const accountsTable = await getAccountsTable();
@@ -78,7 +78,7 @@ const getCachedAccountBy = async (key, value) => {
 const getCachedAccountByAddress = getCachedAccountBy.bind(null, 'address');
 
 const confirmAddress = async address => {
-	if (!validateLisk32Address(address)) return false;
+	if (!validateKlayr32Address(address)) return false;
 	const account = await getCachedAccountByAddress(parseAddress(address));
 	return account && account.address;
 };
@@ -87,8 +87,8 @@ module.exports = {
 	confirmAddress,
 	getIndexedAccountInfo,
 	getLegacyAddressFromPublicKey: getLegacyFormatAddressFromPublicKey,
-	getLisk32AddressFromHexAddress,
-	getLisk32Address,
+	getKlayr32AddressFromHexAddress,
+	getKlayr32Address,
 	getHexAddress,
 	getAccountsTable,
 };

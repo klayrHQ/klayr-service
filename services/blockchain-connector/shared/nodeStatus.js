@@ -17,7 +17,7 @@ const {
 	Logger,
 	Signals,
 	Utils: { waitForIt },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { getNodeInfo } = require('./sdk/endpoints');
 
@@ -25,7 +25,7 @@ const config = require('../config');
 
 const logger = Logger();
 
-const liskAppAddress = config.endpoints.liskWs;
+const klayrAppAddress = config.endpoints.klayrWs;
 const NODE_DISCOVERY_INTERVAL = 1 * 1000; // ms
 const NODE_SYNC_CHECK_INTERVAL = 15 * 1000; // in ms
 
@@ -38,7 +38,7 @@ const checkStatus = () =>
 				resolve(nodeInfo);
 			})
 			.catch(() => {
-				logger.debug(`The node ${liskAppAddress} not available at the moment.`);
+				logger.debug(`The node ${klayrAppAddress} not available at the moment.`);
 				reject();
 			}),
 	);

@@ -15,12 +15,12 @@
  */
 const {
 	math: { q96 },
-} = require('@liskhq/lisk-utils');
+} = require('@klayr/utils');
 const {
 	DB: {
 		MySQL: { getTableInstance },
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const config = require('../../../config');
 const { MAX_COMMISSION } = require('../../constants');

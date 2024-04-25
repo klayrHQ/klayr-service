@@ -5,7 +5,7 @@
 		"properties": {
 			"chainName": {
 				"type": "string",
-				"example": "Lisk",
+				"example": "Klayr",
 				"description": "Name of the blockchain application."
 			},
 			"chainID": {
@@ -23,8 +23,8 @@
 			"address": {
 				"type": "string",
 				"format": "address",
-				"example": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
-				"description": "The Lisk Address is the human-readable representation of a blockchain account.\nIt is 41 character long identifier that begins with `lsk`."
+				"example": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+				"description": "The Klayr Address is the human-readable representation of a blockchain account.\nIt is 41 character long identifier that begins with `kly`."
 			},
 			"lastCertificateHeight": {
 				"type": "integer",
@@ -37,10 +37,10 @@
 				"example": 1616008148,
 				"description": "timestamp"
 			},
-			"escrowedLSK": {
+			"escrowedKLY": {
 				"type": "string",
 				"example": "50000000000",
-				"description": "Number of LSK tokens escrowed to the sidechain."
+				"description": "Number of KLY tokens escrowed to the sidechain."
 			},
 			"escrow": {
 				"type": "array",
@@ -51,7 +51,7 @@
 						"tokenID": {
 							"type": "string",
 							"example": "0000000000000000",
-							"description": "The universal token identifier for the escrowed tokens within the Lisk ecosystem."
+							"description": "The universal token identifier for the escrowed tokens within the Klayr ecosystem."
 						},
 						"amount": {
 							"type": "string",
@@ -102,11 +102,11 @@
 						"example": 35,
 						"description": "List of terminated blockchain applications."
 					},
-					"totalSupplyLSK": {
+					"totalSupplyKLY": {
 						"type": "string",
 						"example": "5000000"
 					},
-					"totalStakedLSK": {
+					"totalStakedKLY": {
 						"type": "string",
 						"example": "3000000"
 					},
@@ -127,7 +127,7 @@
 		"properties": {
 			"chainName": {
 				"type": "string",
-				"example": "Lisk",
+				"example": "Klayr",
 				"description": "Chain name as registered on the network"
 			},
 			"chainID": {
@@ -175,7 +175,7 @@
 		"properties": {
 			"chainName": {
 				"type": "string",
-				"example": "Lisk",
+				"example": "Klayr",
 				"description": "Chain name as registered on the network"
 			},
 			"chainID": {
@@ -186,11 +186,11 @@
 			"displayName": {
 				"type": "string",
 				"description": "Application display name for the wallets.",
-				"example": "Lisk"
+				"example": "Klayr"
 			},
 			"title": {
 				"type": "string",
-				"example": "Lisk blockchain application."
+				"example": "Klayr blockchain application."
 			},
 			"status": {
 				"type": "string",
@@ -199,7 +199,7 @@
 			},
 			"description": {
 				"type": "string",
-				"example": "Lisk is a blockchain application platform."
+				"example": "Klayr is a blockchain application platform."
 			},
 			"networkType": {
 				"type": "string",
@@ -213,12 +213,12 @@
 			},
 			"genesisURL": {
 				"type": "string",
-				"example": "https://downloads.lisk.com/lisk/mainnet/genesis_block.json.tar.gz",
+				"example": "https://downloads.klayr.xyz/klayr/mainnet/genesis_block.json.tar.gz",
 				"description": "URI to the network genesis block."
 			},
 			"projectPage": {
 				"type": "string",
-				"example": "https://lisk.com",
+				"example": "https://klayr.xyz",
 				"description": "URL to the project's homepage."
 			},
 			"serviceURLs": {
@@ -229,13 +229,13 @@
 					"properties": {
 						"http": {
 							"type": "string",
-							"example": "https://service.lisk.com",
-							"description": "HTTP endpoint to access Lisk Service API against the blockchain application"
+							"example": "https://service.klayr.xyz",
+							"description": "HTTP endpoint to access Klayr Service API against the blockchain application"
 						},
 						"ws": {
 							"type": "string",
-							"example": "wss://service.lisk.com",
-							"description": "WS endpoint to access Lisk Service API against the blockchain application"
+							"example": "wss://service.klayr.xyz",
+							"description": "WS endpoint to access Klayr Service API against the blockchain application"
 						},
 						"apiCertificatePublicKey": {
 							"type": "string",
@@ -251,25 +251,25 @@
 				"properties": {
 					"png": {
 						"type": "string",
-						"example": "https://downloads.lisk.com/lisk/images/logo.png",
+						"example": "https://downloads.klayr.xyz/klayr/images/logo.png",
 						"description": "URI to the PNG format of the application logo"
 					},
 					"svg": {
 						"type": "string",
-						"example": "https://downloads.lisk.com/lisk/images/logo.svg",
+						"example": "https://downloads.klayr.xyz/klayr/images/logo.svg",
 						"description": "URI to the SVG format of the application logo"
 					}
 				}
 			},
 			"appPage": {
 				"type": "string",
-				"example": "https://lisk.com",
+				"example": "https://klayr.xyz",
 				"description": "URL to the blockchain application's frontend, if exists"
 			},
 			"backgroundColor": {
 				"type": "string",
 				"example": "#0981D1",
-				"description": "Default background color to be used in the application management and exploration screens of the Lisk wallets. Must be of the format '#rrggbb' (hex values)"
+				"description": "Default background color to be used in the application management and exploration screens of the Klayr wallets. Must be of the format '#rrggbb' (hex values)"
 			},
 			"explorers": {
 				"type": "array",
@@ -279,12 +279,12 @@
 					"properties": {
 						"url": {
 							"type": "string",
-							"example": "https://lisk.observer",
+							"example": "https://explorer.klayr.xyz",
 							"description": "URI endpoint to the explorer's homepage"
 						},
 						"txnPage": {
 							"type": "string",
-							"example": "https://lisk.observer/transactions",
+							"example": "https://explorer.klayr.xyz/transactions",
 							"description": "URI endpoint to the explorer's transactions page"
 						}
 					}
@@ -298,7 +298,7 @@
 					"properties": {
 						"url": {
 							"type": "string",
-							"example": "https://mainnet.lisk.com",
+							"example": "https://mainnet.klayr.xyz",
 							"description": "URI to connect and query to the node directly"
 						},
 						"maintainer": {
@@ -352,18 +352,18 @@
 			},
 			"chainName": {
 				"type": "string",
-				"example": "Lisk",
+				"example": "Klayr",
 				"description": "Chain name as registered on the network"
 			},
 			"tokenID": {
 				"type": "string",
 				"example": "0000000000000000",
-				"description": "The universal identifier for the token within the Lisk ecosystem."
+				"description": "The universal identifier for the token within the Klayr ecosystem."
 			},
 			"tokenName": {
 				"type": "string",
-				"example": "Lisk",
-				"description": "The name of the token. For example Lisk"
+				"example": "Klayr",
+				"description": "The name of the token. For example Klayr"
 			},
 			"networkType": {
 				"type": "string",
@@ -371,7 +371,7 @@
 			},
 			"description": {
 				"type": "string",
-				"example": "LSK is the utility token of Lisk"
+				"example": "KLY is the utility token of Klayr"
 			},
 			"denomUnits": {
 				"type": "array",
@@ -380,19 +380,19 @@
 					"properties": {
 						"denom": {
 							"type": "string",
-							"example": "lsk",
-							"description": "Supported denomination. Example: Beddows, LSK"
+							"example": "kly",
+							"description": "Supported denomination. Example: Beddows, KLY"
 						},
 						"decimals": {
 							"type": "integer",
 							"example": 8,
-							"description": "The exponent over base 10 by which the denomination is a factor of the baseDenom. Example: 8 for LSK (1 LSK = 10^8 Beddows)"
+							"description": "The exponent over base 10 by which the denomination is a factor of the baseDenom. Example: 8 for KLY (1 KLY = 10^8 Beddows)"
 						},
 						"aliases": {
 							"type": "array",
 							"items": {
 								"type": "string",
-								"example": "LISK",
+								"example": "KLAYR",
 								"description": "Human friendly aliases for the denomination unit"
 							}
 						}
@@ -401,13 +401,13 @@
 			},
 			"symbol": {
 				"type": "string",
-				"example": "LSK",
-				"description": "The symbol for the token. Example: LSK"
+				"example": "KLY",
+				"description": "The symbol for the token. Example: KLY"
 			},
 			"displayDenom": {
 				"type": "string",
-				"example": "lsk",
-				"description": "The human friendly denomination unit of the token. Must be a 'denom' in denomUnits. Example: lsk"
+				"example": "kly",
+				"description": "The human friendly denomination unit of the token. Must be a 'denom' in denomUnits. Example: kly"
 			},
 			"baseDenom": {
 				"type": "string",
@@ -419,12 +419,12 @@
 				"properties": {
 					"png": {
 						"type": "string",
-						"example": "https://downloads.lisk.com/lisk/images/logo.png",
+						"example": "https://downloads.klayr.xyz/klayr/images/logo.png",
 						"description": "URI to the PNG format of the token logo"
 					},
 					"svg": {
 						"type": "string",
-						"example": "https://downloads.lisk.com/lisk/images/logo.svg",
+						"example": "https://downloads.klayr.xyz/klayr/images/logo.svg",
 						"description": "URI to the SVG format of the token logo"
 					}
 				}

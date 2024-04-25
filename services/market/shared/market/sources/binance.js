@@ -17,7 +17,7 @@ const {
 	HTTP,
 	CacheRedis,
 	Exceptions: { ServiceUnavailableException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const BluebirdPromise = require('bluebird');
 
@@ -32,8 +32,8 @@ const { apiEndpoint, allowRefreshAfter } = config.market.sources.binance;
 const expireMiliseconds = config.ttl.binance;
 
 const symbolMap = {
-	LSK_BTC: 'LSKBTC',
-	LSK_ETH: 'LSKETH',
+	KLY_BTC: 'KLYBTC',
+	KLY_ETH: 'KLYETH',
 
 	BTC_EUR: 'BTCEUR',
 	BTC_GBP: 'BTCGBP',

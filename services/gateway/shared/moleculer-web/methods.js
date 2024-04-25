@@ -11,7 +11,7 @@ const _ = require('lodash');
 const kleur = require('kleur');
 const {
 	Exceptions: { ValidationException, NotFoundException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 module.exports = {
 	methods: {

@@ -1,5 +1,5 @@
 config:
-  target: '{{ $processEnvironment.LISK_SERVICE_URL }}/api/v2'
+  target: '{{ $processEnvironment.KLAYR_SERVICE_URL }}/api/v2'
   phases:
     - duration: 10
       arrivalRate: 15

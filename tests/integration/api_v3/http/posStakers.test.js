@@ -248,7 +248,7 @@ describe('Stakers API', () => {
 
 		it('should return empty when requested for known non-validator address', async () => {
 			const response = await api.get(
-				`${endpoint}?address=lsk99999999999999999999999999999999999999`,
+				`${endpoint}?address=kly99999999999999999999999999999999999999`,
 			);
 			expect(response).toMap(goodRequestSchema);
 			expect(response.data.stakers.length).toBe(0);

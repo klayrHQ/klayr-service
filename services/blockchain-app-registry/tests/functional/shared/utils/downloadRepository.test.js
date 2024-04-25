@@ -26,7 +26,7 @@ const {
 			KVStore: { configureKeyValueTable, getKeyValueTable },
 		},
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { appMetaObj, tokenMetaObj } = require('../../../constants/metadataIndex');
 
@@ -99,7 +99,7 @@ xdescribe('Test getRepoDownloadURL method', () => {
 	it('should return correct repository download url info', async () => {
 		/* eslint-disable-next-line no-useless-escape */
 		const repoUrlRegex =
-			/^https:\/\/\w*\.github\.com\/LiskHQ\/app-registry\/legacy.tar.gz\/refs\/heads\/main(?:\?token=\w+)?$/;
+			/^https:\/\/\w*\.github\.com\/klayrhq\/app-registry\/legacy.tar.gz\/refs\/heads\/main(?:\?token=\w+)?$/;
 		const response = await getRepoDownloadURL();
 		expect(response.url).toMatch(repoUrlRegex);
 	});
@@ -143,9 +143,9 @@ xdescribe('Test getDiff method', () => {
 		);
 		const fileNames = response.data.files.map(file => file.filename);
 		expect(fileNames).toEqual([
-			'alphanet/Lisk/nativetokens.json',
-			'betanet/Lisk/nativetokens.json',
-			'devnet/Lisk/nativetokens.json',
+			'alphanet/Klayr/nativetokens.json',
+			'betanet/Klayr/nativetokens.json',
+			'devnet/Klayr/nativetokens.json',
 		]);
 	});
 
@@ -192,14 +192,14 @@ xdescribe('Test getDiff method', () => {
 xdescribe('Test buildEventPayload method', () => {
 	it('should return event payload when called with a list of changed files', async () => {
 		const changedFiles = [
-			'betanet/Lisk/nativetokens.json',
-			'devnet/Lisk/nativetokens.json',
-			'Unknown/Lisk/nativetokens.json',
+			'betanet/Klayr/nativetokens.json',
+			'devnet/Klayr/nativetokens.json',
+			'Unknown/Klayr/nativetokens.json',
 		];
 		const response = await buildEventPayload(changedFiles);
 		expect(response).toEqual({
-			betanet: ['lisk_mainchain'],
-			devnet: ['lisk_mainchain'],
+			betanet: ['klayr_mainchain'],
+			devnet: ['klayr_mainchain'],
 			mainnet: [],
 			testnet: [],
 		});

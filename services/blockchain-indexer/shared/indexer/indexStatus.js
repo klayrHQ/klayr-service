@@ -19,7 +19,7 @@ const {
 		MySQL: { getTableInstance },
 	},
 	Signals,
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { getCurrentHeight, getGenesisHeight } = require('../constants');
 

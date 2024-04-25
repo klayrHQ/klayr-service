@@ -124,7 +124,7 @@ describe('get.blockchain.apps.meta.tokens', () => {
 	});
 
 	it('should return blockchain application off-chain metadata for tokens by chainName', async () => {
-		const response = await getBlockchainAppsTokenMetadata({ chainName: 'lisk_mainchain' });
+		const response = await getBlockchainAppsTokenMetadata({ chainName: 'klayr_mainchain' });
 		expect(response).toMap(jsonRpcEnvelopeSchema);
 		const { result } = response;
 		expect(result.data).toBeInstanceOf(Array);
@@ -182,7 +182,7 @@ describe('get.blockchain.apps.meta.tokens', () => {
 
 	it('should return blockchain application off-chain metadata for tokens by tokenName and chainID', async () => {
 		const response = await getBlockchainAppsTokenMetadata({
-			tokenName: 'Lisk',
+			tokenName: 'Klayr',
 			chainID: curChainID,
 		});
 		expect(response).toMap(jsonRpcEnvelopeSchema);
@@ -198,7 +198,7 @@ describe('get.blockchain.apps.meta.tokens', () => {
 
 	it('should return blockchain application off-chain metadata for tokens by tokenName and tokenID', async () => {
 		const response = await getBlockchainAppsTokenMetadata({
-			tokenName: 'Lisk',
+			tokenName: 'Klayr',
 			tokenID: defaultToken,
 		});
 		expect(response).toMap(jsonRpcEnvelopeSchema);
@@ -215,7 +215,7 @@ describe('get.blockchain.apps.meta.tokens', () => {
 	it('should return blockchain application off-chain metadata for tokens by chainID and csv tokenName', async () => {
 		const response = await getBlockchainAppsTokenMetadata({
 			chainID: curChainID,
-			tokenName: 'Lik,Lisk',
+			tokenName: 'Lik,Klayr',
 		});
 		expect(response).toMap(jsonRpcEnvelopeSchema);
 		const { result } = response;
@@ -229,7 +229,7 @@ describe('get.blockchain.apps.meta.tokens', () => {
 	});
 
 	it('should return blockchain application off-chain metadata for tokens by tokenName', async () => {
-		const response = await getBlockchainAppsTokenMetadata({ tokenName: 'Lisk' });
+		const response = await getBlockchainAppsTokenMetadata({ tokenName: 'Klayr' });
 		expect(response).toMap(jsonRpcEnvelopeSchema);
 		const { result } = response;
 		expect(result.data).toBeInstanceOf(Array);
@@ -268,7 +268,7 @@ describe('get.blockchain.apps.meta.tokens', () => {
 	});
 
 	it('should return blockchain applications off-chain metadata for tokens by search', async () => {
-		const response = await getBlockchainAppsTokenMetadata({ search: 'Lisk' });
+		const response = await getBlockchainAppsTokenMetadata({ search: 'Klayr' });
 		expect(response).toMap(jsonRpcEnvelopeSchema);
 		const { result } = response;
 		expect(result.data).toBeInstanceOf(Array);
@@ -294,7 +294,7 @@ describe('get.blockchain.apps.meta.tokens', () => {
 	});
 
 	it('should return blockchain applications off-chain metadata for tokens by case-insensitive search (Upper-case)', async () => {
-		const response = await getBlockchainAppsTokenMetadata({ search: 'LISK' });
+		const response = await getBlockchainAppsTokenMetadata({ search: 'KLAYR' });
 		expect(response).toMap(jsonRpcEnvelopeSchema);
 		const { result } = response;
 		expect(result.data).toBeInstanceOf(Array);
@@ -307,7 +307,7 @@ describe('get.blockchain.apps.meta.tokens', () => {
 	});
 
 	it('should return blockchain applications off-chain metadata for tokens by case-insensitive search (Lower-case)', async () => {
-		const response = await getBlockchainAppsTokenMetadata({ search: 'lisk' });
+		const response = await getBlockchainAppsTokenMetadata({ search: 'klayr' });
 		expect(response).toMap(jsonRpcEnvelopeSchema);
 		const { result } = response;
 		expect(result.data).toBeInstanceOf(Array);

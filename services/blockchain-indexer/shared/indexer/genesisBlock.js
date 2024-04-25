@@ -20,7 +20,7 @@ const {
 		MySQL: { getTableInstance },
 	},
 	Logger,
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { MODULE, MODULE_SUB_STORE, getGenesisHeight } = require('../constants');
 const { updateTotalStake, updateTotalSelfStake } = require('./transactionProcessor/pos/stake');
@@ -34,7 +34,7 @@ const accountBalancesTableSchema = require('../database/schema/accountBalances')
 const stakesTableSchema = require('../database/schema/stakes');
 const commissionsTableSchema = require('../database/schema/commissions');
 
-const { getLisk32AddressFromPublicKey } = require('../utils/account');
+const { getKlayr32AddressFromPublicKey } = require('../utils/account');
 const { requestConnector } = require('../utils/request');
 const { INVALID_ED25519_KEY } = require('../constants');
 
@@ -121,7 +121,7 @@ const indexPosValidatorsInfo = async (numValidators, dbTrx) => {
 				// Index all valid public keys
 				if (isGeneratorKeyValid(validator.generatorKey)) {
 					const account = {
-						address: getLisk32AddressFromPublicKey(validator.generatorKey),
+						address: getKlayr32AddressFromPublicKey(validator.generatorKey),
 						publicKey: validator.generatorKey,
 					};
 

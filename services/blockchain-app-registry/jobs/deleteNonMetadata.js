@@ -18,7 +18,7 @@ const {
 		fs: { rmdir, rm, getFilesAndDirs, stats },
 	},
 	Logger,
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const logger = Logger();
 const config = require('../config');

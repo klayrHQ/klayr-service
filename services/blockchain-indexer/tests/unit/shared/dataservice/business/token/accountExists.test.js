@@ -30,8 +30,8 @@ const mockValidatorUtilsPath = resolve(
 
 beforeEach(() => jest.resetModules());
 
-jest.mock('lisk-service-framework', () => {
-	const actual = jest.requireActual('lisk-service-framework');
+jest.mock('klayr-service-framework', () => {
+	const actual = jest.requireActual('klayr-service-framework');
 	return {
 		...actual,
 		DB: {
@@ -51,8 +51,8 @@ jest.mock('lisk-service-framework', () => {
 
 describe('tokenHasUserAccount', () => {
 	const tokenID = '0000000000000000';
-	const accAddressExists = 'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo';
-	const accAddressNotExists = 'lskz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk';
+	const accAddressExists = 'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo';
+	const accAddressNotExists = 'klyz23xokaxhmmkpbzdjt5agcq59qkby7bne2hwpk';
 	const name = 'testAccount';
 	const publicKey = '3972849f2ab66376a68671c10a00e8b8b67d880434cc65b04c6ed886dfa91c2c';
 

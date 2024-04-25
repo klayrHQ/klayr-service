@@ -15,7 +15,7 @@ const {
 	},
 	Utils,
 	CacheRedis,
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 const { checkWhitelist } = require('./util');
 const config = require('../../config');
 const { BadRequestError } = require('./errors');

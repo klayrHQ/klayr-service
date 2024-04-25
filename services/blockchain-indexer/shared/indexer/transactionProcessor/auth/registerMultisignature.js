@@ -18,12 +18,12 @@ const {
 	DB: {
 		MySQL: { getTableInstance },
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 const config = require('../../../../config');
 
 const { TRANSACTION_STATUS } = require('../../../constants');
 
-const { getLisk32AddressFromPublicKey } = require('../../../utils/account');
+const { getKlayr32AddressFromPublicKey } = require('../../../utils/account');
 
 const logger = Logger();
 
@@ -42,8 +42,8 @@ const resolveMultisignatureMemberships = tx => {
 
 	allKeys.forEach(key => {
 		const members = {
-			id: tx.senderAddress.concat('_', getLisk32AddressFromPublicKey(key)),
-			memberAddress: getLisk32AddressFromPublicKey(key),
+			id: tx.senderAddress.concat('_', getKlayr32AddressFromPublicKey(key)),
+			memberAddress: getKlayr32AddressFromPublicKey(key),
 			groupAddress: tx.senderAddress,
 		};
 		multisignatureInfoToIndex.push(members);

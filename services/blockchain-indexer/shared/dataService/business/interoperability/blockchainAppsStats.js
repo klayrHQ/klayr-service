@@ -18,7 +18,7 @@ const {
 	DB: {
 		MySQL: { getTableInstance },
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const logger = Logger();
 
@@ -72,8 +72,8 @@ const reloadBlockchainAppsStats = async () => {
 			registered: numRegisteredChains,
 			activated: numActivatedChains,
 			terminated: numTerminatedChains,
-			totalSupplyLSK: totalSupply,
-			totalStakedLSK: totalStaked,
+			totalSupplyKLY: totalSupply,
+			totalStakedKLY: totalStaked,
 			currentAnnualInflationRate: annualInflation,
 		};
 

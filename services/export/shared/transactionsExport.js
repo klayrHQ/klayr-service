@@ -26,7 +26,7 @@ const {
 	Queue,
 	HTTP,
 	Logger,
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const config = require('../config');
 const regex = require('./regex');

@@ -92,7 +92,7 @@ const createApiDocsExpectedResponse = {
 			],
 			responses: {
 				200: {
-					description: 'Returns a list of blockchain applications in the Lisk ecosystem',
+					description: 'Returns a list of blockchain applications in the Klayr ecosystem',
 					schema: {
 						$ref: '#/definitions/BlockchainAppsWithEnvelope',
 					},
@@ -221,7 +221,7 @@ const createApiDocsExpectedResponse = {
 				'Returns blockchain applications statistics\n RPC => get.blockchain.apps.statistics',
 			responses: {
 				200: {
-					description: 'Returns statistics for the blockchain applications in the Lisk ecosystem',
+					description: 'Returns statistics for the blockchain applications in the Klayr ecosystem',
 					schema: {
 						$ref: '#/definitions/blockchainAppsStatsEnvelope',
 					},

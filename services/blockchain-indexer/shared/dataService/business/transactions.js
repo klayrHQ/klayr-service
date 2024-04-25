@@ -20,7 +20,7 @@ const {
 	DB: {
 		MySQL: { getTableInstance },
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { getBlockByID } = require('./blocks');
 const { getEventsByHeight } = require('./events');
@@ -34,7 +34,7 @@ const { getFinalizedHeight } = require('../../constants');
 
 const transactionsTableSchema = require('../../database/schema/transactions');
 const config = require('../../../config');
-const { getLisk32AddressFromPublicKey } = require('../../utils/account');
+const { getKlayr32AddressFromPublicKey } = require('../../utils/account');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
@@ -147,7 +147,7 @@ const getTransactions = async params => {
 	transactions.data = await BluebirdPromise.map(
 		transactions.data,
 		async transaction => {
-			const senderAddress = getLisk32AddressFromPublicKey(transaction.senderPublicKey);
+			const senderAddress = getKlayr32AddressFromPublicKey(transaction.senderPublicKey);
 			const senderAccount = await getIndexedAccountInfo({ address: senderAddress, limit: 1 }, [
 				'name',
 			]);
@@ -201,7 +201,7 @@ const formatTransactionsInBlock = async block => {
 	const transactions = await BluebirdPromise.map(
 		block.transactions,
 		async (transaction, index) => {
-			const senderAddress = getLisk32AddressFromPublicKey(transaction.senderPublicKey);
+			const senderAddress = getKlayr32AddressFromPublicKey(transaction.senderPublicKey);
 
 			const senderAccount = await getIndexedAccountInfo({ address: senderAddress, limit: 1 }, [
 				'name',

@@ -13,7 +13,7 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { Logger, Signals } = require('lisk-service-framework');
+const { Logger, Signals } = require('klayr-service-framework');
 const { getEstimateFeePerByte } = require('../shared/dynamicFees');
 
 const logger = Logger();

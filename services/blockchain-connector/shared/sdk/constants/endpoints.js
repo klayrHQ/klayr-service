@@ -101,7 +101,7 @@ const engineEndpoints = [
 	{
 		name: 'legacy_getTransactionByID',
 		request: {
-			$id: '/lisk/legacy/getTransactionByIDRequest',
+			$id: '/klayr/legacy/getTransactionByIDRequest',
 			type: 'object',
 			required: ['id'],
 			properties: {
@@ -117,7 +117,7 @@ const engineEndpoints = [
 	{
 		name: 'legacy_getTransactionsByBlockID',
 		request: {
-			$id: '/lisk/legacy/getTransactionsByBlockIDRequest',
+			$id: '/klayr/legacy/getTransactionsByBlockIDRequest',
 			type: 'object',
 			required: ['id'],
 			properties: {
@@ -133,7 +133,7 @@ const engineEndpoints = [
 	{
 		name: 'legacy_getBlockByID',
 		request: {
-			$id: '/lisk/legacy/getBlockByIDRequest',
+			$id: '/klayr/legacy/getBlockByIDRequest',
 			type: 'object',
 			required: ['id'],
 			properties: {
@@ -149,7 +149,7 @@ const engineEndpoints = [
 	{
 		name: 'legacy_getBlockByHeight',
 		request: {
-			$id: '/lisk/legacy/getBlockByHeightRequest',
+			$id: '/klayr/legacy/getBlockByHeightRequest',
 			type: 'object',
 			required: ['height'],
 			properties: {
@@ -167,7 +167,7 @@ const engineEndpoints = [
 	{
 		name: 'chain_getBlockByID',
 		request: {
-			$id: '/lisk/chain/getBlockByIDRequest',
+			$id: '/klayr/chain/getBlockByIDRequest',
 			type: 'object',
 			required: ['id'],
 			properties: {
@@ -183,7 +183,7 @@ const engineEndpoints = [
 	{
 		name: 'chain_getBlocksByIDs',
 		request: {
-			$id: '/lisk/chain/getBlocksByIDsRequest',
+			$id: '/klayr/chain/getBlocksByIDsRequest',
 			type: 'object',
 			required: ['ids'],
 			properties: {
@@ -202,7 +202,7 @@ const engineEndpoints = [
 	{
 		name: 'chain_getBlockByHeight',
 		request: {
-			$id: '/lisk/chain/getBlockByHeightRequest',
+			$id: '/klayr/chain/getBlockByHeightRequest',
 			type: 'object',
 			required: ['height'],
 			properties: {
@@ -216,7 +216,7 @@ const engineEndpoints = [
 	{
 		name: 'chain_getBlocksByHeightBetween',
 		request: {
-			$id: '/lisk/chain/getBlocksByHeightBetweenRequest',
+			$id: '/klayr/chain/getBlocksByHeightBetweenRequest',
 			type: 'object',
 			required: ['from', 'to'],
 			properties: {
@@ -234,7 +234,7 @@ const engineEndpoints = [
 	{
 		name: 'chain_getTransactionByID',
 		request: {
-			$id: '/lisk/chain/getTransactionByIDRequest',
+			$id: '/klayr/chain/getTransactionByIDRequest',
 			type: 'object',
 			required: ['id'],
 			properties: {
@@ -250,7 +250,7 @@ const engineEndpoints = [
 	{
 		name: 'chain_getTransactionsByIDs',
 		request: {
-			$id: '/lisk/chain/getTransactionsByIDsRequest',
+			$id: '/klayr/chain/getTransactionsByIDsRequest',
 			type: 'object',
 			required: ['ids'],
 			properties: {
@@ -269,7 +269,7 @@ const engineEndpoints = [
 	{
 		name: 'chain_getTransactionsByHeight',
 		request: {
-			$id: '/lisk/chain/getTransactionsByHeightRequest',
+			$id: '/klayr/chain/getTransactionsByHeightRequest',
 			type: 'object',
 			required: ['height'],
 			properties: {
@@ -283,7 +283,7 @@ const engineEndpoints = [
 	{
 		name: 'chain_getAssetsByHeight',
 		request: {
-			$id: '/lisk/chain/getAssetsByHeightRequest',
+			$id: '/klayr/chain/getAssetsByHeightRequest',
 			type: 'object',
 			required: ['height'],
 			properties: {
@@ -301,7 +301,7 @@ const engineEndpoints = [
 	{
 		name: 'chain_getEvents',
 		request: {
-			$id: '/lisk/chain/getEventsRequest',
+			$id: '/klayr/chain/getEventsRequest',
 			type: 'object',
 			required: ['height'],
 			properties: {
@@ -352,7 +352,7 @@ const engineEndpoints = [
 	{
 		name: 'consensus_getBFTParameters',
 		request: {
-			$id: '/lisk/chain/getBFTParametersRequest',
+			$id: '/klayr/chain/getBFTParametersRequest',
 			type: 'object',
 			required: ['height'],
 			properties: {
@@ -366,7 +366,7 @@ const engineEndpoints = [
 	{
 		name: 'consensus_getBFTParametersActiveValidators',
 		request: {
-			$id: '/lisk/chain/getBFTParametersActiveValidatorsRequest',
+			$id: '/klayr/chain/getBFTParametersActiveValidatorsRequest',
 			type: 'object',
 			required: ['height'],
 			properties: {
@@ -412,7 +412,7 @@ const engineEndpoints = [
 	{
 		name: 'system_getMetricsReport',
 		request: {
-			$id: '/lisk/system/getMetricsReportRequest',
+			$id: '/klayr/system/getMetricsReportRequest',
 			type: 'object',
 			required: [],
 			properties: {
@@ -425,7 +425,7 @@ const engineEndpoints = [
 	{
 		name: 'txpool_postTransaction',
 		request: {
-			$id: '/lisk/postTransaction',
+			$id: '/klayr/postTransaction',
 			title: 'Transactions',
 			type: 'object',
 			required: ['transaction'],
@@ -445,7 +445,7 @@ const engineEndpoints = [
 			properties: {
 				address: {
 					type: 'string',
-					format: 'lisk32',
+					format: 'klayr32',
 				},
 			},
 		},
@@ -453,7 +453,7 @@ const engineEndpoints = [
 	{
 		name: 'txpool_dryRunTransaction',
 		request: {
-			$id: '/lisk/dryRunTransaction',
+			$id: '/klayr/dryRunTransaction',
 			title: 'Transactions',
 			type: 'object',
 			required: ['transaction'],
@@ -480,14 +480,14 @@ const engineEndpoints = [
 	{
 		name: 'generator_setStatus',
 		request: {
-			$id: '/lisk/setStatusRequest',
+			$id: '/klayr/setStatusRequest',
 			title: 'Set block generation status',
 			type: 'object',
 			required: ['address', 'height', 'maxHeightGenerated', 'maxHeightPrevoted'],
 			properties: {
 				address: {
 					type: 'string',
-					format: 'lisk32',
+					format: 'klayr32',
 				},
 				height: {
 					type: 'integer',
@@ -507,7 +507,7 @@ const engineEndpoints = [
 	{
 		name: 'generator_updateStatus',
 		request: {
-			$id: '/lisk/updateStatusRequest',
+			$id: '/klayr/updateStatusRequest',
 			title: 'Update block generation status',
 			type: 'object',
 			required: [
@@ -521,7 +521,7 @@ const engineEndpoints = [
 			properties: {
 				address: {
 					type: 'string',
-					format: 'lisk32',
+					format: 'klayr32',
 				},
 				password: {
 					type: 'string',
@@ -563,7 +563,7 @@ const engineEndpoints = [
 			properties: {
 				address: {
 					type: 'string',
-					format: 'lisk32',
+					format: 'klayr32',
 				},
 			},
 			oneOf: [
@@ -601,7 +601,7 @@ const engineEndpoints = [
 			properties: {
 				address: {
 					type: 'string',
-					format: 'lisk32',
+					format: 'klayr32',
 				},
 			},
 		},

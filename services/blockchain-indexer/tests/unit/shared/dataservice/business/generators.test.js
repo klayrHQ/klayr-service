@@ -28,8 +28,8 @@ beforeEach(() => {
 	jest.clearAllMocks();
 });
 
-jest.mock('lisk-service-framework', () => {
-	const actual = jest.requireActual('lisk-service-framework');
+jest.mock('klayr-service-framework', () => {
+	const actual = jest.requireActual('klayr-service-framework');
 	return {
 		...actual,
 		DB: {
@@ -57,7 +57,7 @@ describe('getGeneratorsInfo', () => {
 			requestConnector: jest.fn(() => ({
 				list: [
 					{
-						address: 'lsky2j2fnmhxushe5ywvdw4ouvxg8s4aeo4a7bpxb',
+						address: 'klyy2j2fnmhxushe5ywvdw4ouvxg8s4aeo4a7bpxb',
 						nextAllocatedTime: 1699615180,
 					},
 				],
@@ -72,7 +72,7 @@ describe('getGeneratorsInfo', () => {
 		const generators = await getGeneratorsInfo();
 		const expectedResponse = [
 			{
-				address: 'lsky2j2fnmhxushe5ywvdw4ouvxg8s4aeo4a7bpxb',
+				address: 'klyy2j2fnmhxushe5ywvdw4ouvxg8s4aeo4a7bpxb',
 				name: 'testGenerator_1',
 				nextAllocatedTime: 1699615180,
 				publicKey: 'fe50ee28b084414499465ff823e7d651c9d19d75d33a82c44b2a15e3dc62bac9',

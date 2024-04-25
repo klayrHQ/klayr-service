@@ -18,7 +18,7 @@ const BluebirdPromise = require('bluebird');
 const {
 	CacheRedis,
 	Exceptions: { ServiceUnavailableException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const config = require('../../config');
 const { targetPairs } = require('./priceUpdater');

@@ -14,7 +14,7 @@
  *
  */
 
-const { transactions, cryptography } = require('@liskhq/lisk-client');
+const { transactions, cryptography } = require('@klayr/client');
 const { api } = require('../../../helpers/api');
 
 const { address, privateKey, publicKey, tokenTransferParamsSchema } = require('./constants');
@@ -31,8 +31,8 @@ const createTokenTransferTx = async authEndpoint => {
 		params: {
 			tokenID: Buffer.from([4, 0, 0, 0, 0, 0, 0, 0]),
 			amount: BigInt('1000000000000'),
-			recipientAddress: cryptography.address.getAddressFromLisk32Address(
-				'lskv6v53emsaen6cwbbk226wusdpa6ojdonunka4x',
+			recipientAddress: cryptography.address.getAddressFromKlayr32Address(
+				'klyv6v53emsaen6cwbbk226wusdpa6ojdonunka4x',
 			),
 			data: '',
 		},
@@ -54,7 +54,7 @@ const createTokenTransferTx = async authEndpoint => {
 			...signedTx.params,
 			tokenID: signedTx.params.tokenID.toString('hex'),
 			amount: signedTx.params.amount.toString(),
-			recipientAddress: cryptography.address.getLisk32AddressFromAddress(
+			recipientAddress: cryptography.address.getKlayr32AddressFromAddress(
 				signedTx.params.recipientAddress,
 			),
 		},

@@ -18,7 +18,7 @@ const {
 	DB: {
 		MySQL: { getDBConnection, startDBTransaction, commitDBTransaction, rollbackDBTransaction },
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const logger = Logger();
 const { indexAllBlockchainAppsMeta } = require('./metadataIndex');

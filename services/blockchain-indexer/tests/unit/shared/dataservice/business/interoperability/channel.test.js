@@ -28,16 +28,16 @@ const { mockChannelInfo } = require('../../../constants/transactionEstimateFees'
 beforeEach(() => {
 	jest.resetModules();
 
-	jest.mock('lisk-service-framework', () => {
-		const actualLiskServiceFramework = jest.requireActual('lisk-service-framework');
+	jest.mock('klayr-service-framework', () => {
+		const actualKlayrServiceFramework = jest.requireActual('klayr-service-framework');
 		return {
-			...actualLiskServiceFramework,
+			...actualKlayrServiceFramework,
 			DB: {
-				...actualLiskServiceFramework.DB,
+				...actualKlayrServiceFramework.DB,
 				MySQL: {
-					...actualLiskServiceFramework.DB.MySQL,
+					...actualKlayrServiceFramework.DB.MySQL,
 					KVStore: {
-						...actualLiskServiceFramework.DB.MySQL.KVStore,
+						...actualKlayrServiceFramework.DB.MySQL.KVStore,
 						getKeyValueTable: jest.fn(),
 					},
 				},
@@ -64,7 +64,7 @@ describe('Test resolveMainchainServiceURL method', () => {
 		const { resolveMainchainServiceURL } = require(dataServicePath);
 		const result = await resolveMainchainServiceURL();
 
-		const { serviceURL } = config.networks.LISK.find(c => chainID === c.chainID);
+		const { serviceURL } = config.networks.KLAYR.find(c => chainID === c.chainID);
 		expect(result).toBe(serviceURL);
 	});
 
@@ -83,7 +83,7 @@ describe('Test resolveMainchainServiceURL method', () => {
 		const { resolveMainchainServiceURL } = require(dataServicePath);
 		const result = await resolveMainchainServiceURL();
 
-		const { serviceURL } = config.networks.LISK.find(c => chainID === c.chainID);
+		const { serviceURL } = config.networks.KLAYR.find(c => chainID === c.chainID);
 		expect(result).toBe(serviceURL);
 	});
 

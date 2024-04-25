@@ -19,7 +19,7 @@ const { getIndexedAccountInfo } = require('../../utils/account');
 const { getAddressByName } = require('../../utils/validator');
 const { parseToJSONCompatObj } = require('../../../utils/parser');
 const { requestConnector } = require('../../../utils/request');
-const { getLisk32AddressFromPublicKey } = require('../../../utils/account');
+const { getKlayr32AddressFromPublicKey } = require('../../../utils/account');
 const { indexAccountPublicKey } = require('../../../indexer/accountIndex');
 
 const normalizeStake = stake => parseToJSONCompatObj(stake);
@@ -40,7 +40,7 @@ const getStakes = async params => {
 	}
 
 	if (!params.address && params.publicKey) {
-		params.address = getLisk32AddressFromPublicKey(params.publicKey);
+		params.address = getKlayr32AddressFromPublicKey(params.publicKey);
 
 		// Index publicKey asynchronously
 		indexAccountPublicKey(params.publicKey);

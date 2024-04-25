@@ -21,16 +21,16 @@ const transactionsFilePath = resolve(`${__dirname}/../../../../shared/dataServic
 const mockBusinessFilePath = resolve(`${__dirname}/../../../../shared/dataService/business`);
 
 // Mock KeyValueStore table
-jest.mock('lisk-service-framework', () => {
-	const actualLiskServiceFramework = jest.requireActual('lisk-service-framework');
+jest.mock('klayr-service-framework', () => {
+	const actualKlayrServiceFramework = jest.requireActual('klayr-service-framework');
 	return {
-		...actualLiskServiceFramework,
+		...actualKlayrServiceFramework,
 		DB: {
-			...actualLiskServiceFramework.DB,
+			...actualKlayrServiceFramework.DB,
 			MySQL: {
-				...actualLiskServiceFramework.DB.MySQL,
+				...actualKlayrServiceFramework.DB.MySQL,
 				KVStore: {
-					...actualLiskServiceFramework.KVStore,
+					...actualKlayrServiceFramework.KVStore,
 					getKeyValueTable: jest.fn(),
 				},
 			},

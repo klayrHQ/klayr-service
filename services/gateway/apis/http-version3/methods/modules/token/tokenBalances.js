@@ -28,7 +28,7 @@ module.exports = {
 		address: {
 			optional: false,
 			type: 'string',
-			pattern: regex.ADDRESS_LISK32,
+			pattern: regex.ADDRESS_KLAYR32,
 			altSwaggerKey: 'addressRequired',
 		},
 		tokenID: { optional: true, type: 'string', pattern: regex.TOKEN_ID },

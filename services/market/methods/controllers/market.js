@@ -15,7 +15,7 @@
  */
 const {
 	Exceptions: { ServiceUnavailableException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const marketService = require('../../shared/market/market');
 

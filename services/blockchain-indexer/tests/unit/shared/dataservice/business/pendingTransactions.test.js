@@ -24,8 +24,8 @@ const {
 	getCurrentChainID,
 } = require('../../../../../shared/dataService/business/interoperability/chain');
 
-jest.mock('lisk-service-framework', () => {
-	const actual = jest.requireActual('lisk-service-framework');
+jest.mock('klayr-service-framework', () => {
+	const actual = jest.requireActual('klayr-service-framework');
 	return {
 		...actual,
 		DB: {
@@ -48,7 +48,7 @@ jest.mock('../../../../../shared/utils/request', () => ({
 }));
 
 jest.mock('../../../../../shared/utils/account', () => ({
-	getLisk32AddressFromPublicKey: jest.fn(() => mockSenderAddress),
+	getKlayr32AddressFromPublicKey: jest.fn(() => mockSenderAddress),
 }));
 
 jest.mock('../../../../../shared/dataService/utils/account', () => ({
@@ -69,7 +69,7 @@ describe('Test validateParams method', () => {
 	it('should return validated params when called with valid params', async () => {
 		const params = {
 			moduleCommand: 'token:transfer',
-			address: 'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+			address: 'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 		};
 
 		const result = await validateParams(params);

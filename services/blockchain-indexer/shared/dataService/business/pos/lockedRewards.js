@@ -18,11 +18,11 @@ const {
 		MySQL: { getTableInstance },
 	},
 	Exceptions: { InvalidParamsException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const {
-	address: { getLisk32AddressFromPublicKey },
-} = require('@liskhq/lisk-cryptography');
+	address: { getKlayr32AddressFromPublicKey },
+} = require('@klayr/cryptography');
 
 const config = require('../../../../config');
 
@@ -65,7 +65,7 @@ const getPosLockedRewards = async params => {
 		if (dataRows.length) [{ address }] = dataRows;
 	}
 	if (!address && params.publicKey) {
-		address = getLisk32AddressFromPublicKey(Buffer.from(params.publicKey, 'hex'));
+		address = getKlayr32AddressFromPublicKey(Buffer.from(params.publicKey, 'hex'));
 	}
 
 	const tokenID = await getRewardTokenID();
