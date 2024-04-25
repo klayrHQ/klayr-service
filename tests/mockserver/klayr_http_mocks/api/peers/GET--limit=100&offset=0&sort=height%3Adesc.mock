@@ -428,7 +428,7 @@ Content-Type: application/json; charset=utf-8
             "httpPort": 7000
         },
         {
-            "ip": "testnet-seed-02.lisk-nodes.net",
+            "ip": "testnet-seed-02.klayr-nodes.net",
             "wsPort": 7001,
             "state": 2,
             "os": "linux4.15.0-51-generic",
@@ -440,7 +440,7 @@ Content-Type: application/json; charset=utf-8
             "httpPort": 7000
         },
         {
-            "ip": "testnet-seed-03.lisk.io",
+            "ip": "testnet-seed-03.klayr.io",
             "wsPort": 7001,
             "state": 2,
             "os": "linux4.15.0-51-generic",
