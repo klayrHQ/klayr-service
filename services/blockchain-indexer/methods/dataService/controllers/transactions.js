@@ -18,7 +18,7 @@ const {
 	HTTP: {
 		StatusCodes: { NOT_FOUND, BAD_REQUEST },
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { confirmAddress } = require('../../../shared/dataService/utils/account');
 

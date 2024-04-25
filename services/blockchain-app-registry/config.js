@@ -18,7 +18,7 @@ const packageJson = require('./package.json');
 const config = {};
 
 // Moleculer broker config
-config.transporter = process.env.SERVICE_BROKER || 'redis://lisk:password@127.0.0.1:6379/0';
+config.transporter = process.env.SERVICE_BROKER || 'redis://klayr:password@127.0.0.1:6379/0';
 config.brokerTimeout = Number(process.env.SERVICE_BROKER_TIMEOUT) || 10; // in seconds
 
 /**
@@ -26,7 +26,7 @@ config.brokerTimeout = Number(process.env.SERVICE_BROKER_TIMEOUT) || 10; // in s
  */
 config.endpoints = {};
 config.endpoints.mysql =
-	process.env.SERVICE_APP_REGISTRY_MYSQL || 'mysql://lisk:password@127.0.0.1:3306/lisk';
+	process.env.SERVICE_APP_REGISTRY_MYSQL || 'mysql://klayr:password@127.0.0.1:3306/klayr';
 
 // Logging
 config.log = {
@@ -67,7 +67,7 @@ config.isRebuildIndexAtInit = Boolean(
 
 config.gitHub = {
 	accessToken: process.env.GITHUB_ACCESS_TOKEN,
-	appRegistryRepo: process.env.GITHUB_APP_REGISTRY_REPO || 'https://github.com/LiskHQ/app-registry',
+	appRegistryRepo: process.env.GITHUB_APP_REGISTRY_REPO || 'https://github.com/klayrhq/app-registry',
 	branch: process.env.GITHUB_APP_REGISTRY_REPO_BRANCH || 'main',
 	get appRegistryRepoName() {
 		return this.appRegistryRepo.split('/').pop();
@@ -78,10 +78,10 @@ config.dataDir = `${__dirname}/data`;
 
 config.supportedNetworks = ['mainnet', 'testnet', 'devnet'];
 
-const DEFAULT_LISK_APPS = ['lisk_mainchain'];
+const DEFAULT_KLAYR_APPS = ['klayr_mainchain'];
 const DEFAULT_USER_APPS = String(process.env.DEFAULT_APPS).split(',');
 
-config.defaultApps = DEFAULT_LISK_APPS.concat(DEFAULT_USER_APPS);
+config.defaultApps = DEFAULT_KLAYR_APPS.concat(DEFAULT_USER_APPS);
 
 config.FILENAME = Object.freeze({
 	APP_JSON: 'app.json',

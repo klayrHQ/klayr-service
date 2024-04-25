@@ -39,7 +39,7 @@
 					},
 					"networkVersion": {
 						"type": "object",
-						"description": "Number of nodes on the given Lisk Core network versions.",
+						"description": "Number of nodes on the given Klayr Core network versions.",
 						"properties": {
 							"2.0": {
 								"type": "integer",

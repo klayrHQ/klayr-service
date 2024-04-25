@@ -78,7 +78,7 @@ describe('get.token.account.exists', () => {
 
 	it('should return isExists:false when requested for unknown address', async () => {
 		const response = await getTokenAccountExists({
-			address: 'lskvmcf8bphtskyv49xg866u9a9dm7ftkxremzbkr',
+			address: 'klyvmcf8bphtskyv49xg866u9a9dm7ftkxremzbkr',
 			tokenID: refTokenID,
 		});
 		expect(response).toMap(jsonRpcEnvelopeSchema);

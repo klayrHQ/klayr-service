@@ -31,7 +31,7 @@
 				"type": "integer",
 				"example": 0,
 				"minimum": 0,
-				"description": "Lisk protocol version to which this block adheres to."
+				"description": "Klayr protocol version to which this block adheres to."
 			},
 			"height": {
 				"type": "integer",
@@ -56,7 +56,7 @@
 				"properties": {
 					"address": {
 						"type": "string",
-						"example": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+						"example": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
 						"description": "Address of the block generator."
 					},
 					"name": {
@@ -140,22 +140,22 @@
 			"totalBurnt": {
 				"type": "string",
 				"example": "0",
-				"description": "The total amount of Lisk (in Beddows) that was burnt in this block. It is the sum total of minimum fees for each transaction contained within the block."
+				"description": "The total amount of Klayr (in Beddows) that was burnt in this block. It is the sum total of minimum fees for each transaction contained within the block."
 			},
 			"networkFee": {
 				"type": "string",
 				"example": "15000000",
-				"description": "TThe total amount of Lisk (in Beddows) that the block generator makes from the transaction fees after burning the minimum fees."
+				"description": "TThe total amount of Klayr (in Beddows) that the block generator makes from the transaction fees after burning the minimum fees."
 			},
 			"totalForged": {
 				"type": "string",
 				"example": "65000000",
-				"description": "Total amount of Lisk (in Beddows) that has been forged in this block. It is a sum of all the transaction fees and the block reward."
+				"description": "Total amount of Klayr (in Beddows) that has been forged in this block. It is a sum of all the transaction fees and the block reward."
 			},
 			"reward": {
 				"type": "string",
 				"example": "50000000",
-				"description": "The amount of Lisk (in Beddows) that was rewarded to the block generator."
+				"description": "The amount of Klayr (in Beddows) that was rewarded to the block generator."
 			},
 			"signature": {
 				"type": "string",

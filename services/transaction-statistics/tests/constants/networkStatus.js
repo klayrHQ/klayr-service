@@ -51,7 +51,7 @@ const networkStatus = {
 			'interoperability:registerSidechain',
 			'interoperability:recoverState',
 			'interoperability:terminateSidechainForLiveness',
-			'legacy:reclaimLSK',
+			'legacy:reclaimKLY',
 			'legacy:registerKeys',
 			'pos:registerValidator',
 			'pos:reportMisbehavior',

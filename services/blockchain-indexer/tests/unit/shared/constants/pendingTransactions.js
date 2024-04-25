@@ -1,5 +1,5 @@
-const mockSenderAddress = 'lskvq67zzev53sa6ozt39ft3dsmwxxztb7h29275k';
-const mockRecipientAddress = 'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo';
+const mockSenderAddress = 'klyvq67zzev53sa6ozt39ft3dsmwxxztb7h29275k';
+const mockRecipientAddress = 'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo';
 
 const mockSenderAccountDetails = {
 	name: 'genesis',
@@ -19,7 +19,7 @@ const mockPendingTransactions = [
 		params: {
 			tokenID: '0000000000000000',
 			amount: '100000000000',
-			recipientAddress: 'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+			recipientAddress: 'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 			data: '',
 		},
 		id: 'd96c777b67576ddf4cd933a97a60b4311881e68e3c8bef1393ac0020ec8a506c',
@@ -38,7 +38,7 @@ const mockPendingTransactions = [
 		params: {
 			tokenID: '0000000000000000',
 			amount: '100000000000',
-			recipientAddress: 'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+			recipientAddress: 'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 			receivingChainID: '02000000',
 			data: '',
 			messageFee: '10000000',

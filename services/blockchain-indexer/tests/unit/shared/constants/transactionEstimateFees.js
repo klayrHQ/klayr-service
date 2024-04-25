@@ -8,7 +8,7 @@ const mockTxRequest = {
 			tokenID: '0000000000000000',
 			amount: '100000000000',
 			receivingChainID: '00000001',
-			recipientAddress: 'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+			recipientAddress: 'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 			data: '',
 		},
 		id: 'd96c777b67576ddf4cd933a97a60b4311881e68e3c8bef1393ac0020ec8a506c',
@@ -26,7 +26,7 @@ const mockTransferCrossChainTxRequest = {
 			tokenID: '0200000000000000',
 			amount: '100000000000',
 			receivingChainID: '02000000',
-			recipientAddress: 'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+			recipientAddress: 'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 			data: '',
 			messageFee: '10000000',
 			messageFeeTokenID: '0200000000000000',
@@ -46,7 +46,7 @@ const mockInteroperabilitySubmitMainchainCrossChainUpdateTxRequest = {
 			tokenID: '0200000000000000',
 			amount: '100000000000',
 			receivingChainID: '02000000',
-			recipientAddress: 'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+			recipientAddress: 'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 			data: '',
 			messageFee: '10000000',
 			messageFeeTokenID: '0200000000000000',
@@ -240,7 +240,7 @@ const mockRegisterValidatorTxResult = {
 	},
 };
 
-const mockTxSenderAddress = 'lskguo9kqnea2zsfo3a6qppozsxsg92nuuma3p7ad';
+const mockTxSenderAddress = 'klyguo9kqnea2zsfo3a6qppozsxsg92nuuma3p7ad';
 
 const mockTxAuthAccountInfo = {
 	data: {
@@ -263,7 +263,7 @@ const mockTxRequestConnector = {
 	params: {
 		tokenID: '0000000000000000',
 		amount: '100000000000',
-		recipientAddress: 'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+		recipientAddress: 'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 		data: '',
 	},
 	id: 'd96c777b67576ddf4cd933a97a60b4311881e68e3c8bef1393ac0020ec8a506c',
@@ -283,7 +283,7 @@ const mockTransferCrossChainTxRequestConnector = {
 	params: {
 		tokenID: '0000000000000000',
 		amount: '100000000000',
-		recipientAddress: 'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+		recipientAddress: 'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 		receivingChainID: '02000000',
 		data: '',
 		messageFee: '10000000',

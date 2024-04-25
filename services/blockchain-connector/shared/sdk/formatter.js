@@ -14,12 +14,12 @@
  *
  */
 const { inspect } = require('util');
-const { codec } = require('@liskhq/lisk-codec');
+const { codec } = require('@klayr/codec');
 const {
 	utils: { hash },
-} = require('@liskhq/lisk-cryptography');
-const { computeMinFee } = require('@liskhq/lisk-transactions');
-const { Logger } = require('lisk-service-framework');
+} = require('@klayr/cryptography');
+const { computeMinFee } = require('@klayr/transactions');
+const { Logger } = require('klayr-service-framework');
 
 const {
 	getBlockAssetDataSchemaByModule,
@@ -36,7 +36,7 @@ const {
 
 const { EVENT_NAME_COMMAND_EXECUTION_RESULT } = require('./constants/names');
 const { parseToJSONCompatObj, parseInputBySchema } = require('../utils/parser');
-const { getLisk32Address } = require('../utils/account');
+const { getKlayr32Address } = require('../utils/account');
 const { getMinFeePerByte } = require('./fee');
 
 const logger = Logger();
@@ -158,10 +158,10 @@ const formatEvent = (event, skipDecode) => {
 				`Unable to decode event data. Event data schema missing for ${event.module}:${event.name}.`,
 			);
 		} else {
-			// TODO: Remove after SDK fixes the address format (https://github.com/LiskHQ/lisk-sdk/issues/7629)
+			// TODO: Remove after SDK fixes the address format (https://github.com/KlayrHQ/klayr-sdk/issues/7629)
 			Object.keys(eventDataSchema.properties).forEach(prop => {
 				if (prop.endsWith('Address')) {
-					eventData[prop] = getLisk32Address(eventData[prop].toString('hex'));
+					eventData[prop] = getKlayr32Address(eventData[prop].toString('hex'));
 				}
 			});
 		}
@@ -191,7 +191,7 @@ const formatEvent = (event, skipDecode) => {
 		eventTopics = event.topics.map((topic, index) => {
 			const topicAtIndex = topics[index] || '';
 			if (topicAtIndex.toLowerCase().endsWith('address') && !topicAtIndex.includes('legacy')) {
-				return getLisk32Address(topic);
+				return getKlayr32Address(topic);
 			}
 			return topic;
 		});

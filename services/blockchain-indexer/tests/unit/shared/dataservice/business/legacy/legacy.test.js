@@ -24,8 +24,8 @@ beforeEach(() => {
 	jest.clearAllMocks();
 });
 
-jest.mock('lisk-service-framework', () => {
-	const actual = jest.requireActual('lisk-service-framework');
+jest.mock('klayr-service-framework', () => {
+	const actual = jest.requireActual('klayr-service-framework');
 	return {
 		...actual,
 		DB: {
@@ -61,7 +61,7 @@ describe('getLegacyAccountInfo', () => {
 				legacyAddress: '4823075312309157000L',
 			},
 			meta: {
-				address: 'lskyvfv3esyznwkpxcp4u7rnsoqwv55y82vw4yh7b',
+				address: 'klyyvfv3esyznwkpxcp4u7rnsoqwv55y82vw4yh7b',
 				publicKey: 'fe50ee28b084414499465ff823e7d651c9d19d75d33a82c44b2a15e3dc62bac9',
 			},
 		};

@@ -13,7 +13,7 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { HTTP, Logger, CacheRedis } = require('lisk-service-framework');
+const { HTTP, Logger, CacheRedis } = require('klayr-service-framework');
 const BluebirdPromise = require('bluebird');
 
 const requestLib = HTTP.request;

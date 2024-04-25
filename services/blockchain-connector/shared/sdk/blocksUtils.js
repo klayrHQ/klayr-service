@@ -20,7 +20,7 @@ const json = require('big-json');
 const {
 	Logger,
 	Exceptions: { NotFoundException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { getNodeInfo } = require('./endpoints_1');
 const { formatBlock } = require('./formatter');
@@ -57,8 +57,8 @@ const loadConfig = async () => {
 		genesisBlockFilePath = `./data/${chainID}/genesis_block.json`;
 		logger.info(`genesisBlockFilePath set to ${genesisBlockFilePath}.`);
 	} else {
-		// Check if current node is running Lisk Core
-		const [networkConfig] = config.networks.LISK.filter(c => chainID === c.chainID);
+		// Check if current node is running Klayr Core
+		const [networkConfig] = config.networks.KLAYR.filter(c => chainID === c.chainID);
 		if (networkConfig) {
 			logger.info(`Found config for ${networkConfig.name} (${chainID}).`);
 

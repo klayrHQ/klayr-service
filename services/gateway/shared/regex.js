@@ -15,8 +15,8 @@
  */
 const HASH_SHA256 = /^\b(?:[A-Fa-f0-9]){64}\b$/;
 const HASH_SHA512 = /^\b(?:[A-Fa-f0-9]){128}\b$/;
-const ADDRESS_LISK32 = /^lsk[a-hjkm-z2-9]{38}$/;
-const ADDRESS_LISK32_CSV = /^\b(?:lsk[a-hjkm-z2-9]{38}|,)+\b$/;
+const ADDRESS_KLAYR32 = /^kly[a-hjkm-z2-9]{38}$/;
+const ADDRESS_KLAYR32_CSV = /^\b(?:kly[a-hjkm-z2-9]{38}|,)+\b$/;
 const PUBLIC_KEY = HASH_SHA256;
 const BLOCK_ID = HASH_SHA256;
 const NONCE = /^\d+$/;
@@ -55,16 +55,16 @@ const COMMAND = MODULE;
 const MODULE_CSV = /^(?:[0-9a-zA-Z]{1,32})(?:,[0-9a-zA-Z]{1,32})*$/;
 const COMMAND_CSV = MODULE_CSV;
 const TOPIC_CSV =
-	/^\b(?:(?:04|05)?[0-9a-fA-F]{64}|lsk[a-hjkm-z2-9]{38})(?:,(?:(?:04|05)?[0-9a-fA-F]{64}|lsk[a-hjkm-z2-9]{38}))*\b$/;
+	/^\b(?:(?:04|05)?[0-9a-fA-F]{64}|kly[a-hjkm-z2-9]{38})(?:,(?:(?:04|05)?[0-9a-fA-F]{64}|kly[a-hjkm-z2-9]{38}))*\b$/;
 const HEX_STRING = /^\b[a-fA-F0-9]+\b$/;
 const EXCEL_EXPORT_FILENAME =
-	/^\btransactions_([a-fA-F0-9]{8})_(lsk[a-hjkm-z2-9]{38})_((\d{4})-((1[012])|(0?[1-9]))-(([012][1-9])|([123]0)|31))_((\d{4})-((1[012])|(0?[1-9]))-(([012][1-9])|([123]0)|31))\.xlsx\b$/;
+	/^\btransactions_([a-fA-F0-9]{8})_(kly[a-hjkm-z2-9]{38})_((\d{4})-((1[012])|(0?[1-9]))-(([012][1-9])|([123]0)|31))_((\d{4})-((1[012])|(0?[1-9]))-(([012][1-9])|([123]0)|31))\.xlsx\b$/;
 const EVENT_NAME = /^[\w!@$&. ]{1,32}$/;
 
 module.exports = {
 	PUBLIC_KEY,
-	ADDRESS_LISK32,
-	ADDRESS_LISK32_CSV,
+	ADDRESS_KLAYR32,
+	ADDRESS_KLAYR32_CSV,
 	BLOCK_ID,
 	PARTIAL_SEARCH,
 	PARTIAL_SEARCH_NAME,

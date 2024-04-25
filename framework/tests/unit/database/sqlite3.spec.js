@@ -164,7 +164,7 @@ describe('Test sqlite3 implementation', () => {
 				id,
 				search: {
 					property: 'generatorAddress',
-					pattern: 'lsk',
+					pattern: 'kly',
 				},
 			};
 			const result = await testTable.find(params, ['id']);
@@ -211,7 +211,7 @@ describe('Test sqlite3 implementation', () => {
 				id,
 				search: {
 					property: 'generatorAddress',
-					startsWith: 'ls%h',
+					startsWith: 'kl%h',
 					allowWildCards: true,
 				},
 			};

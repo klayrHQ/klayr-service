@@ -15,7 +15,7 @@
  */
 const {
 	Exceptions: { ValidationException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { normalizeRangeParam } = require('../../../../shared/utils/param');
 

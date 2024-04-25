@@ -21,7 +21,7 @@ const {
 	},
 	Logger,
 	Exceptions: { ValidationException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const config = require('../../config');
 

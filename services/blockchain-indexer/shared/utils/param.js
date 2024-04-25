@@ -16,7 +16,7 @@
 const {
 	Exceptions: { ValidationException },
 	Utils,
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const normalizeRangeParam = (params, property) => {
 	if (!params || !Utils.isObject(params)) return params;

@@ -16,13 +16,13 @@
 const { parseToJSONCompatObj, parseInputBySchema } = require('../../shared/utils/parser');
 
 const {
-	liskAccount,
-	liskBlock,
-	liskBlockHeader,
-	liskBlockHeaderAsset,
-	liskBlockHeaderAssetV3,
-	liskTransaction,
-	liskTransactionAssets,
+	klayrAccount,
+	klayrBlock,
+	klayrBlockHeader,
+	klayrBlockHeaderAsset,
+	klayrBlockHeaderAssetV3,
+	klayrTransaction,
+	klayrTransactionAssets,
 } = require('../constants/parser');
 
 describe('Unit tests for parse utilities', () => {
@@ -140,57 +140,57 @@ describe('Unit tests for parse utilities', () => {
 	});
 
 	describe('parseInputBySchema', () => {
-		it('should parse Lisk Account', async () => {
-			const { input, expected, schema } = liskAccount;
+		it('should parse Klayr Account', async () => {
+			const { input, expected, schema } = klayrAccount;
 			const result = parseInputBySchema(input, schema);
 			expect(typeof result).toBe(typeof input);
 			expect(input === result).toBeFalsy(); // Expect result to be a cloned object
 			expect(result).toStrictEqual(expected);
 		});
 
-		it('should parse Lisk Block', async () => {
-			const { input, expected, schema } = liskBlock;
+		it('should parse Klayr Block', async () => {
+			const { input, expected, schema } = klayrBlock;
 			const result = parseInputBySchema(input, schema);
 			expect(typeof result).toBe(typeof input);
 			expect(input === result).toBeFalsy(); // Expect result to be a cloned object
 			expect(result).toStrictEqual(expected);
 		});
 
-		it('should parse Lisk Block Header', async () => {
-			const { input, expected, schema } = liskBlockHeader;
+		it('should parse Klayr Block Header', async () => {
+			const { input, expected, schema } = klayrBlockHeader;
 			const result = parseInputBySchema(input, schema);
 			expect(typeof result).toBe(typeof input);
 			expect(input === result).toBeFalsy(); // Expect result to be a cloned object
 			expect(result).toStrictEqual(expected);
 		});
 
-		it('should parse Lisk Block Header Asset', async () => {
-			const { input, expected, schema } = liskBlockHeaderAsset;
+		it('should parse Klayr Block Header Asset', async () => {
+			const { input, expected, schema } = klayrBlockHeaderAsset;
 			const result = parseInputBySchema(input, schema);
 			expect(typeof result).toBe(typeof input);
 			expect(input === result).toBeFalsy(); // Expect result to be a cloned object
 			expect(result).toStrictEqual(expected);
 		});
 
-		it('should parse Lisk Block Header Asset v3', async () => {
-			const { input, expected, schema } = liskBlockHeaderAssetV3;
+		it('should parse Klayr Block Header Asset v3', async () => {
+			const { input, expected, schema } = klayrBlockHeaderAssetV3;
 			const result = parseInputBySchema(input, schema);
 			expect(typeof result).toBe(typeof input);
 			expect(input === result).toBeFalsy(); // Expect result to be a cloned object
 			expect(result).toStrictEqual(expected);
 		});
 
-		it('should parse Lisk Transaction', async () => {
-			const { input, expected, schema } = liskTransaction;
+		it('should parse Klayr Transaction', async () => {
+			const { input, expected, schema } = klayrTransaction;
 			const result = parseInputBySchema(input, schema);
 			expect(typeof result).toBe(typeof input);
 			expect(input === result).toBeFalsy(); // Expect result to be a cloned object
 			expect(result).toStrictEqual(expected);
 		});
 
-		liskTransactionAssets.forEach(txAsset => {
+		klayrTransactionAssets.forEach(txAsset => {
 			const { moduleName, moduleID, assetName, assetID } = txAsset;
-			it(`should parse Lisk Transaction Assets for module:asset ${moduleName}:${assetName} (${moduleID}:${assetID})`, async () => {
+			it(`should parse Klayr Transaction Assets for module:asset ${moduleName}:${assetName} (${moduleID}:${assetID})`, async () => {
 				const { input, expected, schema } = txAsset;
 				const result = parseInputBySchema(input, schema);
 				expect(typeof result).toBe(typeof input);

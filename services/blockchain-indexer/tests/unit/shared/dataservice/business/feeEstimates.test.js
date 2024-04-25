@@ -25,8 +25,8 @@ const mockFeeEstimatesFilePath = resolve(
 const { requestFeeEstimator } = require('../../../../../shared/utils/request');
 const { mockTxFeeEstimate } = require('../../constants/transactionEstimateFees');
 
-jest.mock('lisk-service-framework', () => {
-	const actual = jest.requireActual('lisk-service-framework');
+jest.mock('klayr-service-framework', () => {
+	const actual = jest.requireActual('klayr-service-framework');
 	return {
 		...actual,
 		Logger: () => ({

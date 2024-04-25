@@ -167,7 +167,7 @@ describe('get.blockchain.apps', () => {
 	});
 
 	it('should return invalid params for chainName more than 20 characters', async () => {
-		const response = await getBlockchainApps({ chainName: 'lisk_mainchain_used_for_testing' });
+		const response = await getBlockchainApps({ chainName: 'klayr_mainchain_used_for_testing' });
 		expect(response).toMap(invalidParamsSchema);
 	});
 

@@ -1922,111 +1922,90 @@
   resolved "https://registry.yarnpkg.com/@js-sdsl/ordered-map/-/ordered-map-4.4.2.tgz#9299f82874bab9e4c7f9c48d865becbfe8d6907c"
   integrity sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw==
 
-"@liskhq/lisk-api-client@^6.0.2":
-  version "6.0.2"
-  resolved "https://registry.yarnpkg.com/@liskhq/lisk-api-client/-/lisk-api-client-6.0.2.tgz#0fd43b1f6f56725a461c3cb261dbcfa801bef07b"
-  integrity sha512-+i1z1iMCp4h7Uyg1T5Y6KZYnGkuRidCxNmRCaMGlc5V7yTk9eog2D+gVmnTQY+81vz+7GymvodgSJdFviHAxnQ==
+"@klayr/api-client@^6.0.3":
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/@klayr/api-client/-/api-client-6.0.3.tgz#83bdc310a1800659bb4179ab7a584fbe0a5da061"
+  integrity sha512-IK6np9RpB4401dCsK5aBVLXxAAU1kMODkAjL+eKTcEbNaiPgjFAyE5VuuW+1C47+RYOBYU7hvyixLlOc9XkFLw==
   dependencies:
-    "@liskhq/lisk-codec" "^0.4.0"
-    "@liskhq/lisk-cryptography" "^4.0.0"
-    "@liskhq/lisk-transactions" "^6.0.0"
-    "@liskhq/lisk-validator" "^0.8.0"
+    "@klayr/codec" "^0.4.2"
+    "@klayr/cryptography" "^4.0.2"
+    "@klayr/transactions" "^6.0.2"
+    "@klayr/validator" "^0.8.2"
     isomorphic-ws "4.0.1"
     ws "8.11.0"
     zeromq "6.0.0-beta.6"
 
-"@liskhq/lisk-client@^6.0.0":
-  version "6.0.2"
-  resolved "https://registry.yarnpkg.com/@liskhq/lisk-client/-/lisk-client-6.0.2.tgz#2af71187c91ee3289340401684963b9cef20c295"
-  integrity sha512-PlXGKBzl3l/oFUHrO/P77hK6S56CxsQ8Vweuwl6v++bRUkXGPJLjRRkxPN+7GhLGPk2VRLTuj++Y7HJnOL4o+A==
+"@klayr/client@^6.0.2":
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/@klayr/client/-/client-6.0.3.tgz#8dcdd1119498c7b46bcbd3e66594eb39df4c110b"
+  integrity sha512-bUxqHiMyT619dSlK2mn0U/qQBKXkyXyurqp7VZW2YHqmtTXlzCaBbpNO7RArc646b42e7liC6hdi5R8zcPdC7Q==
   dependencies:
-    "@liskhq/lisk-api-client" "^6.0.2"
-    "@liskhq/lisk-codec" "^0.4.0"
-    "@liskhq/lisk-cryptography" "^4.0.0"
-    "@liskhq/lisk-passphrase" "^4.0.0"
-    "@liskhq/lisk-transactions" "^6.0.0"
-    "@liskhq/lisk-tree" "^0.4.0"
-    "@liskhq/lisk-utils" "^0.4.0"
-    "@liskhq/lisk-validator" "^0.8.0"
+    "@klayr/api-client" "^6.0.3"
+    "@klayr/codec" "^0.4.2"
+    "@klayr/cryptography" "^4.0.2"
+    "@klayr/passphrase" "^4.0.2"
+    "@klayr/transactions" "^6.0.2"
+    "@klayr/tree" "^0.4.2"
+    "@klayr/utils" "^0.4.2"
+    "@klayr/validator" "^0.8.2"
     buffer "6.0.3"
 
-"@liskhq/lisk-codec@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@liskhq/lisk-codec/-/lisk-codec-0.4.0.tgz#0b512f7bc835f921d728ead04d498b1a7a647cd1"
-  integrity sha512-03mgvftrWK5KfjBl/VSceEBtcr2wA4NLGnuBsoxKiwL/Bolfd1f3rdXbQgUKzeY4UJEoDGHN6jRPbXLHH/yUnw==
+"@klayr/codec@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@klayr/codec/-/codec-0.4.2.tgz#02793b20e25523b0b1871f184e8249d8ade119b8"
+  integrity sha512-dUPkhQT6B5CCCNIvgqKXqt0kheCIEmrfb5gd9sx52DcQaGjetfHQ5XJgBsbS+UDgZmK5FPKcpw2rpXdld0p1wg==
   dependencies:
-    "@liskhq/lisk-cryptography" "^4.0.0"
-    "@liskhq/lisk-utils" "^0.4.0"
-    "@liskhq/lisk-validator" "^0.8.0"
+    "@klayr/cryptography" "^4.0.2"
+    "@klayr/utils" "^0.4.2"
+    "@klayr/validator" "^0.8.2"
 
-"@liskhq/lisk-codec@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@liskhq/lisk-codec/-/lisk-codec-0.5.0.tgz#39ae557c30d2cc11b449f6db34054928fcf98e78"
-  integrity sha512-IW8s3s1JvHZMx2SmMh8MJyUE7D9gJGJyJq5s8xxWik4IOTN/zRdNFK2m1qIgL+6T8SchEKS4P8r/Xpnl5KUeiw==
+"@klayr/cryptography@^4.0.2":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@klayr/cryptography/-/cryptography-4.0.2.tgz#49237931227f6d9ceae8da69ea76823c0db62e9d"
+  integrity sha512-AwgATewCX5RO15NjiaOOfbZ1xZHxorlJ79BL2g7hOr/dcZg1kynmRwKOribxz/0XvGH7YgL2UYdJJxWfD6fpnA==
   dependencies:
-    "@liskhq/lisk-cryptography" "^4.1.0"
-    "@liskhq/lisk-utils" "^0.4.0"
-    "@liskhq/lisk-validator" "^0.9.0"
-
-"@liskhq/lisk-cryptography@^4.0.0", "@liskhq/lisk-cryptography@^4.1.0":
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/@liskhq/lisk-cryptography/-/lisk-cryptography-4.1.0.tgz#8621bcb61008adb5faee4d148a91e1da068ab3cc"
-  integrity sha512-5//E14nlqyvOE21uwB8zCCYe0JmeEVCQ6gg/TjboKYEct/OX0GkK5gyb6tqJr8ApaQxRaL5WqPt2VOwxf564VA==
-  dependencies:
-    "@liskhq/lisk-passphrase" "^4.1.0"
+    "@klayr/passphrase" "^4.0.2"
     buffer-reverse "1.0.1"
     hash-wasm "4.9.0"
     tweetnacl "1.0.3"
 
-"@liskhq/lisk-passphrase@^4.0.0", "@liskhq/lisk-passphrase@^4.1.0":
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/@liskhq/lisk-passphrase/-/lisk-passphrase-4.1.0.tgz#d9a72a9c9d4cdb557a25b84bffe73d579155f723"
-  integrity sha512-1VdpEp+OGiyCF0Fjtgcc+SLlHeIflzya49GzIXcXjFNf19VgkUu/eIDM8XHxSdj/5KzpL+yD07OYCh+LdoAkfA==
+"@klayr/passphrase@^4.0.2":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@klayr/passphrase/-/passphrase-4.0.2.tgz#b32765cea17d5b543ca2ff0ecb4f28ce054e1955"
+  integrity sha512-A+ajj7ns9EeOpVZtUKFYNlXr8A+BJvZVU9Zd6NSTG3uWpQU16+u1ahSVsSDcA73xESbLEHEYlEGBBDxv1h3l2g==
   dependencies:
     bip39 "3.0.3"
 
-"@liskhq/lisk-transactions@^6.0.0":
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/@liskhq/lisk-transactions/-/lisk-transactions-6.1.0.tgz#4225151b11fb1c1c272d8d01566f3ef45470d450"
-  integrity sha512-v3DS2O7mSDHMqRRI8ilgFaizjH9zZ/PDBdiMviAzJ16ZPCqqYJ7Dwm6Blp7fAOPCgLwRJTVwLNCgeFiMYjo6Kg==
+"@klayr/transactions@^6.0.2":
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/@klayr/transactions/-/transactions-6.0.2.tgz#e33c3c8c540b01233112d730da12323efe8cac8b"
+  integrity sha512-1cbLz2pY6T0+d+bAFF7aKQmK1hjTSrxlQ0wuBmuOFcSUh1GvU1bldhgvTwY/fZVePlFCN5JXy4mOekT7fGQPXQ==
   dependencies:
-    "@liskhq/lisk-codec" "^0.5.0"
-    "@liskhq/lisk-cryptography" "^4.1.0"
-    "@liskhq/lisk-validator" "^0.9.0"
+    "@klayr/codec" "^0.4.2"
+    "@klayr/cryptography" "^4.0.2"
+    "@klayr/validator" "^0.8.2"
 
-"@liskhq/lisk-tree@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@liskhq/lisk-tree/-/lisk-tree-0.4.0.tgz#c81f0681487d1267f9082ebbd41094d4fc8c6145"
-  integrity sha512-Gl4NrFMjF5uEo1jnK5i7GLwxChXC6BoRk80lDConU2Xjrm0hBwyiriEnBxXau4NfGHHfYPUbfZxD6OEJ9Wtl/A==
+"@klayr/tree@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@klayr/tree/-/tree-0.4.2.tgz#e6238419a4f48a9b2f229f5296c0f64acddab304"
+  integrity sha512-Uzdu6jVvvtUZKVsV11kFB7xWFhoyucRngpKEvNg/p+yHfsEYYRLkXib+eiyw60+IFMwUGfrEOv+6WYSA44li6g==
   dependencies:
-    "@liskhq/lisk-cryptography" "^4.0.0"
-    "@liskhq/lisk-utils" "^0.4.0"
+    "@klayr/cryptography" "^4.0.2"
+    "@klayr/utils" "^0.4.2"
 
-"@liskhq/lisk-utils@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@liskhq/lisk-utils/-/lisk-utils-0.4.0.tgz#84a8281d6f1db0605e286fcc41721965df474a71"
-  integrity sha512-rzZZrh36GVSqB65Y4LjaZIe2AVLUH8zXNDNBX0MXM7pI5BhBesDmDpVS2qVLoF7lhyBmUPk9SrARI0wK9/+z9g==
+"@klayr/utils@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@klayr/utils/-/utils-0.4.2.tgz#44c9c18fb8549d420ec84b775ab0dfdc3d76e6dc"
+  integrity sha512-qEtBp813Ns8YeNq3QUIZk9HHHNHO6BPwlOzLUDkX1qHu77SWNFQgzSkOEOxoNQaY5CW+un0uBB3jH0K8L4U/3w==
   dependencies:
     lodash.clonedeep "4.5.0"
 
-"@liskhq/lisk-validator@^0.8.0":
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/@liskhq/lisk-validator/-/lisk-validator-0.8.0.tgz#af62c4ef9cc71b2bd696eb70dca89ca7411c96c3"
-  integrity sha512-aChkjwuwBBzvDIQhyCRozOvQ0fTWjzAOLZJi3i53+1op6J3f6LZYG6ffA6q/x6W1/tQbApSoc2GJWrSCjmFpFw==
+"@klayr/validator@^0.8.2":
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/@klayr/validator/-/validator-0.8.2.tgz#091fcf0c50673b428f447a13d625792796d3287d"
+  integrity sha512-pbLwVfOH34sy/sk3wOwm9EQB+c5kQo/PCmWbwOnaVvk+WNVQm315irvQ8XOyY21QVlapE6hAG5hC9c/CzLsAsw==
   dependencies:
-    "@liskhq/lisk-cryptography" "^4.0.0"
-    ajv "8.1.0"
-    ajv-formats "2.1.1"
-    debug "4.3.4"
-    semver "7.5.2"
-    validator "13.7.0"
-
-"@liskhq/lisk-validator@^0.9.0":
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/@liskhq/lisk-validator/-/lisk-validator-0.9.0.tgz#2dc6a4627accab44d4393302b527ac8d2244e94f"
-  integrity sha512-47zqZxkYDvrtweLK2zWhA6169jjKY1EKJhj3+fQ1lDnqyLjfQwHFJ0qEsY1kFWBYQWI6KRGbOJcnGLsDnGdIfg==
-  dependencies:
-    "@liskhq/lisk-cryptography" "^4.1.0"
+    "@klayr/cryptography" "^4.0.2"
     ajv "8.1.0"
     ajv-formats "2.1.1"
     debug "4.3.4"

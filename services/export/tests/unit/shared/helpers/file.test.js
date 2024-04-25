@@ -139,7 +139,7 @@ describe('Test filesystem interface', () => {
 });
 
 describe('Test getPartialFilenameFromParams method', () => {
-	const address = 'lskpg7qukha2nmu9483huwk8oty7q3pyevh3bohr4';
+	const address = 'klypg7qukha2nmu9483huwk8oty7q3pyevh3bohr4';
 	const publicKey = '86cbecb2a176934e454f63e7ffa05783be6960d90002c5558dfd31397cd8f020';
 	const partialFilenameExtension = '.json';
 
@@ -163,7 +163,7 @@ describe('Test getPartialFilenameFromParams method', () => {
 });
 
 describe('Excel export utils', () => {
-	const address = 'lskeqretdgm6855pqnnz69ahpojk5yxfsv2am34et';
+	const address = 'klyeqretdgm6855pqnnz69ahpojk5yxfsv2am34et';
 	const publicKey = 'b7fdfc991c52ad6646159506a8326d4203c868bd3f16b8043c8e4e034346e581';
 	const chainID = '00000000';
 	const excelFilenameExtension = '.xlsx';

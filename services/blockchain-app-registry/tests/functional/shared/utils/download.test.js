@@ -17,12 +17,12 @@ const {
 	Utils: {
 		fs: { mkdir, rmdir, exists },
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { downloadAndExtractTarball, downloadFile } = require('../../../../shared/utils/download');
 
 const dirPath = `${__dirname}/test_data/`;
-const url = 'https://codeload.github.com/LiskHQ/lisk-service/tar.gz/refs/tags/v0.6.4';
+const url = 'https://codeload.github.com/klayrhq/klayr-service/tar.gz/refs/tags/v0.7.7';
 
 beforeEach(async () => mkdir(dirPath));
 
@@ -31,7 +31,7 @@ afterEach(async () => rmdir(dirPath));
 describe('Test downloadAndExtractTarball method', () => {
 	it('should download and extract correctly when url and data directory is valid', async () => {
 		await downloadAndExtractTarball(url, dirPath);
-		expect(await exists(`${dirPath}/lisk-service-0.6.4`)).toEqual(true);
+		expect(await exists(`${dirPath}/klayr-service-0.7.7`)).toEqual(true);
 	});
 
 	it('should throw error when url is invalid', async () => {

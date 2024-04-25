@@ -13,11 +13,11 @@
 ####################################################################################
 swagger: '2.0'
 info:
-  title: Lisk Service Test API
+  title: Klayr Service Test API
   version: '1.0'
   # put the contact info for your development or API team
   contact:
-    email: admin@lisk.com
+    email: admin@klayr.xyz
   description: |
     ## Endpoint Logic
 

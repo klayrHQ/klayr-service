@@ -19,7 +19,7 @@ const {
 	HTTP: { StatusCodes },
 	Exceptions: { ValidationException },
 	Logger,
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const gatewayConfig = require('../config');
 const { transformPath, transformRequest, transformResponse } = require('./apiUtils');

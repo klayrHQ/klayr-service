@@ -62,7 +62,7 @@ const headerSchema = {
 		generatorAddress: {
 			dataType: 'bytes',
 			fieldNumber: 5,
-			format: 'lisk32',
+			format: 'klayr32',
 		},
 		transactionRoot: {
 			dataType: 'bytes',
@@ -156,7 +156,7 @@ const assetSchema = {
 };
 
 const transactionSchema = {
-	$id: '/lisk/transaction',
+	$id: '/klayr/transaction',
 	type: 'object',
 	required: ['module', 'command', 'nonce', 'fee', 'senderPublicKey', 'params'],
 	properties: {

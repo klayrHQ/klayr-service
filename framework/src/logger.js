@@ -114,7 +114,7 @@ const configure = config => {
 				host,
 				port,
 				type: '@log4js-node/gelf',
-				facility: 'lisk-service',
+				facility: 'klayr-service',
 				customFields: {
 					_component: config.name,
 					_version: config.version,

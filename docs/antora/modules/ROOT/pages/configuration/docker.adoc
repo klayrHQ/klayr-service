@@ -1,34 +1,34 @@
 = Configuration with Docker
 Mona Bärenfänger <mona@lightcurve.io> Muhammad Talha <muhammad.talha@lightcurve.io>
-:description: Describes how to configure Lisk Service with Docker.
+:description: Describes how to configure Klayr Service with Docker.
 :toc:
 :imagesdir: ../assets/images
-:page-previous: /lisk-service/setup/docker.html
+:page-previous: /klayr-service/setup/docker.html
 :page-previous-title: Installation with Docker
-:page-next: /lisk-service/management/docker.html
+:page-next: /klayr-service/management/docker.html
 :page-next-title: Docker commands
 
 :url_references_config: configuration/index.adoc
-:url_github_env: https://github.com/LiskHQ/lisk-service/blob/development/docker/example.env
-:url_github: https://github.com/LiskHQ/lisk-service
+:url_github_env: https://github.com/KlayrHQ/klayr-service/blob/development/docker/example.env
+:url_github: https://github.com/KlayrHQ/klayr-service
 :url_docker_commands: management/docker.adoc
 
-On this page, we discuss how to customize the Docker installation of Lisk Service.
+On this page, we discuss how to customize the Docker installation of Klayr Service.
 
-== Configuring Lisk Service
-The {url_github}[Lisk Service] provides all possible Docker related configurations and their default values in an `example.env` file.
+== Configuring Klayr Service
+The {url_github}[Klayr Service] provides all possible Docker related configurations and their default values in an `example.env` file.
 
 TIP: The default {url_github_env}[example.env] file can be seen on the GitHub repository.
 
-To customize the Docker installation, copy the example configuration file to a `.env` file in the root of the `lisk-service` directory, where the `docker-compose.yml` file is located.
+To customize the Docker installation, copy the example configuration file to a `.env` file in the root of the `klayr-service` directory, where the `docker-compose.yml` file is located.
 
-.Working directory: ./lisk-service/
+.Working directory: ./klayr-service/
 [source,bash]
 ----
 cp docker/example.env .env
 ----
 
 Now edit the newly copied `.env` file to customize configurations accordingly.
-All the Lisk Service related configurations have already been explained on the xref:{url_references_config}[Configuration reference] page.
+All the Klayr Service related configurations have already been explained on the xref:{url_references_config}[Configuration reference] page.
 
-Additional commands for managing Lisk Service with Docker are described on the xref:{url_docker_commands}[] page.
+Additional commands for managing Klayr Service with Docker are described on the xref:{url_docker_commands}[] page.

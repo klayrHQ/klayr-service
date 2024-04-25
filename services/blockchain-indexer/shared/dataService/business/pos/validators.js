@@ -15,7 +15,7 @@
  */
 const BluebirdPromise = require('bluebird');
 
-const { CacheRedis } = require('lisk-service-framework');
+const { CacheRedis } = require('klayr-service-framework');
 
 const config = require('../../../../config');
 

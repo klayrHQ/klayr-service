@@ -17,7 +17,7 @@ const {
 	Utils: {
 		fs: { getDirectories },
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const camelCase = require('camelcase');
 const requireAll = require('require-all');

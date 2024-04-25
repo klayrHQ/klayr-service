@@ -14,7 +14,7 @@
  *
  */
 const util = require('util');
-const { CacheRedis, Logger } = require('lisk-service-framework');
+const { CacheRedis, Logger } = require('klayr-service-framework');
 
 const logger = Logger();
 

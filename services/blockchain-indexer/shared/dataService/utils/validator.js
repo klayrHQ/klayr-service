@@ -13,7 +13,7 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { CacheRedis } = require('lisk-service-framework');
+const { CacheRedis } = require('klayr-service-framework');
 
 const config = require('../../../config');
 

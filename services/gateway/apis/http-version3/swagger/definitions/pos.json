@@ -42,8 +42,8 @@
 			"address": {
 				"type": "string",
 				"format": "address",
-				"example": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
-				"description": "The Lisk Address is the human-readable representation of a blockchain account.\nIt is 41 character long identifier that begins with `lsk`."
+				"example": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+				"description": "The Klayr Address is the human-readable representation of a blockchain account.\nIt is 41 character long identifier that begins with `kly`."
 			},
 			"publicKey": {
 				"type": "string",
@@ -99,7 +99,7 @@
 			"commission": {
 				"type": "number",
 				"example": 100000,
-				"description": "The reward commission. The percentage is obtained by dividing this value by 100, i.e., a value of 10000 corresponds to 100%. It is set to 10000 on the Lisk Mainchain during the migration."
+				"description": "The reward commission. The percentage is obtained by dividing this value by 100, i.e., a value of 10000 corresponds to 100%. It is set to 10000 on the Klayr Mainchain during the migration."
 			},
 			"lastCommissionIncreaseHeight": {
 				"type": "number",
@@ -174,8 +174,8 @@
 			"address": {
 				"type": "string",
 				"format": "address",
-				"example": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
-				"description": "The Lisk Address is the human-readable representation of a blockchain account.\nIt is 41 character long identifier that begins with `lsk`."
+				"example": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+				"description": "The Klayr Address is the human-readable representation of a blockchain account.\nIt is 41 character long identifier that begins with `kly`."
 			},
 			"publicKey": {
 				"type": "string",
@@ -196,7 +196,7 @@
 					"properties": {
 						"validatorAddress": {
 							"type": "string",
-							"example": "lsk24cd35u4jdq8szo3pnsqe5dsxwrnazyqqqg5eu"
+							"example": "kly24cd35u4jdq8szo3pnsqe5dsxwrnazyqqqg5eu"
 						},
 						"amount": {
 							"type": "string",
@@ -244,8 +244,8 @@
 			"address": {
 				"type": "string",
 				"format": "address",
-				"example": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
-				"description": "Address of the staker. The Lisk Address is the human-readable representation of a blockchain account.\nIt is 41 character long identifier that begins with `lsk`."
+				"example": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+				"description": "Address of the staker. The Klayr Address is the human-readable representation of a blockchain account.\nIt is 41 character long identifier that begins with `kly`."
 			},
 			"publicKey": {
 				"type": "string",
@@ -274,7 +274,7 @@
 					"properties": {
 						"validatorAddress": {
 							"type": "string",
-							"example": "lsk24cd35u4jdq8szo3pnsqe5dsxwrnazyqqqg5eu",
+							"example": "kly24cd35u4jdq8szo3pnsqe5dsxwrnazyqqqg5eu",
 							"description": "Address of the validator against which the stake was made."
 						},
 						"amount": {
@@ -285,7 +285,7 @@
 						"tokenID": {
 							"type": "string",
 							"example": "0000000000000000",
-							"description": "The universal identifier for the token within the Lisk ecosystem for PoS module."
+							"description": "The universal identifier for the token within the Klayr ecosystem for PoS module."
 						},
 						"unstakeHeight": {
 							"type": "integer",
@@ -332,7 +332,7 @@
 			"address": {
 				"type": "string",
 				"format": "address",
-				"example": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+				"example": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
 				"description": "Address of the validator."
 			},
 			"amount": {
@@ -343,7 +343,7 @@
 			"name": {
 				"type": "string",
 				"format": "username",
-				"example": "liskhq",
+				"example": "klayrhq",
 				"description": "Name of the validator against whom the stake was made."
 			}
 		}
@@ -358,8 +358,8 @@
 					"address": {
 						"type": "string",
 						"format": "address",
-						"example": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
-						"description": "Address of the queried staker. The Lisk Address is the human-readable representation of a blockchain account.\nIt is 41 character long identifier that begins with `lsk`."
+						"example": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+						"description": "Address of the queried staker. The Klayr Address is the human-readable representation of a blockchain account.\nIt is 41 character long identifier that begins with `kly`."
 					},
 					"publicKey": {
 						"type": "string",
@@ -411,7 +411,7 @@
 			"address": {
 				"type": "string",
 				"format": "address",
-				"example": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+				"example": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
 				"description": "Address of the staker."
 			},
 			"amount": {
@@ -422,7 +422,7 @@
 			"name": {
 				"type": "string",
 				"format": "username",
-				"example": "liskhq",
+				"example": "klayrhq",
 				"description": "Name of the staker. Available only when registered as a validator."
 			}
 		}
@@ -438,8 +438,8 @@
 					"address": {
 						"type": "string",
 						"format": "address",
-						"example": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
-						"description": "Address of the queried validator. The Lisk Address is the human-readable representation of a blockchain account.\nIt is 41 character long identifier that begins with `lsk`."
+						"example": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+						"description": "Address of the queried validator. The Klayr Address is the human-readable representation of a blockchain account.\nIt is 41 character long identifier that begins with `kly`."
 					},
 					"publicKey": {
 						"type": "string",
@@ -593,7 +593,7 @@
 					"posTokenID": {
 						"type": "string",
 						"example": "0000000000000000",
-						"description": "The universal identifier for the token within the Lisk ecosystem for PoS module."
+						"description": "The universal identifier for the token within the Klayr ecosystem for PoS module."
 					},
 					"maxBFTWeightCap": {
 						"type": "number",
@@ -603,12 +603,12 @@
 					"commissionIncreasePeriod": {
 						"type": "number",
 						"example": 260000,
-						"description": "Determines how frequently (after how many blocks) a validator can increase their commission.  It is set to 260000 blocks on the Lisk Mainchain."
+						"description": "Determines how frequently (after how many blocks) a validator can increase their commission.  It is set to 260000 blocks on the Klayr Mainchain."
 					},
 					"maxCommissionIncreaseRate": {
 						"type": "number",
 						"example": 500,
-						"description": "Determines the maximum allowed increase on the commission per transaction. It is set to 5% on the Lisk Mainchain."
+						"description": "Determines the maximum allowed increase on the commission per transaction. It is set to 5% on the Klayr Mainchain."
 					},
 					"useInvalidBLSKey": {
 						"type": "boolean",
@@ -678,7 +678,7 @@
 						"tokenID": {
 							"type": "string",
 							"example": "0000000000000000",
-							"description": "The universal identifier for the token within the Lisk ecosystem used for rewards."
+							"description": "The universal identifier for the token within the Klayr ecosystem used for rewards."
 						},
 						"reward": {
 							"type": "string",
@@ -707,7 +707,7 @@
 						"tokenID": {
 							"type": "string",
 							"example": "0000000000000000",
-							"description": "The universal identifier for the token within the Lisk ecosystem used for rewards."
+							"description": "The universal identifier for the token within the Klayr ecosystem used for rewards."
 						},
 						"reward": {
 							"type": "string",

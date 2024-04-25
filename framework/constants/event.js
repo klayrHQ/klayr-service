@@ -30,8 +30,8 @@ const events = [
 ];
 
 const webSocket = {
-	// endpoint: `wss://testnet-service-staging.lisk.com/${cliEndpoint}`,
-	// endpoint: `ws://testnet-service-dev.liskdev.net/${cliEndpoint}`,
+	// endpoint: `wss://testnet-service.klayr.xyz/${cliEndpoint}`,
+	// endpoint: `ws://testnet-service.klayr.dev/${cliEndpoint}`,
 	endpoint: `ws://127.0.0.1:9901/${cliEndpoint}`,
 };
 

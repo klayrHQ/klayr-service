@@ -16,7 +16,7 @@
 const {
 	HTTP,
 	Exceptions: { ValidationException, ServiceUnavailableException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const {
 	StatusCodes: { BAD_REQUEST },

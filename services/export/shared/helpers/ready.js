@@ -16,7 +16,7 @@
 const Moment = require('moment');
 const MomentRange = require('moment-range');
 
-const { Signals, Logger } = require('lisk-service-framework');
+const { Signals, Logger } = require('klayr-service-framework');
 
 const config = require('../../config');
 

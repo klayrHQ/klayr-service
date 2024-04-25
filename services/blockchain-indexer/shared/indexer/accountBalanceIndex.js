@@ -19,7 +19,7 @@ const {
 		MySQL: { getTableInstance },
 	},
 	Logger,
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const config = require('../../config');
 const accountBalancesTableSchema = require('../database/schema/accountBalances');

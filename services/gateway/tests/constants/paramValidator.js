@@ -102,7 +102,7 @@ const parseParamsExpectedResponse = {
 const validateRawInputParams = {
 	network: 'devnet',
 	tokenID: '0400000000000000',
-	tokenName: 'Lisk,Lis,Lik',
+	tokenName: 'Klayr,Klay,Kly',
 };
 const validateRawInputParamsWithInvalidKey = {
 	...validateRawInputParams,
@@ -250,7 +250,7 @@ const validateSpecs = {
 };
 const validateExpectedParamReport = {
 	valid: {
-		tokenName: 'Lisk,Lis,Lik',
+		tokenName: 'Klayr,Klay,Kly',
 		tokenID: '0400000000000000',
 		network: 'devnet',
 		limit: 10,
@@ -264,7 +264,7 @@ const validateExpectedParamReport = {
 };
 const validateInvalidKeyExpectedResponse = {
 	valid: {
-		tokenName: 'Lisk,Lis,Lik',
+		tokenName: 'Klayr,Klay,Kly',
 		tokenID: '0400000000000000',
 		network: 'devnet',
 		limit: 10,

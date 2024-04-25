@@ -32,7 +32,7 @@ module.exports = {
 			type: 'string',
 			min: 41,
 			max: 41,
-			pattern: regex.ADDRESS_LISK32,
+			pattern: regex.ADDRESS_KLAYR32,
 		},
 		limit: { optional: true, type: 'number', min: 1, max: 100, default: 10, pattern: regex.LIMIT },
 		offset: { optional: true, type: 'number', min: 0, default: 0, pattern: regex.OFFSET },

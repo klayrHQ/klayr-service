@@ -101,7 +101,7 @@ describe('Test validateEndpointParams method', () => {
 		const endpointParams = {
 			endpoint: 'auth_getAuthAccount',
 			params: {
-				address: 'lskt62aft4puvypbjauw5udysh4gktefxsakp6edg',
+				address: 'klyt62aft4puvypbjauw5udysh4gktefxsakp6edg',
 			},
 		};
 		expect(validateEndpointParams(endpointParams)).resolves.toBe(undefined);

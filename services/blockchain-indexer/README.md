@@ -1,13 +1,13 @@
-# Lisk Service Blockchain Indexer
+# Klayr Service Blockchain Indexer
 
 The Blockchain Indexer service, in the _indexing_ mode, is primarily responsible to index all the blockchain information, based on the scheduled jobs by the Blockchain Coordinator.
 In the _data service_ mode, it serves user request queries made via the RESTful API or WebSocket-based RPC calls.
 It can run both the indexer and data service modes simultaneously, and is enabled by default.
 
-This microservice encapsulates most of the business logic for the Lisk Service API. By default, it only implements the business logic for all the available commands from the Lisk SDK.
-The _applyTransaction_ and _revertTransaction_ hooks implement the indexing logic and are specific to each available command. The _applyTransaction_ is triggered when processing an included transaction within a new block while (usually) indexing the `chain_newBlock` event. The _revertTransaction_ hook is triggered when processing an included transaction within a deleted block while processing the `chain_deleteBlock` event. All the implemented hooks are grouped [here](./shared/indexer/transactionProcessor). Command specific hooks are always implemented within a single file and are grouped by the module. When interested in extending Lisk Service and implementing hooks for your custom modules, please check the [Extending Indexer](#extending-indexer) section below.
+This microservice encapsulates most of the business logic for the Klayr Service API. By default, it only implements the business logic for all the available commands from the Klayr SDK.
+The _applyTransaction_ and _revertTransaction_ hooks implement the indexing logic and are specific to each available command. The _applyTransaction_ is triggered when processing an included transaction within a new block while (usually) indexing the `chain_newBlock` event. The _revertTransaction_ hook is triggered when processing an included transaction within a deleted block while processing the `chain_deleteBlock` event. All the implemented hooks are grouped [here](./shared/indexer/transactionProcessor). Command specific hooks are always implemented within a single file and are grouped by the module. When interested in extending Klayr Service and implementing hooks for your custom modules, please check the [Extending Indexer](#extending-indexer) section below.
 
-> Note that this installation instruction is required only for development activities. For a regular Lisk Service user the official [documentation](https://lisk.com/documentation/lisk-service/) is sufficient to run an instance. The global readme file present in the root directory describes running all the microservices at once.
+> Note that this installation instruction is required only for development activities. For a regular Klayr Service user the official [documentation](https://klayr.xyz/documentation/klayr-service/) is sufficient to run an instance. The global readme file present in the root directory describes running all the microservices at once.
 
 ## Installation
 
@@ -17,11 +17,11 @@ Please refer to the [README](../../README.md) in the project root directory.
 
 ## Installation
 
-Clone the Lisk Service Repository:
+Clone the Klayr Service Repository:
 
 ```bash
-git clone https://github.com/LiskHQ/lisk-service.git # clone repository
-cd lisk-service/services/blockchain-indexer # move into blockchain-indexer microservice directory
+git clone https://github.com/KlayrHQ/klayr-service.git # clone repository
+cd klayr-service/services/blockchain-indexer # move into blockchain-indexer microservice directory
 yarn install --frozen-lockfile # install required Node.js dependencies
 ```
 
@@ -39,11 +39,11 @@ A list of the most commonly used environment variables is presented below:
 - `ENABLE_DATA_RETRIEVAL_MODE`: Boolean flag to enable the Data Service mode.
 - `ENABLE_INDEXING_MODE`: Boolean flag to enable the Data Indexing mode.
 - `ENABLE_PERSIST_EVENTS`: Boolean flag to permanently maintain the events in the MySQL database.
-- `ENABLE_APPLY_SNAPSHOT`: Boolean flag to enable initialization of the index with the Lisk Service DB snapshot.
+- `ENABLE_APPLY_SNAPSHOT`: Boolean flag to enable initialization of the index with the Klayr Service DB snapshot.
 - `DURABILITY_VERIFY_FREQUENCY`: Frequency in milliseconds to verify if a block is indexed or rolled-back successfully. By default, it is set to `1`.
-- `INDEX_SNAPSHOT_URL`: URL from where the Lisk Service DB snapshot will be downloaded.
+- `INDEX_SNAPSHOT_URL`: URL from where the Klayr Service DB snapshot will be downloaded.
 - `ENABLE_SNAPSHOT_ALLOW_INSECURE_HTTP`: Boolean flag to enable downloading snapshot from an (unsecured) HTTP URL.
-- `LISK_STATIC`: URL of Lisk static assets.
+- `KLAYR_STATIC`: URL of Klayr static assets.
 - `SERVICE_INDEXER_CACHE_REDIS`: URL of the cache storage (Redis).
 - `ACCOUNT_BALANCE_UPDATE_BATCH_SIZE`: Number of accounts for which the balance index is updated at a time. By default, it is set to `1000`.
 - `INDEX_BLOCKS_QUEUE_SCHEDULED_JOB_MAX_COUNT`: Maximum number of jobs (in active and waiting state) allowed in the block indexing queue. By default, it is set to `100000`.
@@ -74,7 +74,7 @@ A list of the most commonly used environment variables is presented below:
 ### Start
 
 ```bash
-cd lisk-service/services/blockchain-indexer # move into the root directory of the blockchain-indexer microservice
+cd klayr-service/services/blockchain-indexer # move into the root directory of the blockchain-indexer microservice
 yarn start # start the microservice with running nodes locally
 ```
 
@@ -104,7 +104,7 @@ When implementing the custom hooks please adhere to the following:
 
 ## Contributors
 
-https://github.com/LiskHQ/lisk-service/graphs/contributors
+https://github.com/KlayrHQ/klayr-service/graphs/contributors
 
 ## License
 
@@ -122,4 +122,4 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-[lisk documentation site]: https://lisk.com/documentation
+[klayr documentation site]: https://klayr.xyz/documentation

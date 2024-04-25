@@ -21,7 +21,7 @@ const {
 		fs: { mkdir, exists, read, rm },
 	},
 	Logger,
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const logger = Logger();
 

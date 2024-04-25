@@ -27,26 +27,26 @@ const config = {
 /**
  * Inter-service message broker
  */
-config.transporter = process.env.SERVICE_BROKER || 'redis://lisk:password@127.0.0.1:6379/0';
+config.transporter = process.env.SERVICE_BROKER || 'redis://klayr:password@127.0.0.1:6379/0';
 config.brokerTimeout = Number(process.env.SERVICE_BROKER_TIMEOUT) || 10; // in seconds
 
 /**
  * External endpoints
  */
 config.endpoints.cache =
-	process.env.SERVICE_INDEXER_CACHE_REDIS || 'redis://lisk:password@127.0.0.1:6379/2';
+	process.env.SERVICE_INDEXER_CACHE_REDIS || 'redis://klayr:password@127.0.0.1:6379/2';
 config.endpoints.volatileRedis =
-	process.env.SERVICE_INDEXER_REDIS_VOLATILE || 'redis://lisk:password@127.0.0.1:6379/3';
+	process.env.SERVICE_INDEXER_REDIS_VOLATILE || 'redis://klayr:password@127.0.0.1:6379/3';
 config.endpoints.messageQueue =
-	process.env.SERVICE_MESSAGE_QUEUE_REDIS || 'redis://lisk:password@127.0.0.1:6379/4';
+	process.env.SERVICE_MESSAGE_QUEUE_REDIS || 'redis://klayr:password@127.0.0.1:6379/4';
 // Primary database. Used for both read-write operations.
 config.endpoints.mysql =
-	process.env.SERVICE_INDEXER_MYSQL || 'mysql://lisk:password@127.0.0.1:3306/lisk';
+	process.env.SERVICE_INDEXER_MYSQL || 'mysql://klayr:password@127.0.0.1:3306/klayr';
 // DB replicas against the primary. Used for read-only operations.
 config.endpoints.mysqlReplica =
 	process.env.SERVICE_INDEXER_MYSQL_READ_REPLICA || config.endpoints.mysql;
 config.endpoints.mainchainServiceUrl = process.env.MAINCHAIN_SERVICE_URL; // For custom deployments
-config.endpoints.liskStatic = process.env.LISK_STATIC || 'https://static-data.lisk.com';
+config.endpoints.klayrStatic = process.env.KLAYR_STATIC || 'https://static-data.klayr.xyz';
 
 /**
  * LOGGING
@@ -131,29 +131,29 @@ config.operations = {
 };
 
 config.networks = Object.freeze({
-	LISK: [
+	KLAYR: [
 		{
 			name: 'mainnet',
 			chainID: '00000000',
-			serviceURL: 'https://service.lisk.com',
-			snapshotURL: 'https://snapshots.lisk.com/mainnet/service.sql.gz',
+			serviceURL: 'https://service.klayr.xyz',
+			snapshotURL: 'https://snapshots.klayr.xyz/mainnet/service.sql.gz',
 		},
 		{
 			name: 'testnet',
 			chainID: '01000000',
-			serviceURL: 'https://testnet-service.lisk.com',
-			snapshotURL: 'https://snapshots.lisk.com/testnet/service.sql.gz',
+			serviceURL: 'https://testnet-service.klayr.xyz',
+			snapshotURL: 'https://snapshots.klayr.xyz/testnet/service.sql.gz',
 		},
 		{
 			name: 'betanet',
 			chainID: '02000000',
-			serviceURL: 'https://betanet-service.lisk.com',
-			snapshotURL: 'https://snapshots.lisk.com/betanet/service.sql.gz',
+			serviceURL: 'https://betanet-service.klayr.xyz',
+			snapshotURL: 'https://snapshots.klayr.xyz/betanet/service.sql.gz',
 		},
 		{
 			name: 'devnet',
 			chainID: '04000000',
-			serviceURL: process.env.DEVNET_MAINCHAIN_URL || 'http://devnet-service.liskdev.net:9901',
+			serviceURL: process.env.DEVNET_MAINCHAIN_URL || 'http://devnet-service.klayrdev.net:9901',
 		},
 	],
 });

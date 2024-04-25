@@ -19,7 +19,7 @@ const {
 	DB: {
 		MySQL: { getTableInstance },
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { networkStatus } = require('../constants/networkStatus');
 const { DATE_FORMAT } = require('../../shared/utils/constants');

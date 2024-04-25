@@ -94,7 +94,7 @@ module.exports = [
 		name: 'pos.rewards.locked',
 		controller: getPosLockedRewards,
 		params: {
-			address: { optional: true, type: 'string', pattern: regex.ADDRESS_LISK32 },
+			address: { optional: true, type: 'string', pattern: regex.ADDRESS_KLAYR32 },
 			publicKey: { optional: true, type: 'string', pattern: regex.PUBLIC_KEY },
 			name: { optional: true, type: 'string', pattern: regex.NAME },
 			limit: { optional: true, type: 'number', min: 1, max: 100 },

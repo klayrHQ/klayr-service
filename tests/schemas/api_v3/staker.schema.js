@@ -17,13 +17,13 @@ import Joi from 'joi';
 import regex from './regex';
 
 const staker = {
-	address: Joi.string().pattern(regex.ADDRESS_LISK32).required(),
+	address: Joi.string().pattern(regex.ADDRESS_KLAYR32).required(),
 	amount: Joi.string().pattern(regex.DIGITS).required(),
 	name: Joi.string().pattern(regex.NAME).optional(),
 };
 
 const validatorSchema = {
-	address: Joi.string().pattern(regex.ADDRESS_LISK32).required(),
+	address: Joi.string().pattern(regex.ADDRESS_KLAYR32).required(),
 	publicKey: Joi.string().pattern(regex.PUBLIC_KEY).allow(null).optional(),
 	name: Joi.string().pattern(regex.NAME).optional(),
 };

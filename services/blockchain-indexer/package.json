@@ -1,18 +1,18 @@
 {
-	"name": "lisk-service-blockchain-indexer",
+	"name": "klayr-service-blockchain-indexer",
 	"version": "0.7.7",
-	"description": "Lisk Service Blockchain Indexer",
+	"description": "Klayr Service Blockchain Indexer",
 	"keywords": [
-		"lisk",
+		"klayr",
 		"blockchain"
 	],
-	"homepage": "https://github.com/LiskHQ/lisk-service",
+	"homepage": "https://github.com/KlayrHQ/klayr-service",
 	"repository": {
 		"type": "git",
-		"url": "git@github.com:LiskHQ/lisk-service.git"
+		"url": "git@github.com:KlayrHQ/klayr-service.git"
 	},
 	"bugs": {
-		"url": "https://github.com/LiskHQ/lisk-service/issues"
+		"url": "https://github.com/KlayrHQ/klayr-service/issues"
 	},
 	"private": true,
 	"author": "Lisk Foundation <admin@lisk.com>, lightcurve GmbH <admin@lightcurve.io>",
@@ -30,16 +30,16 @@
 		"test:functional": "jest --config=jest.config.functional.js --detectOpenHandles --forceExit"
 	},
 	"dependencies": {
-		"@liskhq/lisk-codec": "^0.5.0",
-		"@liskhq/lisk-cryptography": "4.0.0",
-		"@liskhq/lisk-transactions": "6.0.0",
-		"@liskhq/lisk-utils": "0.4.0",
-		"@liskhq/lisk-validator": "0.8.0",
+		"@klayr/codec": "^0.4.2",
+		"@klayr/cryptography": "4.0.2",
+		"@klayr/transactions": "6.0.2",
+		"@klayr/utils": "0.4.2",
+		"@klayr/validator": "0.8.2",
 		"bluebird": "^3.7.2",
 		"bull": "^4.8.1",
 		"camelcase": "^6.3.0",
 		"ioredis": "^5.3.2",
-		"lisk-service-framework": "https://github.com/LiskHQ/lisk-service/raw/de2ee1ac988ebd2fb150e637647640b25635c6d6/framework/dist/lisk-service-framework-1.6.15.tgz",
+		"klayr-service-framework": "https://github.com/klayrHQ/klayr-service/raw/development/framework/dist/klayr-service-framework-1.6.15.tgz",
 		"lodash": "^4.17.21",
 		"require-all": "^3.0.0"
 	},

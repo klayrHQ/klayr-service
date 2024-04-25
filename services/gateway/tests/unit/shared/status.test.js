@@ -20,7 +20,7 @@ const {
 	Utils: {
 		fs: { exists, rmdir },
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 describe('Test getBuildTimestamp method', () => {
 	const dateStr = '2999-03-21T11:15:59.337Z';

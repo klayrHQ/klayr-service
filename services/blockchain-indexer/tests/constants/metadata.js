@@ -202,7 +202,7 @@ const metadata = {
 						properties: {
 							address: {
 								type: 'string',
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 						},
 						required: ['address'],
@@ -624,7 +624,7 @@ const metadata = {
 						properties: {
 							validatorAddress: {
 								type: 'string',
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 							validatorReward: {
 								type: 'string',
@@ -664,12 +664,12 @@ const metadata = {
 						properties: {
 							senderAddress: {
 								dataType: 'bytes',
-								format: 'lisk32',
+								format: 'klayr32',
 								fieldNumber: 1,
 							},
 							generatorAddress: {
 								dataType: 'bytes',
-								format: 'lisk32',
+								format: 'klayr32',
 								fieldNumber: 2,
 							},
 							burntAmount: {
@@ -698,7 +698,7 @@ const metadata = {
 							},
 							relayerAddress: {
 								dataType: 'bytes',
-								format: 'lisk32',
+								format: 'klayr32',
 								fieldNumber: 2,
 							},
 							burntAmount: {
@@ -715,7 +715,7 @@ const metadata = {
 				{
 					name: 'insufficientFee',
 					data: {
-						$id: '/lisk/empty',
+						$id: '/klayr/empty',
 						type: 'object',
 						properties: {},
 					},
@@ -1315,7 +1315,7 @@ const metadata = {
 				{
 					name: 'invalidRegistrationSignature',
 					data: {
-						$id: '/lisk/empty',
+						$id: '/klayr/empty',
 						type: 'object',
 						properties: {},
 					},
@@ -1373,7 +1373,7 @@ const metadata = {
 				{
 					name: 'invalidSMTVerification',
 					data: {
-						$id: '/lisk/empty',
+						$id: '/klayr/empty',
 						type: 'object',
 						properties: {},
 					},
@@ -1381,7 +1381,7 @@ const metadata = {
 				{
 					name: 'invalidRMTVerification',
 					data: {
-						$id: '/lisk/empty',
+						$id: '/klayr/empty',
 						type: 'object',
 						properties: {},
 					},
@@ -1389,7 +1389,7 @@ const metadata = {
 				{
 					name: 'invalidCertificateSignature',
 					data: {
-						$id: '/lisk/empty',
+						$id: '/klayr/empty',
 						type: 'object',
 						properties: {},
 					},
@@ -2501,9 +2501,9 @@ const metadata = {
 			],
 			commands: [
 				{
-					name: 'reclaimLSK',
+					name: 'reclaimKLY',
 					params: {
-						$id: '/legacy/command/reclaimLSKParams',
+						$id: '/legacy/command/reclaimKLYParams',
 						type: 'object',
 						required: ['amount'],
 						properties: {
@@ -2547,7 +2547,7 @@ const metadata = {
 				{
 					name: 'accountReclaimed',
 					data: {
-						$id: 'lisk/legacy/accountReclaimedEventData',
+						$id: 'klayr/legacy/accountReclaimedEventData',
 						type: 'object',
 						required: ['legacyAddress', 'address', 'amount'],
 						properties: {
@@ -2571,7 +2571,7 @@ const metadata = {
 				{
 					name: 'keysRegistered',
 					data: {
-						$id: 'lisk/legacy/keysRegisteredEventData',
+						$id: 'klayr/legacy/keysRegisteredEventData',
 						type: 'object',
 						required: ['address', 'generatorKey', 'blsKey'],
 						properties: {
@@ -2686,7 +2686,7 @@ const metadata = {
 				{
 					name: 'unlock',
 					params: {
-						$id: '/lisk/empty',
+						$id: '/klayr/empty',
 						type: 'object',
 						properties: {},
 					},
@@ -2726,7 +2726,7 @@ const metadata = {
 										validatorAddress: {
 											dataType: 'bytes',
 											fieldNumber: 1,
-											format: 'lisk32',
+											format: 'klayr32',
 										},
 										amount: {
 											dataType: 'sint64',
@@ -2756,7 +2756,7 @@ const metadata = {
 				{
 					name: 'claimRewards',
 					params: {
-						$id: '/lisk/empty',
+						$id: '/klayr/empty',
 						type: 'object',
 						properties: {},
 					},
@@ -2773,7 +2773,7 @@ const metadata = {
 							address: {
 								dataType: 'bytes',
 								fieldNumber: 1,
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 							height: {
 								dataType: 'uint32',
@@ -2792,7 +2792,7 @@ const metadata = {
 							address: {
 								dataType: 'bytes',
 								fieldNumber: 1,
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 							height: {
 								dataType: 'uint32',
@@ -2811,7 +2811,7 @@ const metadata = {
 							address: {
 								dataType: 'bytes',
 								fieldNumber: 1,
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 							name: {
 								dataType: 'string',
@@ -2830,12 +2830,12 @@ const metadata = {
 							senderAddress: {
 								dataType: 'bytes',
 								fieldNumber: 1,
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 							validatorAddress: {
 								dataType: 'bytes',
 								fieldNumber: 2,
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 							amount: {
 								dataType: 'sint64',
@@ -2857,7 +2857,7 @@ const metadata = {
 						properties: {
 							validatorAddress: {
 								dataType: 'bytes',
-								format: 'lisk32',
+								format: 'klayr32',
 								fieldNumber: 1,
 							},
 							oldCommission: {
@@ -2880,12 +2880,12 @@ const metadata = {
 						properties: {
 							stakerAddress: {
 								dataType: 'bytes',
-								format: 'lisk32',
+								format: 'klayr32',
 								fieldNumber: 1,
 							},
 							validatorAddress: {
 								dataType: 'bytes',
-								format: 'lisk32',
+								format: 'klayr32',
 								fieldNumber: 2,
 							},
 							tokenID: {
@@ -2920,7 +2920,7 @@ const metadata = {
 										validatorAddress: {
 											dataType: 'bytes',
 											fieldNumber: 1,
-											format: 'lisk32',
+											format: 'klayr32',
 										},
 										amount: {
 											dataType: 'uint64',
@@ -2960,7 +2960,7 @@ const metadata = {
 										validatorAddress: {
 											dataType: 'bytes',
 											fieldNumber: 1,
-											format: 'lisk32',
+											format: 'klayr32',
 										},
 										amount: {
 											dataType: 'uint64',
@@ -3067,7 +3067,7 @@ const metadata = {
 							validatorAddress: {
 								dataType: 'bytes',
 								fieldNumber: 1,
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 						},
 					},
@@ -3089,7 +3089,7 @@ const metadata = {
 										address: {
 											dataType: 'bytes',
 											fieldNumber: 1,
-											format: 'lisk32',
+											format: 'klayr32',
 										},
 										weight: {
 											dataType: 'uint64',
@@ -3121,7 +3121,7 @@ const metadata = {
 								fieldNumber: 3,
 								items: {
 									dataType: 'bytes',
-									format: 'lisk32',
+									format: 'klayr32',
 								},
 							},
 						},
@@ -3182,7 +3182,7 @@ const metadata = {
 									properties: {
 										address: {
 											type: 'string',
-											format: 'lisk32',
+											format: 'klayr32',
 										},
 										name: {
 											type: 'string',
@@ -3245,7 +3245,7 @@ const metadata = {
 						properties: {
 							address: {
 								type: 'string',
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 						},
 					},
@@ -3266,7 +3266,7 @@ const metadata = {
 						properties: {
 							address: {
 								type: 'string',
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 							name: {
 								type: 'string',
@@ -3326,7 +3326,7 @@ const metadata = {
 						properties: {
 							address: {
 								type: 'string',
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 						},
 					},
@@ -3344,7 +3344,7 @@ const metadata = {
 									properties: {
 										validatorAddress: {
 											type: 'string',
-											format: 'lisk32',
+											format: 'klayr32',
 										},
 										amount: {
 											type: 'string',
@@ -3362,7 +3362,7 @@ const metadata = {
 									properties: {
 										validatorAddress: {
 											type: 'string',
-											format: 'lisk32',
+											format: 'klayr32',
 										},
 										amount: {
 											type: 'string',
@@ -3536,7 +3536,7 @@ const metadata = {
 						properties: {
 							address: {
 								type: 'string',
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 						},
 					},
@@ -3572,7 +3572,7 @@ const metadata = {
 						properties: {
 							address: {
 								type: 'string',
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 							tokenID: {
 								type: 'string',
@@ -3601,7 +3601,7 @@ const metadata = {
 						properties: {
 							address: {
 								type: 'string',
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 						},
 					},
@@ -3652,7 +3652,7 @@ const metadata = {
 									properties: {
 										address: {
 											type: 'string',
-											format: 'lisk32',
+											format: 'klayr32',
 										},
 										name: {
 											type: 'string',
@@ -3715,7 +3715,7 @@ const metadata = {
 						properties: {
 							address: {
 								type: 'string',
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 						},
 					},
@@ -3738,7 +3738,7 @@ const metadata = {
 									properties: {
 										validatorAddress: {
 											type: 'string',
-											format: 'lisk32',
+											format: 'klayr32',
 										},
 										amount: {
 											type: 'string',
@@ -3783,7 +3783,7 @@ const metadata = {
 						properties: {
 							validatorAddress: {
 								type: 'string',
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 							validatorReward: {
 								type: 'string',
@@ -3838,7 +3838,7 @@ const metadata = {
 									properties: {
 										address: {
 											dataType: 'bytes',
-											format: 'lisk32',
+											format: 'klayr32',
 											fieldNumber: 1,
 										},
 										name: {
@@ -3926,7 +3926,7 @@ const metadata = {
 									properties: {
 										address: {
 											dataType: 'bytes',
-											format: 'lisk32',
+											format: 'klayr32',
 											fieldNumber: 1,
 										},
 										stakes: {
@@ -3938,7 +3938,7 @@ const metadata = {
 												properties: {
 													validatorAddress: {
 														dataType: 'bytes',
-														format: 'lisk32',
+														format: 'klayr32',
 														fieldNumber: 1,
 													},
 													amount: {
@@ -3979,7 +3979,7 @@ const metadata = {
 													validatorAddress: {
 														dataType: 'bytes',
 														fieldNumber: 1,
-														format: 'lisk32',
+														format: 'klayr32',
 													},
 													amount: {
 														dataType: 'uint64',
@@ -4009,7 +4009,7 @@ const metadata = {
 										fieldNumber: 2,
 										items: {
 											dataType: 'bytes',
-											format: 'lisk32',
+											format: 'klayr32',
 										},
 									},
 								},
@@ -4075,7 +4075,7 @@ const metadata = {
 						properties: {
 							generatorAddress: {
 								type: 'string',
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 							seedReveal: {
 								type: 'string',
@@ -4097,14 +4097,14 @@ const metadata = {
 				{
 					name: 'setHashOnion',
 					request: {
-						$id: 'lisk/random/setSeedRequestSchema',
+						$id: 'klayr/random/setSeedRequestSchema',
 						type: 'object',
 						title: 'Random setSeed request',
 						required: ['address'],
 						properties: {
 							address: {
 								type: 'string',
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 							seed: {
 								type: 'string',
@@ -4137,14 +4137,14 @@ const metadata = {
 				{
 					name: 'getHashOnionSeeds',
 					response: {
-						$id: 'lisk/random/setSeedRequestSchema',
+						$id: 'klayr/random/setSeedRequestSchema',
 						type: 'object',
 						title: 'Random setSeed request',
 						required: ['address'],
 						properties: {
 							address: {
 								type: 'string',
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 							seed: {
 								type: 'string',
@@ -4177,18 +4177,18 @@ const metadata = {
 				{
 					name: 'hasHashOnion',
 					request: {
-						$id: 'lisk/random/addressSchema',
+						$id: 'klayr/random/addressSchema',
 						type: 'object',
 						required: ['address'],
 						properties: {
 							address: {
 								type: 'string',
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 						},
 					},
 					response: {
-						$id: 'lisk/random/hasHashOnionResponseSchema',
+						$id: 'klayr/random/hasHashOnionResponseSchema',
 						type: 'object',
 						required: ['hasSeed', 'remaining'],
 						properties: {
@@ -4205,18 +4205,18 @@ const metadata = {
 				{
 					name: 'getHashOnionUsage',
 					request: {
-						$id: 'lisk/random/addressSchema',
+						$id: 'klayr/random/addressSchema',
 						type: 'object',
 						required: ['address'],
 						properties: {
 							address: {
 								type: 'string',
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 						},
 					},
 					response: {
-						$id: 'lisk/random/getHashOnionUsageResponse',
+						$id: 'klayr/random/getHashOnionUsageResponse',
 						type: 'object',
 						required: ['usedHashOnions', 'seed'],
 						properties: {
@@ -4270,7 +4270,7 @@ const metadata = {
 				{
 					name: 'transfer',
 					params: {
-						$id: '/lisk/transferParams',
+						$id: '/klayr/transferParams',
 						title: 'Transfer transaction params',
 						type: 'object',
 						required: ['tokenID', 'amount', 'recipientAddress', 'data'],
@@ -4288,7 +4288,7 @@ const metadata = {
 							recipientAddress: {
 								dataType: 'bytes',
 								fieldNumber: 3,
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 							data: {
 								dataType: 'string',
@@ -4302,7 +4302,7 @@ const metadata = {
 				{
 					name: 'transferCrossChain',
 					params: {
-						$id: '/lisk/ccTransferParams',
+						$id: '/klayr/ccTransferParams',
 						type: 'object',
 						required: [
 							'tokenID',
@@ -4333,7 +4333,7 @@ const metadata = {
 							recipientAddress: {
 								dataType: 'bytes',
 								fieldNumber: 4,
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 							data: {
 								dataType: 'string',
@@ -4365,12 +4365,12 @@ const metadata = {
 						properties: {
 							senderAddress: {
 								dataType: 'bytes',
-								format: 'lisk32',
+								format: 'klayr32',
 								fieldNumber: 1,
 							},
 							recipientAddress: {
 								dataType: 'bytes',
-								format: 'lisk32',
+								format: 'klayr32',
 								fieldNumber: 2,
 							},
 							tokenID: {
@@ -4406,12 +4406,12 @@ const metadata = {
 						properties: {
 							senderAddress: {
 								dataType: 'bytes',
-								format: 'lisk32',
+								format: 'klayr32',
 								fieldNumber: 1,
 							},
 							recipientAddress: {
 								dataType: 'bytes',
-								format: 'lisk32',
+								format: 'klayr32',
 								fieldNumber: 2,
 							},
 							tokenID: {
@@ -4453,12 +4453,12 @@ const metadata = {
 						properties: {
 							senderAddress: {
 								dataType: 'bytes',
-								format: 'lisk32',
+								format: 'klayr32',
 								fieldNumber: 1,
 							},
 							recipientAddress: {
 								dataType: 'bytes',
-								format: 'lisk32',
+								format: 'klayr32',
 								fieldNumber: 2,
 							},
 							tokenID: {
@@ -4493,7 +4493,7 @@ const metadata = {
 						properties: {
 							address: {
 								dataType: 'bytes',
-								format: 'lisk32',
+								format: 'klayr32',
 								fieldNumber: 1,
 							},
 							tokenID: {
@@ -4522,7 +4522,7 @@ const metadata = {
 						properties: {
 							address: {
 								dataType: 'bytes',
-								format: 'lisk32',
+								format: 'klayr32',
 								fieldNumber: 1,
 							},
 							tokenID: {
@@ -4551,7 +4551,7 @@ const metadata = {
 						properties: {
 							address: {
 								dataType: 'bytes',
-								format: 'lisk32',
+								format: 'klayr32',
 								fieldNumber: 1,
 							},
 							module: {
@@ -4586,7 +4586,7 @@ const metadata = {
 						properties: {
 							address: {
 								dataType: 'bytes',
-								format: 'lisk32',
+								format: 'klayr32',
 								fieldNumber: 1,
 							},
 							module: {
@@ -4641,7 +4641,7 @@ const metadata = {
 						properties: {
 							address: {
 								dataType: 'bytes',
-								format: 'lisk32',
+								format: 'klayr32',
 								fieldNumber: 1,
 							},
 							tokenID: {
@@ -4742,7 +4742,7 @@ const metadata = {
 							},
 							relayerAddress: {
 								dataType: 'bytes',
-								format: 'lisk32',
+								format: 'klayr32',
 								fieldNumber: 3,
 							},
 							result: {
@@ -4781,7 +4781,7 @@ const metadata = {
 				{
 					name: 'allTokensSupported',
 					data: {
-						$id: '/lisk/empty',
+						$id: '/klayr/empty',
 						type: 'object',
 						properties: {},
 					},
@@ -4789,7 +4789,7 @@ const metadata = {
 				{
 					name: 'allTokensSupportRemoved',
 					data: {
-						$id: '/lisk/empty',
+						$id: '/klayr/empty',
 						type: 'object',
 						properties: {},
 					},
@@ -4951,7 +4951,7 @@ const metadata = {
 						properties: {
 							address: {
 								type: 'string',
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 							tokenID: {
 								type: 'string',
@@ -4998,7 +4998,7 @@ const metadata = {
 						properties: {
 							address: {
 								type: 'string',
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 						},
 						required: ['address'],
@@ -5168,7 +5168,7 @@ const metadata = {
 						properties: {
 							address: {
 								type: 'string',
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 							tokenID: {
 								type: 'string',
@@ -5241,7 +5241,7 @@ const metadata = {
 									properties: {
 										address: {
 											dataType: 'bytes',
-											format: 'lisk32',
+											format: 'klayr32',
 											fieldNumber: 1,
 										},
 										tokenID: {
@@ -5451,7 +5451,7 @@ const metadata = {
 										address: {
 											fieldNumber: 1,
 											dataType: 'bytes',
-											format: 'lisk32',
+											format: 'klayr32',
 										},
 										bftWeight: {
 											fieldNumber: 2,
@@ -5527,7 +5527,7 @@ const metadata = {
 						properties: {
 							address: {
 								dataType: 'string',
-								format: 'lisk32',
+								format: 'klayr32',
 							},
 						},
 						required: ['address'],

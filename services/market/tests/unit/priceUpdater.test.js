@@ -45,7 +45,7 @@ describe('Format rates', () => {
 		'99.123456789',
 	];
 	const fiatCurrencies = ['EUR', 'USD', 'CHF', 'GBP', 'RUB'];
-	const cryptoCurrencies = ['LSK', 'BTC', 'ETH'];
+	const cryptoCurrencies = ['KLY', 'BTC', 'ETH'];
 
 	it('formatCalculatedRate rounds to 4 digits when the currency is FIAT', async () => {
 		fiatCurrencies.forEach(targetCurrency => {

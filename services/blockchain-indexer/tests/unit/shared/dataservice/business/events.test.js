@@ -42,8 +42,8 @@ describe('getEventsByBlockID', () => {
 	});
 
 	it('should return events from cache if available', async () => {
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			return {
 				...actual,
 				CacheLRU: jest.fn(() => ({
@@ -67,8 +67,8 @@ describe('getEventsByBlockID', () => {
 	});
 
 	it('should return events from DB if not available in cache', async () => {
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			return {
 				...actual,
 				CacheLRU: jest.fn(() => ({
@@ -104,8 +104,8 @@ describe('getEventsByBlockID', () => {
 	});
 
 	it('should return an empty array if cache and db miss', async () => {
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			return {
 				...actual,
 				CacheLRU: jest.fn(() => ({
@@ -141,8 +141,8 @@ describe('cacheEventsByBlockID', () => {
 	});
 
 	it('should cache events by blockID', async () => {
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			return {
 				...actual,
 				CacheLRU: jest.fn(() => ({
@@ -165,8 +165,8 @@ describe('cacheEventsByBlockID', () => {
 	});
 
 	it('should throw error if cache throws error', async () => {
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			return {
 				...actual,
 				CacheLRU: jest.fn(() => ({
@@ -208,8 +208,8 @@ describe('getEvents', () => {
 			};
 		});
 
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			return {
 				...actual,
 				DB: {
@@ -273,7 +273,7 @@ describe('getEvents', () => {
 		const params = {
 			blockID,
 			topic: '03',
-			senderAddress: 'lskw68y3kyus7ota9mykr726aby44mw574m8dkngu',
+			senderAddress: 'klyw68y3kyus7ota9mykr726aby44mw574m8dkngu',
 			transactionID: 'c8ee3933cc841287d834f74f278ac12f145f320d0593a612e11b67b4a58cd17b',
 			timestamp: '1:1000000000',
 			height: '1:1000',
@@ -310,8 +310,8 @@ describe('getEvents', () => {
 			};
 		});
 
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			return {
 				...actual,
 				DB: {
@@ -374,7 +374,7 @@ describe('getEvents', () => {
 
 		const params = {
 			blockID,
-			senderAddress: 'lskw68y3kyus7ota9mykr726aby44mw574m8dkngu',
+			senderAddress: 'klyw68y3kyus7ota9mykr726aby44mw574m8dkngu',
 			topic: 'c8ee3933cc841287d834f74f278ac12f145f320d0593a612e11b67b4a58cd17b',
 			timestamp: '1:1000000000',
 			height: '1:1000',
@@ -409,10 +409,10 @@ describe('getEvents', () => {
 
 		const {
 			Exceptions: { NotFoundException },
-		} = require('lisk-service-framework');
+		} = require('klayr-service-framework');
 
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			return {
 				...actual,
 				DB: {
@@ -458,10 +458,10 @@ describe('getEvents', () => {
 
 		const {
 			Exceptions: { NotFoundException },
-		} = require('lisk-service-framework');
+		} = require('klayr-service-framework');
 
-		jest.mock('lisk-service-framework', () => {
-			const actual = jest.requireActual('lisk-service-framework');
+		jest.mock('klayr-service-framework', () => {
+			const actual = jest.requireActual('klayr-service-framework');
 			return {
 				...actual,
 				DB: {

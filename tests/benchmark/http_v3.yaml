@@ -1,5 +1,5 @@
 config:
-  target: '{{ $processEnvironment.LISK_SERVICE_URL }}/api/v3'
+  target: '{{ $processEnvironment.KLAYR_SERVICE_URL }}/api/v3'
   phases:
     - duration: 10
       arrivalRate: 5
@@ -93,7 +93,7 @@ scenarios:
       - get:
           url: '/validator'
           qs:
-            address: 'lskxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht'
+            address: 'klyxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht'
           expect:
             - statusCode: 200
 
@@ -103,7 +103,7 @@ scenarios:
       - get:
           url: '/auth'
           qs:
-            address: 'lskxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht'
+            address: 'klyxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht'
           expect:
             - statusCode: 200
 
@@ -113,7 +113,7 @@ scenarios:
       - get:
           url: '/token/balances'
           qs:
-            address: 'lskxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht'
+            address: 'klyxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht'
           expect:
             - statusCode: 200
 
@@ -122,7 +122,7 @@ scenarios:
       - get:
           url: '/token/account/exists'
           qs:
-            address: 'lskxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht'
+            address: 'klyxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht'
             tokenID: '0400000000000000'
           expect:
             - statusCode: 200
@@ -220,7 +220,7 @@ scenarios:
       - get:
           url: '/pos/rewards/claimable'
           qs:
-            address: 'lskxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht'
+            address: 'klyxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht'
           expect:
             - statusCode: 200
 
@@ -229,7 +229,7 @@ scenarios:
       - get:
           url: '/pos/rewards/locked'
           qs:
-            address: 'lskxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht'
+            address: 'klyxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht'
           expect:
             - statusCode: 200
 
@@ -238,7 +238,7 @@ scenarios:
       - get:
           url: '/pos/stakers'
           qs:
-            address: 'lskxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht'
+            address: 'klyxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht'
           expect:
             - statusCode: 200
 
@@ -247,7 +247,7 @@ scenarios:
       - get:
           url: '/pos/stakes'
           qs:
-            address: 'lskxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht'
+            address: 'klyxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht'
           expect:
             - statusCode: 200
 
@@ -256,7 +256,7 @@ scenarios:
       - get:
           url: '/pos/unlocks'
           qs:
-            address: 'lskxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht'
+            address: 'klyxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht'
           expect:
             - statusCode: 200
 

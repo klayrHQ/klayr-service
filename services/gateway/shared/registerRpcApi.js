@@ -20,7 +20,7 @@ const {
 		JSON_RPC: { INVALID_PARAMS, INVALID_REQUEST, SERVICE_UNAVAILABLE },
 	},
 	Logger,
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { MoleculerClientError } = require('moleculer').Errors;
 

@@ -18,7 +18,7 @@ const {
 	DB: {
 		MySQL: { getTableInstance },
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 const { getNetworkStatus } = require('../network');
 const { requestConnector } = require('../../../utils/request');
 const { LENGTH_NETWORK_ID, LENGTH_TOKEN_ID } = require('../../../constants');
@@ -32,15 +32,15 @@ const { getMainchainID } = require('./mainchain');
 
 const getBlockchainAppsTable = () => getTableInstance(blockchainAppsTableSchema, MYSQL_ENDPOINT);
 
-let lskTokenID;
+let klyTokenID;
 
-const getLSKTokenID = async () => {
-	if (!lskTokenID) {
+const getKLYTokenID = async () => {
+	if (!klyTokenID) {
 		const mainchainID = await getMainchainID();
-		lskTokenID = mainchainID.substring(0, LENGTH_NETWORK_ID).padEnd(LENGTH_TOKEN_ID, '0');
+		klyTokenID = mainchainID.substring(0, LENGTH_NETWORK_ID).padEnd(LENGTH_TOKEN_ID, '0');
 	}
 
-	return lskTokenID;
+	return klyTokenID;
 };
 
 const getBlockchainApps = async params => {
@@ -96,18 +96,18 @@ const getBlockchainApps = async params => {
 	} = await getNetworkStatus();
 	const { escrowedAmounts } = await requestConnector('getEscrowedAmounts');
 
-	const tokenIdForLSK = await getLSKTokenID();
+	const tokenIdForKLY = await getKLYTokenID();
 	blockchainAppsInfo.data = await BluebirdPromise.map(
 		dbBlockchainApps,
 		async blockchainAppInfo => {
 			const escrow = escrowedAmounts.filter(e => e.escrowChainID === blockchainAppInfo.chainID);
 
-			const escrowEntryForLSKTokenID = escrow.find(item => item.tokenID === tokenIdForLSK);
-			const escrowedLSK = escrowEntryForLSKTokenID ? escrowEntryForLSKTokenID.amount : '0';
+			const escrowEntryForKLYTokenID = escrow.find(item => item.tokenID === tokenIdForKLY);
+			const escrowedKLY = escrowEntryForKLYTokenID ? escrowEntryForKLYTokenID.amount : '0';
 
 			return {
 				...blockchainAppInfo,
-				escrowedLSK,
+				escrowedKLY,
 				escrow: escrow.length
 					? escrow
 					: [
@@ -134,5 +134,5 @@ module.exports = {
 	getBlockchainApps,
 
 	// Testing
-	getLSKTokenID,
+	getKLYTokenID,
 };

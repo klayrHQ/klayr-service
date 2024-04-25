@@ -13,7 +13,7 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { Utils } = require('lisk-service-framework');
+const { Utils } = require('klayr-service-framework');
 
 let app;
 

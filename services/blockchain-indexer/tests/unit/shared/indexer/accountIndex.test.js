@@ -22,7 +22,7 @@ const config = require('../../../../config');
 const accountIndexFilePath = resolve(`${__dirname}/../../../../shared/indexer/accountIndex`);
 
 const mockPublicKey = '3972849f2ab66376a68671c10a00e8b8b67d880434cc65b04c6ed886dfa91c2c';
-const mockAddress = 'lskguo9kqnea2zsfo3a6qppozsxsg92nuuma3p7ad';
+const mockAddress = 'klyguo9kqnea2zsfo3a6qppozsxsg92nuuma3p7ad';
 
 jest.mock('../../../../shared/dataService/index', () => ({
 	getAccountsByAddress: jest.fn().mockResolvedValue([]),
@@ -35,11 +35,11 @@ describe('updateAccountInfoPk', () => {
 	});
 
 	it('should update the account information when upsert is successful', async () => {
-		// Mock lisk framework
-		jest.mock('lisk-service-framework', () => {
-			const actualLiskServiceFramework = jest.requireActual('lisk-service-framework');
+		// Mock klayr framework
+		jest.mock('klayr-service-framework', () => {
+			const actualKlayrServiceFramework = jest.requireActual('klayr-service-framework');
 			return {
-				...actualLiskServiceFramework,
+				...actualKlayrServiceFramework,
 				DB: {
 					MySQL: {
 						getTableInstance: jest.fn(() => ({
@@ -51,7 +51,7 @@ describe('updateAccountInfoPk', () => {
 							}),
 						})),
 						KVStore: {
-							...actualLiskServiceFramework.DB.MySQL.KVStore,
+							...actualKlayrServiceFramework.DB.MySQL.KVStore,
 							configureKeyValueTable: jest.fn(),
 							getKeyValueTable: jest.fn(),
 						},
@@ -74,11 +74,11 @@ describe('updateAccountInfoPk', () => {
 	});
 
 	it('should retry and add publicKey to pendingAccountsByPublicKey when upsert fails', async () => {
-		// Mock lisk framework
-		jest.mock('lisk-service-framework', () => {
-			const actualLiskServiceFramework = jest.requireActual('lisk-service-framework');
+		// Mock klayr framework
+		jest.mock('klayr-service-framework', () => {
+			const actualKlayrServiceFramework = jest.requireActual('klayr-service-framework');
 			return {
-				...actualLiskServiceFramework,
+				...actualKlayrServiceFramework,
 				DB: {
 					MySQL: {
 						getTableInstance: jest.fn(() => ({
@@ -87,7 +87,7 @@ describe('updateAccountInfoPk', () => {
 							}),
 						})),
 						KVStore: {
-							...actualLiskServiceFramework.DB.MySQL.KVStore,
+							...actualKlayrServiceFramework.DB.MySQL.KVStore,
 							configureKeyValueTable: jest.fn(),
 							getKeyValueTable: jest.fn(),
 						},
@@ -118,18 +118,18 @@ describe('updateAccountInfoPk', () => {
 	});
 
 	it('should retry and add publicKey to pendingAccountsByPublicKey when getTableInstance fails', async () => {
-		// Mock lisk framework
-		jest.mock('lisk-service-framework', () => {
-			const actualLiskServiceFramework = jest.requireActual('lisk-service-framework');
+		// Mock klayr framework
+		jest.mock('klayr-service-framework', () => {
+			const actualKlayrServiceFramework = jest.requireActual('klayr-service-framework');
 			return {
-				...actualLiskServiceFramework,
+				...actualKlayrServiceFramework,
 				DB: {
 					MySQL: {
 						getTableInstance: jest.fn(() => {
 							throw Error('error');
 						}),
 						KVStore: {
-							...actualLiskServiceFramework.DB.MySQL.KVStore,
+							...actualKlayrServiceFramework.DB.MySQL.KVStore,
 							configureKeyValueTable: jest.fn(),
 							getKeyValueTable: jest.fn(),
 						},
@@ -167,11 +167,11 @@ describe('updateAccountInfoAddr', () => {
 	});
 
 	it('should update the account information when upsert is successful', async () => {
-		// Mock lisk framework
-		jest.mock('lisk-service-framework', () => {
-			const actualLiskServiceFramework = jest.requireActual('lisk-service-framework');
+		// Mock klayr framework
+		jest.mock('klayr-service-framework', () => {
+			const actualKlayrServiceFramework = jest.requireActual('klayr-service-framework');
 			return {
-				...actualLiskServiceFramework,
+				...actualKlayrServiceFramework,
 				DB: {
 					MySQL: {
 						getTableInstance: jest.fn(() => ({
@@ -182,7 +182,7 @@ describe('updateAccountInfoAddr', () => {
 							}),
 						})),
 						KVStore: {
-							...actualLiskServiceFramework.DB.MySQL.KVStore,
+							...actualKlayrServiceFramework.DB.MySQL.KVStore,
 							configureKeyValueTable: jest.fn(),
 							getKeyValueTable: jest.fn(),
 						},
@@ -205,11 +205,11 @@ describe('updateAccountInfoAddr', () => {
 	});
 
 	it('should retry and add address to pendingAccountsByAddress when upsert fails', async () => {
-		// Mock lisk framework
-		jest.mock('lisk-service-framework', () => {
-			const actualLiskServiceFramework = jest.requireActual('lisk-service-framework');
+		// Mock klayr framework
+		jest.mock('klayr-service-framework', () => {
+			const actualKlayrServiceFramework = jest.requireActual('klayr-service-framework');
 			return {
-				...actualLiskServiceFramework,
+				...actualKlayrServiceFramework,
 				DB: {
 					MySQL: {
 						getTableInstance: jest.fn(() => ({
@@ -218,7 +218,7 @@ describe('updateAccountInfoAddr', () => {
 							}),
 						})),
 						KVStore: {
-							...actualLiskServiceFramework.DB.MySQL.KVStore,
+							...actualKlayrServiceFramework.DB.MySQL.KVStore,
 							configureKeyValueTable: jest.fn(),
 							getKeyValueTable: jest.fn(),
 						},
@@ -249,18 +249,18 @@ describe('updateAccountInfoAddr', () => {
 	});
 
 	it('should retry and add address to pendingAccountsByAddress when getTableInstance fails', async () => {
-		// Mock lisk framework
-		jest.mock('lisk-service-framework', () => {
-			const actualLiskServiceFramework = jest.requireActual('lisk-service-framework');
+		// Mock klayr framework
+		jest.mock('klayr-service-framework', () => {
+			const actualKlayrServiceFramework = jest.requireActual('klayr-service-framework');
 			return {
-				...actualLiskServiceFramework,
+				...actualKlayrServiceFramework,
 				DB: {
 					MySQL: {
 						getTableInstance: jest.fn(() => {
 							throw Error('error');
 						}),
 						KVStore: {
-							...actualLiskServiceFramework.DB.MySQL.KVStore,
+							...actualKlayrServiceFramework.DB.MySQL.KVStore,
 							configureKeyValueTable: jest.fn(),
 							getKeyValueTable: jest.fn(),
 						},

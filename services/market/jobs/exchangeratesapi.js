@@ -13,7 +13,7 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const logger = require('lisk-service-framework').Logger();
+const logger = require('klayr-service-framework').Logger();
 
 const config = require('../config');
 const { reload } = require('../shared/market/sources/exchangeratesapi');

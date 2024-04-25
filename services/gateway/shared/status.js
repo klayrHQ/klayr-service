@@ -46,7 +46,7 @@ const getStatus = async broker => {
 	const networkNodeVersion = Object.keys(version)[versionCount.indexOf(Math.max(...versionCount))];
 	return {
 		build: buildTimestamp,
-		description: 'Lisk Service Gateway',
+		description: 'Klayr Service Gateway',
 		name: packageJson.name,
 		version: packageJson.version,
 		networkNodeVersion,

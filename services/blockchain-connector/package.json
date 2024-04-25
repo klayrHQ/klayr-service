@@ -1,18 +1,18 @@
 {
-	"name": "lisk-service-blockchain-connector",
+	"name": "klayr-service-blockchain-connector",
 	"version": "0.7.7",
-	"description": "Lisk Service Blockchain Connector",
+	"description": "Klayr Service Blockchain Connector",
 	"keywords": [
-		"lisk",
+		"klayr",
 		"blockchain"
 	],
-	"homepage": "https://github.com/LiskHQ/lisk-service",
+	"homepage": "https://github.com/KlayrHQ/klayr-service",
 	"repository": {
 		"type": "git",
-		"url": "git@github.com:LiskHQ/lisk-service.git"
+		"url": "git@github.com:KlayrHQ/klayr-service.git"
 	},
 	"bugs": {
-		"url": "https://github.com/LiskHQ/lisk-service/issues"
+		"url": "https://github.com/KlayrHQ/klayr-service/issues"
 	},
 	"private": true,
 	"author": "Lisk Foundation <admin@lisk.com>, lightcurve GmbH <admin@lightcurve.io>",
@@ -30,17 +30,17 @@
 		"test:functional": "jest --config=jest.config.functional.js --detectOpenHandles --forceExit"
 	},
 	"dependencies": {
-		"@liskhq/lisk-api-client": "6.0.1",
-		"@liskhq/lisk-codec": "^0.5.0",
-		"@liskhq/lisk-cryptography": "4.0.0",
-		"@liskhq/lisk-transactions": "6.0.0",
-		"@liskhq/lisk-validator": "0.8.0",
+		"@klayr/api-client": "6.0.3",
+		"@klayr/codec": "^0.4.2",
+		"@klayr/cryptography": "4.0.2",
+		"@klayr/transactions": "6.0.2",
+		"@klayr/validator": "0.8.2",
 		"better-sqlite3": "^7.6.2",
 		"big-json": "^3.1.0",
 		"bluebird": "^3.7.2",
 		"ioredis": "^5.3.2",
 		"knex": "^2.4.0",
-		"lisk-service-framework": "https://github.com/LiskHQ/lisk-service/raw/de2ee1ac988ebd2fb150e637647640b25635c6d6/framework/dist/lisk-service-framework-1.6.15.tgz",
+		"klayr-service-framework": "https://github.com/klayrHQ/klayr-service/raw/development/framework/dist/klayr-service-framework-1.6.15.tgz",
 		"moment": "^2.29.4",
 		"signals": "^1.0.0",
 		"tar": "^6.1.11"

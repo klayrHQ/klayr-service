@@ -47,7 +47,7 @@ describe('getBlockchainApps', () => {
 			offset: 0,
 		};
 
-		jest.mock('lisk-service-framework', () => ({
+		jest.mock('klayr-service-framework', () => ({
 			DB: {
 				MySQL: {
 					getTableInstance: jest.fn(() => ({
@@ -83,7 +83,7 @@ describe('getBlockchainApps', () => {
 			offset: 0,
 		};
 
-		jest.mock('lisk-service-framework', () => ({
+		jest.mock('klayr-service-framework', () => ({
 			DB: {
 				MySQL: {
 					getTableInstance: jest.fn(() => ({
@@ -118,7 +118,7 @@ describe('getBlockchainApps', () => {
 			offset: 0,
 		};
 
-		jest.mock('lisk-service-framework', () => ({
+		jest.mock('klayr-service-framework', () => ({
 			DB: {
 				MySQL: {
 					getTableInstance: jest.fn(() => ({
@@ -153,7 +153,7 @@ describe('getBlockchainApps', () => {
 			offset: 0,
 		};
 
-		jest.mock('lisk-service-framework', () => ({
+		jest.mock('klayr-service-framework', () => ({
 			DB: {
 				MySQL: {
 					getTableInstance: jest.fn(() => ({
@@ -183,7 +183,7 @@ describe('getBlockchainApps', () => {
 	});
 });
 
-describe('getLSKTokenID', () => {
+describe('getKLYTokenID', () => {
 	beforeEach(() => {
 		jest.resetModules();
 		jest.clearAllMocks();
@@ -194,8 +194,8 @@ describe('getLSKTokenID', () => {
 			getMainchainID: jest.fn(() => mockedMainchainID),
 		}));
 
-		const { getLSKTokenID } = require(mockBlockchainAppsPath);
-		await expect(getLSKTokenID()).resolves.not.toThrow();
+		const { getKLYTokenID } = require(mockBlockchainAppsPath);
+		await expect(getKLYTokenID()).resolves.not.toThrow();
 	});
 
 	it('should throw an error if MainchainID is not found', async () => {
@@ -205,7 +205,7 @@ describe('getLSKTokenID', () => {
 			}),
 		}));
 
-		const { getLSKTokenID } = require(mockBlockchainAppsPath);
-		await expect(getLSKTokenID()).rejects.toThrow();
+		const { getKLYTokenID } = require(mockBlockchainAppsPath);
+		await expect(getKLYTokenID()).rejects.toThrow();
 	});
 });

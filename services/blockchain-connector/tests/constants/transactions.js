@@ -24,7 +24,7 @@ const transaction = Object.freeze({
 	],
 	params: {
 		amount: '1000000000000',
-		recipientAddress: 'lskv6v53emsaen6cwbbk226wusdpa6ojdonunka4x',
+		recipientAddress: 'klyv6v53emsaen6cwbbk226wusdpa6ojdonunka4x',
 		data: '',
 		tokenID: '0400000000000000',
 	},
@@ -43,7 +43,7 @@ const decodedTransaction = Object.freeze({
 	params: {
 		tokenID: '0400000000000000',
 		amount: '1000000000000',
-		recipientAddress: 'lskv6v53emsaen6cwbbk226wusdpa6ojdonunka4x',
+		recipientAddress: 'klyv6v53emsaen6cwbbk226wusdpa6ojdonunka4x',
 		data: '',
 	},
 	id: 'd96c777b67576ddf4cd933a97a60b4311881e68e3c8bef1393ac0020ec8a506c',

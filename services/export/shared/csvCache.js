@@ -15,7 +15,7 @@
  */
 const {
 	Exceptions: { NotFoundException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const FileStorage = require('./helpers/file');
 const S3Storage = require('./helpers/s3');

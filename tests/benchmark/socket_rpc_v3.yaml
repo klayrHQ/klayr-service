@@ -1,5 +1,5 @@
 config:
-  target: '{{ $processEnvironment.LISK_SERVICE_URL }}/rpc-v3'
+  target: '{{ $processEnvironment.KLAYR_SERVICE_URL }}/rpc-v3'
   phases:
     - duration: 15
       arrivalRate: 50
@@ -94,7 +94,7 @@ scenarios:
           data:
             {
               'method': 'get.export.transactions',
-              'address': 'lskxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht',
+              'address': 'klyxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht',
             }
 
   # Validator
@@ -106,7 +106,7 @@ scenarios:
           data:
             {
               'method': 'get.validator',
-              'params': { 'address': 'lskxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht' },
+              'params': { 'address': 'klyxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht' },
             }
 
   # Auth
@@ -118,7 +118,7 @@ scenarios:
           data:
             {
               'method': 'get.auth',
-              'params': { 'address': 'lskxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht' },
+              'params': { 'address': 'klyxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht' },
             }
 
   # Token
@@ -130,7 +130,7 @@ scenarios:
           data:
             {
               'method': 'get.token.balances',
-              'params': { 'address': 'lskxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht' },
+              'params': { 'address': 'klyxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht' },
             }
 
   - name: 'Check existence of an account for the specified token'
@@ -143,7 +143,7 @@ scenarios:
               'method': 'get.token.account.exists',
               'params':
                 {
-                  'address': 'lskxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht',
+                  'address': 'klyxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht',
                   'tokenID': '0400000000000000',
                 },
             }
@@ -270,7 +270,7 @@ scenarios:
           data:
             {
               'method': 'get.pos.rewards.claimable',
-              'params': { 'address': 'lskxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht' },
+              'params': { 'address': 'klyxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht' },
             }
 
   - name: 'Validator locked rewards'
@@ -281,7 +281,7 @@ scenarios:
           data:
             {
               'method': 'get.pos.rewards.locked',
-              'params': { 'address': 'lskxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht' },
+              'params': { 'address': 'klyxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht' },
             }
 
   - name: 'Stakers'
@@ -292,7 +292,7 @@ scenarios:
           data:
             {
               'method': 'get.pos.stakers',
-              'params': { 'address': 'lskxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht' },
+              'params': { 'address': 'klyxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht' },
             }
 
   - name: 'Stakes'
@@ -303,7 +303,7 @@ scenarios:
           data:
             {
               'method': 'get.pos.stakes',
-              'params': { 'address': 'lskxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht' },
+              'params': { 'address': 'klyxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht' },
             }
 
   - name: 'Unlocks'
@@ -314,7 +314,7 @@ scenarios:
           data:
             {
               'method': 'get.pos.unlocks',
-              'params': { 'address': 'lskxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht' },
+              'params': { 'address': 'klyxvhb3f52hye5huvyzbe6hoq2mrd4qrackdthht' },
             }
 
   - name: 'Validators'

@@ -13,11 +13,11 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { codec } = require('@liskhq/lisk-codec');
+const { codec } = require('@klayr/codec');
 const {
-	address: { getAddressFromLisk32Address },
-} = require('@liskhq/lisk-cryptography');
-const { validator } = require('@liskhq/lisk-validator');
+	address: { getAddressFromKlayr32Address },
+} = require('@klayr/cryptography');
+const { validator } = require('@klayr/validator');
 const { api } = require('../../../helpers/api');
 
 const { schemas } = require('./constants');
@@ -39,8 +39,8 @@ const parseInputBySchema = (input, schema) => {
 		if (schemaDataType === 'string') return String(input);
 		if (schemaDataType === 'boolean') return Boolean(input);
 		if (schemaDataType === 'bytes') {
-			if (schema.format === 'lisk32' && input.startsWith('lsk')) {
-				return getAddressFromLisk32Address(input);
+			if (schema.format === 'klayr32' && input.startsWith('kly')) {
+				return getAddressFromKlayr32Address(input);
 			}
 			return Buffer.from(input, 'hex');
 		}

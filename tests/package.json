@@ -1,19 +1,19 @@
 {
-	"name": "lisk-service-tests",
+	"name": "klayr-service-tests",
 	"version": "0.6.4",
-	"description": "Lisk Service Test Package",
+	"description": "Klayr Service Test Package",
 	"keywords": [
-		"lisk",
+		"klayr",
 		"service",
 		"blockchain"
 	],
-	"homepage": "https://github.com/LiskHQ/lisk-service",
+	"homepage": "https://github.com/KlayrHQ/klayr-service",
 	"repository": {
 		"type": "git",
-		"url": "git@github.com:LiskHQ/lisk-service.git"
+		"url": "git@github.com:KlayrHQ/klayr-service.git"
 	},
 	"bugs": {
-		"url": "https://github.com/LiskHQ/lisk-service/issues"
+		"url": "https://github.com/KlayrHQ/klayr-service/issues"
 	},
 	"private": true,
 	"author": "Lisk Foundation <admin@lisk.com>, lightcurve GmbH <admin@lightcurve.io>",
@@ -34,10 +34,10 @@
 		"start": "node app.js"
 	},
 	"dependencies": {
-		"@liskhq/lisk-client": "^6.0.0",
-		"@liskhq/lisk-codec": "^0.5.0",
-		"@liskhq/lisk-cryptography": "^4.0.0",
-		"@liskhq/lisk-validator": "^0.8.0",
+		"@klayr/client": "^6.0.2",
+		"@klayr/codec": "^0.4.2",
+		"@klayr/cryptography": "^4.0.2",
+		"@klayr/validator": "^0.8.2",
 		"async": "^3.2.3",
 		"chai": "^4.3.6",
 		"csv-parse": "^5.0.4",

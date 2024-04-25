@@ -1,9 +1,9 @@
-# Contributing to Lisk Service
+# Contributing to Klayr Service
 
 Firstly, many thanks for taking the time to contribute! :raised_hands:
 
-The following is a set of guidelines for contributing to Lisk Service, which
-are hosted in the [LiskHQ Organization](https://github.com/LiskHQ) on GitHub.
+The following is a set of guidelines for contributing to Klayr Service, which
+are hosted in the [KlayrHQ Organization](https://github.com/KlayrHQ) on GitHub.
 These are mostly guidelines, not rules. Use your best judgement, and feel free to
 propose changes to this document in a pull request.
 
@@ -27,33 +27,26 @@ propose changes to this document in a pull request.
 ## Code of Conduct
 
 This project and everyone participating in it is governed by the
-[Lisk Service Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are
+[Klayr Service Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are
 expected to uphold this code. Please report unacceptable behavior to
-[admin@lisk.com](mailto:admin@lisk.com).
+[admin@klayr.xyz](mailto:admin@klayr.xyz).
 
 ## Project License
 
-Every repository within LiskHQ comes with a LICENSE file. Please read it
+Every repository within KlayrHQ comes with a LICENSE file. Please read it
 carefully before commiting your code to one of the repositories.
 
 ## Help! I don’t want to read this whole thing, I just have a question. :mag_right:
 
-Lisk is an open-source decentralized project, there are many ways and platforms
+Klayr is an open-source decentralized project, there are many ways and platforms
 to get help. These are some of them:
 
-* [Discuss and Ask on Reddit](https://www.reddit.com/r/Lisk/)
-* [Lisk FAQ](https://docs.lisk.com/docs/faq)
-
-If you prefer to chat with LiskHQ and other developers directly:
-
-* [Join the LiskHQ Gitter](https://gitter.im/LiskHQ/lisk)
-* Even though Gitter is a chat service, sometimes it takes several hours for
-	community members to respond &mdash; please be patient!
+* [Klayr FAQ](https://docs.klayr.xyz/docs/faq)
 
 ## How Can I Contribute?
 
-LiskHQ uses GitHub as its sole source of truth. Everything happens here.
-Lightcurve employees who contribute to Lisk are expected to do so in the same
+KlayrHQ uses GitHub as its sole source of truth. Everything happens here.
+Klayr Labs employees who contribute to Klayr are expected to do so in the same
 way as everyone else. In other words, this document applies equally to all
 contributors.
 
@@ -71,7 +64,7 @@ In case you’ve never submitted a pull request (PR) via GitHub before, please
 read
 [this short tutorial](https://help.github.com/articles/creating-a-pull-request).
 If you’ve submitted a PR before, there should be nothing surprising about our
-procedures for Lisk.
+procedures for Klayr.
 
 _Before_ submitting a pull request, please make sure the following is done:
 
@@ -94,7 +87,7 @@ _Before_ submitting a pull request, please make sure the following is done:
 1. Ensure the test and linting suite passes (`yarn run prepush` runs both).
 	Follow the [JavaScript](https://github.com/airbnb/javascript) styleguide from
 	Airbnb with the
-	[lisk extension](https://github.com/LiskHQ/eslint-config-lisk-base).
+	[klayr extension](https://github.com/KlayrHQ/eslint-config-klayr-base).
 1. Format your code using [Prettier](https://prettier.io/). This can be performed manually
    with `yarn format`.
 1. Submit a pull request via GitHub. Include issue numbers in the PR title, at
@@ -105,7 +98,7 @@ _Before_ submitting a pull request, please make sure the following is done:
 
 ### Reporting Bugs
 
-This section guides you through submitting a bug report for Lisk Service.
+This section guides you through submitting a bug report for Klayr Service.
 Following these guidelines helps maintainers and the community understand your
 report :pencil:, reproduce the behavior :computer: :computer:, and find related
 reports :mag_right:.
@@ -123,12 +116,12 @@ helps us resolve issues faster.
 
 #### Before Submitting A Bug Report
 
-* **Check the [FAQs](https://docs.lisk.com/docs/faq)** for a list of common
+* **Check the [FAQs](https://docs.klayr.xyz/docs/faq)** for a list of common
 	questions and problems.
 * **Determine
-	[which repository the problem should be reported in](https://github.com/LiskHQ)**.
+	[which repository the problem should be reported in](https://github.com/KlayrHQ)**.
 * **Perform a
-	[cursory search](https://github.com/search?utf8=%E2%9C%93&q=+is%3Aissue+org%3ALiskHQ&type=)**
+	[cursory search](https://github.com/search?utf8=%E2%9C%93&q=+is%3Aissue+org%3AKlayrHQ&type=)**
 	to see if the problem has already been reported. If it has **and the issue is
 	still open**, add a comment to the existing issue instead of opening a new
 	one.
@@ -136,7 +129,7 @@ helps us resolve issues faster.
 #### How Do I Submit A (Good) Bug Report?
 
 Bugs are tracked as [GitHub issues](https://guides.github.com/features/issues/).
-After you’ve determined [which repository](https://github.com/LiskHQ) your bug
+After you’ve determined [which repository](https://github.com/KlayrHQ) your bug
 is related to, create an issue on that repository and provide the following
 information by filling in [the template](ISSUE_TEMPLATE.md).
 
@@ -168,19 +161,19 @@ the problem:
 Provide more context by answering these questions:
 
 * **Did the problem start happening recently** (e.g. after updating to a new
-	version of Lisk Service, Lisk or any other repository) or was this always a
+	version of Klayr Service, Klayr or any other repository) or was this always a
 	problem?
 * If the problem started happening recently, **can you reproduce the problem in
-	an older version of Lisk Service?** What’s the most recent version in which
-	the problem doesn’t happen? You can download older versions of Lisk Service
-	from [the releases page](https://github.com/LiskHQ/Lisk Service/releases).
+	an older version of Klayr Service?** What’s the most recent version in which
+	the problem doesn’t happen? You can download older versions of Klayr Service
+	from [the releases page](https://github.com/KlayrHQ/Klayr Service/releases).
 * **Can you reliably reproduce the issue?** If not, provide details about how
 	often the problem happens and under which conditions it normally occurs.
 
 ### Suggesting Enhancements
 
 This section guides you through submitting an enhancement suggestion for
-Lisk Service, including completely new features and minor improvements to
+Klayr Service, including completely new features and minor improvements to
 existing functionality. Following these guidelines helps maintainers and the
 community understand your suggestion :pencil: and find related suggestions
 :mag_right:.
@@ -193,7 +186,7 @@ you imagine you would take if the feature you’re requesting existed.
 
 Enhancement suggestions are tracked as
 [GitHub issues](https://guides.github.com/features/issues/). After you’ve
-determined [which repository](https://github.com/LiskHQ) your enhancement
+determined [which repository](https://github.com/KlayrHQ) your enhancement
 suggestion is related to, create an issue on that repository and provide the
 following information:
 
@@ -207,13 +200,13 @@ following information:
 * **Describe the current behavior** and **explain which behavior you expected to
 	see instead** and why.
 * **Include screenshots and animated GIFs** which help you demonstrate the steps
-	or point out the part of Lisk Service which the suggestion is related to. You
+	or point out the part of Klayr Service which the suggestion is related to. You
 	can use [this tool](http://www.cockos.com/licecap/) to record GIFs on macOS
 	and Windows, and [this tool](https://github.com/colinkeenan/silentcast) or
 	[this tool](https://github.com/GNOME/byzanz) on Linux.
-* **Explain why this enhancement would be useful** to most Lisk and
-	Lisk Service users.
-* **Specify which version of Lisk and Lisk Service you’re using.**
+* **Explain why this enhancement would be useful** to most Klayr and
+	Klayr Service users.
+* **Specify which version of Klayr and Klayr Service you’re using.**
 * **Specify the name and version of the OS you’re using.**
 
 ## Styleguides
@@ -227,11 +220,11 @@ following information:
 
 ### JavaScript Styleguide
 
-In Lisk Service we are using [Prettier](https://prettier.io/) and
+In Klayr Service we are using [Prettier](https://prettier.io/) and
 [ESLint](https://eslint.org/). Our ESLint style expands
 [Airbnb’s](https://github.com/airbnb/javascript) style settings and expresses
 some opinions not covered by Prettier’s formatting concerns. You can find more
-details here: https://github.com/LiskHQ/eslint-config-lisk-base
+details here: https://github.com/KlayrHQ/eslint-config-klayr-base
 
 These contribution guidelines were inspired by and are based on Atom’s
 contribution guidelines. They were modified for the purposes of this repository.

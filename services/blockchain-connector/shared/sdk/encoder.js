@@ -13,12 +13,12 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { codec } = require('@liskhq/lisk-codec');
-const { validator } = require('@liskhq/lisk-validator');
+const { codec } = require('@klayr/codec');
+const { validator } = require('@klayr/validator');
 const {
 	Logger,
 	Exceptions: { InvalidParamsException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { parseInputBySchema } = require('../utils/parser');
 const { getTransactionSchema, getTransactionParamsSchema, getCCMSchema } = require('./schema');

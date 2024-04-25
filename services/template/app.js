@@ -14,7 +14,7 @@
  *
  */
 const path = require('path');
-const { Microservice, LoggerConfig, Logger } = require('lisk-service-framework');
+const { Microservice, LoggerConfig, Logger } = require('klayr-service-framework');
 
 const config = require('./config');
 

@@ -20,8 +20,8 @@ const posValidatorsPath = path.resolve(
 	`${__dirname}/../../../../../shared/dataService/pos/validators`,
 );
 
-jest.mock('lisk-service-framework', () => {
-	const actual = jest.requireActual('lisk-service-framework');
+jest.mock('klayr-service-framework', () => {
+	const actual = jest.requireActual('klayr-service-framework');
 	return {
 		...actual,
 		DB: {

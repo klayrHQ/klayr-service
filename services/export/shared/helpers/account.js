@@ -13,14 +13,14 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { Logger, CacheLRU } = require('lisk-service-framework');
+const { Logger, CacheLRU } = require('klayr-service-framework');
 const {
 	utils: { hash },
-	address: { getLisk32AddressFromPublicKey: getLisk32AddressFromPublicKeyHelper },
+	address: { getKlayr32AddressFromPublicKey: getKlayr32AddressFromPublicKeyHelper },
 	legacyAddress: { getFirstEightBytesReversed },
-} = require('@liskhq/lisk-cryptography');
+} = require('@klayr/cryptography');
 
-const { PUBLIC_KEY, ADDRESS_LISK32 } = require('../regex');
+const { PUBLIC_KEY, ADDRESS_KLAYR32 } = require('../regex');
 const { requestAllCustom } = require('./requestAll');
 const { MODULE, MODULE_SUB_STORE } = require('./constants');
 const { requestConnector, requestIndexer } = require('./request');
@@ -33,19 +33,19 @@ const publicKeyCache = CacheLRU('publicKey', { max: NUM_MAX_CACHE_PUBLICKEY });
 let tokenModuleData;
 let loadingAssets = false;
 
-const validateLisk32Address = address =>
-	typeof address === 'string' && ADDRESS_LISK32.test(address);
+const validateKlayr32Address = address =>
+	typeof address === 'string' && ADDRESS_KLAYR32.test(address);
 
 const validatePublicKey = publicKey => typeof publicKey === 'string' && PUBLIC_KEY.test(publicKey);
 
-const getLisk32AddressFromPublicKey = publicKey =>
-	getLisk32AddressFromPublicKeyHelper(Buffer.from(publicKey, 'hex'));
+const getKlayr32AddressFromPublicKey = publicKey =>
+	getKlayr32AddressFromPublicKeyHelper(Buffer.from(publicKey, 'hex'));
 
 const getLegacyAddress = publicKey =>
 	getFirstEightBytesReversed(hash(Buffer.from(publicKey, 'hex'))).toString('hex');
 
 const getAddressFromParams = params =>
-	params.address || getLisk32AddressFromPublicKey(params.publicKey);
+	params.address || getKlayr32AddressFromPublicKey(params.publicKey);
 
 const checkIfAccountExists = async address => {
 	const response = await requestIndexer('token.account.exists', { address });
@@ -123,7 +123,7 @@ const getOpeningBalances = async address => {
 };
 
 const cachePublicKey = async publicKey => {
-	const address = getLisk32AddressFromPublicKey(publicKey);
+	const address = getKlayr32AddressFromPublicKey(publicKey);
 	await publicKeyCache.set(address, publicKey);
 };
 
@@ -135,9 +135,9 @@ const getPublicKeyByAddress = async address => {
 };
 
 module.exports = {
-	validateLisk32Address,
+	validateKlayr32Address,
 	validatePublicKey,
-	getLisk32AddressFromPublicKey,
+	getKlayr32AddressFromPublicKey,
 	getLegacyAddress,
 	getAddressFromParams,
 	checkIfAccountExists,

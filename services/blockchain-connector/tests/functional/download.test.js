@@ -44,7 +44,7 @@ describe('Functional tests for download utility', () => {
 	});
 
 	describe('Test downloadAndExtractTarball method', () => {
-		const [{ genesisBlockUrl }] = config.networks.LISK.filter(
+		const [{ genesisBlockUrl }] = config.networks.KLAYR.filter(
 			network => network.name === 'testnet',
 		);
 		it('should download and extract tar file -> valid url', async () => {
@@ -54,7 +54,7 @@ describe('Functional tests for download utility', () => {
 		});
 
 		it('should throw error -> invalid url', async () => {
-			const invalidUrl = 'https://downloads.lisk.com/lisk/testnet/genesis_block_invalid.json';
+			const invalidUrl = 'https://downloads.klayr.xyz/klayr/testnet/genesis_block_invalid.json';
 			expect(downloadAndExtractTarball(invalidUrl, testDir)).rejects.toThrow();
 		});
 
@@ -74,7 +74,7 @@ describe('Functional tests for download utility', () => {
 	describe('Test downloadJSONFile method', () => {
 		it('should download JSON file -> valid url', async () => {
 			const url =
-				'https://raw.githubusercontent.com/LiskHQ/lisk-service/development/services/gateway/apis/http-version3/swagger/apiJson.json';
+				'https://raw.githubusercontent.com/KlayrHQ/klayr-service/development/services/gateway/apis/http-version3/swagger/apiJson.json';
 			const filePath = `${testDir}/apiJson.json`;
 			expect(exists(filePath)).resolves.toBe(false);
 			await downloadJSONFile(url, filePath);
@@ -105,7 +105,7 @@ describe('Functional tests for download utility', () => {
 
 	describe('Test downloadAndUnzipFile method', () => {
 		it('should download and unzip file -> valid url', async () => {
-			const [{ genesisBlockUrl }] = config.networks.LISK.filter(
+			const [{ genesisBlockUrl }] = config.networks.KLAYR.filter(
 				network => network.name === 'testnet',
 			);
 			const filePath = `${testDir}/genesis_block.json`;
@@ -115,7 +115,7 @@ describe('Functional tests for download utility', () => {
 		});
 
 		it('should throw error -> invalid url', async () => {
-			const url = 'https://downloads.lisk.com/lisk/testnet/service-core-snapshot-invalid.sql.gz';
+			const url = 'https://downloads.klayr.xyz/klayr/testnet/service-core-snapshot-invalid.sql.gz';
 			const filePath = `${testDir}/service-core-snapshot-invalid.sql`;
 			expect(downloadAndUnzipFile(url, filePath)).rejects.toThrow();
 		});
@@ -139,7 +139,7 @@ describe('Functional tests for download utility', () => {
 	describe('Test downloadFile method', () => {
 		it('should download file -> valid url', async () => {
 			const url =
-				'https://raw.githubusercontent.com/LiskHQ/lisk-service/development/services/gateway/apis/http-version3/swagger/apiJson.json';
+				'https://raw.githubusercontent.com/KlayrHQ/klayr-service/development/services/gateway/apis/http-version3/swagger/apiJson.json';
 			const filePath = `${testDir}/apiJson.json`;
 			expect(exists(filePath)).resolves.toBe(false);
 			await downloadFile(url, testDir);
@@ -147,7 +147,7 @@ describe('Functional tests for download utility', () => {
 		});
 
 		it('should throw error -> invalid url', async () => {
-			const url = 'https://downloads.lisk.com/lisk/testnet/genesis_block.json';
+			const url = 'https://downloads.klayr.xyz/klayr/testnet/genesis_block.json';
 			expect(downloadFile(url, testDir)).rejects.toThrow();
 		});
 

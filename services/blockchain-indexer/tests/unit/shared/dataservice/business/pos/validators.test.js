@@ -30,7 +30,7 @@ jest.mock('../../../../../../shared/utils/request', () => ({
 	requestConnector: jest.fn(),
 }));
 
-jest.mock('lisk-service-framework', () => ({
+jest.mock('klayr-service-framework', () => ({
 	CacheRedis: jest.fn(() => ({
 		set: jest.fn(),
 		get: jest.fn(),

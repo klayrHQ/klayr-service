@@ -18,9 +18,9 @@ const {
 	DB: {
 		MySQL: { getTableInstance },
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
-const { getLisk32AddressFromPublicKey } = require('../../../utils/account');
+const { getKlayr32AddressFromPublicKey } = require('../../../utils/account');
 
 const config = require('../../../../config');
 
@@ -46,7 +46,7 @@ const applyTransaction = async (blockHeader, tx, events, dbTrx) => {
 	const validatorsTable = await getValidatorsTable();
 
 	const account = {
-		address: getLisk32AddressFromPublicKey(tx.senderPublicKey),
+		address: getKlayr32AddressFromPublicKey(tx.senderPublicKey),
 		publicKey: tx.senderPublicKey,
 		isValidator: true,
 		blsKey: tx.params.blsKey,
@@ -72,7 +72,7 @@ const revertTransaction = async (blockHeader, tx, events, dbTrx) => {
 
 	// Remove the validator details from the table on transaction reversal
 	const account = {
-		address: getLisk32AddressFromPublicKey(tx.senderPublicKey),
+		address: getKlayr32AddressFromPublicKey(tx.senderPublicKey),
 		publicKey: tx.senderPublicKey,
 		isValidator: true,
 		blsKey: null,

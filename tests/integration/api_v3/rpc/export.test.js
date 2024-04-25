@@ -40,7 +40,7 @@ describe('Export API', () => {
 	const startDate = moment('2023-01-10').format(exportConfig.excel.dateFormat);
 	const endDate = moment('2023-12-30').format(exportConfig.excel.dateFormat);
 
-	const mockAddress = 'lskguo9kqnea2zsfo3a6qppozsxsg92nuuma3p7ad';
+	const mockAddress = 'klyguo9kqnea2zsfo3a6qppozsxsg92nuuma3p7ad';
 	const mockPublicKey = '44e2b746594f74272d15b6f7d18dffbf83c749bbf1babc5f1d314bdbd08f8215';
 
 	describe('Schedule file export', () => {
@@ -118,7 +118,7 @@ describe('Export API', () => {
 
 		it('should return INVALID_PARAMS when invalid address', async () => {
 			const response = await requestTransactionExport({
-				address: 'lsknww5x4dv93x3euds4w72d99ouwnqojyw5qrm',
+				address: 'klynww5x4dv93x3euds4w72d99ouwnqojyw5qrm',
 				interval: `${startDate}:${endDate}`,
 			});
 			expect(response).toMap(invalidParamsSchema);
@@ -152,7 +152,7 @@ describe('Export API', () => {
 
 		it('should return INVALID_PARAMS when invalid address with interval', async () => {
 			const response = await requestTransactionExport({
-				address: 'lsknww5x4dv93x3euds4w72d99ouwnqojyw5qrm',
+				address: 'klynww5x4dv93x3euds4w72d99ouwnqojyw5qrm',
 				interval: `${startDate}:${endDate}`,
 			});
 			expect(response).toMap(invalidParamsSchema);

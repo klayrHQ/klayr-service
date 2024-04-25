@@ -14,7 +14,7 @@
  *
  */
 const crypto = require('crypto');
-const { HTTP, CacheRedis, Logger } = require('lisk-service-framework');
+const { HTTP, CacheRedis, Logger } = require('klayr-service-framework');
 
 const requestLib = HTTP.request;
 const logger = Logger();

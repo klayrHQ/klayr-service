@@ -17,7 +17,7 @@
 const privateKey =
 	'e655ee58490c66dee3f6761f3b69fdcb65def01615efcddde09c791d6fc2a5223972849f2ab66376a68671c10a00e8b8b67d880434cc65b04c6ed886dfa91c2c';
 const publicKey = '3972849f2ab66376a68671c10a00e8b8b67d880434cc65b04c6ed886dfa91c2c';
-const address = 'lskguo9kqnea2zsfo3a6qppozsxsg92nuuma3p7ad';
+const address = 'klyguo9kqnea2zsfo3a6qppozsxsg92nuuma3p7ad';
 const schemas = {
 	block: {
 		$id: '/block',
@@ -37,7 +37,7 @@ const schemas = {
 			timestamp: { dataType: 'uint32', fieldNumber: 2 },
 			height: { dataType: 'uint32', fieldNumber: 3 },
 			previousBlockID: { dataType: 'bytes', fieldNumber: 4 },
-			generatorAddress: { dataType: 'bytes', fieldNumber: 5, format: 'lisk32' },
+			generatorAddress: { dataType: 'bytes', fieldNumber: 5, format: 'klayr32' },
 			transactionRoot: { dataType: 'bytes', fieldNumber: 6 },
 			assetRoot: { dataType: 'bytes', fieldNumber: 7 },
 			eventRoot: { dataType: 'bytes', fieldNumber: 8 },
@@ -86,7 +86,7 @@ const schemas = {
 		},
 	},
 	transaction: {
-		$id: '/lisk/transaction',
+		$id: '/klayr/transaction',
 		type: 'object',
 		required: ['module', 'command', 'nonce', 'fee', 'senderPublicKey', 'params'],
 		properties: {
@@ -145,7 +145,7 @@ const schemas = {
 };
 
 const tokenTransferParamsSchema = {
-	$id: '/test/lisk/transferCommand',
+	$id: '/test/klayr/transferCommand',
 	title: 'Transfer transaction command',
 	type: 'object',
 	required: ['tokenID', 'amount', 'recipientAddress', 'data'],
@@ -161,7 +161,7 @@ const tokenTransferParamsSchema = {
 		recipientAddress: {
 			dataType: 'bytes',
 			fieldNumber: 3,
-			format: 'lisk32',
+			format: 'klayr32',
 		},
 		data: {
 			dataType: 'string',

@@ -202,8 +202,8 @@
 					"address": {
 						"type": "string",
 						"format": "address",
-						"example": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
-						"description": "The Lisk Address is the human-readable representation of a blockchain account.\nIt is 41 character long identifier that begins with `lsk`."
+						"example": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+						"description": "The Klayr Address is the human-readable representation of a blockchain account.\nIt is 41 character long identifier that begins with `kly`."
 					},
 					"publicKey": {
 						"type": "string",
@@ -224,12 +224,12 @@
 					"amount": {
 						"type": "string",
 						"example": "100003490",
-						"description": "Amount of Lisk (in Beddows) to be transferred in this transaction."
+						"description": "Amount of Klayr (in Beddows) to be transferred in this transaction."
 					},
 					"recipientAddress": {
 						"type": "string",
-						"example": "lskz4upsnrwk75wmfurf6kbxsne2nkjqd3yzwdaup",
-						"description": "The Lisk Address is the human-readable representation of a blockchain account.\nIt is a 41 characters long identifier that begins with `lsk`."
+						"example": "klyz4upsnrwk75wmfurf6kbxsne2nkjqd3yzwdaup",
+						"description": "The Klayr Address is the human-readable representation of a blockchain account.\nIt is a 41 characters long identifier that begins with `kly`."
 					},
 					"tokenID": {
 						"type": "string",
@@ -270,8 +270,8 @@
 							"address": {
 								"type": "string",
 								"format": "address",
-								"example": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
-								"description": "The Lisk Address is the human-readable representation of a blockchain account.\nIt is 41 character long identifier that begins with `lsk`."
+								"example": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+								"description": "The Klayr Address is the human-readable representation of a blockchain account.\nIt is 41 character long identifier that begins with `kly`."
 							},
 							"publicKey": {
 								"type": "string",
@@ -418,13 +418,13 @@
 						"properties": {
 							"recipientAddress": {
 								"type": "string",
-								"example": "lskz4upsnrwk75wmfurf6kbxsne2nkjqd3yzwdaup",
-								"description": "The Lisk Address is the human-readable representation of a blockchain account.\nIt is a 41 characters long identifier that begins with `lsk`."
+								"example": "klyz4upsnrwk75wmfurf6kbxsne2nkjqd3yzwdaup",
+								"description": "The Klayr Address is the human-readable representation of a blockchain account.\nIt is a 41 characters long identifier that begins with `kly`."
 							},
 							"amount": {
 								"type": "string",
 								"example": "10000000000",
-								"description": "Amount of Lisk (in Beddows) to be transferred in this transaction."
+								"description": "Amount of Klayr (in Beddows) to be transferred in this transaction."
 							},
 							"tokenID": {
 								"type": "string",
@@ -469,8 +469,8 @@
 									"properties": {
 										"senderAddress": {
 											"type": "string",
-											"example": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
-											"description": "The Lisk Address is the human-readable representation of a blockchain account.\nIt is a 41 characters long identifier that begins with `lsk`."
+											"example": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+											"description": "The Klayr Address is the human-readable representation of a blockchain account.\nIt is a 41 characters long identifier that begins with `kly`."
 										},
 										"tokenID": {
 											"type": "string",
@@ -484,8 +484,8 @@
 										},
 										"recipientAddress": {
 											"type": "string",
-											"example": "lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
-											"description": "The Lisk Address is the human-readable representation of a blockchain account.\nIt is a 41 characters long identifier that begins with `lsk`."
+											"example": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+											"description": "The Klayr Address is the human-readable representation of a blockchain account.\nIt is a 41 characters long identifier that begins with `kly`."
 										},
 										"result": {
 											"type": "integer",
@@ -512,9 +512,9 @@
 									},
 									"example": [
 										"86afcdd640846bf41525481938653ee942be3fac1ecbcff08e98f9aeda3a9583",
-										"lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+										"klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
 										"0000000000000000",
-										"lskdwsyfmcko6mcd357446yatromr9vzgu7eb8y99"
+										"klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99"
 									]
 								},
 								"height": {
@@ -598,8 +598,8 @@
 						"properties": {
 							"recipientAddress": {
 								"type": "string",
-								"example": "lskz4upsnrwk75wmfurf6kbxsne2nkjqd3yzwdaup",
-								"description": "The Lisk Address is the human-readable representation of a blockchain account.\nIt is a 41 characters long identifier that begins with `lsk`."
+								"example": "klyz4upsnrwk75wmfurf6kbxsne2nkjqd3yzwdaup",
+								"description": "The Klayr Address is the human-readable representation of a blockchain account.\nIt is a 41 characters long identifier that begins with `kly`."
 							},
 							"receivingChainID": {
 								"type": "string",

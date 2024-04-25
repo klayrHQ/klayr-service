@@ -20,7 +20,7 @@ const logger = Logger();
 
 const util = require('../util');
 
-const CONN_ENDPOINT_DEFAULT = 'mysql://lisk:password@127.0.0.1:3306/lisk';
+const CONN_ENDPOINT_DEFAULT = 'mysql://klayr:password@127.0.0.1:3306/klayr';
 
 const connectionPool = {};
 const tablePool = {};

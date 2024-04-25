@@ -14,7 +14,7 @@
  *
  */
 const path = require('path');
-const { Utils } = require('lisk-service-framework');
+const { Utils } = require('klayr-service-framework');
 const BluebirdPromise = require('bluebird');
 const { requireAllJson } = require('./utils');
 const config = require('../config');

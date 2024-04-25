@@ -17,7 +17,7 @@ const {
 	HTTP,
 	CacheRedis,
 	Exceptions: { ServiceUnavailableException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const BluebirdPromise = require('bluebird');
 
@@ -32,7 +32,7 @@ const expireMiliseconds = config.ttl.bittrex;
 const bittrexCache = CacheRedis('bittrex', config.endpoints.redis);
 
 const symbolMap = {
-	LSK_BTC: 'LSK-BTC',
+	KLY_BTC: 'KLY-BTC',
 	BTC_USD: 'BTC-USD',
 	BTC_EUR: 'BTC-EUR',
 };

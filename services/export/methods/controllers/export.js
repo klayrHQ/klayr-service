@@ -18,7 +18,7 @@ const {
 		StatusCodes: { NOT_FOUND },
 	},
 	Exceptions: { ServiceUnavailableException, NotFoundException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const exportService = require('../../shared/transactionsExport');
 

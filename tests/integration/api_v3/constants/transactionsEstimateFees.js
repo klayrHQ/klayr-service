@@ -29,7 +29,7 @@ const TOKEN_TRANSFER_TRANSACTION_OBJECT = {
 	command: 'transfer',
 	params: {
 		amount: '1000000000000',
-		recipientAddress: 'lskv6v53emsaen6cwbbk226wusdpa6ojdonunka4x',
+		recipientAddress: 'klyv6v53emsaen6cwbbk226wusdpa6ojdonunka4x',
 		data: '',
 		tokenID: '0400000000000000',
 	},
@@ -96,11 +96,11 @@ const POS_STAKE_TRANSACTION_OBJECT = {
 	params: {
 		stakes: [
 			{
-				validatorAddress: 'lskguo9kqnea2zsfo3a6qppozsxsg92nuuma3p7ad',
+				validatorAddress: 'klyguo9kqnea2zsfo3a6qppozsxsg92nuuma3p7ad',
 				amount: '1000000000000',
 			},
 			{
-				validatorAddress: 'lskx7rscmxc3k9yokbqpxspjj92zz6fue84e2xw92',
+				validatorAddress: 'klyx7rscmxc3k9yokbqpxspjj92zz6fue84e2xw92',
 				amount: '2000000000000',
 			},
 		],
@@ -126,7 +126,7 @@ const POS_CLAIM_REWARDS_TRANSACTION_OBJECT = {
 const LEGACY_RECLAIM_LSK = {
 	...ESTIMATE_FEES_BASE_TRANSACTION,
 	module: 'legacy',
-	command: 'reclaimLSK',
+	command: 'reclaimKLY',
 	params: {
 		amount: '1000000000000',
 	},
@@ -156,7 +156,7 @@ const transactionsMap = {
 	'pos:changeCommission': POS_CHANGE_COMMISSION_TRANSACTION_OBJECT,
 	'pos:claimRewards': POS_CLAIM_REWARDS_TRANSACTION_OBJECT,
 
-	'legacy:reclaimLSK': LEGACY_RECLAIM_LSK,
+	'legacy:reclaimKLY': LEGACY_RECLAIM_KLY,
 	'legacy:registerKeys': LEGACY_REGISTER_KEYS_TRANSACTION_OBJECT,
 };
 
@@ -177,7 +177,7 @@ module.exports = {
 	POS_CLAIM_REWARDS_TRANSACTION_OBJECT,
 
 	// Legacy
-	LEGACY_RECLAIM_LSK,
+	LEGACY_RECLAIM_KLY,
 	LEGACY_REGISTER_KEYS_TRANSACTION_OBJECT,
 
 	transactionsMap,

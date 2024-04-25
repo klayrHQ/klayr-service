@@ -18,7 +18,7 @@ const {
 		StatusCodes: { NOT_FOUND },
 	},
 	Exceptions: { NotFoundException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const dataService = require('../../../shared/dataService');
 

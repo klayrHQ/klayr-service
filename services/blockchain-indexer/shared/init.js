@@ -13,7 +13,7 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { Logger } = require('lisk-service-framework');
+const { Logger } = require('klayr-service-framework');
 
 const config = require('../config');
 

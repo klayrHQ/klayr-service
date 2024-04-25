@@ -16,7 +16,7 @@
 const {
 	HTTP: { StatusCodes },
 	Exceptions: { ValidationException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const {
 	buildAPIAliasesPrefix,
@@ -225,7 +225,7 @@ describe('Test buildAPIConfig method', () => {
 
 		it('should set $statusCode based on the data status', async () => {
 			// Mock the required modules and functions
-			jest.mock('lisk-service-framework');
+			jest.mock('klayr-service-framework');
 			jest.mock('../../../../gateway/shared/apiUtils');
 			jest.mock('../../../../gateway/shared/paramValidator');
 

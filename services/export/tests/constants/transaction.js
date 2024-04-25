@@ -15,7 +15,7 @@
  */
 const reclaimTransaction = {
 	id: '6cff643daaa2bd1112d1b4591abef3e62f9e4f6e37a260fcd7508ce6a06f061c',
-	moduleCommand: 'legacy:reclaimLSK',
+	moduleCommand: 'legacy:reclaimKLY',
 	fee: '119000',
 	minFee: '165000',
 	size: 165,
@@ -27,7 +27,7 @@ const reclaimTransaction = {
 		isFinal: true,
 	},
 	sender: {
-		address: 'lskqz6gpqfu9tb5yc2jtqmqvqp3x8ze35g99u2zfd',
+		address: 'klyqz6gpqfu9tb5yc2jtqmqvqp3x8ze35g99u2zfd',
 		publicKey: '10bdf57ee21ff657ab617395acab81814c3983f608bf6f0be6e626298225331d',
 		name: null,
 	},
@@ -49,14 +49,14 @@ const tokenTransferTransaction = {
 	minFee: '165000',
 	size: 165,
 	sender: {
-		address: 'lskxud8mwmw4et3zhrr6cee9q4d8thhe2b3x6yqdp',
+		address: 'klyxud8mwmw4et3zhrr6cee9q4d8thhe2b3x6yqdp',
 		publicKey: '1a315a7c7ccfb44ee0730f22cac4370307a7ef29710b938cff52e653cac753ad',
 		name: null,
 	},
 	params: {
 		tokenID: '0400000000000000',
 		amount: '1200000000',
-		recipientAddress: 'lskguo9kqnea2zsfo3a6qppozsxsg92nuuma3p7ad',
+		recipientAddress: 'klyguo9kqnea2zsfo3a6qppozsxsg92nuuma3p7ad',
 		data: '',
 	},
 	block: {
@@ -67,7 +67,7 @@ const tokenTransferTransaction = {
 	},
 	meta: {
 		recipient: {
-			address: 'lskguo9kqnea2zsfo3a6qppozsxsg92nuuma3p7ad',
+			address: 'klyguo9kqnea2zsfo3a6qppozsxsg92nuuma3p7ad',
 			publicKey: '3972849f2ab66376a68671c10a00e8b8b67d880434cc65b04c6ed886dfa91c2c',
 			name: 'genesis_0',
 		},
@@ -84,14 +84,14 @@ const tokenTransferTransactionSelf = {
 	minFee: '165000',
 	size: 165,
 	sender: {
-		address: 'lskxud8mwmw4et3zhrr6cee9q4d8thhe2b3x6yqdp',
+		address: 'klyxud8mwmw4et3zhrr6cee9q4d8thhe2b3x6yqdp',
 		publicKey: '1a315a7c7ccfb44ee0730f22cac4370307a7ef29710b938cff52e653cac753ad',
 		name: null,
 	},
 	params: {
 		tokenID: '0400000000000000',
 		amount: '1200000000',
-		recipientAddress: 'lskxud8mwmw4et3zhrr6cee9q4d8thhe2b3x6yqdp',
+		recipientAddress: 'klyxud8mwmw4et3zhrr6cee9q4d8thhe2b3x6yqdp',
 		data: '',
 	},
 	block: {
@@ -102,7 +102,7 @@ const tokenTransferTransactionSelf = {
 	},
 	meta: {
 		recipient: {
-			address: 'lskxud8mwmw4et3zhrr6cee9q4d8thhe2b3x6yqdp',
+			address: 'klyxud8mwmw4et3zhrr6cee9q4d8thhe2b3x6yqdp',
 			publicKey: '1a315a7c7ccfb44ee0730f22cac4370307a7ef29710b938cff52e653cac753ad',
 			name: 'genesis_0',
 		},
@@ -119,14 +119,14 @@ const stakeTransaction = {
 	minFee: '151000',
 	size: 152,
 	sender: {
-		address: 'lskcgfpjvt23ygspv2fx4s8o3p2dfhm7grmqxpzx3',
+		address: 'klycgfpjvt23ygspv2fx4s8o3p2dfhm7grmqxpzx3',
 		publicKey: '8f2027e3a7416e352aef5f9f204a18f70bb6c75148eb761eaf7d9950038aebb5',
 		name: 'genesis_20',
 	},
 	params: {
 		stakes: [
 			{
-				validatorAddress: 'lskcgfpjvt23ygspv2fx4s8o3p2dfhm7grmqxpzx3',
+				validatorAddress: 'klycgfpjvt23ygspv2fx4s8o3p2dfhm7grmqxpzx3',
 				amount: '100000000000',
 			},
 		],
@@ -149,7 +149,7 @@ const tokenTransferCrossChainTransaction = {
 	minFee: '217000',
 	size: 218,
 	sender: {
-		address: 'lskguo9kqnea2zsfo3a6qppozsxsg92nuuma3p7ad',
+		address: 'klyguo9kqnea2zsfo3a6qppozsxsg92nuuma3p7ad',
 		publicKey: '3972849f2ab66376a68671c10a00e8b8b67d880434cc65b04c6ed886dfa91c2c',
 		name: 'genesis_0',
 	},
@@ -157,7 +157,7 @@ const tokenTransferCrossChainTransaction = {
 		tokenID: '0400000000000000',
 		amount: '100000000000',
 		receivingChainID: '04000001',
-		recipientAddress: 'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+		recipientAddress: 'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 		data: 'Cross chain transfer',
 		messageFee: '10000000',
 		messageFeeTokenID: '0400000000000000',
@@ -170,7 +170,7 @@ const tokenTransferCrossChainTransaction = {
 	},
 	meta: {
 		recipient: {
-			address: 'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+			address: 'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 		},
 	},
 	executionStatus: 'successful',
@@ -191,7 +191,7 @@ const posClaimedRewards = {
 		isFinal: true,
 	},
 	sender: {
-		address: 'lskmg3sdmjp4smz6x9k2cuyuwags5ehgtexe4w2ds',
+		address: 'klymg3sdmjp4smz6x9k2cuyuwags5ehgtexe4w2ds',
 		publicKey: 'f0fda0461215e4e63a68d12c79d293833c32519cfe3a5e01ca08b0a0a7493de5',
 		name: null,
 	},
@@ -217,7 +217,7 @@ const transferCrossChain = {
 		isFinal: true,
 	},
 	sender: {
-		address: 'lsk56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
+		address: 'kly56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
 		publicKey: '344c75738c096e4bd94459fe81eba45503382181d003a9d2c8be75a2f38b49fa',
 		name: null,
 	},
@@ -225,7 +225,7 @@ const transferCrossChain = {
 		tokenID: '0400000000000000',
 		amount: '100000000',
 		receivingChainID: '04000002',
-		recipientAddress: 'lsk56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
+		recipientAddress: 'kly56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
 		data: '',
 		messageFee: '109000',
 		messageFeeTokenID: '0400000000000000',
@@ -237,7 +237,7 @@ const transferCrossChain = {
 	index: 0,
 	meta: {
 		recipient: {
-			address: 'lsk56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
+			address: 'kly56p8e53k3kar8epeqwpbxa2yd4urn8ouzhfvgs',
 			publicKey: '344c75738c096e4bd94459fe81eba45503382181d003a9d2c8be75a2f38b49fa',
 			name: null,
 		},
@@ -258,7 +258,7 @@ const submitMainchainCrossChainUpdate = {
 		isFinal: true,
 	},
 	sender: {
-		address: 'lskcd7tbbhkyebmg2fhdd4w4omvnfhzp5rb7wmz4d',
+		address: 'klycd7tbbhkyebmg2fhdd4w4omvnfhzp5rb7wmz4d',
 		publicKey: 'b5e96c1a5ab6f9d96eb08360cbfe4f1d8826591c515d307b9b9eeb1567a19013',
 		name: null,
 	},
@@ -302,7 +302,7 @@ const reportMisbehavior = {
 		isFinal: true,
 	},
 	sender: {
-		address: 'lskhtpeyg2944gcjwubrc7vwp52qoshtu4fs9wmfn',
+		address: 'klyhtpeyg2944gcjwubrc7vwp52qoshtu4fs9wmfn',
 		publicKey: 'd1d951c46376e108bab5e7a9f1dce725bb33f9823442a4a34841b6774bbb5b2f',
 		name: 'pom',
 	},

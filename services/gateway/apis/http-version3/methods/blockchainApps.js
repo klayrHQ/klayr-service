@@ -62,7 +62,7 @@ module.exports = {
 		);
 		blockchainAppsSchema[this.swaggerApiPath].get.responses = {
 			200: {
-				description: 'Returns a list of blockchain applications in the Lisk ecosystem',
+				description: 'Returns a list of blockchain applications in the Klayr ecosystem',
 				schema: {
 					$ref: '#/definitions/BlockchainAppsWithEnvelope',
 				},

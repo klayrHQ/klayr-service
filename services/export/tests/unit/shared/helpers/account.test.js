@@ -15,7 +15,7 @@
  */
 const { resolve } = require('path');
 
-const delay = require('lisk-service-framework/src/delay');
+const delay = require('klayr-service-framework/src/delay');
 const { valid, invalid } = require('../../../constants/account');
 const { transactions } = require('../../../constants/transaction');
 
@@ -26,17 +26,17 @@ beforeEach(() => jest.resetModules());
 
 describe('Account utils', () => {
 	describe('Validate address', () => {
-		it('returns true for valid Lisk32 address', async () => {
-			const { validateLisk32Address } = require('../../../../shared/helpers/account');
+		it('returns true for valid Klayr32 address', async () => {
+			const { validateKlayr32Address } = require('../../../../shared/helpers/account');
 
-			const isValid = validateLisk32Address(valid.address);
+			const isValid = validateKlayr32Address(valid.address);
 			expect(isValid).toBe(true);
 		});
 
-		it('returns false for invalid Lisk32 address', async () => {
-			const { validateLisk32Address } = require('../../../../shared/helpers/account');
+		it('returns false for invalid Klayr32 address', async () => {
+			const { validateKlayr32Address } = require('../../../../shared/helpers/account');
 
-			const isInvalid = validateLisk32Address(invalid.address);
+			const isInvalid = validateKlayr32Address(invalid.address);
 			expect(isInvalid).toBe(false);
 		});
 	});
@@ -58,16 +58,16 @@ describe('Account utils', () => {
 	});
 
 	describe('Extract address from a valid publicKey', () => {
-		it('returns correct Lisk32 address from a valid publicKey', async () => {
-			const { getLisk32AddressFromPublicKey } = require('../../../../shared/helpers/account');
+		it('returns correct Klayr32 address from a valid publicKey', async () => {
+			const { getKlayr32AddressFromPublicKey } = require('../../../../shared/helpers/account');
 
-			const address = getLisk32AddressFromPublicKey(valid.publicKey);
+			const address = getKlayr32AddressFromPublicKey(valid.publicKey);
 			expect(address).toBe(valid.address);
 		});
 	});
 
 	describe('Test getAddressFromParams method', () => {
-		const address = 'lskpg7qukha2nmu9483huwk8oty7q3pyevh3bohr4';
+		const address = 'klypg7qukha2nmu9483huwk8oty7q3pyevh3bohr4';
 		const publicKey = '86cbecb2a176934e454f63e7ffa05783be6960d90002c5558dfd31397cd8f020';
 
 		it('should return address from address in params', async () => {
@@ -98,7 +98,7 @@ describe('Account utils', () => {
 			const { checkIfAccountExists } = require('../../../../shared/helpers/account');
 
 			const isAccountExists = await checkIfAccountExists(
-				'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+				'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 			);
 			expect(isAccountExists).toEqual(true);
 		});
@@ -117,7 +117,7 @@ describe('Account utils', () => {
 			const { checkIfAccountHasTransactions } = require('../../../../shared/helpers/account');
 
 			const isAccountHasTransactions = await checkIfAccountHasTransactions(
-				'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+				'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 			);
 			expect(isAccountHasTransactions).toEqual(true);
 		});
@@ -134,7 +134,7 @@ describe('Account utils', () => {
 			const { checkIfAccountHasTransactions } = require('../../../../shared/helpers/account');
 
 			const isAccountHasTransactions = await checkIfAccountHasTransactions(
-				'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+				'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 			);
 			expect(isAccountHasTransactions).toEqual(false);
 		});
@@ -152,7 +152,7 @@ describe('Account utils', () => {
 						totalStake: '0',
 						selfStake: '0',
 						validatorWeight: '0',
-						address: 'lsk3j2dfuw4rsfsbcftwy838hd9vagmu2emype9do',
+						address: 'kly3j2dfuw4rsfsbcftwy838hd9vagmu2emype9do',
 						publicKey: '750b2fa94026d29b8ef49d8e00ceb1b0d31107914e327d3c8f45d61b6afef370',
 					},
 				],
@@ -162,7 +162,7 @@ describe('Account utils', () => {
 			const { checkIfAccountIsValidator } = require('../../../../shared/helpers/account');
 
 			const isAccountValidator = await checkIfAccountIsValidator(
-				'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+				'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 			);
 			expect(isAccountValidator).toEqual(true);
 		});
@@ -179,7 +179,7 @@ describe('Account utils', () => {
 			const { checkIfAccountIsValidator } = require('../../../../shared/helpers/account');
 
 			const isAccountValidator = await checkIfAccountIsValidator(
-				'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+				'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 			);
 			expect(isAccountValidator).toEqual(false);
 		});
@@ -189,7 +189,7 @@ describe('Account utils', () => {
 		it('should return opening balances when called with valid address', async () => {
 			const mockUserSubstore = [
 				{
-					address: 'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+					address: 'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 					availableBalance: '100000000000000',
 					lockedBalances: [],
 					tokenID: '0400000000000000',
@@ -203,7 +203,7 @@ describe('Account utils', () => {
 
 			const { getOpeningBalances } = require('../../../../shared/helpers/account');
 
-			const openingBalance = await getOpeningBalances('lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo');
+			const openingBalance = await getOpeningBalances('klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo');
 			const expectedResponse = [
 				{
 					tokenID: '0400000000000000',
@@ -229,7 +229,7 @@ describe('Account utils', () => {
 		it('should return token balances at genesis', async () => {
 			const mockUserSubstore = [
 				{
-					address: 'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+					address: 'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 					availableBalance: '100000000000000',
 					lockedBalances: [],
 					tokenID: '0400000000000000',
@@ -263,7 +263,7 @@ describe('Account utils', () => {
 			const expectedResponse2 = [
 				{
 					tokenID: '0400000000000000',
-					address: 'lskyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
+					address: 'klyyvvam5rxyvbvofxbdfcupxetzmqxu22phm4yuo',
 					availableBalance: '100000000000000',
 					lockedBalances: [],
 				},

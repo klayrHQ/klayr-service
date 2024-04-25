@@ -1,6 +1,6 @@
-# Lisk Service App Framework
+# Klayr Service App Framework
 
-Lisk Service Framework is made for quick development of Micoservice-based applications with minimal requirements.
+Klayr Service Framework is made for quick development of Micoservice-based applications with minimal requirements.
 
 It has the following features built-in:
 
@@ -16,7 +16,7 @@ All modules can be easily replaced by other libraries when needed.
 Set the target URL to the desired tarball distribution permalink.
 
 ```
-yarn install https://github.com/LiskHQ/lisk-service/raw/d63fb9be0e01a28ea8dc5f87a2d1b70a61650dda/framework/dist/lisk-service-framework-1.4.22.tgz
+yarn install https://github.com/klayrhq/klayr-service/raw/d63fb9be0e01a28ea8dc5f87a2d1b70a61650dda/framework/dist/klayr-service-framework-1.4.22.tgz
 ```
 
 ## Quick Start
@@ -26,7 +26,7 @@ Alternatively NATS can be used.
 
 ```javascript
 // app.js - main application loader
-const { Microservice, LoggerConfig, Logger } = require('lisk-service-framework');
+const { Microservice, LoggerConfig, Logger } = require('klayr-service-framework');
 
 // Configure logger
 LoggerConfig({
@@ -41,7 +41,7 @@ const logger = Logger('test-microservice');
 // Initialize Microservice framework
 const app = Microservice({
 	name: 'test',
-	transporter: 'redis://lisk:password@127.0.0.1:6379',
+	transporter: 'redis://klayr:password@127.0.0.1:6379',
 	logger: Logger('test-moleculer'),
 });
 
@@ -65,7 +65,7 @@ app
 	});
 ```
 
-Browse the Lisk Service Template repo for more examples.
+Browse the Klayr Service Template repo for more examples.
 
 ## Docs
 
@@ -91,4 +91,4 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-[lisk documentation site]: https://lisk.com/documentation
+[klayr documentation site]: https://klayr.xyz/documentation

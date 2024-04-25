@@ -24,7 +24,7 @@ const {
 	Logger,
 	Exceptions: { NotFoundException },
 	HTTP: { request },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { read, exists } = require('./fs');
 

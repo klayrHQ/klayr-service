@@ -18,9 +18,9 @@ const {
 	DB: {
 		MySQL: { getTableInstance },
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
-const { getLisk32AddressFromPublicKey } = require('../../../utils/account');
+const { getKlayr32AddressFromPublicKey } = require('../../../utils/account');
 
 const config = require('../../../../config');
 
@@ -47,7 +47,7 @@ const applyTransaction = async (blockHeader, tx, events, dbTrx) => {
 		chainID: tx.params.chainID,
 		chainName: tx.params.name,
 		status: chainInfo.status,
-		address: getLisk32AddressFromPublicKey(tx.senderPublicKey),
+		address: getKlayr32AddressFromPublicKey(tx.senderPublicKey),
 		lastUpdated: blockHeader.timestamp,
 		lastCertificateHeight: blockHeader.height,
 	};

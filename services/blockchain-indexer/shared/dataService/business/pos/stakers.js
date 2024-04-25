@@ -19,12 +19,12 @@ const {
 	DB: {
 		MySQL: { getTableInstance },
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const config = require('../../../../config');
 const stakesTableSchema = require('../../../database/schema/stakes');
 
-const { getLisk32AddressFromPublicKey } = require('../../../utils/account');
+const { getKlayr32AddressFromPublicKey } = require('../../../utils/account');
 
 const { getIndexedAccountInfo, getAccountsTable } = require('../../utils/account');
 const { indexAccountPublicKey } = require('../../../indexer/accountIndex');
@@ -58,7 +58,7 @@ const getStakers = async params => {
 		const { publicKey, ...remParams } = params;
 		params = remParams;
 
-		const address = getLisk32AddressFromPublicKey(publicKey);
+		const address = getKlayr32AddressFromPublicKey(publicKey);
 
 		params.validatorAddress = address;
 		stakersResponse.meta.validator.address = params.validatorAddress;

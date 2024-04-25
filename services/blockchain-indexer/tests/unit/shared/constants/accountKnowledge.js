@@ -1,7 +1,7 @@
 const mockedValidKnowledge = {
 	data: {
 		address1: {
-			owner: 'LiskHQ',
+			owner: 'KlayrHQ',
 			description: 'Initial seed',
 		},
 		address2: {

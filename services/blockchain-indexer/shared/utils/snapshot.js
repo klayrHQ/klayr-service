@@ -26,7 +26,7 @@ const {
 	},
 	Logger,
 	Exceptions: { NotFoundException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 const config = require('../../config');
 const execInShell = util.promisify(require('child_process').exec);
 const { requestConnector } = require('./request');
@@ -208,7 +208,7 @@ const initSnapshot = async () => {
 	}
 
 	const { chainID } = await requestConnector('getNetworkStatus');
-	const network = config.networks.LISK.find(networkInfo => networkInfo.chainID === chainID);
+	const network = config.networks.KLAYR.find(networkInfo => networkInfo.chainID === chainID);
 
 	snapshotFilePath = `./data/${network.name}/service-snapshot.sql`;
 	let { snapshotUrl } = network;

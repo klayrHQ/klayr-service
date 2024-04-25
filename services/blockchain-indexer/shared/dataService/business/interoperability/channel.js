@@ -16,7 +16,7 @@
 const {
 	HTTP,
 	Exceptions: { ValidationException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { getCurrentChainID, isMainchain } = require('./chain');
 const regex = require('../../../regex');
@@ -30,7 +30,7 @@ const resolveMainchainServiceURL = async () => {
 	const chainID = await getCurrentChainID();
 	const networkID = chainID.substring(0, LENGTH_NETWORK_ID);
 	const mainchainID = networkID.padEnd(LENGTH_CHAIN_ID, '0');
-	const [{ serviceURL } = {}] = config.networks.LISK.filter(
+	const [{ serviceURL } = {}] = config.networks.KLAYR.filter(
 		networkInfo => networkInfo.chainID === mainchainID,
 	);
 	return serviceURL;

@@ -19,8 +19,8 @@ const {
 	HTTP,
 	Exceptions: { TimeoutException },
 	Utils: { delay, isObject, waitForIt },
-} = require('lisk-service-framework');
-const { createWSClient, createIPCClient } = require('@liskhq/lisk-api-client');
+} = require('klayr-service-framework');
+const { createWSClient, createIPCClient } = require('@klayr/api-client');
 
 const crypto = require('crypto');
 
@@ -29,8 +29,8 @@ const config = require('../../config');
 const logger = Logger();
 
 // Connection strings
-const liskAddressWs = config.endpoints.liskWs;
-const liskAddressHttp = config.endpoints.liskHttp;
+const klayrAddressWs = config.endpoints.klayrWs;
+const klayrAddressHttp = config.endpoints.klayrHttp;
 
 // Constants
 const ERROR_CONN_REFUSED = 'ECONNREFUSED';
@@ -95,10 +95,10 @@ const pingListener = apiClient => {
 const instantiateNewClient = async () => {
 	clientInstantiationStats.attempts++;
 	try {
-		const newClient = config.isUseLiskIPCClient
-			? await createIPCClient(config.liskAppDataPath)
+		const newClient = config.isUseKlayrIPCClient
+			? await createIPCClient(config.klayrAppDataPath)
 			: await (async () => {
-					const client = await createWSClient(`${liskAddressWs}/rpc-ws`);
+					const client = await createWSClient(`${klayrAddressWs}/rpc-ws`);
 					client._channel._ws.on('ping', pingListener.bind(null, client));
 					return client;
 			  })();
@@ -107,9 +107,9 @@ const instantiateNewClient = async () => {
 		return newClient;
 	} catch (err) {
 		clientInstantiationStats.fail++;
-		const errMessage = config.isUseLiskIPCClient
-			? `Error instantiating IPC client at ${config.liskAppDataPath}`
-			: `Error instantiating WS client to ${liskAddressWs}`;
+		const errMessage = config.isUseKlayrIPCClient
+			? `Error instantiating IPC client at ${config.klayrAppDataPath}`
+			: `Error instantiating WS client to ${klayrAddressWs}`;
 
 		logger.error(`${errMessage}: ${err.message}`);
 		if (err.message.includes(ERROR_CONN_REFUSED)) {
@@ -271,7 +271,7 @@ const invokeEndpoint = async (endpoint, params = {}, numRetries = NUM_REQUEST_RE
 		try {
 			requestCount++;
 			if (config.isUseHttpApi) {
-				// HTTP API-based communication with the Lisk app node
+				// HTTP API-based communication with the Klayr app node
 				const rpcRequest = {
 					jsonrpc: '2.0',
 					id: requestCount,
@@ -279,11 +279,11 @@ const invokeEndpoint = async (endpoint, params = {}, numRetries = NUM_REQUEST_RE
 					params,
 				};
 
-				const response = await HTTP.post(`${liskAddressHttp}/rpc`, rpcRequest);
+				const response = await HTTP.post(`${klayrAddressHttp}/rpc`, rpcRequest);
 				return buildHTTPResponse(endpoint, params, response);
 			}
 
-			// WS and IPC client-based communication with the Lisk app node
+			// WS and IPC client-based communication with the Klayr app node
 			const apiClient = await getApiClient();
 			const response = await apiClient._channel.invoke(endpoint, params);
 			return response;

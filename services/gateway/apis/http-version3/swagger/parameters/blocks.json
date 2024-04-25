@@ -11,7 +11,7 @@
 	"generatorAddress": {
 		"name": "generatorAddress",
 		"in": "query",
-		"description": "Lisk account address",
+		"description": "Klayr account address",
 		"type": "string",
 		"format": "address",
 		"minLength": 41,

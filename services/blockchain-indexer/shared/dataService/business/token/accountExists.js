@@ -16,7 +16,7 @@
 const { requestConnector } = require('../../../utils/request');
 const { getAddressByName } = require('../../utils/validator');
 
-const { getLisk32AddressFromPublicKey } = require('../../../utils/account');
+const { getKlayr32AddressFromPublicKey } = require('../../../utils/account');
 const { getAvailableTokenIDs } = require('./availableIDs');
 
 const tokenHasUserAccount = async params => {
@@ -34,7 +34,7 @@ const tokenHasUserAccount = async params => {
 	}
 
 	if (!address && params.publicKey) {
-		address = getLisk32AddressFromPublicKey(params.publicKey);
+		address = getKlayr32AddressFromPublicKey(params.publicKey);
 	}
 
 	// Check existence if address found. Return false otherwise

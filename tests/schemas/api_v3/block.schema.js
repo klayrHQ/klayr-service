@@ -19,7 +19,7 @@ import regex from './regex';
 const EMPTY_STRING = '';
 
 const generator = {
-	address: Joi.string().pattern(regex.ADDRESS_LISK32).required(),
+	address: Joi.string().pattern(regex.ADDRESS_KLAYR32).required(),
 	publicKey: Joi.string().pattern(regex.PUBLIC_KEY).allow(null).optional(),
 	name: Joi.string().pattern(regex.NAME).allow(null).optional(),
 };

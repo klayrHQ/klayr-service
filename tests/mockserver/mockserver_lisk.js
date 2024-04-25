@@ -3,25 +3,25 @@ const httpProxy = require('http-proxy');
 const mockserver = require('mockserver');
 const log4js = require('log4js');
 const socketIo = require('socket.io');
-const blocks = require('./lisk_ws_mocks/blocksChange.json');
-const transactions = require('./lisk_ws_mocks/transactionsChange.json');
-const rounds = require('./lisk_ws_mocks/roundsChange.json');
+const blocks = require('./klayr_ws_mocks/blocksChange.json');
+const transactions = require('./klayr_ws_mocks/transactionsChange.json');
+const rounds = require('./klayr_ws_mocks/roundsChange.json');
 
 const logger = log4js.getLogger();
 logger.level = 'info';
 
 const proxy = httpProxy.createProxyServer({});
-const mockserverName = 'Lisk Core Mock';
-const liskCoreServerUrl = process.env.LISK_CORE_HTTP || 'http://127.0.0.1:4000';
+const mockserverName = 'Klayr Core Mock';
+const klayrCoreServerUrl = process.env.KLAYR_CORE_HTTP || 'http://127.0.0.1:4000';
 const eventFreqMultiplier = 1000;
 const port = Number(process.env.PORT) || 9007;
 
 const server = http.createServer((req, res) => {
 	if (req.url.includes('/api/peers')) {
-		mockserver('mockserver/lisk_http_mocks')(req, res);
+		mockserver('mockserver/klayr_http_mocks')(req, res);
 	} else {
 		proxy.web(req, res, {
-			target: liskCoreServerUrl,
+			target: klayrCoreServerUrl,
 		});
 	}
 });

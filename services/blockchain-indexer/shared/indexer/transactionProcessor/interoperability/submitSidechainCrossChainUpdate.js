@@ -18,7 +18,7 @@ const {
 	DB: {
 		MySQL: { getTableInstance },
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { MODULE_NAME } = require('./index');
 const { COMMAND_NAME: COMMAND_NAME_REGISTER_MAINCHAIN } = require('./registerMainchain');

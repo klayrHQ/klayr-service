@@ -21,7 +21,7 @@ const tar = require('tar');
 const {
 	Logger,
 	Exceptions: { NotFoundException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const logger = Logger();
 

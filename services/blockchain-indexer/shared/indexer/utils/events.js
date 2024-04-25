@@ -25,7 +25,7 @@ const {
 			KVStore: { getKeyValueTable },
 		},
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const {
 	getGenesisHeight,

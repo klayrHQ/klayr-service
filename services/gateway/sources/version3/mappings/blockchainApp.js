@@ -20,7 +20,7 @@ module.exports = {
 	address: '=,string',
 	lastCertificateHeight: '=,number',
 	lastUpdated: '=,number',
-	escrowedLSK: '=,string',
+	escrowedKLY: '=,string',
 	escrow: [
 		'escrow',
 		{

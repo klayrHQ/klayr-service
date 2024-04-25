@@ -18,9 +18,9 @@ const {
 	DB: {
 		MySQL: { getTableInstance },
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
-const { getLisk32AddressFromPublicKey } = require('../../../utils/account');
+const { getKlayr32AddressFromPublicKey } = require('../../../utils/account');
 
 const config = require('../../../../config');
 
@@ -40,7 +40,7 @@ const getCommissionIndexingInfo = (blockHeader, tx) => {
 	const { newCommission } = tx.params;
 
 	const newCommissionEntry = {
-		address: getLisk32AddressFromPublicKey(tx.senderPublicKey),
+		address: getKlayr32AddressFromPublicKey(tx.senderPublicKey),
 		commission: newCommission,
 		height: blockHeader.height,
 	};

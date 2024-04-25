@@ -1,5 +1,5 @@
 config:
-  target: '{{ $processEnvironment.LISK_SERVICE_URL }}/rpc-v2'
+  target: '{{ $processEnvironment.KLAYR_SERVICE_URL }}/rpc-v2'
   socketio:
     transports: ['websocket']
   phases:

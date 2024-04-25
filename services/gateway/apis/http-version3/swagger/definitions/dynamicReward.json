@@ -11,7 +11,7 @@
 					"tokenID": {
 						"type": "string",
 						"example": "0000000000000000",
-						"description": "The universal identifier for the token within the Lisk ecosystem used for rewards."
+						"description": "The universal identifier for the token within the Klayr ecosystem used for rewards."
 					},
 					"defaultReward": {
 						"type": "string",
@@ -38,7 +38,7 @@
 					"rewardTokenID": {
 						"type": "string",
 						"example": "0000000000000000",
-						"description": "The universal identifier for the token within the Lisk ecosystem used for rewards."
+						"description": "The universal identifier for the token within the Klayr ecosystem used for rewards."
 					}
 				}
 			},
@@ -59,7 +59,7 @@
 					"tokenID": {
 						"type": "string",
 						"example": "0000000000000000",
-						"description": "The universal identifier for the token within the Lisk ecosystem used for rewards."
+						"description": "The universal identifier for the token within the Klayr ecosystem used for rewards."
 					},
 					"rate": {
 						"type": "string",

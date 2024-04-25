@@ -22,7 +22,7 @@ const {
 		sqlite3: { getTableInstance },
 	},
 	Utils: { delay },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const logger = Logger();
 

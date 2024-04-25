@@ -72,7 +72,7 @@ const engineEndpoints = [
 	{
 		name: 'chain_getBlockByHeight',
 		request: {
-			$id: '/lisk/chain/getBlockByHeightRequest',
+			$id: '/klayr/chain/getBlockByHeightRequest',
 			type: 'object',
 			required: ['height'],
 			properties: {

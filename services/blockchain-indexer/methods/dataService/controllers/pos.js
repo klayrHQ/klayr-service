@@ -18,7 +18,7 @@ const {
 		StatusCodes: { BAD_REQUEST },
 	},
 	Exceptions: { ValidationException, InvalidParamsException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const dataService = require('../../../shared/dataService');
 

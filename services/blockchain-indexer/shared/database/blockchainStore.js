@@ -16,7 +16,7 @@
 const {
 	CacheRedis,
 	// Logger,
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const config = require('../../config');
 

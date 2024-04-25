@@ -28,7 +28,7 @@ const waitMs = n =>
 beforeEach(() => {});
 
 // TODO: Update to mainnet url after production
-const url = 'https://testnet-service.lisk.com/api/v3/blocks';
+const url = 'https://testnet-service.klayr.xyz/api/v3/blocks';
 
 describe('HTTP library is able to send GET request', () => {
 	it('should have default parameters', async () => {

@@ -13,7 +13,7 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const ADDRESS_LISK32 = /^lsk[a-hjkm-z2-9]{38}$/;
+const ADDRESS_KLAYR32 = /^kly[a-hjkm-z2-9]{38}$/;
 const TOKEN_ID = /[0-9A-Fa-f]{16}/;
 const MAINCHAIN_ID = /^\d{2}0{6}$/;
 const NAME = /^[a-z0-9!@$&_.]{1,20}$/;
@@ -21,7 +21,7 @@ const PUBLIC_KEY = /^([A-Fa-f0-9]{2}){32}$/;
 const PRIVATE_IP_REGEX = /^(10(\.\d{1,3}){3})|((172\.(1[6-9]|2\d|3[0-1])|192\.168)(\.\d{1,3}){2})$/;
 
 module.exports = {
-	ADDRESS_LISK32,
+	ADDRESS_KLAYR32,
 	MAINCHAIN_ID,
 	NAME,
 	PUBLIC_KEY,

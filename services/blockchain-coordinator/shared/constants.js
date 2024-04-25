@@ -13,7 +13,7 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { Signals } = require('lisk-service-framework');
+const { Signals } = require('klayr-service-framework');
 const { requestConnector } = require('./utils/request');
 
 let genesisHeight;

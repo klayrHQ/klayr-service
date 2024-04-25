@@ -17,7 +17,7 @@ const moment = require('moment');
 
 const {
 	Exceptions: { ValidationException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const config = require('../../config');
 

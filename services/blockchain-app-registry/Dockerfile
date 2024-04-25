@@ -19,14 +19,14 @@ RUN yarn install --frozen-lockfile
 
 FROM node:$NODEJS_VERSION-alpine
 
-RUN mkdir -p /home/lisk/lisk-service/blockchain-app-registry/data && \
-    adduser -D lisk && \
-    chown -R lisk:lisk /home/lisk/
+RUN mkdir -p /home/klayr/klayr-service/blockchain-app-registry/data && \
+    adduser -D klayr && \
+    chown -R klayr:klayr /home/klayr/
 
-USER lisk
-WORKDIR /home/lisk/lisk-service/blockchain-app-registry
+USER klayr
+WORKDIR /home/klayr/klayr-service/blockchain-app-registry
 
-COPY --chown=lisk:lisk ./ .
-COPY --chown=lisk:lisk --from=builder /home/builder/build/node_modules/ ./node_modules/
+COPY --chown=klayr:klayr ./ .
+COPY --chown=klayr:klayr --from=builder /home/builder/build/node_modules/ ./node_modules/
 
 CMD ["node", "app.js"]

@@ -1,18 +1,18 @@
 {
-	"name": "lisk-service-market",
+	"name": "klayr-service-market",
 	"version": "0.7.7",
-	"description": "Lisk Service Market",
+	"description": "Klayr Service Market",
 	"keywords": [
-		"lisk",
+		"klayr",
 		"blockchain"
 	],
-	"homepage": "https://github.com/LiskHQ/lisk-service",
+	"homepage": "https://github.com/KlayrHQ/klayr-service",
 	"repository": {
 		"type": "git",
-		"url": "git@github.com:LiskHQ/lisk-service.git"
+		"url": "git@github.com:KlayrHQ/klayr-service.git"
 	},
 	"bugs": {
-		"url": "https://github.com/LiskHQ/lisk-service/issues"
+		"url": "https://github.com/KlayrHQ/klayr-service/issues"
 	},
 	"private": true,
 	"author": "Lisk Foundation <admin@lisk.com>, lightcurve GmbH <admin@lightcurve.io>",
@@ -32,7 +32,7 @@
 	"dependencies": {
 		"bluebird": "^3.7.2",
 		"joi": "^17.4.0",
-		"lisk-service-framework": "https://github.com/LiskHQ/lisk-service/raw/de2ee1ac988ebd2fb150e637647640b25635c6d6/framework/dist/lisk-service-framework-1.6.15.tgz",
+		"klayr-service-framework": "https://github.com/klayrHQ/klayr-service/raw/development/framework/dist/klayr-service-framework-1.6.15.tgz",
 		"moment": "^2.29.4",
 		"node-cron": "=2.0.3"
 	},

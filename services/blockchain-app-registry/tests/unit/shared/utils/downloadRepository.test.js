@@ -28,15 +28,15 @@ const {
 } = require('../../../constants/downloadRepository');
 
 // Mock KeyValueStore table
-jest.mock('lisk-service-framework', () => {
-	const actualLiskServiceFramework = jest.requireActual('lisk-service-framework');
+jest.mock('klayr-service-framework', () => {
+	const actualKlayrServiceFramework = jest.requireActual('klayr-service-framework');
 	return {
-		...actualLiskServiceFramework,
+		...actualKlayrServiceFramework,
 		DB: {
 			MySQL: {
-				...actualLiskServiceFramework.DB.MySQL,
+				...actualKlayrServiceFramework.DB.MySQL,
 				KVStore: {
-					...actualLiskServiceFramework.KVStore,
+					...actualKlayrServiceFramework.KVStore,
 					configureKeyValueTable: jest.fn(),
 					getKeyValueTable: jest.fn(),
 				},
@@ -78,7 +78,7 @@ describe('Test getRepoInfoFromURL method', () => {
 	it('should return proper response when url is valid', async () => {
 		const response = getRepoInfoFromURL(config.gitHub.appRegistryRepo);
 		expect(response).toMatchObject({
-			owner: 'LiskHQ',
+			owner: 'klayrhq',
 			repo: 'app-registry',
 		});
 	});

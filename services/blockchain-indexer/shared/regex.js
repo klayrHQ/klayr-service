@@ -14,7 +14,7 @@
  *
  */
 
-const ADDRESS_LISK32 = /^lsk[a-hjkm-z2-9]{38}$/;
+const ADDRESS_KLAYR32 = /^kly[a-hjkm-z2-9]{38}$/;
 const BLS_KEY = /^\b[a-fA-F0-9]{96}\b$/;
 const PROOF_OF_POSSESSION = /^\b[a-fA-F0-9]{192}\b$/;
 const PUBLIC_KEY = /^([A-Fa-f0-9]{2}){32}$/;
@@ -24,7 +24,7 @@ const MAINCHAIN_ID = /^[a-fA-F0-9]{2}000000$/;
 const CHAIN_ID = /^\b[a-fA-F0-9]{8}\b$/;
 
 module.exports = {
-	ADDRESS_LISK32,
+	ADDRESS_KLAYR32,
 	BLS_KEY,
 	PROOF_OF_POSSESSION,
 	PUBLIC_KEY,

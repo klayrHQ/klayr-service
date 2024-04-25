@@ -22,7 +22,7 @@ const {
 			KVStore: { getKeyValueTable },
 		},
 	},
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 const { ServiceBroker } = require('moleculer');
 
 const { KV_STORE_KEY } = require('../../../shared/constants');

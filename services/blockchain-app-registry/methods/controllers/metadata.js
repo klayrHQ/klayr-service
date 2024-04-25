@@ -16,7 +16,7 @@
 const {
 	HTTP,
 	Exceptions: { InvalidParamsException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const {
 	StatusCodes: { BAD_REQUEST },

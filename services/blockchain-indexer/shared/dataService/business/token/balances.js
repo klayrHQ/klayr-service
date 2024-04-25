@@ -15,7 +15,7 @@
  */
 const {
 	Exceptions: { InvalidParamsException },
-} = require('lisk-service-framework');
+} = require('klayr-service-framework');
 
 const { requestConnector } = require('../../../utils/request');
 

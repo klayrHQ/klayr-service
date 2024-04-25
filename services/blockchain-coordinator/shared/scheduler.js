@@ -16,7 +16,7 @@
 const MessageQueue = require('bull');
 const BluebirdPromise = require('bluebird');
 
-const { Logger } = require('lisk-service-framework');
+const { Logger } = require('klayr-service-framework');
 
 const logger = Logger();
 
