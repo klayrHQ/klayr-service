@@ -1,5 +1,5 @@
 /*
- * LiskHQ/lisk-service
+ * Klayrhq/klayrservice
  * Copyright © 2023 Lisk Foundation
  *
  * See the LICENSE file at the top-level directory of this distribution
@@ -15,7 +15,7 @@
  */
 const getModifiedFileNamesInput = {
 	betanet: {
-		Lisk: [{ filename: 'betanet/Klayr/app.json' }, { filename: 'betanet/Klayr/nativetokens.json' }],
+		Klayr: [{ filename: 'betanet/Klayr/app.json' }, { filename: 'betanet/Klayr/nativetokens.json' }],
 		Enevti: [
 			{ filename: 'betanet/Enevti/app.json' },
 			{ filename: 'betanet/Enevti/nativetokens.json' },

@@ -48,9 +48,9 @@ services:
       - services_network
     environment:
       - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_USER=lisk
+      - MYSQL_USER=klayr
       - MYSQL_PASSWORD=password
-      - MYSQL_DATABASE=lisk
+      - MYSQL_DATABASE=klayr
     healthcheck:
       test: ['CMD', 'bash', '/healthcheck.sh']
 
@@ -75,7 +75,7 @@ services:
       endpoint_mode: vip
     environment:
       - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_DATABASE=lisk
+      - MYSQL_DATABASE=klayr
     healthcheck:
       test: ['CMD', 'mysqladmin', 'ping', '-hlocalhost', '-ppassword']
 
@@ -95,7 +95,7 @@ services:
       test: ['CMD', 'service', 'nginx', 'status']
 
   blockchain-app-registry:
-    image: lisk/service_blockchain_app_registry
+    image: klayr/service_blockchain_app_registry
     depends_on:
       nats:
         condition: service_healthy
@@ -138,9 +138,9 @@ services:
     environment:
       - SERVICE_BROKER=nats://nats:4222
       - GEOIP_JSON=${GEOIP_JSON}
-      - LISK_APP_WS=${LISK_APP_WS}
-      - USE_LISK_HTTP_API=${USE_LISK_HTTP_API}
-      - LISK_APP_HTTP=${LISK_APP_HTTP}
+      - KLAYR_APP_WS=${KLAYR_APP_WS}
+      - USE_KLAYR_HTTP_API=${USE_KLAYR_HTTP_API}
+      - KLAYR_APP_HTTP=${KLAYR_APP_HTTP}
       - SERVICE_BROKER_TIMEOUT=${SERVICE_BROKER_TIMEOUT}
       - SERVICE_LOG_CONSOLE=${SERVICE_LOG_CONSOLE}
       - SERVICE_LOG_STDOUT=${SERVICE_LOG_STDOUT}
@@ -148,8 +148,8 @@ services:
       - SERVICE_LOG_FILE=${SERVICE_LOG_FILE}
       - SERVICE_LOG_LEVEL=${SERVICE_LOG_LEVEL}
       - DOCKER_HOST=${DOCKER_HOST}
-      - USE_LISK_IPC_CLIENT=${USE_LISK_IPC_CLIENT}
-      - LISK_APP_DATA_PATH=${LISK_APP_DATA_PATH}
+      - USE_KLAYR_IPC_CLIENT=${USE_KLAYR_IPC_CLIENT}
+      - KLAYR_APP_DATA_PATH=${KLAYR_APP_DATA_PATH}
       - GENESIS_BLOCK_URL=${GENESIS_BLOCK_URL}
       - ENABLE_TESTING_MODE=${ENABLE_TESTING_MODE}
       - ENABLE_BLOCK_CACHING=${ENABLE_BLOCK_CACHING}
@@ -169,7 +169,7 @@ services:
       - 'host.docker.internal:host-gateway'
 
   blockchain-indexer:
-    image: lisk/service_blockchain_indexer
+    image: klayr/service_blockchain_indexer
     depends_on:
       nats:
         condition: service_healthy
@@ -188,11 +188,11 @@ services:
       replicas: 1
     environment:
       - SERVICE_BROKER=nats://nats:4222
-      - SERVICE_INDEXER_CACHE_REDIS=redis://lisk:password@redis_persistent:6379/0
-      - SERVICE_INDEXER_REDIS_VOLATILE=redis://lisk:password@redis_volatile:6379/0
-      - SERVICE_MESSAGE_QUEUE_REDIS=redis://lisk:password@redis_persistent:6379/8
-      - SERVICE_INDEXER_MYSQL=mysql://lisk:password@mysql-primary:3306/lisk
-      - SERVICE_INDEXER_MYSQL_READ_REPLICA=mysql://reader:password@mysql-read-replica-haproxy:3307/lisk
+      - SERVICE_INDEXER_CACHE_REDIS=redis://klayr:password@redis_persistent:6379/0
+      - SERVICE_INDEXER_REDIS_VOLATILE=redis://klayr:password@redis_volatile:6379/0
+      - SERVICE_MESSAGE_QUEUE_REDIS=redis://klayr:password@redis_persistent:6379/8
+      - SERVICE_INDEXER_MYSQL=mysql://klayr:password@mysql-primary:3306/klayr
+      - SERVICE_INDEXER_MYSQL_READ_REPLICA=mysql://reader:password@mysql-read-replica-haproxy:3307/klayr
       - ENABLE_DATA_RETRIEVAL_MODE=${ENABLE_DATA_RETRIEVAL_MODE}
       - ENABLE_INDEXING_MODE=${ENABLE_INDEXING_MODE}
       - ENABLE_PERSIST_EVENTS=${ENABLE_PERSIST_EVENTS}
@@ -208,7 +208,7 @@ services:
       - ENABLE_SNAPSHOT_ALLOW_INSECURE_HTTP=${ENABLE_SNAPSHOT_ALLOW_INSECURE_HTTP}
       - DOCKER_HOST=${DOCKER_HOST}
       - MAINCHAIN_SERVICE_URL=${MAINCHAIN_SERVICE_URL}
-      - LISK_STATIC=${LISK_STATIC}
+      - KLAYR_STATIC=${KLAYR_STATIC}
       - DEVNET_MAINCHAIN_URL=${DEVNET_MAINCHAIN_URL}
       - ACCOUNT_BALANCE_UPDATE_BATCH_SIZE=${ACCOUNT_BALANCE_UPDATE_BATCH_SIZE}
       - INDEX_BLOCKS_QUEUE_SCHEDULED_JOB_MAX_COUNT=${INDEX_BLOCKS_QUEUE_SCHEDULED_JOB_MAX_COUNT}
@@ -233,7 +233,7 @@ services:
     restart: always
 
   blockchain-coordinator:
-    image: lisk/service_blockchain_coordinator
+    image: klayr/service_blockchain_coordinator
     depends_on:
       nats:
         condition: service_healthy
@@ -248,7 +248,7 @@ services:
       replicas: 1
     environment:
       - SERVICE_BROKER=nats://nats:4222
-      - SERVICE_MESSAGE_QUEUE_REDIS=redis://lisk:password@redis_persistent:6379/8
+      - SERVICE_MESSAGE_QUEUE_REDIS=redis://klayr:password@redis_persistent:6379/8
       - SERVICE_BROKER_TIMEOUT=${SERVICE_BROKER_TIMEOUT}
       - SERVICE_LOG_LEVEL=${SERVICE_LOG_LEVEL}
       - SERVICE_LOG_CONSOLE=${SERVICE_LOG_CONSOLE}
@@ -263,7 +263,7 @@ services:
     restart: always
 
   transaction-statistics:
-    image: lisk/service_transaction_statistics
+    image: klayr/service_transaction_statistics
     depends_on:
       nats:
         condition: service_healthy
@@ -280,9 +280,9 @@ services:
       replicas: 1
     environment:
       - SERVICE_BROKER=nats://nats:4222
-      - SERVICE_STATISTICS_REDIS=redis://lisk:password@redis_persistent:6379/5
-      - SERVICE_STATISTICS_MYSQL=mysql://lisk:password@mysql-primary:3306/lisk
-      - SERVICE_STATISTICS_MYSQL_READ_REPLICA=mysql://reader:password@mysql-read-replica-haproxy:3307/lisk
+      - SERVICE_STATISTICS_REDIS=redis://klayr:password@redis_persistent:6379/5
+      - SERVICE_STATISTICS_MYSQL=mysql://klayr:password@mysql-primary:3306/klayr
+      - SERVICE_STATISTICS_MYSQL_READ_REPLICA=mysql://reader:password@mysql-read-replica-haproxy:3307/klayr
       - TRANSACTION_STATS_HISTORY_LENGTH_DAYS=${TRANSACTION_STATS_HISTORY_LENGTH_DAYS}
       - SERVICE_BROKER_TIMEOUT=${SERVICE_BROKER_TIMEOUT}
       - SERVICE_LOG_LEVEL=${SERVICE_LOG_LEVEL}
@@ -298,7 +298,7 @@ services:
     restart: always
 
   fee-estimator:
-    image: lisk/service_fee_estimator
+    image: klayr/service_fee_estimator
     depends_on:
       nats:
         condition: service_healthy
@@ -311,7 +311,7 @@ services:
       replicas: 1
     environment:
       - SERVICE_BROKER=nats://nats:4222
-      - SERVICE_FEE_ESTIMATOR_CACHE=redis://lisk:password@redis_persistent:6379/6
+      - SERVICE_FEE_ESTIMATOR_CACHE=redis://klayr:password@redis_persistent:6379/6
       - ENABLE_FEE_ESTIMATOR_QUICK=${ENABLE_FEE_ESTIMATOR_QUICK}
       - ENABLE_FEE_ESTIMATOR_FULL=${ENABLE_FEE_ESTIMATOR_FULL}
       - FEE_EST_COLD_START_BATCH_SIZE=${FEE_EST_COLD_START_BATCH_SIZE}
@@ -330,7 +330,7 @@ services:
     restart: always
 
   gateway:
-    image: lisk/service_gateway
+    image: klayr/service_gateway
     depends_on:
       nats:
         condition: service_healthy
@@ -349,7 +349,7 @@ services:
       - SERVICE_BROKER=nats://nats:4222
       - PORT=${PORT}
       - HOST=${HOST}
-      - SERVICE_GATEWAY_REDIS_VOLATILE=redis://lisk:password@redis_volatile:6379/1
+      - SERVICE_GATEWAY_REDIS_VOLATILE=redis://klayr:password@redis_volatile:6379/1
       - ENABLE_HTTP_API=${ENABLE_HTTP_API}
       - ENABLE_WS_API=${ENABLE_WS_API}
       - HTTP_CACHE_CONTROL_DIRECTIVES=${HTTP_CACHE_CONTROL_DIRECTIVES}
@@ -385,7 +385,7 @@ services:
       test: curl --fail http://gateway:${PORT:-9901}/api/v3/blocks
 
   market:
-    image: lisk/service_market
+    image: klayr/service_market
     depends_on:
       nats:
         condition: service_healthy
@@ -398,7 +398,7 @@ services:
       replicas: 1
     environment:
       - SERVICE_BROKER=nats://nats:4222
-      - SERVICE_MARKET_REDIS=redis://lisk:password@redis_persistent:6379/2
+      - SERVICE_MARKET_REDIS=redis://klayr:password@redis_persistent:6379/2
       - EXCHANGERATESAPI_IO_API_KEY=${EXCHANGERATESAPI_IO_API_KEY}
       - SERVICE_MARKET_FIAT_CURRENCIES=${SERVICE_MARKET_FIAT_CURRENCIES}
       - SERVICE_MARKET_TARGET_PAIRS=${SERVICE_MARKET_TARGET_PAIRS}
@@ -422,7 +422,7 @@ services:
     restart: always
 
   export:
-    image: lisk/service_export
+    image: klayr/service_export
     depends_on:
       nats:
         condition: service_healthy
@@ -437,11 +437,11 @@ services:
       replicas: 1
     environment:
       - SERVICE_BROKER=nats://nats:4222
-      - SERVICE_EXPORT_REDIS=redis://lisk:password@redis_persistent:6379/3
-      - SERVICE_EXPORT_REDIS_VOLATILE=redis://lisk:password@redis_volatile:6379/3
-      - SERVICE_EXPORT_PARTIALS=/home/lisk/lisk-service/export/data/partials
+      - SERVICE_EXPORT_REDIS=redis://klayr:password@redis_persistent:6379/3
+      - SERVICE_EXPORT_REDIS_VOLATILE=redis://klayr:password@redis_volatile:6379/3
+      - SERVICE_EXPORT_PARTIALS=/home/klayr/klayr-service/export/data/partials
       - EXPORT_S3_BUCKET_NAME_PARTIALS=${EXPORT_S3_BUCKET_NAME_PARTIALS}
-      - SERVICE_EXPORT_STATIC=/home/lisk/lisk-service/export/data/static
+      - SERVICE_EXPORT_STATIC=/home/klayr/klayr-service/export/data/static
       - EXPORT_S3_BUCKET_NAME_EXPORTS=${EXPORT_S3_BUCKET_NAME_EXPORTS}
       - SERVICE_BROKER_TIMEOUT=${SERVICE_BROKER_TIMEOUT}
       - SERVICE_LOG_LEVEL=${SERVICE_LOG_LEVEL}
@@ -459,7 +459,7 @@ services:
       - JOB_INTERVAL_CACHE_PURGE=${JOB_INTERVAL_CACHE_PURGE}
       - JOB_SCHEDULE_CACHE_PURGE=${JOB_SCHEDULE_CACHE_PURGE}
     volumes:
-      - export-data:/home/lisk/lisk-service/export/data
+      - export-data:/home/klayr/klayr-service/export/data
     restart: always
 
 networks:
