@@ -378,7 +378,7 @@ Klayr Testnet::
 // Use local Service node
 // const WS_RPC_ENDPOINT = 'ws://127.0.0.1:9901/rpc-v3';
 //Use public Service node
-//const WS_RPC_ENDPOINT = "wss://service.lisk.com/rpc-v3";
+//const WS_RPC_ENDPOINT = "wss://service.klayr.xyz/rpc-v3";
 
 // 2. Connect to Lisk Service via WebSockets
 // const socket = io(WS_RPC_ENDPOINT, {
@@ -440,7 +440,7 @@ Klayr Testnet::
 // Uses local Service node
 // const WS_SUBSCRIBE_ENDPOINT = 'ws://127.0.0.1:9901/blockchain';
 // Uses public Service node
-//const WS_SUBSCRIBE_ENDPOINT = "wss://service.lisk.com/blockchain";
+//const WS_SUBSCRIBE_ENDPOINT = "wss://service.klayr.xyz/blockchain";
 
 // const socket = io(WS_SUBSCRIBE_ENDPOINT, {
 // 	forceNew: true,
