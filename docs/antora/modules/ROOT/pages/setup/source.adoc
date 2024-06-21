@@ -314,8 +314,8 @@ To install Redis on MacOS, please follow the {url_redis_install_mac}[official Re
 
 
 ////
-Lisk Service is not compatible with this service right now.
-we should encourage community to make Lisk Service compatible with this service, then they can use it as alternative GeoIP service.
+Klayr Service is not compatible with this service right now.
+we should encourage community to make Klayr Service compatible with this service, then they can use it as alternative GeoIP service.
 === GeoJS
 
 {url_geojs}[GeoJS] is used by the Network Monitor for IP address geo-location.
@@ -351,7 +351,7 @@ cd klayr-service
 
 .Switch to the recent stable as a base
 ----
-git checkout v0.7.7
+git checkout v0.7.8
 ----
 
 .\...or use the development branch
@@ -378,4 +378,4 @@ To change the default configuration, check out the page xref:{url_config}[].
 
 More commands about how to manage Klayr Service are described on the xref:{url_management_pm2}[] page.
 
-// TODO: TIP: Check the xref:{url_index_usage}[Usage] section for examples of how to use and interact with Lisk Service.
+// TODO: TIP: Check the xref:{url_index_usage}[Usage] section for examples of how to use and interact with Klayr Service.

@@ -4,7 +4,7 @@
 
 ### CSV transaction export
 
-Klayr Service 0.7.7 allows to export transactions in CSV format.
+Klayr Service 0.7.8 allows to export transactions in CSV format.
 
 To enable this feature ensure that your PM2 config has the klayr-service-export microservice started. The Docker script enables it automatically, however, the gateway needs a param to enable it to the public.
 

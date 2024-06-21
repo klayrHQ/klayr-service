@@ -14,8 +14,8 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: lisk
-      MYSQL_USER: lisk
+      MYSQL_DATABASE: klayr
+      MYSQL_USER: klayr
       MYSQL_PASSWORD: password
     ports:
       - '127.0.0.1:3306:3306'

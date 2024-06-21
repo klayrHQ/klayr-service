@@ -1,11 +1,11 @@
 /*
- * LiskHQ/lisk-service
- * Copyright © 2019 Lisk Foundation
+ * Klayrhq/klayrservice
+ * Copyright © 2019 Klayr Foundation
  *
  * See the LICENSE file at the top-level directory of this distribution
  * for licensing information.
  *
- * Unless otherwise agreed in a custom licensing agreement with the Lisk Foundation,
+ * Unless otherwise agreed in a custom licensing agreement with the Klayr Foundation,
  * no part of this software, including this file, may be copied, modified,
  * propagated, or distributed except according to the terms contained in the
  * LICENSE file.
@@ -17,7 +17,7 @@
 module.exports = {
 	apps: [
 		{
-			name: 'lisk-service-gateway',
+			name: 'klayr-service-gateway',
 			script: 'app.js',
 			cwd: './services/gateway',
 			pid_file: './pids/service_gateway.pid',
@@ -30,8 +30,8 @@ module.exports = {
 			autorestart: true,
 			env: {
 				PORT: 9901,
-				SERVICE_BROKER: 'redis://lisk:password@127.0.0.1:6379/0',
-				SERVICE_GATEWAY_REDIS_VOLATILE: 'redis://lisk:password@127.0.0.1:6379/3',
+				SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
+				SERVICE_GATEWAY_REDIS_VOLATILE: 'redis://klayr:password@127.0.0.1:6379/3',
 				ENABLE_HTTP_API: 'http-status,http-version3,http-exports',
 				ENABLE_WS_API: 'blockchain,rpc-v3',
 				GATEWAY_DEPENDENCIES: 'indexer,connector',
@@ -48,7 +48,7 @@ module.exports = {
 			},
 		},
 		{
-			name: 'lisk-service-blockchain-app-registry',
+			name: 'klayr-service-blockchain-app-registry',
 			script: 'app.js',
 			cwd: './services/blockchain-app-registry',
 			pid_file: './pids/service_blockchain_app_registry.pid',
@@ -61,13 +61,13 @@ module.exports = {
 			autorestart: true,
 			env: {
 				// --- Remember to set the properties below
-				SERVICE_BROKER: 'redis://lisk:password@127.0.0.1:6379/0',
-				SERVICE_APP_REGISTRY_MYSQL: 'mysql://lisk:password@127.0.0.1:3306/lisk',
+				SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
+				SERVICE_APP_REGISTRY_MYSQL: 'mysql://klayr:password@127.0.0.1:3306/klayr',
 				ENABLE_REBUILD_INDEX_AT_INIT: false,
 			},
 		},
 		{
-			name: 'lisk-service-blockchain-connector',
+			name: 'klayr-service-blockchain-connector',
 			script: 'app.js',
 			cwd: './services/blockchain-connector',
 			pid_file: './pids/service_blockchain_connector.pid',
@@ -80,16 +80,16 @@ module.exports = {
 			autorestart: true,
 			env: {
 				// --- Remember to set the properties below
-				SERVICE_BROKER: 'redis://lisk:password@127.0.0.1:6379/0',
-				LISK_APP_WS: 'ws://127.0.0.1:7887',
-				GEOIP_JSON: 'https://geoip.lisk.com/json',
-				// USE_LISK_IPC_CLIENT: true,
-				// LISK_APP_DATA_PATH: '~/.lisk/lisk-core',
+				SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
+				KLAYR_APP_WS: 'ws://127.0.0.1:7887',
+				GEOIP_JSON: 'https://geoip.klayr.com/json',
+				// USE_KLAYR_IPC_CLIENT: true,
+				// KLAYR_APP_DATA_PATH: '~/.klayr/klayr-core',
 				ENABLE_TESTING_MODE: true,
 			},
 		},
 		{
-			name: 'lisk-service-blockchain-indexer',
+			name: 'klayr-service-blockchain-indexer',
 			script: 'app.js',
 			cwd: './services/blockchain-indexer',
 			pid_file: './pids/service_blockchain_indexer.pid',
@@ -102,11 +102,11 @@ module.exports = {
 			autorestart: true,
 			env: {
 				// --- Remember to set the properties below
-				SERVICE_BROKER: 'redis://lisk:password@127.0.0.1:6379/0',
-				SERVICE_INDEXER_CACHE_REDIS: 'redis://lisk:password@127.0.0.1:6379/1',
-				SERVICE_INDEXER_REDIS_VOLATILE: 'redis://lisk:password@127.0.0.1:6379/2',
-				SERVICE_MESSAGE_QUEUE_REDIS: 'redis://lisk:password@127.0.0.1:6379/3',
-				SERVICE_INDEXER_MYSQL: 'mysql://lisk:password@127.0.0.1:3306/lisk',
+				SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
+				SERVICE_INDEXER_CACHE_REDIS: 'redis://klayr:password@127.0.0.1:6379/1',
+				SERVICE_INDEXER_REDIS_VOLATILE: 'redis://klayr:password@127.0.0.1:6379/2',
+				SERVICE_MESSAGE_QUEUE_REDIS: 'redis://klayr:password@127.0.0.1:6379/3',
+				SERVICE_INDEXER_MYSQL: 'mysql://klayr:password@127.0.0.1:3306/klayr',
 				ENABLE_DATA_RETRIEVAL_MODE: true,
 				ENABLE_INDEXING_MODE: true,
 				ENABLE_PERSIST_EVENTS: false,
@@ -114,7 +114,7 @@ module.exports = {
 			},
 		},
 		{
-			name: 'lisk-service-blockchain-coordinator',
+			name: 'klayr-service-blockchain-coordinator',
 			script: 'app.js',
 			cwd: './services/blockchain-coordinator',
 			pid_file: './pids/service_blockchain_coordinator.pid',
@@ -127,12 +127,12 @@ module.exports = {
 			autorestart: true,
 			env: {
 				// --- Remember to set the properties below
-				SERVICE_BROKER: 'redis://lisk:password@127.0.0.1:6379/0',
-				SERVICE_MESSAGE_QUEUE_REDIS: 'redis://lisk:password@127.0.0.1:6379/3',
+				SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
+				SERVICE_MESSAGE_QUEUE_REDIS: 'redis://klayr:password@127.0.0.1:6379/3',
 			},
 		},
 		{
-			name: 'lisk-service-fee-estimator',
+			name: 'klayr-service-fee-estimator',
 			script: 'app.js',
 			cwd: './services/fee-estimator',
 			pid_file: './pids/service_fee_estimator.pid',
@@ -145,14 +145,14 @@ module.exports = {
 			autorestart: true,
 			env: {
 				// --- Remember to set the properties below
-				SERVICE_BROKER: 'redis://lisk:password@127.0.0.1:6379/0',
-				SERVICE_FEE_ESTIMATOR_CACHE: 'redis://lisk:password@127.0.0.1:6379/1',
+				SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
+				SERVICE_FEE_ESTIMATOR_CACHE: 'redis://klayr:password@127.0.0.1:6379/1',
 				ENABLE_FEE_ESTIMATOR_QUICK: true,
 				ENABLE_FEE_ESTIMATOR_FULL: false,
 			},
 		},
 		{
-			name: 'lisk-service-transaction-statistics',
+			name: 'klayr-service-transaction-statistics',
 			script: 'app.js',
 			cwd: './services/transaction-statistics',
 			pid_file: './pids/service_transaction_statistics.pid',
@@ -165,14 +165,14 @@ module.exports = {
 			autorestart: true,
 			env: {
 				// --- Remember to set the properties below
-				SERVICE_BROKER: 'redis://lisk:password@127.0.0.1:6379/0',
-				SERVICE_STATISTICS_REDIS: 'redis://lisk:password@127.0.0.1:6379/1',
-				SERVICE_STATISTICS_MYSQL: 'mysql://lisk:password@127.0.0.1:3306/lisk',
+				SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
+				SERVICE_STATISTICS_REDIS: 'redis://klayr:password@127.0.0.1:6379/1',
+				SERVICE_STATISTICS_MYSQL: 'mysql://klayr:password@127.0.0.1:3306/klayr',
 				// TRANSACTION_STATS_HISTORY_LENGTH_DAYS: 366,
 			},
 		},
 		{
-			name: 'lisk-service-market',
+			name: 'klayr-service-market',
 			script: 'app.js',
 			cwd: './services/market',
 			pid_file: './pids/service_market.pid',
@@ -184,15 +184,15 @@ module.exports = {
 			max_memory_restart: '250M',
 			autorestart: true,
 			env: {
-				SERVICE_BROKER: 'redis://lisk:password@127.0.0.1:6379/0',
-				SERVICE_MARKET_REDIS: 'redis://lisk:password@127.0.0.1:6379/2',
+				SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
+				SERVICE_MARKET_REDIS: 'redis://klayr:password@127.0.0.1:6379/2',
 				// SERVICE_MARKET_FIAT_CURRENCIES: 'EUR,USD,CHF,GBP,RUB',
 				// SERVICE_MARKET_TARGET_PAIRS: 'LSK_BTC,LSK_EUR,LSK_USD,LSK_CHF,BTC_EUR,BTC_USD,BTC_CHF',
 				// EXCHANGERATESAPI_IO_API_KEY: ''
 			},
 		},
 		{
-			name: 'lisk-service-export',
+			name: 'klayr-service-export',
 			script: 'app.js',
 			cwd: './services/export',
 			pid_file: './pids/service_export.pid',
@@ -204,9 +204,9 @@ module.exports = {
 			max_memory_restart: '250M',
 			autorestart: true,
 			env: {
-				SERVICE_BROKER: 'redis://lisk:password@127.0.0.1:6379/0',
-				SERVICE_EXPORT_REDIS: 'redis://lisk:password@127.0.0.1:6379/3',
-				SERVICE_EXPORT_REDIS_VOLATILE: 'redis://lisk:password@127.0.0.1:6379/4',
+				SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
+				SERVICE_EXPORT_REDIS: 'redis://klayr:password@127.0.0.1:6379/3',
+				SERVICE_EXPORT_REDIS_VOLATILE: 'redis://klayr:password@127.0.0.1:6379/4',
 				// SERVICE_EXPORT_PARTIALS: './data/partials',
 				// EXPORT_S3_BUCKET_NAME_PARTIALS: 'partials',
 				// SERVICE_EXPORT_STATIC: './data/static',

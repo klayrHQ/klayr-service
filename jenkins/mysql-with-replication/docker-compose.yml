@@ -14,7 +14,7 @@ services:
       - services_network
     environment:
       - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_USER=lisk
+      - MYSQL_USER=klayr
       - MYSQL_PASSWORD=password
     ports:
       - '127.0.0.1:3306:3306'
