@@ -351,7 +351,7 @@ cd klayr-service
 
 .Switch to the recent stable as a base
 ----
-git checkout v0.7.7
+git checkout v0.7.8
 ----
 
 .\...or use the development branch
