@@ -1,6 +1,6 @@
 MYSQL_PORT = 3306;
 REDIS_PORT = 6381;
-LISK_CORE_WS_PORT = 7887;
+KLAYR_CORE_WS_PORT = 7887;
 SERVICE_BROKER_PORT = 4222;
 
 def checkOpenPort(nPort) {
@@ -36,7 +36,7 @@ def echoBanner(msg) {
 }
 
 pipeline {
-	agent { node { label 'lisk-service' } }
+	agent { node { label 'klayr-service' } }
 	triggers {
 		cron('0 23 * * *')
 	}
@@ -46,7 +46,7 @@ pipeline {
 	environment {
 		ENABLE_HTTP_API='http-status,http-version3,http-exports'
 		ENABLE_WS_API='rpc-v3,rpc-test,blockchain'
-		LISK_APP_WS='ws://host.docker.internal:7887'
+		KLAYR_APP_WS='ws://host.docker.internal:7887'
 		ENABLE_TESTING_MODE='true'
     }
 	stages {
@@ -61,12 +61,12 @@ pipeline {
 			steps {
 				script { echoBanner(STAGE_NAME) }
 				cleanWs()
-				dir('lisk-service') {
+				dir('klayr-service') {
 					checkout scm
 				}
 			}
 		}
-		stage('Start Lisk Service') {
+		stage('Start Klayr Service') {
 			when {
 				anyOf {
 					branch 'development'
@@ -76,7 +76,7 @@ pipeline {
 			}
 			steps {
 				script { echoBanner(STAGE_NAME) }
-				dir('lisk-service') {
+				dir('klayr-service') {
 					nvm(readFile('.nvmrc').trim()) {
 						sh '''
 							make build
@@ -87,7 +87,7 @@ pipeline {
 				}
 			}
 		}
-		stage('Start Lisk Core') {
+		stage('Start Klayr Core') {
 			when {
 				anyOf {
 					branch 'development'
@@ -97,18 +97,18 @@ pipeline {
 			}
 			steps {
 				script { echoBanner(STAGE_NAME) }
-				dir('lisk-service') {
+				dir('klayr-service') {
 					nvm(readFile('.nvmrc').trim()) {
 						sh '''
-							# lisk-core
-							npm i -g lisk-core@^4.0.0-rc.6
+							# klayr-core
+							npm i -g klayr-core@^4.0.0-rc.6
 							npm i -g pm2
-							pm2 stop jenkins/lisk-core/pm2.config.json
-							pm2 delete jenkins/lisk-core/pm2.config.json
+							pm2 stop jenkins/klayr-core/pm2.config.json
+							pm2 delete jenkins/klayr-core/pm2.config.json
 							pm2 flush
-							rm -rf ~/.lisk/
-							lisk-core blockchain:import jenkins/lisk-core/snapshots/blockchain.tar.gz
-							LISK_CONFIG_FILE=$PWD/jenkins/lisk-core/config/config.json pm2 start jenkins/lisk-core/pm2.config.json
+							rm -rf ~/.klayr/
+							klayr-core blockchain:import jenkins/klayr-core/snapshots/blockchain.tar.gz
+							KLAYR_CONFIG_FILE=$PWD/jenkins/klayr-core/config/config.json pm2 start jenkins/klayr-core/pm2.config.json
 						'''
 					}
 					sleep(5)
@@ -124,14 +124,14 @@ pipeline {
 				}
 			}
 			steps {
-				dir('lisk-service') {
+				dir('klayr-service') {
 					script {
 						runServiceIfMissing('MySQL', './jenkins/mysql', MYSQL_PORT)
 						runServiceIfMissing('Redis', './jenkins/redis', REDIS_PORT)
 					}
 					sleep(5)
 				}
-			}	
+			}
 		}
 		stage('Wait till indexing is complete') {
 			when {
@@ -173,7 +173,7 @@ pipeline {
 				stage ('Check linting') {
 					steps {
 						script { echoBanner(STAGE_NAME) }
-						dir('lisk-service') {
+						dir('klayr-service') {
 							nvm(readFile('.nvmrc').trim()) {
 								sh 'yarn lint'
 							}
@@ -183,18 +183,18 @@ pipeline {
 				stage('Run functional tests') {
 					steps {
 						script { echoBanner(STAGE_NAME) }
-						dir('lisk-service') {
+						dir('klayr-service') {
 							nvm(readFile('.nvmrc').trim()) {
 								dir('./services/blockchain-app-registry') { sh "npm run test:functional" }
-								dir('./services/blockchain-indexer') { 
-									sh "SERVICE_BROKER='nats://127.0.0.1:${SERVICE_BROKER_PORT}' SERVICE_INDEXER_CACHE_REDIS='redis://lisk:password@127.0.0.1:${REDIS_PORT}/2' SERVICE_INDEXER_REDIS_VOLATILE='redis://lisk:password@127.0.0.1:${REDIS_PORT}/3' SERVICE_MESSAGE_QUEUE_REDIS='redis://lisk:password@127.0.0.1:${REDIS_PORT}/4' npm run test:functional"
+								dir('./services/blockchain-indexer') {
+									sh "SERVICE_BROKER='nats://127.0.0.1:${SERVICE_BROKER_PORT}' SERVICE_INDEXER_CACHE_REDIS='redis://klayr:password@127.0.0.1:${REDIS_PORT}/2' SERVICE_INDEXER_REDIS_VOLATILE='redis://klayr:password@127.0.0.1:${REDIS_PORT}/3' SERVICE_MESSAGE_QUEUE_REDIS='redis://klayr:password@127.0.0.1:${REDIS_PORT}/4' npm run test:functional"
 								}
 								dir('./services/fee-estimator') { sh "npm run test:functional" }
-								dir('./services/market') { 
-									sh "SERVICE_BROKER='nats://127.0.0.1:${SERVICE_BROKER_PORT}' SERVICE_MARKET_REDIS='redis://lisk:password@127.0.0.1:${REDIS_PORT}/10' npm run test:functional"
+								dir('./services/market') {
+									sh "SERVICE_BROKER='nats://127.0.0.1:${SERVICE_BROKER_PORT}' SERVICE_MARKET_REDIS='redis://klayr:password@127.0.0.1:${REDIS_PORT}/10' npm run test:functional"
 								}
 								dir('./services/transaction-statistics') { sh "SERVICE_BROKER='nats://127.0.0.1:${SERVICE_BROKER_PORT}' npm run test:functional" }
-								dir('./framework') { sh "REDIS_URL='redis://lisk:password@127.0.0.1:${REDIS_PORT}/0' npm run test:functional" }
+								dir('./framework') { sh "REDIS_URL='redis://klayr:password@127.0.0.1:${REDIS_PORT}/0' npm run test:functional" }
 								dir('./services/blockchain-connector') { sh "SERVICE_BROKER='nats://127.0.0.1:${SERVICE_BROKER_PORT}' npm run test:functional" }
 							}
 						}
@@ -203,7 +203,7 @@ pipeline {
 				stage('Run integration tests') {
 					steps {
 						script { echoBanner(STAGE_NAME) }
-						dir('lisk-service') {
+						dir('klayr-service') {
 							nvm(readFile('.nvmrc').trim()) {
 								dir('./tests') { sh "node runIntegrationTestsWithRetry.js" }
 							}
@@ -216,13 +216,13 @@ pipeline {
 	post {
 		failure {
 			emailext(
-				to: 'service-dev@lisk.com',
+				to: 'service-dev@klayr.com',
 				subject: "[JENKINS] ${currentBuild.fullDisplayName} - ${currentBuild.result}",
 				body: """
 					Hello Team,<br><br>
-					
-					Build <b>${currentBuild.fullDisplayName}</b> for <b>Lisk Service</b> needs your attention. Please find all the necessary details below:
-					
+
+					Build <b>${currentBuild.fullDisplayName}</b> for <b>Klayr Service</b> needs your attention. Please find all the necessary details below:
+
 					<p>
 						<ul>
 							<li>Job <b>${currentBuild.fullDisplayName}</b> finished with result - <b>${currentBuild.result}</b></li>
@@ -231,22 +231,22 @@ pipeline {
 						</ul>
 					</p>
 
-					- Lisk Service Team!
+					- Klayr Service Team!
 				""",
 				mimeType: 'text/html'
 			)
-			script { 
-				echoBanner('Failed to run the pipeline') 
+			script {
+				echoBanner('Failed to run the pipeline')
 			}
 		}
 		cleanup {
-			script { 
-				dir('lisk-service') {
+			script {
+				dir('klayr-service') {
 					nvm(readFile('.nvmrc').trim()) {
 						sh '''
 							docker-compose -f jenkins/docker-compose.nightly.yml down --volumes --remove-orphans
-							pm2 stop jenkins/lisk-core/pm2.config.json
-							pm2 delete jenkins/lisk-core/pm2.config.json
+							pm2 stop jenkins/klayr-core/pm2.config.json
+							pm2 delete jenkins/klayr-core/pm2.config.json
 							pm2 flush
 							make clean
 						'''

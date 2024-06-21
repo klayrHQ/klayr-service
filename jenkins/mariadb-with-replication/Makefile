@@ -15,7 +15,7 @@ logs:
 clean: down
 
 cli-primary:
-	$(compose) exec mysql-primary mysql -u root -ppassword lisk
+	$(compose) exec mysql-primary mysql -u root -ppassword klayr
 
 cli-replica:
-	$(compose) exec mysql-read-replica mysql -u root -ppassword lisk
+	$(compose) exec mysql-read-replica mysql -u root -ppassword klayr

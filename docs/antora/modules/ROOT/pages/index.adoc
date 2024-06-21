@@ -54,11 +54,11 @@ Mona Bärenfänger <mona@lightcurve.io>
 :url_api_rpc:   {klayr-docs}api/klayr-node-rpc.adoc
 :url_api_subscribe:  {klayr-docs}api/klayr-service-pubsub.adoc
 :url_config:  configuration/docker.adoc
-// url_protocol:  {lisk-docs}understand-blockchain/lisk-protocol/index.adoc
+// url_protocol:  {klayr-docs}understand-blockchain/klayr-protocol/index.adoc
 :url_setup:  setup/docker.adoc
 
 //TODO: Undo this link when the respective page is read in the beta version.
-// {url_github_lisk_service}[Lisk Service^] is a web application middleware that allows interaction with various blockchain networks based on the xref:{url_protocol}[Lisk] protocol.
+// {url_github_klayr_service}[Klayr Service^] is a web application middleware that allows interaction with various blockchain networks based on the xref:{url_protocol}[Klayr] protocol.
 {url_github_klayr_service}[Klayr Service^] is a web application middleware that allows interaction with various blockchain networks based on the Klayr protocol.
 
 
@@ -101,8 +101,8 @@ An overview of each microservice is given in the following table listed below.
 |The Gateway component exposes the API for Klayr Service users to access and use over HTTP and WS protocols.
 Its main purpose is to proxy API requests from users to other microservice components provided by Klayr Service.
 It provides the users with a **central point of data access** that ensures existing application compatibility is maintained.
-// provides a RESTful xref:{url_api_http}[HTTP API], which all users of Lisk Service can access and use.
-// Its main purpose is to proxy API requests from users to other components provided by Lisk Service.
+// provides a RESTful xref:{url_api_http}[HTTP API], which all users of Klayr Service can access and use.
+// Its main purpose is to proxy API requests from users to other components provided by Klayr Service.
 // It also maintains backwards compatibility when its public API is changed or replaced by a new version.
 // This provides users with a **central point of data access** that never breaks existing application compatibility.
 
@@ -205,30 +205,30 @@ The Gateway service provides the following APIs, which all users of Klayr Servic
 
 // [source,bash]
 // ----
-// tar -xf lisk-service-x.y.z.tar.gz
-// cd lisk-service
+// tar -xf klayr-service-x.y.z.tar.gz
+// cd klayr-service
 // ----
 
-// The above commands retrieve the entire source code, however, this does not cover building a custom version of Lisk Service.
-// For more information refer to this document: {url_service-source}[Building Lisk Service from source^].
+// The above commands retrieve the entire source code, however, this does not cover building a custom version of Klayr Service.
+// For more information refer to this document: {url_service-source}[Building Klayr Service from source^].
 
 // ==== Docker image build
 
 // Building a Docker image is optional.
-// However, if you wish to build the local version of Lisk Service execute the following command below:
+// However, if you wish to build the local version of Klayr Service execute the following command below:
 
 // [source,bash]
 // ----
 // make build-images
 // ----
-// Please note, this step is only necessary if you wish to build a custom or pre-release version of Lisk Service that does not have a pre-built Docker image published on the Docker Hub.
+// Please note, this step is only necessary if you wish to build a custom or pre-release version of Klayr Service that does not have a pre-built Docker image published on the Docker Hub.
 // The installation script chooses the last available stable version on the Docker Hub, *unless* there is no local image.
 
 // If you are unsure about any local builds, use the `make clean` command to remove all locally built docker images.
 
 // === Configuration
 
-// The default configuration is sufficient to run Lisk Service against the local node.
+// The default configuration is sufficient to run Klayr Service against the local node.
 
 // Before running the application copy the default docker-compose environment file as shown in the command below:
 
@@ -244,19 +244,19 @@ The Gateway service provides the following APIs, which all users of Klayr Servic
 // $EDITOR .env
 // ----
 
-// The example snippet below assumes that the Lisk Core (or any Lisk protocol-compliant blockchain application), node is running on the host machine and not inside of a Docker container.
+// The example snippet below assumes that the Klayr Core (or any Klayr protocol-compliant blockchain application), node is running on the host machine and not inside of a Docker container.
 
 // [source,bash]
 // ----
 // ## Required
-// # The local Lisk Core node WebSocket API port
-// export LISK_APP_WS="ws://host.docker.internal:7667"
+// # The local Klayr Core node WebSocket API port
+// export KLAYR_APP_WS="ws://host.docker.internal:7667"
 // ----
 
 // When running a node inside of a Docker container, the variable needs to refer to the container as shown below:
-// `LISK_APP_WS="ws://<your_docker_container>:7667"`.
+// `KLAYR_APP_WS="ws://<your_docker_container>:7667"`.
 
-// For more information, the configuration options are described here in the {url_service_config}[Lisk Service Configuration Reference^], which may also be helpful with regard to PM2-based installations.
+// For more information, the configuration options are described here in the {url_service_config}[Klayr Service Configuration Reference^], which may also be helpful with regard to PM2-based installations.
 
 
 
@@ -380,7 +380,7 @@ Klayr Testnet::
 //Use public Service node
 //const WS_RPC_ENDPOINT = "wss://service.klayr.xyz/rpc-v3";
 
-// 2. Connect to Lisk Service via WebSockets
+// 2. Connect to Klayr Service via WebSockets
 // const socket = io(WS_RPC_ENDPOINT, {
 //   forceNew: true,
 //  transports: ['websocket']

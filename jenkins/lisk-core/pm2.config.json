@@ -1,7 +1,7 @@
 {
-	"name": "lisk-core",
-	"script": "lisk-core start",
+	"name": "klayr-core",
+	"script": "klayr-core start",
 	"env": {
-		"LISK_NETWORK": "devnet"
+		"KLAYR_NETWORK": "devnet"
 	}
 }

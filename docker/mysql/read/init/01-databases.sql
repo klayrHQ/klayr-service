@@ -1,5 +1,5 @@
 -- Create database(s).
-CREATE DATABASE IF NOT EXISTS `lisk`;
+CREATE DATABASE IF NOT EXISTS `klayr`;
 
 -- Create `reader` user for read queries and grant read privilages.
 CREATE USER 'reader'@'%' IDENTIFIED WITH caching_sha2_password BY 'password';

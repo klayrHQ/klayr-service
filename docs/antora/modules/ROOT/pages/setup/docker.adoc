@@ -228,4 +228,4 @@ make down
 
 More commands about how to manage Klayr Service are described on the xref:{url_management}[] page.
 
-// TIP: Check the xref:{url_index_usage}[Usage] section for examples of how to use and interact with Lisk Service.
+// TIP: Check the xref:{url_index_usage}[Usage] section for examples of how to use and interact with Klayr Service.

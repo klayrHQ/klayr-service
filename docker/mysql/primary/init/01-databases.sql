@@ -1,8 +1,8 @@
 -- Create database(s).
-CREATE DATABASE IF NOT EXISTS `lisk`;
+CREATE DATABASE IF NOT EXISTS `klayr`;
 
--- Grant rights to `lisk` user.
-GRANT ALL PRIVILEGES ON *.* TO 'lisk'@'%';
+-- Grant rights to `klayr` user.
+GRANT ALL PRIVILEGES ON *.* TO 'klayr'@'%';
 
 -- Create user for replica and grant replication privilege.
 CREATE USER 'replica'@'%' IDENTIFIED WITH caching_sha2_password BY 'password';
