@@ -225,4 +225,6 @@ config.invokeAllowedMethods = process.env.INVOKE_ALLOWED_METHODS
 			'pos_getExpectedSharedRewards',
 	  ];
 
+config.indexBlocksRetryDelay = Number(process.env.INDEX_BLOCKS_RETRY_DELAY) || 1000;
+
 module.exports = config;

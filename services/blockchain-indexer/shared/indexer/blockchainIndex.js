@@ -430,6 +430,9 @@ const indexBlock = async job => {
 				: `Error occurred while indexing block at height ${failedBlockInfo.height}. Will retry.`,
 		);
 		logger.debug(error.stack);
+
+		// eslint-disable-next-line no-promise-executor-return
+		await new Promise(r => setTimeout(r, config.indexBlocksRetryDelay)); // reduce stress on core node
 		throw error;
 	}
 };
