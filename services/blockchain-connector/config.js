@@ -116,12 +116,19 @@ config.job = {
 };
 
 config.apiClient = {
-	poolSize: Number(process.env.CLIENT_POOL_SIZE) || 10,
+	poolSize: Number(process.env.CLIENT_POOL_SIZE) || 1,
 	wsServerPingInterval: Number(process.env.WS_SERVER_PING_INTERVAL) || 3 * 1000, // in millisecs
 	pingIntervalBuffer: Number(process.env.WS_SERVER_PING_INTERVAL_BUFFER) || 1000, // in millisecs
 	request: {
 		maxRetries: Number(process.env.ENDPOINT_INVOKE_MAX_RETRIES) || 3,
 		retryDelay: Number(process.env.ENDPOINT_INVOKE_RETRY_DELAY) || 1000, // in millisecs
+	},
+};
+
+config.queue = {
+	invokeEndpoint: {
+		name: 'InvokeEndpoint',
+		concurrency: Number(process.env.INVOKE_ENDPOINT_QUEUE_CONCURRENCY) || 1,
 	},
 };
 

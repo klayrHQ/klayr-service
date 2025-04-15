@@ -25,6 +25,7 @@ const { createWSClient, createIPCClient } = require('@klayr/api-client');
 const crypto = require('crypto');
 
 const config = require('../../config');
+const { getQueueInstance } = require('../utils/queue');
 
 const logger = Logger();
 
@@ -265,7 +266,7 @@ const buildHTTPResponse = (endpoint, params, response) => {
 };
 
 // eslint-disable-next-line consistent-return
-const invokeEndpoint = async (endpoint, params = {}, numRetries = NUM_REQUEST_RETRIES) => {
+const invokeEndpointWrapped = async (endpoint, params = {}, numRetries = NUM_REQUEST_RETRIES) => {
 	let retriesLeft = numRetries;
 	do {
 		try {
@@ -308,6 +309,13 @@ const invokeEndpoint = async (endpoint, params = {}, numRetries = NUM_REQUEST_RE
 			}
 		}
 	} while (retriesLeft--);
+};
+
+const invokeEndpoint = async (endpoint, params = {}, numRetries = NUM_REQUEST_RETRIES) => {
+	const invokeEndpointQueue = await getQueueInstance({
+		concurrency: config.queue.invokeEndpoint.concurrency,
+	});
+	return invokeEndpointQueue.add(() => invokeEndpointWrapped(endpoint, params, numRetries));
 };
 
 module.exports = {
