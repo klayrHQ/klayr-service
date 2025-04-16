@@ -36,6 +36,7 @@ config.transporter = process.env.SERVICE_BROKER || 'redis://klayr:password@127.0
 config.brokerTimeout = Number(process.env.SERVICE_BROKER_TIMEOUT) || 10; // in seconds
 config.volatileRedis =
 	process.env.SERVICE_GATEWAY_REDIS_VOLATILE || 'redis://klayr:password@127.0.0.1:6379/5';
+config.routesCallTimeout = Number(process.env.GATEWAY_ROUTES_CALL_TIMEOUT) || 30; // in seconds
 
 /**
  * Compatibility

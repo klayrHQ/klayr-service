@@ -22,7 +22,7 @@ const defaultConfig = {
 	aliases: {},
 
 	callOptions: {
-		timeout: 30000,
+		timeout: config.routesCallTimeout * 1000,
 		retries: 3,
 	},
 
