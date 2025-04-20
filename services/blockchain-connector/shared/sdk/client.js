@@ -52,7 +52,7 @@ const globalClientInstantiationStats = {
 };
 
 let lastUsedIndex = 0;
-const nodeClientPool = {};
+const nodeClientPool = [];
 
 function getNodeClientActiveSize(node) {
 	return node.url.startsWith('http')
@@ -61,27 +61,24 @@ function getNodeClientActiveSize(node) {
 }
 
 function getActiveNodeClientActive() {
-	return Object.fromEntries(
-		// eslint-disable-next-line no-unused-vars
-		Object.entries(nodeClientPool).filter(([_, node]) => getNodeClientActiveSize(node) > 0),
-	);
+	return nodeClientPool.filter(node => getNodeClientActiveSize(node) > 0);
 }
 
 function getEventSubscriberNodeURL() {
-	const isConfigValueExist = Object.keys(nodeClientPool).includes(
-		config.endpoints.klayrEventSubscriber,
-	);
+	const isConfigValueExist =
+		nodeClientPool.findIndex(node => node.url === config.endpoints.klayrEventSubscriber) > -1;
 	if (isConfigValueExist) return config.endpoints.klayrEventSubscriber;
 	return config.endpoints.klayrUrls[0];
 }
 
 function getEventSubscriberNode() {
-	if (Object.entries(nodeClientPool).length === 0) return undefined;
-	return nodeClientPool[getEventSubscriberNodeURL()];
+	if (nodeClientPool.length === 0) return undefined;
+	const eventSubscriberUrl = getEventSubscriberNodeURL();
+	return nodeClientPool.find(node => node.url === eventSubscriberUrl);
 }
 
 async function initNodeClientPool() {
-	if (Object.entries(nodeClientPool).length > 0) return;
+	if (nodeClientPool.length > 0) return;
 
 	for (let index = 0; index < config.endpoints.klayrUrls.length; index++) {
 		const node = {
@@ -97,7 +94,7 @@ async function initNodeClientPool() {
 			isDedicatedEventSubscriber: false,
 			isReInstantiateIntervalRunning: false,
 		};
-		nodeClientPool[config.endpoints.klayrUrls[index]] = node;
+		nodeClientPool.push(node);
 	}
 
 	const eventSubscriberNode = getEventSubscriberNode();
@@ -111,7 +108,7 @@ async function initNodeClientPool() {
 }
 
 async function initNodeClientPoolIfEmpty() {
-	if (Object.entries(nodeClientPool).length === 0) {
+	if (nodeClientPool.length === 0) {
 		await initNodeClientPool();
 		return true;
 	}
@@ -124,42 +121,42 @@ function getNodeQueueSize(node) {
 
 async function getLeastLoadedNode() {
 	if (await initNodeClientPoolIfEmpty()) {
-		const nodes = Object.entries(nodeClientPool);
 		lastUsedIndex++;
-		return nodes[lastUsedIndex % nodes.length][1];
+		return nodeClientPool[lastUsedIndex % nodes.length];
 	}
 
 	// 1. Filter only healthy nodes
 	const healthyNodes = getActiveNodeClientActive();
-	if (Object.entries(healthyNodes).length === 0) {
+	if (healthyNodes.length === 0) {
 		logger.error('getLeastLoadedNode Error: No healthy nodes available!');
 		throw new Error('No healthy nodes available');
 	}
 
 	// 2. Find the minimum active requests
 	// eslint-disable-next-line no-unused-vars
-	const minLoad = Math.min(...Object.entries(healthyNodes).map(([_, n]) => getNodeQueueSize(n)));
+	const minLoad = Math.min(...healthyNodes.map(n => getNodeQueueSize(n)));
 
 	// 3. Collect all nodes with that min load
-	const candidates = Object.entries(healthyNodes).filter(
+	const candidates = healthyNodes.filter(
 		// eslint-disable-next-line no-unused-vars
-		([_, n]) => getNodeQueueSize(n) <= minLoad,
+		n => getNodeQueueSize(n) <= minLoad,
 	);
 
 	// 4. Round-robin selection among candidates
 	const selected = candidates[lastUsedIndex % candidates.length];
 	lastUsedIndex++;
 
-	return selected[1];
+	return selected;
 }
 
 async function getNodeClient(url) {
 	await initNodeClientPoolIfEmpty();
-	if (!nodeClientPool[url]) {
+	const node = nodeClientPool.find(n => n.url === url);
+	if (!node) {
 		logger.error(`getNodeClient Error: Node client for ${url} is not available!`);
 		throw new Error(`Node client for ${url} is not available!`);
 	}
-	return nodeClientPool[url];
+	return node;
 }
 
 const checkIsClientAlive = client => client && client._channel && client._channel.isAlive;
