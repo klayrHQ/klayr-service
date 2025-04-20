@@ -113,11 +113,8 @@ module.exports = {
 			env: {
 				// --- Remember to set the properties below
 				SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
-				// USE_KLAYR_IPC_CLIENT: true,
-				// KLAYR_APP_DATA_PATH: '~/.klayr/klayr-core',
-				// USE_KLAYR_HTTP_API: true,
-				// KLAYR_APP_HTTP: 'http://127.0.0.1:7887',
-				// KLAYR_APP_WS: 'ws://127.0.0.1:7887',
+				// KLAYR_APP_URLS: 'ws://127.0.0.1:7887',
+				// KLAYR_EVENT_SUBSCRIBER_NODE: 'ws://127.0.0.1:7887',
 				// GEOIP_JSON: 'https://geoip.klayr.com/json',
 				// ENABLE_BLOCK_CACHING: true,
 				// EXPIRY_IN_HOURS: 12,

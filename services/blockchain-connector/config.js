@@ -34,19 +34,12 @@ config.brokerTimeout = Number(process.env.SERVICE_BROKER_TIMEOUT) || 10; // in s
 /**
  * External endpoints
  */
-config.endpoints.klayrWs = process.env.KLAYR_APP_WS || 'ws://127.0.0.1:7887';
-config.endpoints.klayrHttp =
-	process.env.KLAYR_APP_HTTP || config.endpoints.klayrWs.replace('ws', 'http');
+config.endpoints.klayrUrls = process.env.KLAYR_APP_URLS
+	? process.env.KLAYR_APP_URLS.split(',')
+	: ['ws://127.0.0.1:7887'];
+config.endpoints.klayrEventSubscriber =
+	process.env.KLAYR_EVENT_SUBSCRIBER_NODE || 'ws://127.0.0.1:7887';
 config.endpoints.geoip = process.env.GEOIP_JSON || 'https://geoip.klayr.xyz/json';
-
-/**
- * API Client related settings
- */
-config.isUseHttpApi = Boolean(String(process.env.USE_KLAYR_HTTP_API).toLowerCase() === 'true'); // Disabled by default
-config.isUseKlayrIPCClient = Boolean(
-	String(process.env.USE_KLAYR_IPC_CLIENT).toLowerCase() === 'true',
-);
-config.klayrAppDataPath = process.env.KLAYR_APP_DATA_PATH || '~/.klayr/klayr-core';
 
 /**
  * Network-related settings

@@ -1,11 +1,15 @@
-let queueInstance = null;
+let PQueue;
 
-async function getQueueInstance({ concurrency }) {
-	if (!queueInstance) {
-		const PQueue = await import('p-queue');
-		queueInstance = new PQueue.default({ concurrency });
+async function importPQueue() {
+	if (!PQueue) {
+		PQueue = await import('p-queue');
 	}
-	return queueInstance;
+	return PQueue;
 }
 
-module.exports = { getQueueInstance };
+async function createQueueInstance(concurrency) {
+	const pQueue = await importPQueue();
+	return new pQueue.default({ concurrency });
+}
+
+module.exports = { createQueueInstance };

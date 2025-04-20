@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 /*
  * Klayrhq/klayrservice
  * Copyright © 2022 Lisk Foundation
@@ -18,20 +19,16 @@ const {
 	Signals,
 	HTTP,
 	Exceptions: { TimeoutException },
-	Utils: { delay, isObject, waitForIt },
+	Utils: { delay, isObject },
 } = require('klayr-service-framework');
 const { createWSClient, createIPCClient } = require('@klayr/api-client');
 
 const crypto = require('crypto');
 
 const config = require('../../config');
-const { getQueueInstance } = require('../utils/queue');
+const { createQueueInstance } = require('../utils/queue');
 
 const logger = Logger();
-
-// Connection strings
-const klayrAddressWs = config.endpoints.klayrWs;
-const klayrAddressHttp = config.endpoints.klayrHttp;
 
 // Constants
 const ERROR_CONN_REFUSED = 'ECONNREFUSED';
@@ -48,22 +45,135 @@ const WS_SERVER_PING_BUFFER = config.apiClient.pingIntervalBuffer; // In case th
 const WS_SERVER_PING_THRESHOLD = WS_SERVER_PING_INTERVAL + WS_SERVER_PING_BUFFER;
 
 // Caching
-const clientPool = [];
-const clientInstantiationStats = {
+const globalClientInstantiationStats = {
 	attempts: 0,
 	success: 0,
 	fail: 0,
 };
-let requestCount = 0;
+
+let lastUsedIndex = 0;
+const nodeClientPool = {};
+
+function getNodeClientActiveSize(node) {
+	return node.url.startsWith('http')
+		? 1
+		: node.clientPool.filter(client => client && client._channel && client._channel.isAlive).length;
+}
+
+function getActiveNodeClientActive() {
+	return Object.fromEntries(
+		// eslint-disable-next-line no-unused-vars
+		Object.entries(nodeClientPool).filter(([_, node]) => getNodeClientActiveSize(node) > 0),
+	);
+}
+
+function getEventSubscriberNodeURL() {
+	const isConfigValueExist = Object.keys(nodeClientPool).includes(
+		config.endpoints.klayrEventSubscriber,
+	);
+	if (isConfigValueExist) return config.endpoints.klayrEventSubscriber;
+	return config.endpoints.klayrUrls[0];
+}
+
+function getEventSubscriberNode() {
+	if (Object.entries(nodeClientPool).length === 0) return undefined;
+	return nodeClientPool[getEventSubscriberNodeURL()];
+}
+
+async function initNodeClientPool() {
+	if (Object.entries(nodeClientPool).length > 0) return;
+
+	for (let index = 0; index < config.endpoints.klayrUrls.length; index++) {
+		const node = {
+			url: config.endpoints.klayrUrls[index],
+			clientPool: [],
+			queue: await createQueueInstance(config.queue.invokeEndpoint.concurrency),
+			instantiationStats: {
+				attempts: 0,
+				success: 0,
+				fail: 0,
+			},
+			numEndpointInvocations: 0,
+			isDedicatedEventSubscriber: false,
+			isReInstantiateIntervalRunning: false,
+		};
+		nodeClientPool[config.endpoints.klayrUrls[index]] = node;
+	}
+
+	const eventSubscriberNode = getEventSubscriberNode();
+	eventSubscriberNode.isDedicatedEventSubscriber = true;
+
+	for (let index = 0; index < config.endpoints.klayrUrls.length; index++) {
+		const type = getClientUrlType(config.endpoints.klayrUrls[index]);
+		if (type !== 'http')
+			await initClientPool(config.endpoints.klayrUrls[index], MAX_CLIENT_POOL_SIZE);
+	}
+}
+
+async function initNodeClientPoolIfEmpty() {
+	if (Object.entries(nodeClientPool).length === 0) {
+		await initNodeClientPool();
+		return true;
+	}
+	return false;
+}
+
+function getNodeQueueSize(node) {
+	return node.queue.size + node.queue.pending;
+}
+
+async function getLeastLoadedNode() {
+	if (await initNodeClientPoolIfEmpty()) {
+		const nodes = Object.entries(nodeClientPool);
+		lastUsedIndex++;
+		return nodes[lastUsedIndex % nodes.length][1];
+	}
+
+	// 1. Filter only healthy nodes
+	const healthyNodes = getActiveNodeClientActive();
+	if (Object.entries(healthyNodes).length === 0) {
+		logger.error('getLeastLoadedNode Error: No healthy nodes available!');
+		throw new Error('No healthy nodes available');
+	}
+
+	// 2. Find the minimum active requests
+	// eslint-disable-next-line no-unused-vars
+	const minLoad = Math.min(...Object.entries(healthyNodes).map(([_, n]) => getNodeQueueSize(n)));
+
+	// 3. Collect all nodes with that min load
+	const candidates = Object.entries(healthyNodes).filter(
+		// eslint-disable-next-line no-unused-vars
+		([_, n]) => getNodeQueueSize(n) <= minLoad,
+	);
+
+	// 4. Round-robin selection among candidates
+	const selected = candidates[lastUsedIndex % candidates.length];
+	lastUsedIndex++;
+
+	return selected[1];
+}
+
+async function getNodeClient(url) {
+	await initNodeClientPoolIfEmpty();
+	if (!nodeClientPool[url]) {
+		logger.error(`getNodeClient Error: Node client for ${url} is not available!`);
+		throw new Error(`Node client for ${url} is not available!`);
+	}
+	return nodeClientPool[url];
+}
 
 const checkIsClientAlive = client => client && client._channel && client._channel.isAlive;
 
-const getApiClientStats = () => ({
-	...clientInstantiationStats,
-	activePoolSize: clientPool.filter(client => checkIsClientAlive(client)).length,
-	expectedPoolSize: MAX_CLIENT_POOL_SIZE,
-	numEndpointInvocations: requestCount,
-});
+const getApiClientStats = async url => {
+	const node = await getNodeClient(url);
+	return {
+		...node.instantiationStats,
+		queueSize: getNodeQueueSize(node),
+		activePoolSize: getNodeClientActiveSize(node),
+		expectedPoolSize: MAX_CLIENT_POOL_SIZE,
+		numEndpointInvocations: node.numEndpointInvocations,
+	};
+};
 
 const pingListener = apiClient => {
 	if (!isObject(apiClient)) {
@@ -72,7 +182,7 @@ const pingListener = apiClient => {
 	}
 
 	const now = Date.now();
-	logger.trace(`Client ${apiClient.poolIndex} received server ping at ${now}.`);
+	logger.trace(`Client ${apiClient.poolIndex} at ${apiClient.url} received server ping at ${now}.`);
 	clearTimeout(apiClient.pingTimeout);
 
 	apiClient.pingTimeout = setTimeout(() => {
@@ -80,12 +190,12 @@ const pingListener = apiClient => {
 		const timeSinceLastPing = now - apiClient.lastPingAt;
 		if (timeSinceLastPing) {
 			logger.warn(
-				`No ping for client ${apiClient.poolIndex} from server in ${timeSinceLastPing}ms (last ping: ${apiClient.lastPingAt}).`,
+				`No ping for client ${apiClient.poolIndex} from server ${apiClient.url} in ${timeSinceLastPing}ms (last ping: ${apiClient.lastPingAt}).`,
 			);
 			apiClient._channel.isAlive = false;
 			Signals.get('resetApiClient').dispatch(apiClient);
 			logger.debug(
-				`Dispatched 'resetApiClient' signal from pingListener for API client ${apiClient.poolIndex}.`,
+				`Dispatched 'resetApiClient' signal from pingListener for API client ${apiClient.poolIndex} at ${apiClient.url}.`,
 			);
 		}
 	}, WS_SERVER_PING_THRESHOLD);
@@ -93,44 +203,67 @@ const pingListener = apiClient => {
 	apiClient.lastPingAt = now;
 };
 
-const instantiateNewClient = async () => {
-	clientInstantiationStats.attempts++;
-	try {
-		const newClient = config.isUseKlayrIPCClient
-			? await createIPCClient(config.klayrAppDataPath)
-			: await (async () => {
-					const client = await createWSClient(`${klayrAddressWs}/rpc-ws`);
-					client._channel._ws.on('ping', pingListener.bind(null, client));
-					return client;
-			  })();
+const getClientUrlType = url => {
+	if (url.startsWith('http')) return 'http';
+	if (url.startsWith('ws')) return 'ws';
+	return 'ipc';
+};
 
-		clientInstantiationStats.success++;
+const instantiateNewClient = async url => {
+	const node = await getNodeClient(url);
+	globalClientInstantiationStats.attempts++;
+	node.instantiationStats.attempts++;
+
+	const urlType = getClientUrlType(url);
+	if (urlType === 'http') {
+		logger.error('instantiateNewClient Error: API Client instantiation is only for ws or ipc');
+		throw new Error('API Client instantiation is only for ws or ipc');
+	}
+
+	try {
+		const newClient =
+			urlType === 'ipc'
+				? await createIPCClient(url)
+				: await (async () => {
+						const client = await createWSClient(`${url}/rpc-ws`);
+						client._channel._ws.on('ping', pingListener.bind(null, client));
+						return client;
+				  })();
+
+		globalClientInstantiationStats.success++;
+		node.instantiationStats.success++;
+
 		return newClient;
 	} catch (err) {
-		clientInstantiationStats.fail++;
-		const errMessage = config.isUseKlayrIPCClient
-			? `Error instantiating IPC client at ${config.klayrAppDataPath}`
-			: `Error instantiating WS client to ${klayrAddressWs}`;
+		globalClientInstantiationStats.fail++;
+		node.instantiationStats.fail++;
+
+		const errMessage =
+			urlType === 'ipc'
+				? `Error instantiating IPC client at ${url}`
+				: `Error instantiating WS client to ${url}`;
 
 		logger.error(`${errMessage}: ${err.message}`);
 		if (err.message.includes(ERROR_CONN_REFUSED)) {
-			throw new Error('Unable to connect to the node.');
+			logger.error(`instantiateNewClient Error: Unable to connect to the node ${url}`);
+			throw new Error(`Unable to connect to the node ${url}`);
 		}
 
 		throw err;
 	}
 };
 
-let isReInstantiateIntervalRunning = false;
-const initClientPool = async poolSize => {
+const initClientPool = async (url, poolSize) => {
+	const node = await getNodeClient(url);
+
 	// Set the intervals only at application init
-	if (clientPool.length === 0) {
-		setInterval(() => {
-			const stats = getApiClientStats();
-			logger.info(`API client instantiation stats: ${JSON.stringify(stats)}`);
+	if (node.clientPool.length === 0) {
+		setInterval(async () => {
+			const stats = await getApiClientStats(url);
+			logger.info(`API client at node ${url} instantiation stats: ${JSON.stringify(stats)}`);
 			if (stats.activePoolSize < stats.expectedPoolSize) {
 				logger.warn(
-					'activePoolSize should catch up with the expectedPoolSize, once the node is under less stress.',
+					`activePoolSize on ${url} should catch up with the expectedPoolSize, once the node is under less stress.`,
 				);
 			}
 		}, 5 * 60 * 1000);
@@ -138,28 +271,31 @@ const initClientPool = async poolSize => {
 		// Re-instantiate interval: Replaces nulls in clientPool with new active apiClients
 		// isReInstantiateIntervalRunning is the safety check to skip callback execution if the previous one is already in-progress
 		setInterval(async () => {
-			if (isReInstantiateIntervalRunning) return;
-			isReInstantiateIntervalRunning = true;
+			if (node.isReInstantiateIntervalRunning) return;
+			node.isReInstantiateIntervalRunning = true;
 
-			for (let index = 0; index < clientPool.length; index++) {
-				const apiClient = clientPool[index];
+			for (let index = 0; index < node.clientPool.length; index++) {
+				const apiClient = node.clientPool[index];
 
 				// eslint-disable-next-line no-continue
 				if (isObject(apiClient)) continue;
 
 				// Re-instantiate when null
-				const newApiClient = await instantiateNewClient()
+				const newApiClient = await instantiateNewClient(url)
 					.then(client => {
+						client.url = url;
 						client.poolIndex = index;
 						return client;
 					})
 					// Delay to lower stress on the node
 					.catch(() => delay(Math.ceil(2 * WS_SERVER_PING_INTERVAL), null));
-				clientPool[index] = newApiClient;
-				if (newApiClient) Signals.get('newApiClient').dispatch(newApiClient.poolIndex);
+				node.clientPool[index] = newApiClient;
+				if (node.isDedicatedEventSubscriber === true && newApiClient) {
+					Signals.get('newApiClient').dispatch(newApiClient.url, newApiClient.poolIndex);
+				}
 			}
 
-			isReInstantiateIntervalRunning = false;
+			node.isReInstantiateIntervalRunning = false;
 		}, WS_SERVER_PING_INTERVAL);
 	}
 
@@ -167,43 +303,72 @@ const initClientPool = async poolSize => {
 		const startTime = Date.now();
 		for (let i = 0; i < poolSize; i++) {
 			// Do not instantiate new clients if enough clients already cached
-			if (clientPool.length >= poolSize) break;
+			if (node.clientPool.length >= poolSize) break;
 
-			const newApiClient = await instantiateNewClient();
-			newApiClient.poolIndex = clientPool.length;
-			clientPool.push(newApiClient);
+			const newApiClient = await instantiateNewClient(url);
+			newApiClient.poolIndex = node.clientPool.length;
+			newApiClient.url = url;
+			node.clientPool.push(newApiClient);
 		}
 		logger.info(
-			`Initialized client pool in ${Date.now() - startTime}ms with ${clientPool.length} instances.`,
+			`Initialized client pool in ${Date.now() - startTime}ms at node ${url} with ${
+				node.clientPool.length
+			} instances.`,
 		);
 	} catch (err) {
 		logger.warn(
-			clientPool.length
-				? `API client pool initialization failed due to: ${err.message}\nManaged to initialize the pool with only ${clientPool.length} instead of expected ${poolSize} clients.`
-				: `API client pool initialization failed due to: ${err.message}`,
+			node.clientPool.length
+				? `API client pool initialization on ${url} failed due to: ${err.message}\nManaged to initialize the pool with only ${node.clientPool.length} instead of expected ${poolSize} clients.`
+				: `API client pool initialization on ${url} failed due to: ${err.message}`,
 		);
 		throw err;
 	}
 };
 
-const getApiClient = async poolIndex => {
-	if (!clientPool.length) await initClientPool(MAX_CLIENT_POOL_SIZE);
+const waitForGetApiClient = (url, intervalMs = 1000, resolveUndefined = false) =>
+	// eslint-disable-next-line implicit-arrow-linebreak
+	new Promise(resolve => {
+		// eslint-disable-next-line consistent-return
+		const timeout = setInterval(async () => {
+			try {
+				const result = await getApiClient(url);
+				if (resolveUndefined || result !== undefined) {
+					clearInterval(timeout);
+					return resolve(result);
+				}
+			} catch (err) {
+				logger.debug(`Waiting ${intervalMs}...`);
+			}
+		}, intervalMs);
+	});
+
+const getApiClient = async (url, poolIndex) => {
+	await initNodeClientPoolIfEmpty();
+	const node = await getNodeClient(url);
 
 	const index = Number.isNaN(Number(poolIndex))
-		? crypto.randomInt(Math.min(clientPool.length, MAX_CLIENT_POOL_SIZE))
+		? crypto.randomInt(Math.min(node.clientPool.length, MAX_CLIENT_POOL_SIZE))
 		: poolIndex;
 
-	const apiClient = clientPool[index];
+	const apiClient = node.clientPool[index];
 	return checkIsClientAlive(apiClient)
 		? apiClient
-		: (() => {
+		: (async () => {
 				if (apiClient) {
 					Signals.get('resetApiClient').dispatch(apiClient);
 					logger.debug(
-						`Dispatched 'resetApiClient' signal from getApiClient for API client ${apiClient.poolIndex}.`,
+						`Dispatched 'resetApiClient' signal from getApiClient for API client ${apiClient.poolIndex} at ${apiClient.url}.`,
 					);
 				}
-				return waitForIt(getApiClient, Math.ceil(WS_SERVER_PING_INTERVAL / MAX_CLIENT_POOL_SIZE));
+
+				const intervalMs = Math.ceil(WS_SERVER_PING_INTERVAL / MAX_CLIENT_POOL_SIZE);
+
+				if (getNodeClientActiveSize(node) === 0) {
+					const healthyNode = await getLeastLoadedNode();
+					return waitForGetApiClient(healthyNode.url, intervalMs);
+				}
+
+				return waitForGetApiClient(url, intervalMs);
 		  })();
 };
 
@@ -215,37 +380,49 @@ const resetApiClient = async (apiClient, isEventSubscriptionClient = false) => {
 		return;
 	}
 
-	const { poolIndex } = apiClient;
+	const { url, poolIndex } = apiClient;
 
 	// Do not attempt reset if last ping was within the acceptable threshold
 	// This is to avoid unnecessary socket creation
 	if (Date.now() - (apiClient.lastPingAt || 0) < WS_SERVER_PING_THRESHOLD) {
-		logger.debug(`Not resetting apiClient ${poolIndex}. Received a late ping from the server.`);
+		logger.debug(
+			`Not resetting apiClient ${poolIndex} at ${url}. Received a late ping from the server.`,
+		);
 		return;
 	}
 
 	if (isEventSubscriptionClient) {
-		logger.info(`Attempting to reset the eventSubscriptionClient: apiClient ${poolIndex}.`);
+		logger.info(
+			`Attempting to reset the eventSubscriptionClient: apiClient ${poolIndex} at ${url}.`,
+		);
 		Signals.get('eventSubscriptionClientReset').dispatch();
 	} else {
-		logger.info(`Attempting to reset apiClient ${poolIndex}.`);
+		logger.info(`Attempting to reset apiClient ${poolIndex} at ${url}.`);
 	}
 
 	await apiClient
 		.disconnect()
-		.catch(err => logger.warn(`Error disconnecting apiClient: ${err.message}. Will proceed.`));
+		.catch(err =>
+			logger.warn(
+				`Error disconnecting apiClient ${poolIndex} at ${url}: ${err.message}. Will proceed.`,
+			),
+		);
 
-	const newApiClient = await instantiateNewClient()
+	const newApiClient = await instantiateNewClient(url)
 		.then(client => {
+			client.url = url;
 			client.poolIndex = poolIndex;
-			logger.info(`Successfully reset apiClient ${poolIndex}.`);
+			logger.info(`Successfully reset apiClient ${poolIndex} at ${url}.`);
 			return client;
 		})
 		.catch(() => null);
 
-	clientPool[poolIndex] = newApiClient;
+	const node = await getNodeClient(url);
+	node.clientPool[poolIndex] = newApiClient;
 
-	if (newApiClient) Signals.get('newApiClient').dispatch(newApiClient.poolIndex);
+	if (node.isDedicatedEventSubscriber === true && newApiClient) {
+		Signals.get('newApiClient').dispatch(newApiClient.url, newApiClient.poolIndex);
+	}
 };
 Signals.get('resetApiClient').add(resetApiClient);
 
@@ -265,35 +442,44 @@ const buildHTTPResponse = (endpoint, params, response) => {
 	throw new Error(errorMessage);
 };
 
-// eslint-disable-next-line consistent-return
-const invokeEndpointWrapped = async (endpoint, params = {}, numRetries = NUM_REQUEST_RETRIES) => {
+const invokeEndpointWrapped = async (
+	node,
+	endpoint,
+	params = {},
+	numRetries = NUM_REQUEST_RETRIES,
+	// eslint-disable-next-line consistent-return
+) => {
 	let retriesLeft = numRetries;
+
 	do {
 		try {
-			requestCount++;
-			if (config.isUseHttpApi) {
+			node.numEndpointInvocations++;
+
+			if (node.url.startsWith('http')) {
 				// HTTP API-based communication with the Klayr app node
 				const rpcRequest = {
 					jsonrpc: '2.0',
-					id: requestCount,
+					id: node.numEndpointInvocations,
 					method: endpoint,
 					params,
 				};
 
-				const response = await HTTP.post(`${klayrAddressHttp}/rpc`, rpcRequest);
+				const response = await HTTP.post(`${node.url}/rpc`, rpcRequest);
 				return buildHTTPResponse(endpoint, params, response);
 			}
 
 			// WS and IPC client-based communication with the Klayr app node
-			const apiClient = await getApiClient();
+			const apiClient = await getApiClient(node.url);
 			const response = await apiClient._channel.invoke(endpoint, params);
 			return response;
 		} catch (err) {
 			if (TIMEOUT_REGEX.test(err.message)) {
 				if (!retriesLeft) {
 					const exceptionMsg = Object.getOwnPropertyNames(params).length
-						? `Invocation timed out for '${endpoint}' with params:\n${JSON.stringify(params)}.`
-						: `Invocation timed out for '${endpoint}'.`;
+						? `Invocation timed out for '${endpoint}' at ${node.url} with params:\n${JSON.stringify(
+								params,
+						  )}.`
+						: `Invocation timed out for '${endpoint}' at ${node.url}.`;
 
 					throw new TimeoutException(exceptionMsg);
 				}
@@ -301,8 +487,10 @@ const invokeEndpointWrapped = async (endpoint, params = {}, numRetries = NUM_REQ
 			} else {
 				logger.warn(
 					Object.getOwnPropertyNames(params).length
-						? `Error invoking '${endpoint}' with params:\n${JSON.stringify(params)}.\n${err.stack}`
-						: `Error invoking '${endpoint}'.\n${err.stack}`,
+						? `Error invoking '${endpoint}' at ${node.url} with params:\n${JSON.stringify(
+								params,
+						  )}.\n${err.stack}`
+						: `Error invoking '${endpoint}' at ${node.url}.\n${err.stack}`,
 				);
 
 				throw err;
@@ -312,10 +500,18 @@ const invokeEndpointWrapped = async (endpoint, params = {}, numRetries = NUM_REQ
 };
 
 const invokeEndpoint = async (endpoint, params = {}, numRetries = NUM_REQUEST_RETRIES) => {
-	const invokeEndpointQueue = await getQueueInstance({
-		concurrency: config.queue.invokeEndpoint.concurrency,
-	});
-	return invokeEndpointQueue.add(() => invokeEndpointWrapped(endpoint, params, numRetries));
+	const node = await getLeastLoadedNode();
+	return node.queue.add(() => invokeEndpointWrapped(node, endpoint, params, numRetries));
+};
+
+const invokeEndpointOnSpecificNode = async (
+	url,
+	endpoint,
+	params = {},
+	numRetries = NUM_REQUEST_RETRIES,
+) => {
+	const node = await getNodeClient(url);
+	return node.queue.add(() => invokeEndpointWrapped(node, endpoint, params, numRetries));
 };
 
 module.exports = {
@@ -323,4 +519,6 @@ module.exports = {
 
 	getApiClient,
 	invokeEndpoint,
+	getEventSubscriberNodeURL,
+	invokeEndpointOnSpecificNode,
 };

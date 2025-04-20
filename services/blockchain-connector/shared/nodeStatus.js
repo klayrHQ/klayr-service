@@ -13,66 +13,97 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const {
-	Logger,
-	Signals,
-	Utils: { waitForIt },
-} = require('klayr-service-framework');
-
-const { getNodeInfo } = require('./sdk/endpoints');
-
+const { Logger, Signals } = require('klayr-service-framework');
 const config = require('../config');
+const { invokeEndpointOnSpecificNode } = require('./sdk/client');
 
 const logger = Logger();
 
-const klayrAppAddress = config.endpoints.klayrWs;
 const NODE_DISCOVERY_INTERVAL = 1 * 1000; // ms
 const NODE_SYNC_CHECK_INTERVAL = 15 * 1000; // in ms
 
 let intervalID;
 
-const checkStatus = () =>
+const getSpecificNodeInfo = async url => invokeEndpointOnSpecificNode(url, 'system_getNodeInfo');
+
+const checkStatus = url =>
 	new Promise((resolve, reject) =>
-		getNodeInfo()
+		// eslint-disable-next-line no-promise-executor-return
+		getSpecificNodeInfo(url)
 			.then(nodeInfo => {
 				resolve(nodeInfo);
 			})
 			.catch(() => {
-				logger.debug(`The node ${klayrAppAddress} not available at the moment.`);
+				logger.debug(`The node ${url} not available at the moment.`);
 				reject();
 			}),
 	);
 
-const waitForNode = () => waitForIt(checkStatus, NODE_DISCOVERY_INTERVAL);
+const waitForSpecificNode = async url =>
+	new Promise(resolve => {
+		// eslint-disable-next-line consistent-return
+		const timeout = setInterval(async () => {
+			try {
+				const result = await checkStatus(url);
+				clearInterval(timeout);
+				return resolve(result);
+			} catch (err) {
+				logger.debug(`Waiting ${NODE_DISCOVERY_INTERVAL}...`);
+			}
+		}, NODE_DISCOVERY_INTERVAL);
+	});
 
-const waitForNodeToFinishSync = resolve =>
-	new Promise(res => {
-		if (!resolve) resolve = res;
+const waitForNode = async () => {
+	// waiting for all node in config.endpoints.klayrUrls
+	for (let index = 0; index < config.endpoints.klayrUrls.length; index++) {
+		await waitForSpecificNode(config.endpoints.klayrUrls[index]);
+	}
+};
+
+const waitForNodeToFinishSync = () =>
+	new Promise(resolve => {
+		// Clear any previous interval
 		if (intervalID) {
 			clearInterval(intervalID);
 			intervalID = null;
 		}
 
-		return getNodeInfo(true).then(nodeInfo => {
-			const { syncing } = nodeInfo;
-			const isNodeSyncComplete = !syncing;
+		// Our check function
+		// eslint-disable-next-line consistent-return
+		const checkAll = async () => {
+			try {
+				// 1. Fetch each node's status in parallel
+				const infos = await Promise.all(
+					config.endpoints.klayrUrls.map(async url => getSpecificNodeInfo(url)),
+				);
 
-			return isNodeSyncComplete
-				? (() => {
-						logger.info('Node is fully synchronized with the network.');
-						Signals.get('nodeIsSynced').dispatch();
-						return resolve(isNodeSyncComplete);
-				  })()
-				: (() => {
-						logger.info(
-							'Node synchronization in progress. Will wait for node to sync with the network before scheduling indexing.',
-						);
-						intervalID = setInterval(
-							waitForNodeToFinishSync.bind(null, resolve),
-							NODE_SYNC_CHECK_INTERVAL,
-						);
-				  })();
-		});
+				// 2. See if any are still syncing
+				const stillSyncing = infos
+					.map((info, i) => ({ url: config.endpoints.klayrUrls[i], syncing: info.syncing }))
+					.filter(x => x.syncing);
+
+				if (stillSyncing.length === 0) {
+					// 🚀 All done!
+					logger.info('All nodes are fully synchronized with the network.');
+					Signals.get('nodeIsSynced').dispatch();
+					clearInterval(intervalID);
+					return resolve(true);
+				}
+
+				// 🔄 Otherwise log and wait for next poll
+				const urls = stillSyncing.map(x => x.url).join(', ');
+				logger.info(`Waiting on ${stillSyncing.length}/${infos.length} nodes to sync: ${urls}`);
+			} catch (err) {
+				// you might want to handle per‑node errors differently
+				logger.warn('Error while checking node sync status:', err);
+			}
+		};
+
+		// 3. Kick off the first check immediately ...
+		checkAll();
+
+		// 4. ... then every NODE_SYNC_CHECK_INTERVAL ms
+		intervalID = setInterval(checkAll, NODE_SYNC_CHECK_INTERVAL);
 	});
 
 module.exports = {
