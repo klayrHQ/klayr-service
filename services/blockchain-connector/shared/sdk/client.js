@@ -58,7 +58,7 @@ const nodeClientPool = [];
 
 async function getNodeClientActiveSize(node) {
 	return node.url.startsWith('http')
-		? (await isReachable(`${node.url}/url`))
+		? (await isReachable(`${node.url}/rpc`))
 			? 1
 			: 0
 		: node.clientPool.filter(client => client && client._channel && client._channel.isAlive).length;
