@@ -1,4 +1,9 @@
 {
+	"parser": "@babel/eslint-parser",
+	"parserOptions": {
+		"sourceType": "module",
+		"allowImportExportEverywhere": true
+	},
 	"extends": [
 		"klayr-base",
 		"prettier"
@@ -18,6 +23,7 @@
 		"jest": true
 	},
 	"rules": {
+		"import/no-dynamic-require": "off",
 		"arrow-parens": "off",
 		"func-names": "off",
 		"global-require": "off",
