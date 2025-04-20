@@ -22,6 +22,7 @@ const {
 	Utils: { delay, isObject },
 } = require('klayr-service-framework');
 const { createWSClient, createIPCClient } = require('@klayr/api-client');
+const isReachable = require('is-reachable');
 
 const crypto = require('crypto');
 
@@ -36,6 +37,7 @@ const STATUS_HTTP_TIMEOUT = 'ETIMEDOUT';
 const MESSAGE_RPC_TIMEOUT = 'Response not received in';
 const TIMEOUT_REGEX_STR = `(?:${STATUS_HTTP_TIMEOUT}|${MESSAGE_RPC_TIMEOUT})`;
 const TIMEOUT_REGEX = new RegExp(TIMEOUT_REGEX_STR);
+const INSTANTIATION_STATS_CHECK_INTERVAL = 5 * 60 * 1000;
 
 const MAX_CLIENT_POOL_SIZE = config.apiClient.poolSize;
 const NUM_REQUEST_RETRIES = config.apiClient.request.maxRetries;
@@ -54,14 +56,16 @@ const globalClientInstantiationStats = {
 let lastUsedIndex = 0;
 const nodeClientPool = [];
 
-function getNodeClientActiveSize(node) {
+async function getNodeClientActiveSize(node) {
 	return node.url.startsWith('http')
-		? 1
+		? (await isReachable(`${node.url}/url`))
+			? 1
+			: 0
 		: node.clientPool.filter(client => client && client._channel && client._channel.isAlive).length;
 }
 
-function getActiveNodeClientActive() {
-	return nodeClientPool.filter(node => getNodeClientActiveSize(node) > 0);
+async function getActiveNodeClientActive() {
+	return nodeClientPool.filter(async node => (await getNodeClientActiveSize(node)) > 0);
 }
 
 function getEventSubscriberNodeURL() {
@@ -102,8 +106,19 @@ async function initNodeClientPool() {
 
 	for (let index = 0; index < config.endpoints.klayrUrls.length; index++) {
 		const type = getClientUrlType(config.endpoints.klayrUrls[index]);
-		if (type !== 'http')
+		if (type !== 'http') {
 			await initClientPool(config.endpoints.klayrUrls[index], MAX_CLIENT_POOL_SIZE);
+		} else {
+			setInterval(async () => {
+				const stats = await getApiClientStats(config.endpoints.klayrUrls[index]);
+				logger.info(
+					`HTTP client at node ${config.endpoints.klayrUrls[index]} stats: ${JSON.stringify({
+						queueSize: stats.queueSize,
+						numEndpointInvocations: stats.numEndpointInvocations,
+					})}`,
+				);
+			}, INSTANTIATION_STATS_CHECK_INTERVAL);
+		}
 	}
 }
 
@@ -126,7 +141,7 @@ async function getLeastLoadedNode() {
 	}
 
 	// 1. Filter only healthy nodes
-	const healthyNodes = getActiveNodeClientActive();
+	const healthyNodes = await getActiveNodeClientActive();
 	if (healthyNodes.length === 0) {
 		logger.error('getLeastLoadedNode Error: No healthy nodes available!');
 		throw new Error('No healthy nodes available');
@@ -166,7 +181,7 @@ const getApiClientStats = async url => {
 	return {
 		...node.instantiationStats,
 		queueSize: getNodeQueueSize(node),
-		activePoolSize: getNodeClientActiveSize(node),
+		activePoolSize: await getNodeClientActiveSize(node),
 		expectedPoolSize: MAX_CLIENT_POOL_SIZE,
 		numEndpointInvocations: node.numEndpointInvocations,
 	};
@@ -263,7 +278,7 @@ const initClientPool = async (url, poolSize) => {
 					`activePoolSize on ${url} should catch up with the expectedPoolSize, once the node is under less stress.`,
 				);
 			}
-		}, 5 * 60 * 1000);
+		}, INSTANTIATION_STATS_CHECK_INTERVAL);
 
 		// Re-instantiate interval: Replaces nulls in clientPool with new active apiClients
 		// isReInstantiateIntervalRunning is the safety check to skip callback execution if the previous one is already in-progress
@@ -360,7 +375,7 @@ const getApiClient = async (url, poolIndex) => {
 
 				const intervalMs = Math.ceil(WS_SERVER_PING_INTERVAL / MAX_CLIENT_POOL_SIZE);
 
-				if (getNodeClientActiveSize(node) === 0) {
+				if ((await getNodeClientActiveSize(node)) === 0) {
 					const healthyNode = await getLeastLoadedNode();
 					return waitForGetApiClient(healthyNode.url, intervalMs);
 				}
