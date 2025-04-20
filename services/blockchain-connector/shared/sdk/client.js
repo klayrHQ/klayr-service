@@ -498,7 +498,10 @@ const invokeEndpointWrapped = async (
 
 const invokeEndpoint = async (endpoint, params = {}, numRetries = NUM_REQUEST_RETRIES) => {
 	const node = await getLeastLoadedNode();
-	return node.queue.add(() => invokeEndpointWrapped(node, endpoint, params, numRetries));
+	if (config.queue.invokeEndpoint.concurrency > 0) {
+		return node.queue.add(() => invokeEndpointWrapped(node, endpoint, params, numRetries));
+	}
+	return invokeEndpointWrapped(node, endpoint, params, numRetries);
 };
 
 const invokeEndpointOnSpecificNode = async (
@@ -508,7 +511,10 @@ const invokeEndpointOnSpecificNode = async (
 	numRetries = NUM_REQUEST_RETRIES,
 ) => {
 	const node = await getNodeClient(url);
-	return node.queue.add(() => invokeEndpointWrapped(node, endpoint, params, numRetries));
+	if (config.queue.invokeEndpoint.concurrency > 0) {
+		return node.queue.add(() => invokeEndpointWrapped(node, endpoint, params, numRetries));
+	}
+	return invokeEndpointWrapped(node, endpoint, params, numRetries);
 };
 
 module.exports = {
