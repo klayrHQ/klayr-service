@@ -28,7 +28,7 @@ const inFlightRequests = new Map();
 const resultCache = new Map();
 
 // constants
-const DEFAULT_TTL_MS = config.coalescing.ttl;
+const DEFAULT_TTL_MS = config.coalescingTTL;
 const PRUNE_INTERVAL_MS = 60000;
 
 /**
