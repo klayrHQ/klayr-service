@@ -113,8 +113,8 @@ module.exports = {
 			env: {
 				// --- Remember to set the properties below
 				SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
-				// KLAYR_APP_URLS: 'ws://127.0.0.1:7887',
-				// KLAYR_EVENT_SUBSCRIBER_NODE: 'ws://127.0.0.1:7887',
+				// KLAYR_APP_URLS: 'http://127.0.0.1:7887',
+				// KLAYR_EVENT_SUBSCRIBER_NODE: 'http://127.0.0.1:7887',
 				// GEOIP_JSON: 'https://geoip.klayr.com/json',
 				// ENABLE_BLOCK_CACHING: true,
 				// EXPIRY_IN_HOURS: 12,

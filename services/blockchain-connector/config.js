@@ -36,9 +36,9 @@ config.brokerTimeout = Number(process.env.SERVICE_BROKER_TIMEOUT) || 10; // in s
  */
 config.endpoints.klayrUrls = process.env.KLAYR_APP_URLS
 	? process.env.KLAYR_APP_URLS.split(',')
-	: ['ws://127.0.0.1:7887'];
+	: ['http://127.0.0.1:7887'];
 config.endpoints.klayrEventSubscriber =
-	process.env.KLAYR_EVENT_SUBSCRIBER_NODE || 'ws://127.0.0.1:7887';
+	process.env.KLAYR_EVENT_SUBSCRIBER_NODE || 'http://127.0.0.1:7887';
 config.endpoints.geoip = process.env.GEOIP_JSON || 'https://geoip.klayr.xyz/json';
 
 /**
