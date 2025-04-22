@@ -77,7 +77,9 @@ const logStats = () => {
 	allStats.sort((a, b) => b.count - a.count);
 
 	if (allStats.length > 0) {
-		console.log('📊 [invokeTracker] Invocation Stats Before Prune (Sorted, Count > 1):');
+		console.log(
+			`📊 [invokeTracker] Detected ${allStats.length} Repeated Invocation For Time Window ${DEFAULT_WINDOW_MS} ms`,
+		);
 		for (const stat of allStats) {
 			console.log(
 				`- [${stat.functionName}] (${stat.args.map(a => JSON.stringify(a)).join(', ')}) => ${
