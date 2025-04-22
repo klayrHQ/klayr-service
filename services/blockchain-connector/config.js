@@ -125,6 +125,8 @@ config.queue = {
 	},
 };
 
+config.coalescing.ttl = Number(process.env.INVOKE_ENDPOINT_COALESCING_CACHE_TTL) || 1000; // in milisecs
+
 // Every n milliseconds, verify if client connection is alive
 config.clientConnVerifyInterval =
 	Number(process.env.CLIENT_CONNECTION_VERIFY_INTERVAL) || 30 * 1000; // in millisecs
