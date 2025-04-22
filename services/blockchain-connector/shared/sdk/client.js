@@ -85,6 +85,10 @@ function getEventSubscriberNode() {
 async function initNodeClientPool() {
 	if (nodeClientPool.length > 0) return;
 
+	logger.info(
+		'Initializing node client pool with URLs: ' + JSON.stringify(config.endpoints.klayrUrls),
+	);
+
 	for (let index = 0; index < config.endpoints.klayrUrls.length; index++) {
 		const node = {
 			url: config.endpoints.klayrUrls[index],
@@ -100,9 +104,11 @@ async function initNodeClientPool() {
 			isReInstantiateIntervalRunning: false,
 		};
 		nodeClientPool.push(node);
+		logger.trace(`Adding ${node.url} to node client pool`);
 	}
 
 	const eventSubscriberNode = getEventSubscriberNode();
+	logger.trace(`Setting ${eventSubscriberNode.url} as dedicated event subscriber`);
 	eventSubscriberNode.isDedicatedEventSubscriber = true;
 
 	for (let index = 0; index < config.endpoints.klayrUrls.length; index++) {
@@ -138,7 +144,9 @@ function getNodeQueueSize(node) {
 async function getLeastLoadedNode() {
 	if (await initNodeClientPoolIfEmpty()) {
 		lastUsedIndex++;
-		return nodeClientPool[lastUsedIndex % nodes.length];
+		const node = nodeClientPool[lastUsedIndex % nodes.length];
+		logger.trace(`Selected initial node ${node.url}`);
+		return node;
 	}
 
 	// 1. Filter only healthy nodes
@@ -162,6 +170,7 @@ async function getLeastLoadedNode() {
 	const selected = candidates[lastUsedIndex % candidates.length];
 	lastUsedIndex++;
 
+	logger.trace(`Selected node ${selected.url} with load ${getNodeQueueSize(selected)}`);
 	return selected;
 }
 
@@ -514,6 +523,8 @@ const invokeEndpointWrapped = async (
 
 const invokeEndpoint = async (endpoint, params = {}, numRetries = NUM_REQUEST_RETRIES) => {
 	const node = await getLeastLoadedNode();
+	logger.trace(`invokeEndpoint ${endpoint} dispatching to ${node.url}`);
+
 	if (config.queue.invokeEndpoint.concurrency > 0) {
 		return node.queue.add(
 			async () =>
@@ -534,6 +545,8 @@ const invokeEndpointOnSpecificNode = async (
 	numRetries = NUM_REQUEST_RETRIES,
 ) => {
 	const node = await getNodeClient(url);
+	logger.trace(`invokeEndpointOnSpecificNode ${endpoint} dispatching to ${node.url}`);
+
 	if (config.queue.invokeEndpoint.concurrency > 0) {
 		return node.queue.add(
 			async () =>
