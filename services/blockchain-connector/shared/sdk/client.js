@@ -28,7 +28,7 @@ const crypto = require('crypto');
 
 const config = require('../../config');
 const { createQueueInstance } = require('../utils/queue');
-const { coalesceRequest, makeCoalescingKey } = require('../utils/coalescing');
+const { getCoalescerInstance } = require('../utils/coalescing');
 
 const logger = Logger();
 
@@ -525,17 +525,15 @@ const invokeEndpoint = async (endpoint, params = {}, numRetries = NUM_REQUEST_RE
 	const node = await getLeastLoadedNode();
 	logger.trace(`invokeEndpoint ${endpoint} dispatching to ${node.url}`);
 
+	const coalescer = getCoalescerInstance();
+
 	if (config.queue.invokeEndpoint.concurrency > 0) {
 		return node.queue.add(
 			async () =>
-				await coalesceRequest(makeCoalescingKey('invokeEndpoint', endpoint, params), async () =>
-					invokeEndpointWrapped(node, endpoint, params, numRetries),
-				),
+				await coalescer.coalesce(invokeEndpointWrapped, node, endpoint, params, numRetries),
 		);
 	}
-	return await coalesceRequest(makeCoalescingKey('invokeEndpoint', endpoint, params), async () =>
-		invokeEndpointWrapped(node, endpoint, params, numRetries),
-	);
+	return await coalescer.coalesce(invokeEndpointWrapped, node, endpoint, params, numRetries);
 };
 
 const invokeEndpointOnSpecificNode = async (
@@ -547,17 +545,15 @@ const invokeEndpointOnSpecificNode = async (
 	const node = await getNodeClient(url);
 	logger.trace(`invokeEndpointOnSpecificNode ${endpoint} dispatching to ${node.url}`);
 
+	const coalescer = getCoalescerInstance();
+
 	if (config.queue.invokeEndpoint.concurrency > 0) {
 		return node.queue.add(
 			async () =>
-				await coalesceRequest('invokeEndpoint', async () =>
-					invokeEndpointWrapped(node, endpoint, params, numRetries),
-				),
+				await coalescer.coalesce(invokeEndpointWrapped, node, endpoint, params, numRetries),
 		);
 	}
-	return await coalesceRequest('invokeEndpoint', async () =>
-		invokeEndpointWrapped(node, endpoint, params, numRetries),
-	);
+	return await coalescer.coalesce(invokeEndpointWrapped, node, endpoint, params, numRetries);
 };
 
 module.exports = {
