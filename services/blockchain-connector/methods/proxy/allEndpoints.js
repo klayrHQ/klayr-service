@@ -13,13 +13,13 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const endpoints = require('../../shared/sdk/endpoints');
+const { getRegisteredEndpoints } = require('../../shared/sdk/endpoints');
+const { invokeEndpointProxy } = require('../../shared/sdk/invoke');
 
 const exportAllEndpoints = async () => {
-	const registeredEndpoints = await endpoints.getRegisteredEndpoints();
+	const registeredEndpoints = await getRegisteredEndpoints();
 	const allMethods = registeredEndpoints.map(endpoint => {
-		const genericController = regEndpoint => params =>
-			endpoints.invokeEndpointProxy(regEndpoint, params);
+		const genericController = regEndpoint => params => invokeEndpointProxy(regEndpoint, params);
 		const controller = genericController(endpoint);
 		return {
 			name: endpoint,
