@@ -522,18 +522,19 @@ const invokeEndpointWrapped = async (
 };
 
 const invokeEndpoint = async (endpoint, params = {}, numRetries = NUM_REQUEST_RETRIES) => {
-	const node = await getLeastLoadedNode();
-	logger.trace(`invokeEndpoint ${endpoint} dispatching to ${node.url}`);
+	const invokeEndpointCall = async () => {
+		const node = await getLeastLoadedNode();
+		logger.trace(`invokeEndpoint ${endpoint} dispatching to ${node.url}`);
+
+		if (config.queue.invokeEndpoint.concurrency > 0) {
+			return await node.queue.add(() => invokeEndpointWrapped(node, endpoint, params, numRetries));
+		} else {
+			return await invokeEndpointWrapped(node, endpoint, params, numRetries);
+		}
+	};
 
 	const coalescer = getCoalescerInstance();
-
-	if (config.queue.invokeEndpoint.concurrency > 0) {
-		return node.queue.add(
-			async () =>
-				await coalescer.coalesce(invokeEndpointWrapped, node, endpoint, params, numRetries),
-		);
-	}
-	return await coalescer.coalesce(invokeEndpointWrapped, node, endpoint, params, numRetries);
+	return await coalescer.coalesce(invokeEndpointCall, endpoint, params);
 };
 
 const invokeEndpointOnSpecificNode = async (
@@ -545,15 +546,16 @@ const invokeEndpointOnSpecificNode = async (
 	const node = await getNodeClient(url);
 	logger.trace(`invokeEndpointOnSpecificNode ${endpoint} dispatching to ${node.url}`);
 
-	const coalescer = getCoalescerInstance();
+	const invokeEndpointCall = async () => {
+		if (config.queue.invokeEndpoint.concurrency > 0) {
+			return await node.queue.add(() => invokeEndpointWrapped(node, endpoint, params, numRetries));
+		} else {
+			return await invokeEndpointWrapped(node, endpoint, params, numRetries);
+		}
+	};
 
-	if (config.queue.invokeEndpoint.concurrency > 0) {
-		return node.queue.add(
-			async () =>
-				await coalescer.coalesce(invokeEndpointWrapped, node, endpoint, params, numRetries),
-		);
-	}
-	return await coalescer.coalesce(invokeEndpointWrapped, node, endpoint, params, numRetries);
+	const coalescer = getCoalescerInstance();
+	return await coalescer.coalesce(invokeEndpointCall, node.url, endpoint, params);
 };
 
 module.exports = {
