@@ -21,6 +21,7 @@ const {
 	formatBlock: formatBlockFromFormatter,
 	formatTransaction,
 } = require('../../shared/sdk/formatter');
+const { getBlockByHeight } = require('../../shared/sdk');
 
 const EMPTY_TREE_ROOT_HASH = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
 const logger = Logger();
@@ -87,12 +88,12 @@ const chainNewBlockController = async cb => {
 				blockHeader.assetRoot !== EMPTY_TREE_ROOT_HASH
 			) {
 				try {
-					const block = await getBlockByID(blockHeader.id);
+					const block = await getBlockByHeight(blockHeader.height);
 					transactions = block.transactions;
 					assets = block.assets;
 				} catch (err) {
 					logger.warn(
-						`Could not fetch block ${blockHeader.id} within chainNewBlockListener due to: ${err.message}`,
+						`Could not fetch block ${blockHeader.id} at height ${blockHeader.height} within chainNewBlockListener due to: ${err.message}`,
 					);
 					logger.debug(err.stack);
 				}
