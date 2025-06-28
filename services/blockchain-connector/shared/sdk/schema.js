@@ -45,6 +45,8 @@ const setMetadata = _metadata => (metadata = _metadata);
 
 const getBlockAssetDataSchemaByModule = _module => {
 	const moduleMetadata = metadata.modules.find(m => m.name === _module);
+	if (moduleMetadata === undefined) return undefined;
+
 	const [{ data: schema } = {}] = moduleMetadata.assets;
 	return schema;
 };
