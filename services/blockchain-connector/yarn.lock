@@ -5225,10 +5225,10 @@ regjsparser@^0.9.1:
   dependencies:
     jsesc "~0.5.0"
 
-reqoal@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/reqoal/-/reqoal-1.0.1.tgz#11b50f1795a88fec0e22daf7f8b8dd2490f7bfa5"
-  integrity sha512-nQaEZTFPt+NEfPSDyiNYJdU2024rxWL7/Tn4V2mjq6sy8fqQ2KEHLCTjHFfpH34Ea1SMnd1B88rDhf6EOABG1Q==
+reqoal@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/reqoal/-/reqoal-1.0.2.tgz#ff463eb26043baa83107bd4c123098beab693b32"
+  integrity sha512-va/xSGIa3b2XgvFyNZfN9J02kyP8+G61lnrHt4RkeSTgf598C5xgzYuAhifBUC8Y3CK9HrTnQafT9FrCVE9+Mg==
   dependencies:
     json-stable-stringify "^1.3.0"
 
