@@ -368,7 +368,6 @@ const indexBlock = async job => {
 		};
 
 		// TODO: enrich block database, make it same from node, with additional information
-		console.log(blockToIndex);
 		await blocksTable.upsert(blockToIndex, dbTrx);
 		await commitDBTransaction(dbTrx);
 		logger.debug(

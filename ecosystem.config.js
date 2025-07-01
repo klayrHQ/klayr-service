@@ -162,7 +162,7 @@ module.exports = {
 				SERVICE_INDEXER_MYSQL: 'mysql://klayr:password@127.0.0.1:3306/klayr',
 				// ENABLE_DATA_RETRIEVAL_MODE: true,
 				// ENABLE_INDEXING_MODE: true,
-				// ENABLE_PERSIST_EVENTS: false,
+				// ENABLE_PERSIST_EVENTS: true,
 				// ENABLE_APPLY_SNAPSHOT: false,
 				// DURABILITY_VERIFY_FREQUENCY: 1,
 				// INDEX_SNAPSHOT_URL: '',
