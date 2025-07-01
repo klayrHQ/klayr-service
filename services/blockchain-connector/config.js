@@ -88,14 +88,6 @@ config.enableTestingMode = Boolean(
 	String(process.env.ENABLE_TESTING_MODE).toLowerCase() === 'true',
 );
 
-config.cache = {
-	isBlockCachingEnabled: Boolean(
-		String(process.env.ENABLE_BLOCK_CACHING).toLowerCase() !== 'false',
-	), // Enabled by default
-	expiryInHours: Number(process.env.EXPIRY_IN_HOURS) || 12,
-	dbDataDir: 'data/db_cache',
-};
-
 config.job = {
 	// Interval takes priority over schedule and must be greater than 0 to be valid
 	cacheCleanup: {

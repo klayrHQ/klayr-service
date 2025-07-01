@@ -24,11 +24,6 @@ const {
 	getSystemMetadata,
 	getEngineEndpoints,
 } = require('./endpoints_1');
-const {
-	cacheBlocksIfEnabled,
-	getBlockByIDFromCache,
-	getTransactionByIDFromCache,
-} = require('./cache');
 const { invokeEndpoint } = require('./client');
 const { getGenesisHeight, getGenesisBlockID, getGenesisBlock } = require('./genesisBlock');
 
@@ -65,7 +60,7 @@ const getBlockByHeight = async (height, includeGenesisAssets = false) => {
 	}
 
 	const block = await invokeEndpoint('chain_getBlockByHeight', { height });
-	cacheBlocksIfEnabled(block);
+	// TODO: cacheBlocksIfEnabled(block);
 
 	return block;
 };
@@ -89,7 +84,7 @@ const getBlocksByHeightBetween = async ({ from, to }) => {
 	}
 
 	const blocks = blocksNestedList.flat();
-	cacheBlocksIfEnabled(blocks);
+	// TODO: cacheBlocksIfEnabled(blocks);
 	return blocks;
 };
 
@@ -99,11 +94,12 @@ const getBlockByID = async (id, includeGenesisAssets = false) => {
 		return getGenesisBlock(includeGenesisAssets);
 	}
 
-	const blockFromCache = await getBlockByIDFromCache(id).catch(() => null);
-	if (blockFromCache) return blockFromCache;
+	// TODO: get from db
+	// const blockFromCache = await getBlockByIDFromCache(id).catch(() => null);
+	// if (blockFromCache) return blockFromCache;
 
 	const block = await invokeEndpoint('chain_getBlockByID', { id });
-	cacheBlocksIfEnabled(block);
+	// TODO: cacheBlocksIfEnabled(block);
 	return block;
 };
 
@@ -121,7 +117,8 @@ const getBlocksByIDs = async ids => {
 		return remainingBlocks;
 	}
 
-	const blocks = config.cache.isBlockCachingEnabled
+	// TODO: get from db
+	const blocks = false
 		? await BluebirdPromise.map(ids, async id => getBlockByID(id), { concurrency: 1 })
 		: await invokeEndpoint('chain_getBlocksByIDs', { ids });
 
@@ -134,15 +131,17 @@ const getEventsByHeight = async height => {
 };
 
 const getTransactionByID = async id => {
-	const transactionFromCache = await getTransactionByIDFromCache(id).catch(() => null);
-	if (transactionFromCache) return transactionFromCache;
+	// TODO: get from db
+	// const transactionFromCache = await getTransactionByIDFromCache(id).catch(() => null);
+	// if (transactionFromCache) return transactionFromCache;
 
 	const transaction = await invokeEndpoint('chain_getTransactionByID', { id });
 	return transaction;
 };
 
 const getTransactionsByIDs = async ids => {
-	const transactions = config.cache.isBlockCachingEnabled
+	// TODO: get from db
+	const transactions = false
 		? await BluebirdPromise.map(ids, async id => getTransactionByID(id), { concurrency: 1 })
 		: await invokeEndpoint('chain_getTransactionsByIDs', { ids });
 

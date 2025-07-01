@@ -23,6 +23,7 @@ LoggerConfig(config.log);
 const packageJson = require('./package.json');
 const nodeStatus = require('./shared/nodeStatus');
 const { init } = require('./shared/sdk');
+const { initDatabase } = require('./shared/database/init');
 
 const logger = Logger();
 
@@ -59,10 +60,18 @@ nodeStatus.waitForNode().then(async () => {
 			app.addMethods(path.join(__dirname, 'methods', 'tests'));
 		}
 
-		app
-			.run()
-			.then(async () => {
-				await init();
+		initDatabase()
+			.then(() => {
+				app
+					.run()
+					.then(async () => {
+						await init();
+					})
+					.catch(err => {
+						logger.fatal(`Failed to start service ${packageJson.name} due to: ${err.message}`);
+						logger.fatal(err.stack);
+						process.exit(1);
+					});
 			})
 			.catch(err => {
 				logger.fatal(`Failed to start service ${packageJson.name} due to: ${err.message}`);
