@@ -91,6 +91,7 @@ const applyTransaction = async (blockHeader, tx, events, dbTrx) => {
 
 	tx.minFee = formattedTransaction.minFee;
 	logger.trace(`Indexing transaction ${tx.id} contained in block at height ${tx.height}.`);
+	// TODO: enrich transaction database, make it same from node, with additional information
 	await transactionsTable.upsert(tx, dbTrx);
 	logger.debug(`Indexed transaction ${tx.id} contained in block at height ${tx.height}.`);
 

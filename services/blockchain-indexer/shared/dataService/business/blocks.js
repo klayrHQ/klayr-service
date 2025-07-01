@@ -96,6 +96,7 @@ const normalizeBlock = async (originalBlock, isDeletedBlock = false) => {
 				};
 			}
 
+			// TODO: should this retrieved from DB?
 			const events = isDeletedBlock
 				? await getEventsByBlockID(block.id)
 				: await getEventsByHeight(block.height);
