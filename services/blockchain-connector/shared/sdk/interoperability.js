@@ -14,7 +14,7 @@
  *
  */
 const { invokeEndpoint } = require('./client');
-const { getNodeInfo } = require('./cached_endpoints');
+const { getNodeInfo } = require('./endpoints');
 
 let isThisMainchain;
 let mainchainID;

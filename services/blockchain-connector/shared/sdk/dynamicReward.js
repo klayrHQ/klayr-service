@@ -14,7 +14,7 @@
  *
  */
 const { invokeEndpoint } = require('./client');
-const { getRegisteredModules } = require('./cached_endpoints');
+const { getRegisteredModules } = require('./endpoints');
 
 let registeredRewardModule;
 let rewardTokenID;

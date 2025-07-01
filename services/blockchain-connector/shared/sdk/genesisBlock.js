@@ -18,7 +18,7 @@ const {
 	Exceptions: { TimeoutException },
 } = require('klayr-service-framework');
 
-const { getNodeInfo } = require('./cached_endpoints');
+const { getNodeInfo } = require('./endpoints');
 const { getGenesisBlockFromFS } = require('./blocksUtils');
 
 const { TIMEOUT_REGEX, invokeEndpoint } = require('./client');
