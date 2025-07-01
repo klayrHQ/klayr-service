@@ -26,6 +26,20 @@ module.exports = {
 		assetsModules: { type: 'json' },
 		numberOfEvents: { type: 'integer', defaultValue: 0 },
 		reward: { type: 'bigInteger', defaultValue: BigInt('0') },
+
+		// Retrieved Directly From Block Header:
+		previousBlockID: { type: 'string' },
+		stateRoot: { type: 'string' },
+		assetRoot: { type: 'string' },
+		eventRoot: { type: 'string' },
+		transactionRoot: { type: 'string' },
+		validatorsHash: { type: 'string' },
+		aggregateCommit: { type: 'json' },
+		maxHeightPrevoted: { type: 'integer' },
+		maxHeightGenerated: { type: 'integer' },
+		impliesMaxPrevotes: { type: 'boolean' },
+		signature: { type: 'string' },
+		assets: { type: 'json' },
 	},
 	indexes: {
 		id: { type: 'key' },
