@@ -23,7 +23,7 @@ const {
 	getNodeInfo,
 	getSystemMetadata,
 	getEngineEndpoints,
-} = require('./endpoints_1');
+} = require('./cached_endpoints');
 const { invokeEndpoint } = require('./client');
 const { getGenesisHeight, getGenesisBlockID, getGenesisBlock } = require('./genesisBlock');
 
