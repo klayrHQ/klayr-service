@@ -13,7 +13,7 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { getRegisteredEndpoints } = require('../../shared/sdk/endpoints');
+const { getRegisteredEndpoints } = require('../../shared/sdk/cached_endpoints');
 const { invokeEndpointProxy } = require('../../shared/sdk/invoke');
 
 const exportAllEndpoints = async () => {

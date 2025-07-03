@@ -13,21 +13,16 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const BluebirdPromise = require('bluebird');
-
-const {
-	getSchemas,
-	getRegisteredEndpoints,
-	getRegisteredEvents,
-	getRegisteredModules,
-	getNodeInfo,
-	getSystemMetadata,
-	getEngineEndpoints,
-} = require('./cached_endpoints');
 const { invokeEndpoint } = require('./client');
 const { getGenesisHeight, getGenesisBlockID, getGenesisBlock } = require('./genesisBlock');
-
-const config = require('../../config');
+const {
+	getBlockByHeightFromDB,
+	getBlockByIDFromDB,
+	getBlocksByIDsFromDB,
+	getTransactionByIDFromDB,
+	getTransactionsByIDsFromDB,
+	getBlocksByHeightsBetweenFromDB,
+} = require('./database');
 
 const getNetworkConnectedPeers = async () => {
 	const connectedPeers = await invokeEndpoint('network_getConnectedPeers');
@@ -54,18 +49,26 @@ const getLastBlock = async () => {
 	return block;
 };
 
-const getBlockByHeight = async (height, includeGenesisAssets = false) => {
+const getBlockByHeight = async (height, includeGenesisAssets = false, forceFromNode = false) => {
 	if (Number(height) === (await getGenesisHeight())) {
 		return getGenesisBlock(includeGenesisAssets);
 	}
 
-	const block = await invokeEndpoint('chain_getBlockByHeight', { height });
-	// TODO: cacheBlocksIfEnabled(block);
+	let block;
+	if (!forceFromNode) {
+		block = await getBlockByHeightFromDB(height);
+		if (block) return block;
+	}
+
+	block = await invokeEndpoint('chain_getBlockByHeight', { height });
+
+	// NOTE: DB indexing is done by indexBlocks, no need to index blocks after chain_getBlockByHeight
+	// This is also required to prevent double indexing, and made (in)sert available
 
 	return block;
 };
 
-const getBlocksByHeightBetween = async ({ from, to }) => {
+const getBlocksByHeightBetween = async ({ from, to, forceFromNode }) => {
 	const gHeight = await getGenesisHeight();
 	const blocksNestedList = [[], []];
 
@@ -75,35 +78,44 @@ const getBlocksByHeightBetween = async ({ from, to }) => {
 
 	// File-based genesis block handling
 	if (Number(from) === gHeight) {
-		blocksNestedList[0] = await getBlockByHeight(gHeight);
+		blocksNestedList[0] = await getBlockByHeight(gHeight, undefined, forceFromNode === true);
 		from++;
 	}
 
+	// Get from database
 	if (from <= to) {
-		blocksNestedList[1] = await invokeEndpoint('chain_getBlocksByHeightBetween', { from, to });
+		if (forceFromNode === true) {
+			blocksNestedList[1] = await invokeEndpoint('chain_getBlocksByHeightBetween', { from, to });
+		} else {
+			blocksNestedList[1] = await getBlocksByHeightsBetweenFromDB(from, to);
+		}
 	}
 
 	const blocks = blocksNestedList.flat();
-	// TODO: cacheBlocksIfEnabled(blocks);
 	return blocks;
 };
 
-const getBlockByID = async (id, includeGenesisAssets = false) => {
+const getBlockByID = async (id, includeGenesisAssets = false, forceFromNode = false) => {
 	// File-based genesis block handling
 	if (id === (await getGenesisBlockID())) {
 		return getGenesisBlock(includeGenesisAssets);
 	}
 
-	// TODO: get from db
-	// const blockFromCache = await getBlockByIDFromCache(id).catch(() => null);
-	// if (blockFromCache) return blockFromCache;
+	let block;
+	if (!forceFromNode) {
+		block = await getBlockByIDFromDB(id);
+		if (block) return block;
+	}
 
-	const block = await invokeEndpoint('chain_getBlockByID', { id });
-	// TODO: cacheBlocksIfEnabled(block);
+	block = await invokeEndpoint('chain_getBlockByID', { id });
+
+	// NOTE: DB indexing is done by indexBlocks, no need to index blocks after chain_getBlockByID
+	// This is also required to prevent double indexing, and made (in)sert available
+
 	return block;
 };
 
-const getBlocksByIDs = async ids => {
+const getBlocksByIDs = async (ids, forceFromNode = false) => {
 	// File-based genesis block handling
 	const genesisBlockId = await getGenesisBlockID();
 	const genesisBlockIndex = ids.indexOf(genesisBlockId);
@@ -117,33 +129,52 @@ const getBlocksByIDs = async ids => {
 		return remainingBlocks;
 	}
 
-	// TODO: get from db
-	const blocks = false
-		? await BluebirdPromise.map(ids, async id => getBlockByID(id), { concurrency: 1 })
-		: await invokeEndpoint('chain_getBlocksByIDs', { ids });
+	let blocks;
+	if (!forceFromNode) {
+		blocks = await getBlocksByIDsFromDB(ids);
+		if (blocks !== undefined) return blocks;
+	}
+
+	blocks = await invokeEndpoint('chain_getBlocksByIDs', { ids });
+
+	// NOTE: DB indexing is done by indexBlocks, no need to index blocks after chain_getBlocksByIDs
+	// This is also required to prevent double indexing, and made (in)sert available
 
 	return blocks;
 };
 
 const getEventsByHeight = async height => {
+	// TODO: get from db
 	const events = await invokeEndpoint('chain_getEvents', { height });
 	return events;
 };
 
-const getTransactionByID = async id => {
-	// TODO: get from db
-	// const transactionFromCache = await getTransactionByIDFromCache(id).catch(() => null);
-	// if (transactionFromCache) return transactionFromCache;
+const getTransactionByID = async (id, forceFromNode = false) => {
+	let transaction;
+	if (!forceFromNode) {
+		transaction = await getTransactionByIDFromDB(id);
+		if (transaction) return transaction;
+	}
 
-	const transaction = await invokeEndpoint('chain_getTransactionByID', { id });
+	transaction = await invokeEndpoint('chain_getTransactionByID', { id });
+
+	// NOTE: DB indexing is done by indexBlocks, no need to index transactions after chain_getTransactionByID
+	// This is also required to prevent double indexing, and made (in)sert available
+
 	return transaction;
 };
 
-const getTransactionsByIDs = async ids => {
-	// TODO: get from db
-	const transactions = false
-		? await BluebirdPromise.map(ids, async id => getTransactionByID(id), { concurrency: 1 })
-		: await invokeEndpoint('chain_getTransactionsByIDs', { ids });
+const getTransactionsByIDs = async (ids, forceFromNode = false) => {
+	let transactions;
+	if (!forceFromNode) {
+		transactions = await getTransactionsByIDsFromDB(ids);
+		if (transactions) return transactions;
+	}
+
+	transactions = await invokeEndpoint('chain_getTransactionsByIDs', { ids });
+
+	// NOTE: DB indexing is done by indexBlocks, no need to index transactions after chain_getTransactionsByIDs
+	// This is also required to prevent double indexing, and made (in)sert available
 
 	return transactions;
 };
@@ -179,13 +210,6 @@ const getBFTParameters = async height => {
 
 module.exports = {
 	invokeEndpoint,
-	getSchemas,
-	getRegisteredEndpoints,
-	getRegisteredEvents,
-	getRegisteredModules,
-	getNodeInfo,
-	getSystemMetadata,
-	getEngineEndpoints,
 	getNetworkConnectedPeers,
 	getNetworkDisconnectedPeers,
 	getGeneratorStatus,

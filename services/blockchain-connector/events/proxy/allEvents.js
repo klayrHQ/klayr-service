@@ -15,7 +15,7 @@
  */
 const { Logger, Signals } = require('klayr-service-framework');
 
-const { getRegisteredEvents } = require('../../shared/sdk/endpoints');
+const { getRegisteredEvents } = require('../../shared/sdk/cached_endpoints');
 const { subscribeToAllRegisteredEvents, events } = require('../../shared/sdk/events');
 
 const logger = Logger();

@@ -28,6 +28,7 @@ module.exports = {
 		reward: { type: 'bigInteger', defaultValue: BigInt('0') },
 
 		// Retrieved Directly From Block Header:
+		version: { type: 'integer' },
 		previousBlockID: { type: 'string' },
 		stateRoot: { type: 'string' },
 		assetRoot: { type: 'string' },

@@ -21,13 +21,8 @@ const config = require('../../config');
 
 const { getApiClient, getEventSubscriberNodeURL } = require('./client');
 const { formatEvent } = require('./formatter');
-const {
-	getRegisteredEvents,
-	getEventsByHeight,
-	getNodeInfo,
-	getBlockByHeight,
-	getBFTParameters,
-} = require('./endpoints');
+const { getEventsByHeight, getBlockByHeight, getBFTParameters } = require('./endpoints');
+const { getNodeInfo, getRegisteredEvents } = require('./cached_endpoints');
 const { updateTokenInfo } = require('./token');
 const { getPosConstants } = require('./pos');
 

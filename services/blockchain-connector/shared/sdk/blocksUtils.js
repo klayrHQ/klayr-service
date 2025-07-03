@@ -22,7 +22,7 @@ const {
 	Exceptions: { NotFoundException },
 } = require('klayr-service-framework');
 
-const { getNodeInfo } = require('./endpoints');
+const { getNodeInfo } = require('./cached_endpoints');
 const { formatBlock } = require('./formatter');
 const { exists, mkdir, rm, extractTarBall } = require('../utils/fs');
 const { downloadFile, verifyFileChecksum } = require('../utils/download');

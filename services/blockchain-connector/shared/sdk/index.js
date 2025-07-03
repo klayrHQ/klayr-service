@@ -26,18 +26,17 @@ const {
 	getGenesisAssetsLength,
 } = require('./genesisBlock');
 
+const { getGenerators, getGeneratorStatus, updateGeneratorStatus } = require('./endpoints');
+
 const {
-	getGenerators,
-	getGeneratorStatus,
-	updateGeneratorStatus,
+	getNodeInfo,
 	getSchemas,
 	getRegisteredEndpoints,
 	getRegisteredEvents,
 	getRegisteredModules,
-	getNodeInfo,
 	getSystemMetadata,
 	getEngineEndpoints,
-} = require('./endpoints');
+} = require('./cached_endpoints');
 
 const {
 	getLastBlock,
