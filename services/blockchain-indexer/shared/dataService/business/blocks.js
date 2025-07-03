@@ -48,6 +48,8 @@ const latestBlockCache = CacheRedis('latestBlock', config.endpoints.cache);
 let latestBlock;
 
 const normalizeBlock = async (originalBlock, isDeletedBlock = false) => {
+	// TODO: if it's already normalized (or with metadata), return
+
 	try {
 		const blocksTable = await getBlocksTable();
 
@@ -169,6 +171,7 @@ const getLastBlock = async () => {
 	const response = await requestConnector('getLastBlock');
 	latestBlock = await normalizeBlock(response);
 	if (latestBlock && latestBlock.id) {
+		// TODO: inspect where cache is retrieved / used
 		await latestBlockCache.set('latestBlock', JSON.stringify(latestBlock));
 	}
 	return latestBlock;
