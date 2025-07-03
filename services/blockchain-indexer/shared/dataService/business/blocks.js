@@ -130,7 +130,7 @@ const normalizeBlock = async (originalBlock, isDeletedBlock = false) => {
 				block.networkFee += BigInt(txn.fee) - BigInt(txn.minFee);
 				return txn;
 			},
-			{ concurrency: 1 },
+			{ concurrency: block.transactions.length },
 		);
 
 		return parseToJSONCompatObj(block);
