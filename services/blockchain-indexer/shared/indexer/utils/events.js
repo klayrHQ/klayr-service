@@ -117,44 +117,6 @@ const getEventsInfoToIndex = (block, events) => {
 	return eventsInfoToIndex;
 };
 
-const deleteEventStrTillHeight = async toHeight => {
-	const eventsTable = await getEventsTable();
-
-	const fromHeight = await keyValueTable.get(LAST_DELETED_EVENTS_HEIGHT);
-
-	const connection = await getDBConnection(MYSQL_ENDPOINT);
-	const dbTrx = await startDBTransaction(connection);
-	logger.debug(
-		`Created new MySQL transaction to delete serialized events until height ${toHeight}.`,
-	);
-
-	try {
-		const queryParams = {
-			propBetweens: [
-				{
-					property: 'height',
-					from: fromHeight ? fromHeight + 1 : await getGenesisHeight(),
-					to: toHeight,
-				},
-			],
-		};
-
-		await eventsTable.update({ where: queryParams, updates: { eventStr: null } }, dbTrx);
-		await keyValueTable.set(LAST_DELETED_EVENTS_HEIGHT, toHeight, dbTrx);
-
-		await commitDBTransaction(dbTrx);
-		logger.debug(
-			`Committed MySQL transaction to delete serialized events until height ${toHeight}.`,
-		);
-	} catch (_) {
-		await rollbackDBTransaction(dbTrx);
-		logger.debug(
-			`Rolled back MySQL transaction to delete serialized events until height ${toHeight}.`,
-		);
-	}
-};
-
 module.exports = {
 	getEventsInfoToIndex,
-	deleteEventStrTillHeight,
 };
