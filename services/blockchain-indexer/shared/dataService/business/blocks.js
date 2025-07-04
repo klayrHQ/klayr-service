@@ -17,6 +17,7 @@ const util = require('util');
 const BluebirdPromise = require('bluebird');
 
 const {
+	CacheLRU,
 	CacheRedis,
 	Logger,
 	DB: {
@@ -38,14 +39,113 @@ const { normalizeTransaction } = require('../../utils/transactions');
 const { getNameByAddress } = require('../../utils/validator');
 
 const config = require('../../../config');
+const { getTransactionByBlockIDFromDB } = require('./transactions');
 
-const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
+const MYSQL_ENDPOINT = config.endpoints.mysql;
 
 const getBlocksTable = () => getTableInstance(blocksTableSchema, MYSQL_ENDPOINT);
 
 const latestBlockCache = CacheRedis('latestBlock', config.endpoints.cache);
+const blockCache = CacheLRU('block');
+const blockCacheByHeight = CacheLRU('blockByHeight');
 
 let latestBlock;
+
+const formatBlockResponseFromDB = async block => {
+	const formattedBlock = {
+		header: {
+			version: block.version,
+			timestamp: block.timestamp,
+			height: block.height,
+			previousBlockID: block.previousBlockID,
+			stateRoot: block.stateRoot,
+			assetRoot: block.assetRoot,
+			eventRoot: block.eventRoot,
+			transactionRoot: block.transactionRoot,
+			validatorsHash: block.validatorsHash,
+			aggregateCommit: JSON.parse(block.aggregateCommit),
+			generatorAddress: block.generatorAddress,
+			maxHeightPrevoted: block.maxHeightPrevoted,
+			maxHeightGenerated: block.maxHeightGenerated,
+			impliesMaxPrevotes: block.impliesMaxPrevotes,
+			signature: block.signature,
+			id: block.id,
+		},
+		transactions: [],
+		assets: JSON.parse(block.assets),
+	};
+	formattedBlock.transactions = (await getTransactionByBlockIDFromDB(block.id)) || [];
+	return formattedBlock;
+};
+
+const getBlockByIDFromDB = async id => {
+	const blocksTable = await getBlocksTable();
+
+	const [dbResponse] = await blocksTable.find(
+		{ id, limit: 1 },
+		Object.getOwnPropertyNames(blocksTableSchema.schema),
+	);
+
+	if (dbResponse) return await formatBlockResponseFromDB(dbResponse);
+
+	return undefined;
+};
+
+const getBlockByHeightFromDB = async height => {
+	const blocksTable = await getBlocksTable();
+
+	const [dbResponse] = await blocksTable.find(
+		{ height, limit: 1 },
+		Object.getOwnPropertyNames(blocksTableSchema.schema),
+	);
+
+	if (dbResponse) return await formatBlockResponseFromDB(dbResponse);
+
+	return undefined;
+};
+
+const getBlocksByIDsFromDB = async ids => {
+	const blocksTable = await getBlocksTable();
+
+	const dbResponses = await blocksTable.find(
+		{ whereIn: { property: 'id', values: ids } },
+		Object.getOwnPropertyNames(blocksTableSchema.schema),
+	);
+
+	if (dbResponses.length) {
+		return await Promise.all(dbResponses.map(block => formatBlockResponseFromDB(block)));
+	}
+
+	return undefined;
+};
+
+const getBlocksByHeightsBetweenFromDB = async (minHeight, maxHeight) => {
+	const blocksTable = await getBlocksTable();
+
+	const dbResponses = await blocksTable.find(
+		{
+			whereBetween: {
+				column: 'height',
+				values: [minHeight, maxHeight],
+			},
+		},
+		Object.getOwnPropertyNames(blocksTableSchema.schema),
+	);
+
+	if (dbResponses.length) {
+		return await Promise.all(dbResponses.map(block => formatBlockResponseFromDB(block)));
+	}
+
+	return undefined;
+};
+
+function createHeightBetweenArray(from, to) {
+	const result = [];
+	for (let i = from; i <= to; i++) {
+		result.push(i);
+	}
+	return result;
+}
 
 const normalizeBlock = async (originalBlock, isDeletedBlock = false) => {
 	// TODO: if it's already normalized (or with metadata), return
@@ -152,18 +252,90 @@ const normalizeBlocks = async blocks => {
 	return normalizedBlocks;
 };
 
-const getBlockByHeight = async height => {
+const getBlocksByHeightBetween = async ({ from, to, forceFromNode }) => {
+	// Get from cache
+	const heightBetween = createHeightBetweenArray(from, to);
+	const cachedBlocks = (
+		await Promise.all(heightBetween.map(height => blockCacheByHeight.get(height)))
+	).filter(block => block);
+	if (cachedBlocks.length === heightBetween.length)
+		return cachedBlocks.map(block => JSON.parse(block));
+
+	let blocks = [];
+
+	if (from <= to) {
+		if (forceFromNode === true) {
+			blocks = await invokeEndpoint('chain_getBlocksByHeightBetween', { from, to });
+		} else {
+			blocks = await getBlocksByHeightsBetweenFromDB(from, to);
+		}
+		for (const b of blocks) await blockCacheByHeight.set(b.header.height, JSON.stringify(b));
+	}
+
+	return blocks;
+};
+
+const getBlockByHeight = async (height, forceFromNode = false) => {
+	// Get from cache
+	const cachedBlocks = await blockCacheByHeight.get(height);
+	if (cachedBlocks) return JSON.parse(cachedBlocks);
+
+	// Get from DB first (this is the default behavior)
+	if (!forceFromNode) {
+		const block = await getBlockByHeightFromDB(height);
+		if (block) {
+			await blockCacheByHeight.set(height, JSON.stringify(block));
+			return block;
+		}
+	}
+
+	// Get from node
 	const response = await requestConnector('getBlockByHeight', { height });
+	await blockCacheByHeight.set(height, JSON.stringify(response));
 	return normalizeBlock(response);
 };
 
-const getBlockByID = async id => {
+const getBlockByID = async (id, forceFromNode = false) => {
+	// Get from cache
+	const cachedBlocks = await blockCache.get(id);
+	if (cachedBlocks) return JSON.parse(cachedBlocks);
+
+	// Get from DB first (this is the default behavior)
+	if (!forceFromNode) {
+		const block = await getBlockByIDFromDB(id);
+		if (block) {
+			await blockCache.set(id, JSON.stringify(block));
+			return block;
+		}
+	}
+
+	// Get from node
 	const response = await requestConnector('getBlockByID', { id });
+	await blockCache.set(id, JSON.stringify(response));
 	return normalizeBlock(response);
 };
 
-const getBlocksByIDs = async ids => {
+const getBlocksByIDs = async (ids, forceFromNode = false) => {
+	// Get from cache
+	const cachedBlocks = (await Promise.all(ids.map(id => blockCache.get(id)))).filter(
+		block => block,
+	);
+	if (cachedBlocks.length === ids.length) return cachedBlocks.map(block => JSON.parse(block));
+
+	// Get from DB first (this is the default behavior)
+	if (!forceFromNode) {
+		const blocks = await getBlocksByIDsFromDB(ids);
+		if (blocks && blocks.length) {
+			for (const b of blocks) await blockCache.set(b.header.id, JSON.stringify(b));
+
+			return blocks;
+		}
+	}
+
+	// Get from node
 	const response = await requestConnector('getBlocksByIDs', { ids });
+
+	for (const b of response) await await blockCache.set(b.header.id, JSON.stringify(b));
 	return normalizeBlocks(response);
 };
 
@@ -340,5 +512,6 @@ module.exports = {
 	getLastBlock,
 	getBlockByHeight,
 	getBlockByID,
+	getBlocksByHeightBetween,
 	getBlocksAssets,
 };

@@ -15,14 +15,6 @@
  */
 const { invokeEndpoint } = require('./client');
 const { getGenesisHeight, getGenesisBlockID, getGenesisBlock } = require('./genesisBlock');
-const {
-	getBlockByHeightFromDB,
-	getBlockByIDFromDB,
-	getBlocksByIDsFromDB,
-	getTransactionByIDFromDB,
-	getTransactionsByIDsFromDB,
-	getBlocksByHeightsBetweenFromDB,
-} = require('./database');
 
 const getNetworkConnectedPeers = async () => {
 	const connectedPeers = await invokeEndpoint('network_getConnectedPeers');
@@ -49,26 +41,17 @@ const getLastBlock = async () => {
 	return block;
 };
 
-const getBlockByHeight = async (height, includeGenesisAssets = false, forceFromNode = false) => {
+const getBlockByHeight = async (height, includeGenesisAssets = false) => {
 	if (Number(height) === (await getGenesisHeight())) {
 		return getGenesisBlock(includeGenesisAssets);
 	}
 
-	let block;
-	if (!forceFromNode) {
-		block = await getBlockByHeightFromDB(height);
-		if (block) return block;
-	}
-
-	block = await invokeEndpoint('chain_getBlockByHeight', { height });
-
-	// NOTE: DB indexing is done by indexBlocks, no need to index blocks after chain_getBlockByHeight
-	// This is also required to prevent double indexing, and made (in)sert available
+	const block = await invokeEndpoint('chain_getBlockByHeight', { height });
 
 	return block;
 };
 
-const getBlocksByHeightBetween = async ({ from, to, forceFromNode }) => {
+const getBlocksByHeightBetween = async ({ from, to }) => {
 	const gHeight = await getGenesisHeight();
 	const blocksNestedList = [[], []];
 
@@ -78,44 +61,29 @@ const getBlocksByHeightBetween = async ({ from, to, forceFromNode }) => {
 
 	// File-based genesis block handling
 	if (Number(from) === gHeight) {
-		blocksNestedList[0] = await getBlockByHeight(gHeight, undefined, forceFromNode === true);
+		blocksNestedList[0] = await getBlockByHeight(gHeight);
 		from++;
 	}
 
-	// Get from database
 	if (from <= to) {
-		if (forceFromNode === true) {
-			blocksNestedList[1] = await invokeEndpoint('chain_getBlocksByHeightBetween', { from, to });
-		} else {
-			blocksNestedList[1] = await getBlocksByHeightsBetweenFromDB(from, to);
-		}
+		blocksNestedList[1] = await invokeEndpoint('chain_getBlocksByHeightBetween', { from, to });
 	}
 
 	const blocks = blocksNestedList.flat();
 	return blocks;
 };
 
-const getBlockByID = async (id, includeGenesisAssets = false, forceFromNode = false) => {
+const getBlockByID = async (id, includeGenesisAssets = false) => {
 	// File-based genesis block handling
 	if (id === (await getGenesisBlockID())) {
 		return getGenesisBlock(includeGenesisAssets);
 	}
 
-	let block;
-	if (!forceFromNode) {
-		block = await getBlockByIDFromDB(id);
-		if (block) return block;
-	}
-
-	block = await invokeEndpoint('chain_getBlockByID', { id });
-
-	// NOTE: DB indexing is done by indexBlocks, no need to index blocks after chain_getBlockByID
-	// This is also required to prevent double indexing, and made (in)sert available
-
+	const block = await invokeEndpoint('chain_getBlockByID', { id });
 	return block;
 };
 
-const getBlocksByIDs = async (ids, forceFromNode = false) => {
+const getBlocksByIDs = async ids => {
 	// File-based genesis block handling
 	const genesisBlockId = await getGenesisBlockID();
 	const genesisBlockIndex = ids.indexOf(genesisBlockId);
@@ -129,53 +97,23 @@ const getBlocksByIDs = async (ids, forceFromNode = false) => {
 		return remainingBlocks;
 	}
 
-	let blocks;
-	if (!forceFromNode) {
-		blocks = await getBlocksByIDsFromDB(ids);
-		if (blocks !== undefined) return blocks;
-	}
-
-	blocks = await invokeEndpoint('chain_getBlocksByIDs', { ids });
-
-	// NOTE: DB indexing is done by indexBlocks, no need to index blocks after chain_getBlocksByIDs
-	// This is also required to prevent double indexing, and made (in)sert available
+	const blocks = await invokeEndpoint('chain_getBlocksByIDs', { ids });
 
 	return blocks;
 };
 
 const getEventsByHeight = async height => {
-	// TODO: get from db
 	const events = await invokeEndpoint('chain_getEvents', { height });
 	return events;
 };
 
-const getTransactionByID = async (id, forceFromNode = false) => {
-	let transaction;
-	if (!forceFromNode) {
-		transaction = await getTransactionByIDFromDB(id);
-		if (transaction) return transaction;
-	}
-
-	transaction = await invokeEndpoint('chain_getTransactionByID', { id });
-
-	// NOTE: DB indexing is done by indexBlocks, no need to index transactions after chain_getTransactionByID
-	// This is also required to prevent double indexing, and made (in)sert available
-
+const getTransactionByID = async id => {
+	const transaction = await invokeEndpoint('chain_getTransactionByID', { id });
 	return transaction;
 };
 
-const getTransactionsByIDs = async (ids, forceFromNode = false) => {
-	let transactions;
-	if (!forceFromNode) {
-		transactions = await getTransactionsByIDsFromDB(ids);
-		if (transactions) return transactions;
-	}
-
-	transactions = await invokeEndpoint('chain_getTransactionsByIDs', { ids });
-
-	// NOTE: DB indexing is done by indexBlocks, no need to index transactions after chain_getTransactionsByIDs
-	// This is also required to prevent double indexing, and made (in)sert available
-
+const getTransactionsByIDs = async ids => {
+	const transactions = await invokeEndpoint('chain_getTransactionsByIDs', { ids });
 	return transactions;
 };
 

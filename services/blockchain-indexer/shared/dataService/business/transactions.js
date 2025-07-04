@@ -16,6 +16,7 @@
 const BluebirdPromise = require('bluebird');
 
 const {
+	CacheLRU,
 	Exceptions: { InvalidParamsException },
 	DB: {
 		MySQL: { getTableInstance },
@@ -36,9 +37,68 @@ const transactionsTableSchema = require('../../database/schema/transactions');
 const config = require('../../../config');
 const { getKlayr32AddressFromPublicKey } = require('../../utils/account');
 
-const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
+const MYSQL_ENDPOINT = config.endpoints.mysql;
+
+const transactionCache = CacheLRU('transaction');
 
 const getTransactionsTable = () => getTableInstance(transactionsTableSchema, MYSQL_ENDPOINT);
+
+const formatTransactionResponseFromDB = transaction => {
+	const formattedTransaction = {
+		module: transaction.moduleCommand.split(':')[0],
+		command: transaction.moduleCommand.split(':')[1],
+		params: JSON.parse(transaction.params),
+		nonce: transaction.nonce,
+		fee: transaction.fee.toString(),
+		senderPublicKey: transaction.senderPublicKey,
+		signatures: JSON.parse(transaction.signatures),
+		id: transaction.id,
+	};
+	return formattedTransaction;
+};
+
+const getTransactionByIDFromDB = async id => {
+	const transactionsTable = await getTransactionsTable();
+
+	const [dbResponse] = await transactionsTable.find(
+		{ id, limit: 1 },
+		Object.getOwnPropertyNames(transactionsTableSchema.schema),
+	);
+
+	if (dbResponse) return formatTransactionResponseFromDB(dbResponse);
+
+	return undefined;
+};
+
+const getTransactionsByIDsFromDB = async ids => {
+	const transactionsTable = await getTransactionsTable();
+
+	const dbResponses = await transactionsTable.find(
+		{ whereIn: { property: 'id', values: ids } },
+		Object.getOwnPropertyNames(transactionsTableSchema.schema),
+	);
+
+	if (dbResponses.length) {
+		return dbResponses.map(formatTransactionResponseFromDB);
+	}
+
+	return undefined;
+};
+
+const getTransactionByBlockIDFromDB = async blockID => {
+	const transactionsTable = await getTransactionsTable();
+
+	const dbResponses = await transactionsTable.find(
+		{ blockID },
+		Object.getOwnPropertyNames(transactionsTableSchema.schema),
+	);
+
+	if (dbResponses.length) {
+		return dbResponses.map(formatTransactionResponseFromDB);
+	}
+
+	return undefined;
+};
 
 const getTransactionIDsByBlockID = async blockID => {
 	const transactionsTable = await getTransactionsTable();
@@ -64,8 +124,45 @@ const normalizeTransactions = async txs => {
 	return normalizedTransactions;
 };
 
-const getTransactionsByIDs = async ids => {
+const getTransactionByID = async (id, forceFromNode = false) => {
+	// Get from cache
+	const cachedTransaction = await transactionCache.get(id);
+	if (cachedTransaction) return JSON.parse(cachedTransaction);
+
+	// Get from DB first (this is the default behavior)
+	if (!forceFromNode) {
+		const transaction = await getTransactionByIDFromDB(id);
+		if (transaction) {
+			await transactionCache.set(id, JSON.stringify(transaction));
+			return transaction;
+		}
+	}
+
+	// Get from node
+	const response = await requestConnector('getTransactionByID', { id });
+	await transactionCache.set(id, JSON.stringify(response));
+	return normalizeBlock(response);
+};
+
+const getTransactionsByIDs = async (ids, forceFromNode = false) => {
+	// Get from cache
+	const cachedTransaction = (await Promise.all(ids.map(id => transactionCache.get(id)))).filter(
+		tx => tx,
+	);
+	if (cachedTransaction.length === ids.length) return cachedTransaction.map(tx => JSON.parse(tx));
+
+	// Get from DB first (this is the default behavior)
+	if (!forceFromNode) {
+		const transaction = await getTransactionsByIDsFromDB(ids);
+		if (transaction && transaction.length) {
+			for (const tx of transaction) await transactionCache.set(tx.id, JSON.stringify(tx));
+			return transaction;
+		}
+	}
+
+	// Get from node
 	const response = await requestConnector('getTransactionsByIDs', { ids });
+	for (const tx of response) await transactionCache.set(tx.id, JSON.stringify(tx));
 	return normalizeTransactions(response);
 };
 
@@ -275,6 +372,11 @@ module.exports = {
 	getTransactionsByIDs,
 	normalizeTransaction,
 	formatTransactionsInBlock,
+
+	// for db indexnig use
+	formatTransactionResponseFromDB,
+	getTransactionByBlockIDFromDB,
+	getTransactionByID,
 
 	// For unit test
 	validateParams,

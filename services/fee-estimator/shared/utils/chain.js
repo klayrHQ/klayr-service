@@ -78,6 +78,7 @@ const cacheBlockByHeight = async block => {
 	}
 };
 
+// TODO: should delete cache related code
 const emptyCacheBlockByHeight = async block => {
 	try {
 		if (isValidBlock(block)) {
@@ -92,6 +93,7 @@ const getBlockByHeight = async height => {
 	const blockStr = await blockByHeightCache.get(height);
 	if (blockStr) return JSON.parse(blockStr);
 
+	// TODO: should get from db / indexer, maybe create new method on indexer (like getBlockByHeight but from db)?
 	const block = await requestConnector('getBlockByHeight', { height });
 	await cacheBlockByHeight(block);
 	return block;
