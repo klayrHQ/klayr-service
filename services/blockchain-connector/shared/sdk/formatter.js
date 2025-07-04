@@ -133,6 +133,8 @@ const formatBlock = block => {
 };
 
 const formatEvent = (event, skipDecode) => {
+	// TODO: skip formatting if event is already formatted
+
 	// Calculate event ID
 	const eventSchema = getEventSchema();
 	const schemaCompliantEvent = parseInputBySchema(event, eventSchema);

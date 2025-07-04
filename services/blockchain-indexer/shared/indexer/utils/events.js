@@ -65,11 +65,9 @@ const getEventsInfoToIndex = (block, events) => {
 			timestamp: block.timestamp,
 		};
 
-		// Store whole event when persistence is enabled or block is not finalized yet
-		// Storing event of non-finalized block is required to fetch events of a deleted block
-		if (!block.isFinal || config.db.isPersistEvents) {
-			eventInfo.eventStr = JSON.stringify(event);
-		}
+		// Store whole event is now the default behavior
+		// Storing whole event is required to fetch events of a deleted block, and to make event retrieval faster
+		eventInfo.eventStr = JSON.stringify(event);
 
 		eventsInfoToIndex.eventsInfo.push(eventInfo);
 

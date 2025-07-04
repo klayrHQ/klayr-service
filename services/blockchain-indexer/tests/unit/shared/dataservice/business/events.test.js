@@ -203,7 +203,6 @@ describe('getEvents', () => {
 				...actual,
 				db: {
 					...actual.db,
-					isPersistEvents: true,
 				},
 			};
 		});
@@ -305,7 +304,6 @@ describe('getEvents', () => {
 				...actual,
 				db: {
 					...actual.db,
-					isPersistEvents: true,
 				},
 			};
 		});

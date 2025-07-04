@@ -159,7 +159,6 @@ config.networks = Object.freeze({
 });
 
 config.db = {
-	isPersistEvents: String(process.env.ENABLE_PERSIST_EVENTS).toLowerCase() !== 'false', // Enabled by default
 	durabilityVerifyFrequency: Number(process.env.DURABILITY_VERIFY_FREQUENCY) || 1, // In millisecs
 };
 

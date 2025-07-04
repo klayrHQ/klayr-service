@@ -54,18 +54,16 @@ const getEventsByHeight = async height => {
 	const cachedEvents = await eventCache.get(height);
 	if (cachedEvents) return JSON.parse(cachedEvents);
 
-	// Get from DB only when isPersistEvents is enabled
-	if (config.isPersistEvents) {
-		const eventsTable = await getEventsTable();
-		const dbEventStrings = await eventsTable.find({ height }, ['eventStr']);
+	// Get from DB first (this is the default behavior)
+	const eventsTable = await getEventsTable();
+	const dbEventStrings = await eventsTable.find({ height }, ['eventStr']);
 
-		if (dbEventStrings.length) {
-			const dbEvents = dbEventStrings.map(({ eventStr }) =>
-				eventStr ? JSON.parse(eventStr) : eventStr,
-			);
-			await eventCache.set(height, JSON.stringify(dbEvents));
-			return dbEvents;
-		}
+	if (dbEventStrings.length) {
+		const dbEvents = dbEventStrings.map(({ eventStr }) =>
+			eventStr ? JSON.parse(eventStr) : eventStr,
+		);
+		await eventCache.set(height, JSON.stringify(dbEvents));
+		return dbEvents;
 	}
 
 	// Get from node
@@ -240,14 +238,14 @@ const getEvents = async params => {
 		eventsInfo,
 		async ({ eventStr, height, index }) => {
 			let event;
-			if (config.db.isPersistEvents) {
-				if (eventStr) event = JSON.parse(eventStr);
-			}
+			if (eventStr) event = JSON.parse(eventStr);
+
 			if (!event) {
 				const eventsFromCache = await getEventsByHeight(height);
 				event = eventsFromCache.find(entry => entry.index === index);
 			}
 
+			// TODO: seems like id and timestamp are already available on event table???
 			const [{ id, timestamp } = {}] = await blocksTable.find({ height, limit: 1 }, [
 				'id',
 				'timestamp',
