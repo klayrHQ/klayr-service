@@ -93,7 +93,10 @@ async function initNodeClientPool() {
 		const node = {
 			url: config.endpoints.klayrUrls[index],
 			clientPool: [],
-			queue: await createQueueInstance(config.queue.invokeEndpoint.concurrency),
+			queue:
+				config.queue.invokeEndpoint.concurrency > 0
+					? await createQueueInstance(config.queue.invokeEndpoint.concurrency)
+					: undefined,
 			instantiationStats: {
 				attempts: 0,
 				success: 0,
@@ -138,6 +141,7 @@ async function initNodeClientPoolIfEmpty() {
 }
 
 function getNodeQueueSize(node) {
+	if (!node.queue) return 0;
 	return node.queue.size + node.queue.pending;
 }
 
