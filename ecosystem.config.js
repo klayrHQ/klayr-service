@@ -160,6 +160,7 @@ module.exports = {
 				SERVICE_INDEXER_REDIS_VOLATILE: 'redis://klayr:password@127.0.0.1:6379/2',
 				SERVICE_MESSAGE_QUEUE_REDIS: 'redis://klayr:password@127.0.0.1:6379/3',
 				SERVICE_INDEXER_MYSQL: 'mysql://klayr:password@127.0.0.1:3306/klayr',
+				// ENABLE_INDEXING_BENCHMARK: false,
 				// ENABLE_DATA_RETRIEVAL_MODE: true,
 				// ENABLE_INDEXING_MODE: true,
 				// ENABLE_APPLY_SNAPSHOT: false,

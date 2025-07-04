@@ -28,6 +28,7 @@ const logger = Logger();
 const blocksTableSchema = require('../database/schema/blocks');
 
 const config = require('../../config');
+const { stopIndexSpeedRecord } = require('../utils/indexSpeed');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
@@ -79,6 +80,7 @@ const checkIndexReadiness = async () => {
 		logger.info('The blockchain index is complete.');
 		logger.debug(`'blockIndexReady' signal: ${Signals.get('blockIndexReady')}`);
 		Signals.get('blockIndexReady').dispatch(true);
+		if (config.isBenchmarkingIndexing) stopIndexSpeedRecord();
 	}
 };
 

@@ -53,6 +53,10 @@ const { indexAccountPublicKey } = require('./accountIndex');
 const { getGenesisAssetIntervalTimeout, indexGenesisBlockAssets } = require('./genesisBlock');
 const { updateTotalLockedAmounts } = require('./utils/blockchainIndex');
 const {
+	startIndexSpeedRecord,
+	increaseBlockIndexedForSpeedRecord,
+} = require('../utils/indexSpeed');
+const {
 	getAddressesFromTokenEvents,
 	scheduleAddressesBalanceUpdate,
 } = require('./accountBalanceIndex');
@@ -136,6 +140,8 @@ const indexBlock = async job => {
 	let blockToIndexFromNode;
 
 	const genesisHeight = await getGenesisHeight();
+	if (config.isBenchmarkingIndexing && blockHeightFromJobData === 2) startIndexSpeedRecord();
+
 	try {
 		const blocksTable = await getBlocksTable();
 
@@ -439,6 +445,8 @@ const indexBlock = async job => {
 		await new Promise(r => setTimeout(r, config.indexBlocksRetryDelay)); // reduce stress on core node
 		throw error;
 	}
+
+	if (config.isBenchmarkingIndexing) increaseBlockIndexedForSpeedRecord();
 };
 
 // Returns a list of all indexed blocks since the minimum block height from job

@@ -25,6 +25,11 @@ const config = {
 };
 
 /**
+ * Indexing Benchmark config
+ */
+config.isBenchmarkingIndexing = process.env.ENABLE_INDEXING_BENCHMARK === 'true'; // Disabled by default
+
+/**
  * Inter-service message broker
  */
 config.transporter = process.env.SERVICE_BROKER || 'redis://klayr:password@127.0.0.1:6379/0';
