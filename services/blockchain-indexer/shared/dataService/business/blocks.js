@@ -512,6 +512,7 @@ module.exports = {
 	getLastBlock,
 	getBlockByHeight,
 	getBlockByID,
+	getBlocksByIDs,
 	getBlocksByHeightBetween,
 	getBlocksAssets,
 };

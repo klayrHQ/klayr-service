@@ -95,6 +95,7 @@ initDatabase()
 		setAppContext(app);
 
 		app.addMethods(path.join(__dirname, 'methods'));
+		app.addMethods(path.join(__dirname, 'methods', 'internal'));
 
 		if (config.operations.isDataRetrievalModeEnabled) {
 			app.addJobs(path.join(__dirname, 'jobs', 'dataService'));
