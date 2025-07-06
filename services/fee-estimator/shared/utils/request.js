@@ -27,7 +27,10 @@ const requestRpc = async (service, method, params = {}) => {
 
 const requestConnector = async (method, params) => requestRpc('connector', method, params);
 
+const requestIndexer = async (method, params) => requestRpc('indexer', method, params);
+
 module.exports = {
 	setAppContext,
 	requestConnector,
+	requestIndexer,
 };
