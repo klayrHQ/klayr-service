@@ -125,35 +125,37 @@ const normalizeTransactions = async txs => {
 };
 
 const getTransactionByID = async (id, forceFromNode = false) => {
-	// Get from cache
-	const cachedTransaction = await transactionCache.get(id);
-	if (cachedTransaction) return JSON.parse(cachedTransaction);
-
-	// Get from DB first (this is the default behavior)
 	if (!forceFromNode) {
+		// Get from cache
+		const cachedTransaction = await transactionCache.get(id);
+		if (cachedTransaction) return JSON.parse(cachedTransaction);
+
+		// Get from DB first (this is the default behavior)
 		const transaction = await getTransactionByIDFromDB(id);
 		if (transaction) {
-			await transactionCache.set(id, JSON.stringify(transaction));
-			return transaction;
+			const normalizedTransaction = await normalizeTransaction(transaction);
+			await transactionCache.set(id, JSON.stringify(normalizedTransaction));
+			return normalizedTransaction;
 		}
 	}
 
 	// Get from node
 	const response = await requestConnector('getTransactionByID', { id });
-	await transactionCache.set(id, JSON.stringify(response));
-	return normalizeBlock(response);
+	const normalizedTransaction = await normalizeTransaction(response);
+	await transactionCache.set(id, JSON.stringify(normalizedTransaction));
+	return normalizedTransaction;
 };
 
 const getTransactionsByIDs = async (ids, forceFromNode = false) => {
-	// Get from cache
-	const cachedTransaction = (await Promise.all(ids.map(id => transactionCache.get(id)))).filter(
-		tx => tx,
-	);
-	if (cachedTransaction.length === ids.length) return cachedTransaction.map(tx => JSON.parse(tx));
-
-	// Get from DB first (this is the default behavior)
 	if (!forceFromNode) {
-		const transaction = await getTransactionsByIDsFromDB(ids);
+		// Get from cache
+		const cachedTransaction = (await Promise.all(ids.map(id => transactionCache.get(id)))).filter(
+			tx => tx,
+		);
+		if (cachedTransaction.length === ids.length) return cachedTransaction.map(tx => JSON.parse(tx));
+
+		// Get from DB first (this is the default behavior)
+		const transaction = await normalizeTransactions(await getTransactionsByIDsFromDB(ids));
 		if (transaction && transaction.length) {
 			for (const tx of transaction) await transactionCache.set(tx.id, JSON.stringify(tx));
 			return transaction;
@@ -161,7 +163,9 @@ const getTransactionsByIDs = async (ids, forceFromNode = false) => {
 	}
 
 	// Get from node
-	const response = await requestConnector('getTransactionsByIDs', { ids });
+	const response = await normalizeTransactions(
+		await requestConnector('getTransactionsByIDs', { ids }),
+	);
 	for (const tx of response) await transactionCache.set(tx.id, JSON.stringify(tx));
 	return normalizeTransactions(response);
 };

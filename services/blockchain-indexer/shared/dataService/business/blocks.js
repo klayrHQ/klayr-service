@@ -253,90 +253,101 @@ const normalizeBlocks = async blocks => {
 };
 
 const getBlocksByHeightBetween = async ({ from, to, forceFromNode }) => {
-	// Get from cache
-	const heightBetween = createHeightBetweenArray(from, to);
-	const cachedBlocks = (
-		await Promise.all(heightBetween.map(height => blockCacheByHeight.get(height)))
-	).filter(block => block);
-	if (cachedBlocks.length === heightBetween.length)
-		return cachedBlocks.map(block => JSON.parse(block));
-
 	let blocks = [];
 
 	if (from <= to) {
-		if (forceFromNode === true) {
-			blocks = await invokeEndpoint('chain_getBlocksByHeightBetween', { from, to });
-		} else {
+		if (forceFromNode !== true) {
+			// Get from cache
+			const heightBetween = createHeightBetweenArray(from, to);
+			const cachedBlocks = (
+				await Promise.all(heightBetween.map(height => blockCacheByHeight.get(height)))
+			).filter(block => block);
+			if (cachedBlocks.length === heightBetween.length)
+				return cachedBlocks.map(block => JSON.parse(block));
+
+			// Get from DB
 			blocks = await getBlocksByHeightsBetweenFromDB(from, to);
 		}
-		for (const b of blocks) await blockCacheByHeight.set(b.header.height, JSON.stringify(b));
+		if (blocks.length === 0) {
+			blocks = await invokeEndpoint('chain_getBlocksByHeightBetween', { from, to });
+		}
+		if (blocks.length > 0) {
+			blocks = await normalizeBlocks(blocks);
+			await BluebirdPromise.map(
+				blocks,
+				async block => await blockCacheByHeight.set(block.height, JSON.stringify(block)),
+				{ concurrency: blocks.length },
+			);
+		}
 	}
 
 	return blocks;
 };
 
 const getBlockByHeight = async (height, forceFromNode = false) => {
-	// Get from cache
-	const cachedBlocks = await blockCacheByHeight.get(height);
-	if (cachedBlocks) return JSON.parse(cachedBlocks);
-
-	// Get from DB first (this is the default behavior)
 	if (!forceFromNode) {
+		// Get from cache
+		const cachedBlocks = await blockCacheByHeight.get(height);
+		if (cachedBlocks) return JSON.parse(cachedBlocks);
+
+		// Get from DB first (this is the default behavior)
 		const block = await getBlockByHeightFromDB(height);
 		if (block) {
-			await blockCacheByHeight.set(height, JSON.stringify(block));
-			return block;
+			const normalizedBlock = await normalizeBlock(block);
+			await blockCacheByHeight.set(height, JSON.stringify(normalizedBlock));
+			return normalizedBlock;
 		}
 	}
 
 	// Get from node
 	const response = await requestConnector('getBlockByHeight', { height });
-	await blockCacheByHeight.set(height, JSON.stringify(response));
-	return normalizeBlock(response);
+	const normalizedBlock = await normalizeBlock(response);
+	await blockCacheByHeight.set(height, JSON.stringify(normalizedBlock));
+	return normalizedBlock;
 };
 
 const getBlockByID = async (id, forceFromNode = false) => {
-	// Get from cache
-	const cachedBlocks = await blockCache.get(id);
-	if (cachedBlocks) return JSON.parse(cachedBlocks);
-
-	// Get from DB first (this is the default behavior)
 	if (!forceFromNode) {
+		// Get from cache
+		const cachedBlocks = await blockCache.get(id);
+		if (cachedBlocks) return JSON.parse(cachedBlocks);
+
+		// Get from DB first (this is the default behavior)
 		const block = await getBlockByIDFromDB(id);
 		if (block) {
-			await blockCache.set(id, JSON.stringify(block));
-			return block;
+			const normalizedBlock = await normalizeBlock(block);
+			await blockCache.set(id, JSON.stringify(normalizedBlock));
+			return normalizedBlock;
 		}
 	}
 
 	// Get from node
 	const response = await requestConnector('getBlockByID', { id });
-	await blockCache.set(id, JSON.stringify(response));
-	return normalizeBlock(response);
+	const normalizedBlock = await normalizeBlock(response);
+	await blockCache.set(id, JSON.stringify(normalizedBlock));
+	return normalizedBlock;
 };
 
 const getBlocksByIDs = async (ids, forceFromNode = false) => {
-	// Get from cache
-	const cachedBlocks = (await Promise.all(ids.map(id => blockCache.get(id)))).filter(
-		block => block,
-	);
-	if (cachedBlocks.length === ids.length) return cachedBlocks.map(block => JSON.parse(block));
-
-	// Get from DB first (this is the default behavior)
 	if (!forceFromNode) {
-		const blocks = await getBlocksByIDsFromDB(ids);
-		if (blocks && blocks.length) {
-			for (const b of blocks) await blockCache.set(b.header.id, JSON.stringify(b));
+		// Get from cache
+		const cachedBlocks = (await Promise.all(ids.map(id => blockCache.get(id)))).filter(
+			block => block,
+		);
+		if (cachedBlocks.length === ids.length) return cachedBlocks.map(block => JSON.parse(block));
 
+		// Get from DB first (this is the default behavior)
+		const blocks = await normalizeBlocks(await getBlocksByIDsFromDB(ids));
+		if (blocks && blocks.length) {
+			for (const b of blocks) await blockCache.set(b.id, JSON.stringify(b));
 			return blocks;
 		}
 	}
 
 	// Get from node
-	const response = await requestConnector('getBlocksByIDs', { ids });
-
-	for (const b of response) await await blockCache.set(b.header.id, JSON.stringify(b));
-	return normalizeBlocks(response);
+	const response = await normalizeBlocks(await requestConnector('getBlocksByIDs', { ids }));
+	for (const b of response) await await blockCache.set(b.id, JSON.stringify(b));
+	return response;
 };
 
 const getLastBlock = async () => {
