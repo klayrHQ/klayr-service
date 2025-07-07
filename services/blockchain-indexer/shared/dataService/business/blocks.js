@@ -39,7 +39,6 @@ const { normalizeTransaction } = require('../../utils/transactions');
 const { getNameByAddress } = require('../../utils/validator');
 
 const config = require('../../../config');
-const { getTransactionByBlockIDFromDB } = require('./transactions');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
@@ -50,6 +49,21 @@ const blockCache = CacheLRU('block');
 const blockCacheByHeight = CacheLRU('blockByHeight');
 
 let latestBlock;
+
+const getTransactionByBlockIDFromDB = async blockID => {
+	const transactionsTable = await getTransactionsTable();
+
+	const dbResponses = await transactionsTable.find(
+		{ blockID },
+		Object.getOwnPropertyNames(transactionsTableSchema.schema),
+	);
+
+	if (dbResponses.length) {
+		return dbResponses.map(formatTransactionResponseFromDB);
+	}
+
+	return undefined;
+};
 
 const formatBlockResponseFromDB = async block => {
 	const formattedBlock = {
@@ -526,4 +540,5 @@ module.exports = {
 	getBlocksByIDs,
 	getBlocksByHeightBetween,
 	getBlocksAssets,
+	getTransactionByBlockIDFromDB,
 };

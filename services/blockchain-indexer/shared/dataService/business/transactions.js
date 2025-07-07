@@ -85,21 +85,6 @@ const getTransactionsByIDsFromDB = async ids => {
 	return undefined;
 };
 
-const getTransactionByBlockIDFromDB = async blockID => {
-	const transactionsTable = await getTransactionsTable();
-
-	const dbResponses = await transactionsTable.find(
-		{ blockID },
-		Object.getOwnPropertyNames(transactionsTableSchema.schema),
-	);
-
-	if (dbResponses.length) {
-		return dbResponses.map(formatTransactionResponseFromDB);
-	}
-
-	return undefined;
-};
-
 const getTransactionIDsByBlockID = async blockID => {
 	const transactionsTable = await getTransactionsTable();
 	const transactions = await transactionsTable.find(
@@ -379,7 +364,6 @@ module.exports = {
 
 	// for db indexnig use
 	formatTransactionResponseFromDB,
-	getTransactionByBlockIDFromDB,
 	getTransactionByID,
 
 	// For unit test
