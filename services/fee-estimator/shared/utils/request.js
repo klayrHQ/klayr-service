@@ -33,4 +33,5 @@ module.exports = {
 	setAppContext,
 	requestConnector,
 	requestIndexer,
+	getAppContext,
 };

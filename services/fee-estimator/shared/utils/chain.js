@@ -21,6 +21,7 @@ const {
 
 const config = require('../../config');
 const { requestIndexer, requestConnector } = require('./request');
+const { waitForIndexerReady } = require('./indexerReady');
 
 let genesisHeight;
 let blockTime;
@@ -92,6 +93,8 @@ const emptyCacheBlockByHeight = async block => {
 const getBlockByHeight = async height => {
 	const blockStr = await blockByHeightCache.get(height);
 	if (blockStr) return JSON.parse(blockStr);
+
+	await waitForIndexerReady();
 
 	const block = await requestIndexer('getBlockByHeight', { height });
 	await cacheBlockByHeight(block);
