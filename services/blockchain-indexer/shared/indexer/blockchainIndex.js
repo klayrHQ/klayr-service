@@ -183,7 +183,7 @@ const indexBlock = async job => {
 		}
 
 		// Get block from node
-		blockToIndexFromNode = await getBlockByHeight(blockHeightToIndex);
+		blockToIndexFromNode = await getBlockByHeight(blockHeightToIndex, true);
 		if (!validateBlock(blockToIndexFromNode)) {
 			throw new Error(
 				`Invalid block ${blockToIndexFromNode.id} at height ${blockToIndexFromNode.height}.`,
