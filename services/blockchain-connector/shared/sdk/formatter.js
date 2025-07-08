@@ -133,7 +133,11 @@ const formatBlock = block => {
 };
 
 const formatEvent = (event, skipDecode) => {
-	// TODO: skip formatting if event is already formatted
+	// Events data from blockchain doesn't have an id.
+	// If id exists, it means that the event is already formatted.
+	if (Object.hasOwn(event, 'id')) {
+		return parseToJSONCompatObj(event);
+	}
 
 	// Calculate event ID
 	const eventSchema = getEventSchema();
