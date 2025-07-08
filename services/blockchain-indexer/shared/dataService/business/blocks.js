@@ -18,7 +18,6 @@ const BluebirdPromise = require('bluebird');
 
 const {
 	CacheLRU,
-	CacheRedis,
 	Logger,
 	DB: {
 		MySQL: { getTableInstance },
@@ -30,6 +29,7 @@ const logger = Logger();
 const { getEventsByHeight, getEventsByBlockID } = require('./events');
 const { getFinalizedHeight, MODULE, EVENT, getGenesisHeight } = require('../../constants');
 const blocksTableSchema = require('../../database/schema/blocks');
+const transactionsTableSchema = require('../../database/schema/transactions');
 
 const { getIndexedAccountInfo } = require('../utils/account');
 const { requestConnector } = require('../../utils/request');
@@ -43,6 +43,7 @@ const config = require('../../../config');
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
 const getBlocksTable = () => getTableInstance(blocksTableSchema, MYSQL_ENDPOINT);
+const getTransactionsTable = () => getTableInstance(transactionsTableSchema, MYSQL_ENDPOINT);
 
 // NOTE: latestBlockCache is not used anywhere in the codebase.
 // const latestBlockCache = CacheRedis('latestBlock', config.endpoints.cache);
@@ -67,6 +68,20 @@ const getTransactionByBlockIDFromDB = async blockID => {
 	return undefined;
 };
 
+const formatTransactionResponseFromDB = transaction => {
+	const formattedTransaction = {
+		module: transaction.moduleCommand.split(':')[0],
+		command: transaction.moduleCommand.split(':')[1],
+		params: JSON.parse(transaction.params),
+		nonce: transaction.nonce,
+		fee: transaction.fee.toString(),
+		senderPublicKey: transaction.senderPublicKey,
+		signatures: JSON.parse(transaction.signatures),
+		id: transaction.id,
+	};
+	return formattedTransaction;
+};
+
 const formatBlockResponseFromDB = async block => {
 	const formattedBlock = {
 		header: {
@@ -89,6 +104,18 @@ const formatBlockResponseFromDB = async block => {
 		},
 		transactions: [],
 		assets: JSON.parse(block.assets),
+		metadata: {
+			generator: JSON.parse(block.generator),
+			networkFee: block.networkFee,
+			totalBurnt: block.totalBurnt,
+			totalForged: block.totalForged,
+			reward: block.reward,
+			size: block.size,
+			numberOfEvents: block.numberOfEvents,
+			numberOfAssets: block.numberOfAssets,
+			numberOfTransactions: block.numberOfTransactions,
+			isFinal: block.isFinal,
+		},
 	};
 	formattedBlock.transactions = (await getTransactionByBlockIDFromDB(block.id)) || [];
 	return formattedBlock;
@@ -163,8 +190,53 @@ function createHeightBetweenArray(from, to) {
 	return result;
 }
 
+const normalizeFormattedBlock = async originalBlock => {
+	const normalizedBlock = {
+		// From header
+		id: originalBlock.header.id,
+		version: originalBlock.header.version,
+		height: originalBlock.header.height,
+		timestamp: originalBlock.header.timestamp,
+		previousBlockID: originalBlock.header.previousBlockID,
+		transactionRoot: originalBlock.header.transactionRoot,
+		assetRoot: originalBlock.header.assetRoot,
+		stateRoot: originalBlock.header.stateRoot,
+		eventRoot: originalBlock.header.eventRoot,
+		maxHeightGenerated: originalBlock.header.maxHeightGenerated,
+		maxHeightPrevoted: originalBlock.header.maxHeightPrevoted,
+		validatorsHash: originalBlock.header.validatorsHash,
+		aggregateCommit: originalBlock.header.aggregateCommit,
+		generatorAddress: originalBlock.header.generatorAddress,
+		signature: originalBlock.header.signature,
+		impliesMaxPrevotes: originalBlock.header.impliesMaxPrevotes,
+
+		// From metadata
+		generator: originalBlock.metadata.generator,
+		numberOfTransactions: originalBlock.metadata.numberOfTransactions,
+		numberOfAssets: originalBlock.metadata.numberOfAssets,
+		numberOfEvents: originalBlock.metadata.numberOfEvents,
+		totalBurnt: originalBlock.metadata.totalBurnt,
+		networkFee: originalBlock.metadata.networkFee,
+		totalForged: originalBlock.metadata.totalForged,
+		reward: originalBlock.metadata.reward,
+		isFinal: originalBlock.metadata.isFinal,
+		size: originalBlock.metadata.size,
+
+		// Transactions and assets
+		transactions: originalBlock.transactions,
+		assets: originalBlock.assets,
+	};
+
+	if (normalizedBlock.isFinal !== true)
+		normalizedBlock.isFinal = normalizedBlock.height <= (await getFinalizedHeight());
+
+	return normalizedBlock;
+};
+
 const normalizeBlock = async (originalBlock, isDeletedBlock = false) => {
-	// TODO: if it's already normalized (or with metadata), return
+	// NOTE: if a block has metadata, it means it's fetched from db
+	// and could be normalized without unnecessary extra steps
+	if (Object.hasOwn(originalBlock, 'metadata')) return normalizeFormattedBlock(originalBlock);
 
 	try {
 		const blocksTable = await getBlocksTable();
@@ -542,4 +614,5 @@ module.exports = {
 	getBlocksByHeightBetween,
 	getBlocksAssets,
 	getTransactionByBlockIDFromDB,
+	formatTransactionResponseFromDB,
 };

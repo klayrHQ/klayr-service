@@ -41,6 +41,14 @@ module.exports = {
 		impliesMaxPrevotes: { type: 'boolean' },
 		signature: { type: 'string' },
 		assets: { type: 'json' },
+
+		// Additional Metadata:
+		generator: { type: 'json' },
+		networkFee: { type: 'bigInteger', defaultValue: BigInt('0') },
+		totalBurnt: { type: 'bigInteger', defaultValue: BigInt('0') },
+		totalForged: { type: 'bigInteger', defaultValue: BigInt('0') },
+		numberOfAssets: { type: 'integer', defaultValue: 0 },
+		numberOfTransactions: { type: 'integer', defaultValue: 0 },
 	},
 	indexes: {
 		id: { type: 'key' },

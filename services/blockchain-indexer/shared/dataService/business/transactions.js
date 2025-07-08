@@ -23,7 +23,7 @@ const {
 	},
 } = require('klayr-service-framework');
 
-const { getBlockByID } = require('./blocks');
+const { getBlockByID, formatTransactionResponseFromDB } = require('./blocks');
 const { getEventsByHeight } = require('./events');
 
 const { getCurrentChainID } = require('./interoperability/chain');
@@ -42,20 +42,6 @@ const MYSQL_ENDPOINT = config.endpoints.mysql;
 const transactionCache = CacheLRU('transaction');
 
 const getTransactionsTable = () => getTableInstance(transactionsTableSchema, MYSQL_ENDPOINT);
-
-const formatTransactionResponseFromDB = transaction => {
-	const formattedTransaction = {
-		module: transaction.moduleCommand.split(':')[0],
-		command: transaction.moduleCommand.split(':')[1],
-		params: JSON.parse(transaction.params),
-		nonce: transaction.nonce,
-		fee: transaction.fee.toString(),
-		senderPublicKey: transaction.senderPublicKey,
-		signatures: JSON.parse(transaction.signatures),
-		id: transaction.id,
-	};
-	return formattedTransaction;
-};
 
 const getTransactionByIDFromDB = async id => {
 	const transactionsTable = await getTransactionsTable();
