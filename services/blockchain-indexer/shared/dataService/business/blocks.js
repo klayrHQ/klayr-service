@@ -44,7 +44,9 @@ const MYSQL_ENDPOINT = config.endpoints.mysql;
 
 const getBlocksTable = () => getTableInstance(blocksTableSchema, MYSQL_ENDPOINT);
 
-const latestBlockCache = CacheRedis('latestBlock', config.endpoints.cache);
+// NOTE: latestBlockCache is not used anywhere in the codebase.
+// const latestBlockCache = CacheRedis('latestBlock', config.endpoints.cache);
+
 const blockCache = CacheLRU('block');
 const blockCacheByHeight = CacheLRU('blockByHeight');
 
@@ -212,7 +214,6 @@ const normalizeBlock = async (originalBlock, isDeletedBlock = false) => {
 				};
 			}
 
-			// TODO: should this retrieved from DB?
 			const events = isDeletedBlock
 				? await getEventsByBlockID(block.id)
 				: await getEventsByHeight(block.height);
@@ -368,8 +369,8 @@ const getLastBlock = async () => {
 	const response = await requestConnector('getLastBlock');
 	latestBlock = await normalizeBlock(response);
 	if (latestBlock && latestBlock.id) {
-		// TODO: inspect where cache is retrieved / used
-		await latestBlockCache.set('latestBlock', JSON.stringify(latestBlock));
+		// NOTE: latestBlockCache is not used anywhere in the codebase.
+		// await latestBlockCache.set('latestBlock', JSON.stringify(latestBlock));
 	}
 	return latestBlock;
 };
