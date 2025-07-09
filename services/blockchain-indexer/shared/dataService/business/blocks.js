@@ -505,16 +505,25 @@ const getBlocks = async params => {
 		params = normalizeRangeParam(params, 'timestamp');
 	}
 
+	let resultSet = [];
 	const total = await blocksTable.count(params);
+
 	if (isQueryFromIndex(params)) {
-		const resultSet = await blocksTable.find(params, ['id']);
+		resultSet = await blocksTable.find(
+			params,
+			Object.getOwnPropertyNames(blocksTableSchema.schema),
+		);
 		params.ids = resultSet.map(row => row.id);
 	}
 
 	try {
+		// Under normal circumstances params.ids will always populated,
+		// So we could directly use resultSet without any re-fetch
+		// In case params.ids is not available, we re-fetch blocks by id/height/lastBlock
+
 		if (params.ids) {
 			if (Array.isArray(params.ids) && params.ids.length) {
-				blocks.data = await getBlocksByIDs(params.ids);
+				blocks.data = resultSet;
 			}
 		} else if (params.id) {
 			blocks.data.push(await getBlockByID(params.id));
