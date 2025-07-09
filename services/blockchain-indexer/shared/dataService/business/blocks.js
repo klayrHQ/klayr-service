@@ -523,7 +523,13 @@ const getBlocks = async params => {
 
 		if (params.ids) {
 			if (Array.isArray(params.ids) && params.ids.length) {
-				blocks.data = resultSet;
+				blocks.data = await BluebirdPromise.map(resultSet, block => {
+					return {
+						...block,
+						aggregateCommit: JSON.parse(block.aggregateCommit),
+						generator: JSON.parse(block.generator),
+					};
+				});
 			}
 		} else if (params.id) {
 			blocks.data.push(await getBlockByID(params.id));
@@ -589,7 +595,10 @@ const getBlocksAssets = async params => {
 
 	logger.debug(`Querying index to retrieve block IDs with params: ${util.inspect(params)}`);
 	const total = await blocksTable.count(params);
-	const blocksFromDB = await blocksTable.find(params, ['id']);
+	const blocksFromDB = await blocksTable.find(
+		params,
+		Object.getOwnPropertyNames(blocksTableSchema.schema),
+	);
 
 	logger.debug(
 		`Requesting blockchain application for blocks with IDs: ${blocksFromDB
@@ -599,8 +608,10 @@ const getBlocksAssets = async params => {
 	blockAssets.data = await BluebirdPromise.map(
 		blocksFromDB,
 		async blockFromDB => {
-			const block = await getBlockByID(blockFromDB.id);
-
+			const block = {
+				...blockFromDB,
+				assets: JSON.parse(blockFromDB.assets),
+			};
 			return {
 				block: {
 					id: block.id,
