@@ -196,25 +196,12 @@ const getTransactions = async params => {
 	params = await validateParams(params);
 
 	const total = await transactionsTable.count(params);
-	const resultSet = await transactionsTable.find({ ...params, limit: params.limit || total }, [
-		'id',
-		'timestamp',
-		'height',
-		'blockID',
-		'executionStatus',
-		'index',
-		'minFee',
-	]);
-	params.ids = resultSet.map(row => row.id);
+	const resultSet = await transactionsTable.find(
+		{ ...params, limit: params.limit || total },
+		Object.getOwnPropertyNames(transactionsTableSchema.schema),
+	);
 
-	if (params.ids.length) {
-		const BATCH_SIZE = 25;
-		for (let i = 0; i < Math.ceil(params.ids.length / BATCH_SIZE); i++) {
-			transactions.data = transactions.data.concat(
-				await getTransactionsByIDs(params.ids.slice(i * BATCH_SIZE, (i + 1) * BATCH_SIZE)),
-			);
-		}
-	}
+	if (resultSet.length) transactions.data = resultSet;
 
 	transactions.data = await BluebirdPromise.map(
 		transactions.data,
@@ -229,6 +216,9 @@ const getTransactions = async params => {
 				publicKey: transaction.senderPublicKey,
 				name: senderAccount ? senderAccount.name : null,
 			};
+
+			transaction.params = JSON.parse(transaction.params);
+			transaction.signatures = JSON.parse(transaction.signatures);
 
 			if (transaction.params.recipientAddress) {
 				const recipientAccount = await getIndexedAccountInfo(
@@ -245,17 +235,12 @@ const getTransactions = async params => {
 				};
 			}
 
-			const indexedTxInfo = resultSet.find(txInfo => txInfo.id === transaction.id) || {};
 			transaction.block = {
-				id: indexedTxInfo.blockID,
-				height: indexedTxInfo.height,
-				timestamp: indexedTxInfo.timestamp,
-				isFinal: indexedTxInfo.height <= (await getFinalizedHeight()),
+				id: transaction.blockID,
+				height: transaction.height,
+				timestamp: transaction.timestamp,
+				isFinal: transaction.height <= (await getFinalizedHeight()),
 			};
-
-			transaction.executionStatus = indexedTxInfo.executionStatus;
-			transaction.index = indexedTxInfo.index;
-			transaction.minFee = indexedTxInfo.minFee;
 
 			return transaction;
 		},
