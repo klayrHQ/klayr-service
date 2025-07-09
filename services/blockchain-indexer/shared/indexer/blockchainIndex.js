@@ -253,7 +253,6 @@ const indexBlock = async job => {
 					// Store address -> publicKey mapping
 					indexAccountPublicKey(tx.senderPublicKey);
 
-					// TODO: enrich transaction database, make it same from node, with additional information
 					await transactionsTable.upsert(tx, dbTrx);
 
 					// Invoke 'applyTransaction' to execute command specific processing logic
@@ -288,7 +287,6 @@ const indexBlock = async job => {
 
 			const { eventsInfo, eventTopicsInfo } = getEventsInfoToIndex(blockToIndexFromNode, events);
 
-			// TODO: enrich event database, make it same from node, with additional information
 			await eventsTable.upsert(eventsInfo, dbTrx);
 			await eventTopicsTable.upsert(eventTopicsInfo, dbTrx);
 
@@ -373,7 +371,6 @@ const indexBlock = async job => {
 			reward: blockReward,
 		};
 
-		// TODO: enrich block database, make it same from node, with additional information
 		await blocksTable.upsert(blockToIndex, dbTrx);
 		await commitDBTransaction(dbTrx);
 		logger.debug(
@@ -502,7 +499,6 @@ const deleteIndexedBlocks = async job => {
 					return;
 				}
 
-				// TODO: should retrieve from database?
 				let { data: forkedTransactions } = await getTransactionsByBlockID(blockFromJob.id);
 				const transactionsTable = await getTransactionsTable();
 				const events = await getEventsByBlockID(blockFromJob.id);

@@ -245,7 +245,6 @@ const getEvents = async params => {
 				event = eventsFromCache.find(entry => entry.index === index);
 			}
 
-			// TODO: seems like id and timestamp are already available on event table???
 			const [{ id, timestamp } = {}] = await blocksTable.find({ height, limit: 1 }, [
 				'id',
 				'timestamp',

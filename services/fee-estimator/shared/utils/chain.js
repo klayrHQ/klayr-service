@@ -79,7 +79,6 @@ const cacheBlockByHeight = async block => {
 	}
 };
 
-// TODO: should delete cache related code
 const emptyCacheBlockByHeight = async block => {
 	try {
 		if (isValidBlock(block)) {
