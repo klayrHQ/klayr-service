@@ -82,7 +82,7 @@ const formatTransactionResponseFromDB = transaction => {
 	return formattedTransaction;
 };
 
-const formatBlockResponseFromDB = async block => {
+const formatBlockResponseFromDB = async (block, skipFetchTransaction = false) => {
 	const formattedBlock = {
 		header: {
 			version: block.version,
@@ -117,11 +117,14 @@ const formatBlockResponseFromDB = async block => {
 			isFinal: block.isFinal,
 		},
 	};
-	formattedBlock.transactions = (await getTransactionByBlockIDFromDB(block.id)) || [];
+
+	if (!skipFetchTransaction)
+		formattedBlock.transactions = (await getTransactionByBlockIDFromDB(block.id)) || [];
+
 	return formattedBlock;
 };
 
-const getBlockByIDFromDB = async id => {
+const getBlockByIDFromDB = async (id, skipFetchTransaction = false) => {
 	const blocksTable = await getBlocksTable();
 
 	const [dbResponse] = await blocksTable.find(
@@ -129,12 +132,12 @@ const getBlockByIDFromDB = async id => {
 		Object.getOwnPropertyNames(blocksTableSchema.schema),
 	);
 
-	if (dbResponse) return await formatBlockResponseFromDB(dbResponse);
+	if (dbResponse) return await formatBlockResponseFromDB(dbResponse, skipFetchTransaction);
 
 	return undefined;
 };
 
-const getBlockByHeightFromDB = async height => {
+const getBlockByHeightFromDB = async (height, skipFetchTransaction = false) => {
 	const blocksTable = await getBlocksTable();
 
 	const [dbResponse] = await blocksTable.find(
@@ -142,12 +145,12 @@ const getBlockByHeightFromDB = async height => {
 		Object.getOwnPropertyNames(blocksTableSchema.schema),
 	);
 
-	if (dbResponse) return await formatBlockResponseFromDB(dbResponse);
+	if (dbResponse) return await formatBlockResponseFromDB(dbResponse, skipFetchTransaction);
 
 	return undefined;
 };
 
-const getBlocksByIDsFromDB = async ids => {
+const getBlocksByIDsFromDB = async (ids, skipFetchTransaction = false) => {
 	const blocksTable = await getBlocksTable();
 
 	const dbResponses = await blocksTable.find(
@@ -156,13 +159,19 @@ const getBlocksByIDsFromDB = async ids => {
 	);
 
 	if (dbResponses.length) {
-		return await Promise.all(dbResponses.map(block => formatBlockResponseFromDB(block)));
+		return await Promise.all(
+			dbResponses.map(block => formatBlockResponseFromDB(block, skipFetchTransaction)),
+		);
 	}
 
 	return undefined;
 };
 
-const getBlocksByHeightsBetweenFromDB = async (minHeight, maxHeight) => {
+const getBlocksByHeightsBetweenFromDB = async (
+	minHeight,
+	maxHeight,
+	skipFetchTransaction = false,
+) => {
 	const blocksTable = await getBlocksTable();
 
 	const dbResponses = await blocksTable.find(
@@ -176,7 +185,9 @@ const getBlocksByHeightsBetweenFromDB = async (minHeight, maxHeight) => {
 	);
 
 	if (dbResponses.length) {
-		return await Promise.all(dbResponses.map(block => formatBlockResponseFromDB(block)));
+		return await Promise.all(
+			dbResponses.map(block => formatBlockResponseFromDB(block, skipFetchTransaction)),
+		);
 	}
 
 	return undefined;
