@@ -53,6 +53,12 @@ const blockCacheByHeight = CacheLRU('blockByHeight');
 
 let latestBlock;
 
+const normalizeAndCacheBlock = async block => {
+	const normalizedBlock = await normalizeBlock(block);
+	await blockCacheByHeight.set(block.header.height, JSON.stringify(normalizedBlock));
+	return normalizedBlock;
+};
+
 const getTransactionByBlockIDFromDB = async blockID => {
 	const transactionsTable = await getTransactionsTable();
 
@@ -244,7 +250,7 @@ const normalizeFormattedBlock = async originalBlock => {
 	return normalizedBlock;
 };
 
-const normalizeBlock = async (originalBlock, isDeletedBlock = false) => {
+const normalizeBlock = async (originalBlock, isDeletedBlock = false, forceFromNode = false) => {
 	// NOTE: if a block has metadata, it means it's fetched from db
 	// and could be normalized without unnecessary extra steps
 	if (Object.hasOwn(originalBlock, 'metadata')) return normalizeFormattedBlock(originalBlock);
@@ -285,16 +291,18 @@ const normalizeBlock = async (originalBlock, isDeletedBlock = false) => {
 				  })();
 
 		const { numberOfEvents, reward } = await (async () => {
-			const [dbResponse] = await blocksTable.find({ height: block.height, limit: 1 }, [
-				'numberOfEvents',
-				'reward',
-			]);
+			if (!forceFromNode) {
+				const [dbResponse] = await blocksTable.find({ height: block.height, limit: 1 }, [
+					'numberOfEvents',
+					'reward',
+				]);
 
-			if (dbResponse) {
-				return {
-					numberOfEvents: dbResponse.numberOfEvents,
-					reward: dbResponse.reward,
-				};
+				if (dbResponse) {
+					return {
+						numberOfEvents: dbResponse.numberOfEvents,
+						reward: dbResponse.reward,
+					};
+				}
 			}
 
 			const events = isDeletedBlock
@@ -391,7 +399,7 @@ const getBlockByHeight = async (height, forceFromNode = false) => {
 		// Get from DB first (this is the default behavior)
 		const block = await getBlockByHeightFromDB(height);
 		if (block) {
-			const normalizedBlock = await normalizeBlock(block);
+			const normalizedBlock = await normalizeBlock(block, false, forceFromNode);
 			await blockCacheByHeight.set(height, JSON.stringify(normalizedBlock));
 			return normalizedBlock;
 		}
@@ -413,7 +421,7 @@ const getBlockByID = async (id, forceFromNode = false) => {
 		// Get from DB first (this is the default behavior)
 		const block = await getBlockByIDFromDB(id);
 		if (block) {
-			const normalizedBlock = await normalizeBlock(block);
+			const normalizedBlock = await normalizeBlock(block, false, forceFromNode);
 			await blockCache.set(id, JSON.stringify(normalizedBlock));
 			return normalizedBlock;
 		}
@@ -637,6 +645,7 @@ module.exports = {
 	formatBlock,
 	getBlocks,
 	getFinalizedHeight,
+	normalizeBlock,
 	normalizeBlocks,
 	getLastBlock,
 	getBlockByHeight,
@@ -646,4 +655,5 @@ module.exports = {
 	getBlocksAssets,
 	getTransactionByBlockIDFromDB,
 	formatTransactionResponseFromDB,
+	normalizeAndCacheBlock,
 };
