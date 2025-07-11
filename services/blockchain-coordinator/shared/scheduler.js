@@ -118,7 +118,7 @@ const scheduleBlocksIndexing = async heights => {
 	blockHeights.sort((h1, h2) => h1 - h2); // sort heights in ascending order
 
 	// Schedule indexing in batches when the list is too long to avoid OOM
-	const MAX_BATCH_SIZE = 15000;
+	const MAX_BATCH_SIZE = config.job.indexMissingBlocks.scheduleBlockIndexingMaxBatchSize;
 	const numBatches = Math.ceil(blockHeights.length / MAX_BATCH_SIZE);
 	if (numBatches > 1)
 		logger.info(

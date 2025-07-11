@@ -80,6 +80,8 @@ config.job = {
 		schedule: process.env.JOB_SCHEDULE_INDEX_MISSING_BLOCKS || '*/5 * * * *',
 		skipThreshold: Number(process.env.INDEX_MISSING_BLOCKS_SKIP_THRESHOLD) || 1000,
 		maxBlocksToSchedule: Number(process.env.INDEX_MISSING_BLOCKS_MAX_SCHEDULE) || 25000,
+		scheduleBlockIndexingMaxBatchSize:
+			Number(process.env.SCHEDULE_BLOCK_INDEXING_MAX_BATCH_SIZE) || 15000,
 	},
 };
 
