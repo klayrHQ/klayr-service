@@ -36,6 +36,7 @@ const { getCurrentHeight, getGenesisHeight, initNodeConstants } = require('./con
 const { range } = require('./utils/array');
 const delay = require('./utils/delay');
 const config = require('../config');
+const { requestConnector } = require('./utils/request');
 
 const blockMessageQueue = new MessageQueue(config.queue.block.name, config.endpoints.messageQueue, {
 	defaultJobOptions: config.queue.defaultJobOptions,
@@ -129,14 +130,20 @@ const scheduleBlocksIndexing = async heights => {
 		await waitForJobCountToFallBelowThreshold();
 
 		if (isMultiBatch) logger.debug(`Scheduling batch ${i + 1}/${numBatches}.`);
-		// TODO: apply batch block indexing? by fetching block directly here, and pass the block to job
 		const blockHeightsBatch = blockHeights.slice(i * MAX_BATCH_SIZE, (i + 1) * MAX_BATCH_SIZE);
 
+		const blocksBetweenHeight = await requestConnector('getBlocksByHeightBetween', {
+			from: blockHeightsBatch[0],
+			to: blockHeightsBatch[blockHeightsBatch.length - 1],
+		});
+
+		blocksBetweenHeight.sort((a, b) => a.header.height - b.header.height);
+
 		// eslint-disable-next-line no-restricted-syntax
-		for (const height of blockHeightsBatch) {
-			logger.trace(`Scheduling indexing for block at height: ${height}.`);
-			await blockMessageQueue.add({ height });
-			logger.debug(`Scheduled indexing for block at height: ${height}.`);
+		for (const block of blocksBetweenHeight) {
+			logger.trace(`Scheduling indexing for block at height: ${block.header.height}.`);
+			await blockMessageQueue.add({ block, height: block.header.height });
+			logger.debug(`Scheduled indexing for block at height: ${block.header.height}.`);
 		}
 
 		if (isMultiBatch)

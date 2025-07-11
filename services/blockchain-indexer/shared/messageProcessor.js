@@ -27,6 +27,7 @@ const {
 	addHeightToIndexBlocksQueue,
 	scheduleBlockDeletion,
 	indexNewBlock,
+	addBlockToIndexBlocksQueue,
 } = require('./indexer/blockchainIndex');
 
 const {
@@ -138,10 +139,17 @@ const initMessageProcessors = async () => {
 	logger.info(`Registering job processor for ${blockMessageQueue.name} message queue.`);
 	blockMessageQueue.process(async job => {
 		logger.debug('Subscribed to block index message queue.');
-		const { height } = job.data;
+		const { height, block } = job.data;
 
-		logger.debug(`Scheduling indexing for block at height: ${height}.`);
-		await addHeightToIndexBlocksQueue(height);
+		if (block !== undefined) {
+			logger.debug(
+				`Scheduling indexing using whole block with height: ${block.header.height}, and id: ${block.header.id}.`,
+			);
+			await addBlockToIndexBlocksQueue(block);
+		} else if (height !== undefined) {
+			logger.debug(`Scheduling indexing for block with height: ${height}.`);
+			await addHeightToIndexBlocksQueue(height);
+		}
 	});
 
 	logger.info(`Registering job processor for ${eventMessageQueue.name} message queue.`);

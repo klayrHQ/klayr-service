@@ -76,6 +76,7 @@ const eventsTableSchema = require('../database/schema/events');
 const eventTopicsTableSchema = require('../database/schema/eventTopics');
 const transactionsTableSchema = require('../database/schema/transactions');
 const validatorsTableSchema = require('../database/schema/validators');
+const { normalizeBlock } = require('../dataService/business/blocks');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
@@ -133,14 +134,17 @@ const checkBlockIDsDeleteStatusInDB = async (blockIDs, status) => {
 };
 
 const indexBlock = async job => {
-	const { height: blockHeightFromJobData } = job.data;
-	let blockHeightToIndex = blockHeightFromJobData;
+	const { height: blockHeightFromJobData, block: blockFromJobData } = job.data;
+	if (blockHeightFromJobData === undefined && blockFromJobData === undefined)
+		throw new Error('invalid indexBlock job.data');
+
+	let blockHeightToIndex = blockHeightFromJobData || blockFromJobData.header.height;
 	let addressesToUpdateBalance = [];
 	let dbTrx;
 	let blockToIndexFromNode;
 
 	const genesisHeight = await getGenesisHeight();
-	if (config.isBenchmarkingIndexing && blockHeightFromJobData === 2) startIndexSpeedRecord();
+	if (config.isBenchmarkingIndexing && blockHeightToIndex === 2) startIndexSpeedRecord();
 
 	try {
 		const blocksTable = await getBlocksTable();
@@ -186,10 +190,12 @@ const indexBlock = async job => {
 			);
 		}
 
-		// TODO: use block from arg?
-
 		// Get block from node
-		blockToIndexFromNode = await getBlockByHeight(blockHeightToIndex, true);
+		if (blockFromJobData && blockFromJobData.header.height === blockHeightToIndex) {
+			blockToIndexFromNode = await normalizeBlock(blockFromJobData, false, true);
+		} else {
+			blockToIndexFromNode = await getBlockByHeight(blockHeightToIndex, true);
+		}
 		if (!validateBlock(blockToIndexFromNode)) {
 			throw new Error(
 				`Invalid block ${blockToIndexFromNode.id} at height ${blockToIndexFromNode.height}.`,
@@ -860,7 +866,19 @@ const getMissingBlocks = async params => {
 	return listOfMissingBlocks;
 };
 
-// TODO: addBlockToIndexBlocksQueue?
+const addBlockToIndexBlocksQueue = async (block, priority) => {
+	const liveIndexingJobCount = await getLiveIndexingJobCount();
+	if (liveIndexingJobCount > config.queue.indexBlocks.scheduledJobsMaxCount) {
+		logger.trace(
+			`Skipping adding new job to the queue. Current liveIndexingJobCount: ${liveIndexingJobCount}.`,
+		);
+		return null;
+	}
+
+	return typeof priority === 'number'
+		? indexBlocksQueue.add({ block }, { priority })
+		: indexBlocksQueue.add({ block });
+};
 
 const addHeightToIndexBlocksQueue = async (height, priority) => {
 	const liveIndexingJobCount = await getLiveIndexingJobCount();
@@ -902,6 +920,7 @@ const isGenesisBlockIndexed = async () => {
 module.exports = {
 	indexNewBlock,
 	addHeightToIndexBlocksQueue,
+	addBlockToIndexBlocksQueue,
 	getMissingBlocks,
 	scheduleBlockDeletion,
 	getIndexVerifiedHeight,
