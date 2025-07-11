@@ -367,7 +367,7 @@ const getBlocksByHeightBetween = async ({ from, to, forceFromNode }) => {
 			blocks = await getBlocksByHeightsBetweenFromDB(from, to);
 		}
 		if (blocks.length === 0) {
-			blocks = await invokeEndpoint('chain_getBlocksByHeightBetween', { from, to });
+			blocks = await requestConnector('getBlocksByHeightBetween', { from, to });
 		}
 		if (blocks.length > 0) {
 			blocks = await normalizeBlocks(blocks);
