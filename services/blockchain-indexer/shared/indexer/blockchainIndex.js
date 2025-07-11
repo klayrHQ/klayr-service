@@ -145,6 +145,8 @@ const indexBlock = async job => {
 	try {
 		const blocksTable = await getBlocksTable();
 
+		// TODO: optimize lastIndexedBlock using cache
+
 		const [lastIndexedBlock = {}] = await blocksTable.find(
 			{
 				sort: 'height:desc',
@@ -162,6 +164,8 @@ const indexBlock = async job => {
 			// Skip job run if the height to be indexed does not exist
 			if ((await getCurrentHeight()) < blockHeightToIndex) return;
 		}
+
+		// TODO: merge blocksTable find for currentBlockInDB and prevBlockInDB
 
 		const [currentBlockInDB = {}] = await blocksTable.find(
 			{
@@ -181,6 +185,8 @@ const indexBlock = async job => {
 				['id', 'height'],
 			);
 		}
+
+		// TODO: use block from arg?
 
 		// Get block from node
 		blockToIndexFromNode = await getBlockByHeight(blockHeightToIndex, true);
@@ -770,6 +776,9 @@ const indexNewBlock = async block => {
 		await scheduleBlockDeletion(blockFromDB);
 	}
 
+	// TODO: block already available as args here? optimize
+	// TODO: apply batch block indexing?
+
 	// Schedule indexing of the incoming block if not already indexed or a fork was detected
 	if (!blockFromDB || blockFromDB.id !== block.id) {
 		await indexBlocksQueue.add({ height: block.height });
@@ -850,6 +859,8 @@ const getMissingBlocks = async params => {
 	const listOfMissingBlocks = nestedListOfRanges.flat();
 	return listOfMissingBlocks;
 };
+
+// TODO: addBlockToIndexBlocksQueue?
 
 const addHeightToIndexBlocksQueue = async (height, priority) => {
 	const liveIndexingJobCount = await getLiveIndexingJobCount();

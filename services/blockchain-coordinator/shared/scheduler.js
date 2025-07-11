@@ -129,6 +129,7 @@ const scheduleBlocksIndexing = async heights => {
 		await waitForJobCountToFallBelowThreshold();
 
 		if (isMultiBatch) logger.debug(`Scheduling batch ${i + 1}/${numBatches}.`);
+		// TODO: apply batch block indexing? by fetching block directly here, and pass the block to job
 		const blockHeightsBatch = blockHeights.slice(i * MAX_BATCH_SIZE, (i + 1) * MAX_BATCH_SIZE);
 
 		// eslint-disable-next-line no-restricted-syntax
