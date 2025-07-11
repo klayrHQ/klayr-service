@@ -40,6 +40,7 @@ const {
 	formatPendingTransaction,
 } = require('./dataService');
 const { accountAddrUpdateQueue } = require('./indexer/accountIndex');
+const { indexPendingNewBlock } = require('./indexer/pendingBlockchainIndex');
 
 const STATS_INTERVAL = 1 * 60 * 1000; // ms
 
@@ -82,7 +83,7 @@ const newBlockProcessor = async block => {
 	const response = await formatBlock(block);
 	const [newBlock] = response.data;
 
-	await indexNewBlock(newBlock);
+	await indexPendingNewBlock(block);
 	await performLastBlockUpdate(newBlock);
 	Signals.get('newBlock').dispatch(response);
 	logger.info(

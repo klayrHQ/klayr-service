@@ -190,7 +190,7 @@ const indexBlock = async job => {
 			);
 		}
 
-		// Get block from node
+		// Get block from args if have same height, otherwise get from node
 		if (blockFromJobData && blockFromJobData.header.height === blockHeightToIndex) {
 			blockToIndexFromNode = await normalizeBlock(blockFromJobData, false, true);
 		} else {
@@ -763,9 +763,11 @@ const scheduleBlockDeletion = async block => {
 
 const indexNewBlock = async block => {
 	const blocksTable = await getBlocksTable();
-	logger.info(`Scheduling indexing of new block: ${block.id} at height ${block.height}.`);
+	logger.info(
+		`Scheduling indexing of new block: ${block.header.id} at height ${block.header.height}.`,
+	);
 
-	const [blockFromDB] = await blocksTable.find({ height: block.height, limit: 1 }, [
+	const [blockFromDB] = await blocksTable.find({ height: block.header.height, limit: 1 }, [
 		'id',
 		'height',
 		'generatorAddress',
@@ -774,20 +776,19 @@ const indexNewBlock = async block => {
 	]);
 
 	// Schedule block deletion in case of an unprocessed fork detection
-	if (blockFromDB && blockFromDB.id !== block.id) {
+	if (blockFromDB && blockFromDB.id !== block.header.id) {
 		logger.info(
-			`Fork detected while scheduling indexing at height: ${block.height}. Actual blockID: ${block.id}, indexed blockID: ${blockFromDB.id}.`,
+			`Fork detected while scheduling indexing at height: ${block.header.height}. Actual blockID: ${block.header.id}, indexed blockID: ${blockFromDB.id}.`,
 		);
 
 		await scheduleBlockDeletion(blockFromDB);
 	}
 
-	// TODO: block already available as args here? optimize
-	// TODO: apply batch block indexing?
-
 	// Schedule indexing of the incoming block if not already indexed or a fork was detected
-	if (!blockFromDB || blockFromDB.id !== block.id) {
-		await indexBlocksQueue.add({ height: block.height });
+	if (!blockFromDB || blockFromDB.id !== block.header.id) {
+		await indexBlocksQueue.add({ height: block.header.height, block });
+	} else {
+		logger.info(`Block ${block.header.id} at height ${block.header.height} already indexed`);
 	}
 
 	// Update finality status of indexed blocks

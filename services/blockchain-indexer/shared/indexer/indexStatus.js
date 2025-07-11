@@ -29,6 +29,7 @@ const blocksTableSchema = require('../database/schema/blocks');
 
 const config = require('../../config');
 const { stopIndexSpeedRecord } = require('../utils/indexSpeed');
+const { registerPendingNewBlockSignal } = require('./pendingBlockchainIndex');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
@@ -115,6 +116,7 @@ const init = async () => {
 
 	// Register event listeners
 	Signals.get('newBlock').add(checkIndexReadiness);
+	await registerPendingNewBlockSignal();
 };
 
 module.exports = {
