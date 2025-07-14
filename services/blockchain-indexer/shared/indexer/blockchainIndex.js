@@ -197,8 +197,14 @@ const indexBlock = async job => {
 		}
 
 		// Get block from args if have same height, otherwise get from node
-		if (blockFromJobData && blockFromJobData.header.height === blockHeightToIndex) {
-			blockToIndexFromNode = await normalizeBlock(blockFromJobData, false, true);
+		if (blockFromJobData) {
+			if (blockFromJobData.header.height === blockHeightToIndex) {
+				blockToIndexFromNode = await normalizeBlock(blockFromJobData, false, true);
+			} else {
+				throw new Error(
+					`Non-sequential blockFromJobData received in indexBlock: expected height ${blockHeightToIndex}, got ${blockFromJobData.header.height}`,
+				);
+			}
 		} else {
 			blockToIndexFromNode = await getBlockByHeight(blockHeightToIndex, true);
 		}
@@ -795,8 +801,40 @@ const scheduleBlockDeletion = async block => {
 	await deleteIndexedBlocksQueue.add({ blocks });
 };
 
+function createMissingBlockArray(lastIndexedBlockHeight, newBlockHeight) {
+	const result = [];
+	for (let i = lastIndexedBlockHeight + 1; i < newBlockHeight; i++) {
+		result.push(i);
+	}
+	return result;
+}
+
 const indexNewBlock = async block => {
 	const blocksTable = await getBlocksTable();
+	const lastIndexedBlock = await getLastIndexedBlock();
+
+	// if new block height is not sequential, then schedule for indexing
+	if (lastIndexedBlock && block.header.height > lastIndexedBlock.height + 1) {
+		logger.info(
+			`Detected missing block between last indexed block at height: ${lastIndexedBlock.height} until new block at height: ${block.header.height}`,
+		);
+		const missingBlocks = createMissingBlockArray(lastIndexedBlock.height, block.header.height);
+
+		for (const missingBlockHeight of missingBlocks) {
+			logger.info(`Scheduling indexing of missing block at height ${missingBlockHeight}`);
+
+			const [blockFromDB] = await blocksTable.find({ height: missingBlockHeight, limit: 1 }, [
+				'id',
+			]);
+
+			if (!blockFromDB) {
+				await indexBlocksQueue.add({ height: missingBlockHeight });
+			} else {
+				logger.info(`Block at height ${missingBlockHeight} already indexed`);
+			}
+		}
+	}
+
 	logger.info(
 		`Scheduling indexing of new block: ${block.header.id} at height ${block.header.height}.`,
 	);

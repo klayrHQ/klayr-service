@@ -26,7 +26,6 @@ const { initNodeConstants } = require('./constants');
 const {
 	addHeightToIndexBlocksQueue,
 	scheduleBlockDeletion,
-	indexNewBlock,
 	addBlockToIndexBlocksQueue,
 } = require('./indexer/blockchainIndex');
 
