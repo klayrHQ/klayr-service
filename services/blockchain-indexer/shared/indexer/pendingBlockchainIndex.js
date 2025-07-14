@@ -29,7 +29,6 @@ const startIndexingPendingNewBlock = async () => {
 };
 
 const indexPendingNewBlock = async block => {
-	console.log('indexPendingNewBlock', block);
 	if (indexReady) {
 		await indexNewBlock(block);
 	} else {

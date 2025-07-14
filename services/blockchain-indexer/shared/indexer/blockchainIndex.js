@@ -29,6 +29,7 @@ const {
 		},
 	},
 	Utils: { waitForIt },
+	CacheLRU,
 } = require('klayr-service-framework');
 
 const { applyTransaction, revertTransaction } = require('./transactionProcessor');
@@ -90,6 +91,43 @@ const getValidatorsTable = () => getTableInstance(validatorsTableSchema, MYSQL_E
 
 const validateBlock = block => !!block && block.height >= 0;
 
+const LAST_INDEXED_BLOCK_CACHE_KEY = 'lastIndexedBlock';
+
+const lastIndexedBlockCache = CacheLRU('lastIndexedBlock', { max: 1 });
+
+const getLastIndexedBlockFromDB = async () => {
+	const blocksTable = await getBlocksTable();
+	const [lastIndexedBlockFromDB] = await blocksTable.find(
+		{
+			sort: 'height:desc',
+			limit: 1,
+		},
+		Object.getOwnPropertyNames(blocksTableSchema.schema),
+	);
+	if (lastIndexedBlockFromDB) await setLastIndexedBlock(lastIndexedBlockFromDB);
+	return lastIndexedBlockFromDB;
+};
+
+const getLastIndexedBlock = async () => {
+	const lastIndexedBlock = await lastIndexedBlockCache.get(LAST_INDEXED_BLOCK_CACHE_KEY);
+	if (lastIndexedBlock) {
+		return JSON.parse(lastIndexedBlock);
+	} else {
+		return await getLastIndexedBlockFromDB();
+	}
+};
+
+const setLastIndexedBlock = async block => {
+	if (block) {
+		await lastIndexedBlockCache.set(
+			LAST_INDEXED_BLOCK_CACHE_KEY,
+			JSON.stringify({ id: block.id, height: block.height }),
+		);
+	} else {
+		await getLastIndexedBlockFromDB();
+	}
+};
+
 const DB_STATUS = Object.freeze({
 	COMMIT: 'commit',
 	ROLLBACK: 'rollback',
@@ -148,46 +186,14 @@ const indexBlock = async job => {
 
 	try {
 		const blocksTable = await getBlocksTable();
-
-		// TODO: optimize lastIndexedBlock using cache
-
-		const [lastIndexedBlock = {}] = await blocksTable.find(
-			{
-				sort: 'height:desc',
-				limit: 1,
-			},
-			['height'],
-		);
-
-		const { height: lastIndexedHeight } = lastIndexedBlock;
+		const lastIndexedBlock = await getLastIndexedBlock();
 
 		// Always index the last indexed blockHeight + 1 (sequential indexing)
-		if (typeof lastIndexedHeight !== 'undefined') {
-			blockHeightToIndex = lastIndexedHeight + 1;
+		if (lastIndexedBlock !== undefined) {
+			blockHeightToIndex = lastIndexedBlock.height + 1;
 
 			// Skip job run if the height to be indexed does not exist
 			if ((await getCurrentHeight()) < blockHeightToIndex) return;
-		}
-
-		// TODO: merge blocksTable find for currentBlockInDB and prevBlockInDB
-
-		const [currentBlockInDB = {}] = await blocksTable.find(
-			{
-				where: { height: blockHeightToIndex },
-				limit: 1,
-			},
-			['id', 'height'],
-		);
-
-		let prevBlockInDB = {};
-		if (blockHeightToIndex > genesisHeight + 1) {
-			[prevBlockInDB] = await blocksTable.find(
-				{
-					where: { height: blockHeightToIndex - 1 },
-					limit: 1,
-				},
-				['id', 'height'],
-			);
 		}
 
 		// Get block from args if have same height, otherwise get from node
@@ -202,32 +208,56 @@ const indexBlock = async job => {
 			);
 		}
 
-		// If current index block is incorrectly indexed then schedule for deletion
-		/* eslint-disable no-use-before-define */
-		if (Object.keys(currentBlockInDB).length && blockToIndexFromNode.id !== currentBlockInDB.id) {
-			await scheduleBlockDeletion(currentBlockInDB);
-			await addHeightToIndexBlocksQueue(currentBlockInDB.height);
-			return;
+		if (lastIndexedBlock && lastIndexedBlock.height + 1 !== blockFromJobData.height) {
+			const [currentBlockInDB = {}] = await blocksTable.find(
+				{
+					where: { height: blockHeightToIndex },
+					limit: 1,
+				},
+				['id', 'height'],
+			);
+
+			// If current index block is incorrectly indexed then schedule for deletion
+			/* eslint-disable no-use-before-define */
+			if (Object.keys(currentBlockInDB).length && blockToIndexFromNode.id !== currentBlockInDB.id) {
+				await scheduleBlockDeletion(currentBlockInDB);
+				await addHeightToIndexBlocksQueue(currentBlockInDB.height);
+				return;
+			}
+
+			// If current block is already indexed, then index the highest indexed block height + 1
+			// which is already implemented on line blockHeightToIndex = lastIndexedBlock.height + 1 above
+			if (Object.keys(currentBlockInDB).length) {
+				// Skip indexing if the blockchain is fully indexed.
+				const currentBlockchainHeight = await getCurrentHeight();
+				if (lastIndexedBlock.height >= currentBlockchainHeight) return;
+
+				// blockHeightToIndex = lastIndexedBlock.height + 1;
+			}
 		}
 
-		// Incase prev block is incorrect schedule that for deletion
-		if (
-			Object.keys(prevBlockInDB).length &&
-			prevBlockInDB.id !== blockToIndexFromNode.previousBlockID
-		) {
-			await scheduleBlockDeletion(prevBlockInDB);
-			await addHeightToIndexBlocksQueue(prevBlockInDB.height);
-			return;
-		}
-		/* eslint-enable no-use-before-define */
+		// under normal condition, prevBlockInID should be lastIndexedBlock
+		if (lastIndexedBlock && lastIndexedBlock.id !== blockToIndexFromNode.previousBlockID) {
+			if (blockHeightToIndex > genesisHeight + 1) {
+				const [prevBlockInDB] = await blocksTable.find(
+					{
+						where: { height: blockHeightToIndex - 1 },
+						limit: 1,
+					},
+					['id', 'height'],
+				);
 
-		// If current block is already indexed, then index the highest indexed block height + 1
-		if (Object.keys(currentBlockInDB).length) {
-			// Skip indexing if the blockchain is fully indexed.
-			const currentBlockchainHeight = await getCurrentHeight();
-			if (lastIndexedHeight >= currentBlockchainHeight) return;
-
-			blockHeightToIndex = lastIndexedHeight + 1;
+				// Incase prev block is incorrect schedule that for deletion
+				if (
+					Object.keys(prevBlockInDB).length &&
+					prevBlockInDB.id !== blockToIndexFromNode.previousBlockID
+				) {
+					await scheduleBlockDeletion(prevBlockInDB);
+					await addHeightToIndexBlocksQueue(prevBlockInDB.height);
+					return;
+				}
+				/* eslint-enable no-use-before-define */
+			}
 		}
 
 		// Create DB transaction. Queries from here sees a snapshot of the database
@@ -385,6 +415,7 @@ const indexBlock = async job => {
 
 		await blocksTable.upsert(blockToIndex, dbTrx);
 		await commitDBTransaction(dbTrx);
+		await setLastIndexedBlock(blockToIndex);
 		logger.debug(
 			`Committed MySQL transaction to index block ${blockToIndexFromNode.id} at height ${blockToIndexFromNode.height}.`,
 		);
@@ -669,6 +700,9 @@ const deleteIndexedBlocks = async job => {
 		// Only schedule address balance updates if the block is deleted successfully
 		await scheduleAddressesBalanceUpdate(addressesToUpdateBalance);
 		logger.debug(`Committed MySQL transaction to delete block(s) with ID(s): ${blockIDs}.`);
+
+		// Pass nothing as argument, means that it will set last indexed block from db
+		await setLastIndexedBlock();
 	} catch (error) {
 		logger.debug(`Rolled back MySQL transaction to delete block(s) with ID(s): ${blockIDs}.`);
 		await rollbackDBTransaction(dbTrx);
