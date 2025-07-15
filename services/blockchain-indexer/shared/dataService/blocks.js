@@ -53,11 +53,6 @@ const getBlocksFromServer = async params => {
 	if (response.data) blocks.data = response.data;
 	if (response.meta) blocks.meta = response.meta;
 
-	// TODO: should this be deleted?
-	if (blocks.data.length) {
-		blocks.data.forEach(block => setLastBlock(block));
-	}
-
 	return blocks;
 };
 
