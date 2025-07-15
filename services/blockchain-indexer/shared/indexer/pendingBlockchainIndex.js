@@ -1,5 +1,18 @@
-const { Signals, Logger } = require('klayr-service-framework');
+const {
+	DB: {
+		MySQL: { getTableInstance },
+	},
+	Signals,
+	Logger,
+} = require('klayr-service-framework');
 const { indexNewBlock } = require('./blockchainIndex');
+
+const blocksTableSchema = require('../database/schema/blocks');
+const config = require('../../config');
+
+const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
+
+const getBlocksTable = () => getTableInstance(blocksTableSchema, MYSQL_ENDPOINT);
 
 const logger = Logger();
 
@@ -8,6 +21,8 @@ let indexReady = false;
 let indexerLastCurrentHeight = -1;
 
 const pendingBlockToIndex = [];
+
+const getPendingIndexReady = () => indexReady;
 
 const getPendingBlockToIndexLength = () => pendingBlockToIndex.length;
 
@@ -28,6 +43,11 @@ const setPendingIndexIsReady = () => {
 		logger.trace('setIndexIsReady is setting indexReady as true on pendingBlockchainIndex.js');
 		indexReady = true;
 	}
+};
+
+const getNumBlocksIndexed = async () => {
+	const blocksTable = await getBlocksTable();
+	return await blocksTable.count();
 };
 
 const startIndexingPendingNewBlock = async numBlocksIndexed => {
@@ -71,6 +91,18 @@ const indexPendingNewBlock = async block => {
 	}
 };
 
+const registerPendingIndexReadySignal = () => {
+	const pendingIndexReadySignalListener = async () => {
+		Signals.get('blockIndexReady').remove(pendingIndexReadySignalListener);
+		if (indexReady) return;
+
+		const numBlocksIndexed = await getNumBlocksIndexed();
+		setPendingIndexIsReady();
+		await startIndexingPendingNewBlock(numBlocksIndexed);
+	};
+	Signals.get('blockIndexReady').add(pendingIndexReadySignalListener);
+};
+
 module.exports = {
 	indexPendingNewBlock,
 	startIndexingPendingNewBlock,
@@ -78,4 +110,7 @@ module.exports = {
 	getIndexerLastCurrentHeight,
 	setPendingIndexerLastCurrentHeight,
 	setPendingIndexIsReady,
+	getNumBlocksIndexed,
+	registerPendingIndexReadySignal,
+	getPendingIndexReady,
 };
