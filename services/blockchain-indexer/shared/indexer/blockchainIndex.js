@@ -200,6 +200,11 @@ const indexBlock = async job => {
 		if (blockFromJobData) {
 			if (blockFromJobData.header.height === blockHeightToIndex) {
 				blockToIndexFromNode = await normalizeBlock(blockFromJobData, false, true);
+			} else if (blockFromJobData.header.height < blockHeightToIndex) {
+				// this section means this blockFromJobData is a rescheduled failed job from previous queue
+				// but the block should be already indexed
+				// hence, return
+				return;
 			} else {
 				throw new Error(
 					`Non-sequential blockFromJobData received in indexBlock: expected height ${blockHeightToIndex}, got ${blockFromJobData.header.height}`,
