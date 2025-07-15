@@ -13,40 +13,7 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const {
-	Logger,
-	DB: {
-		MySQL: {
-			getTableInstance,
-			getDBConnection,
-			startDBTransaction,
-			commitDBTransaction,
-			rollbackDBTransaction,
-			KVStore: { getKeyValueTable },
-		},
-	},
-} = require('klayr-service-framework');
-
-const {
-	getGenesisHeight,
-	EVENT,
-	EVENT_TOPIC_PREFIX,
-	LENGTH_ID,
-	MODULE,
-} = require('../../constants');
-
-const config = require('../../../config');
-const eventsTableSchema = require('../../database/schema/events');
-
-const logger = Logger();
-
-const LAST_DELETED_EVENTS_HEIGHT = 'lastDeletedEventsHeight';
-
-const MYSQL_ENDPOINT = config.endpoints.mysql;
-
-const keyValueTable = getKeyValueTable();
-
-const getEventsTable = () => getTableInstance(eventsTableSchema, MYSQL_ENDPOINT);
+const { EVENT, EVENT_TOPIC_PREFIX, LENGTH_ID, MODULE } = require('../../constants');
 
 const getEventsInfoToIndex = (block, events) => {
 	const eventsInfoToIndex = {
