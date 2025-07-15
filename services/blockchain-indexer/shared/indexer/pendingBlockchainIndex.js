@@ -78,7 +78,7 @@ const startIndexingPendingNewBlock = async numBlocksIndexed => {
 
 const indexPendingNewBlock = async block => {
 	if (indexReady) {
-		await indexNewBlock(block);
+		await indexNewBlock(block, true);
 	} else {
 		if (!pendingBlockToIndex.some(b => b.header.id === block.header.id)) {
 			logger.info(
