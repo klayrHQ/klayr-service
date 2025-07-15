@@ -29,7 +29,11 @@ const blocksTableSchema = require('../database/schema/blocks');
 
 const config = require('../../config');
 const { stopIndexSpeedRecord } = require('../utils/indexSpeed');
-const { registerPendingNewBlockSignal } = require('./pendingBlockchainIndex');
+const {
+	getIndexerLastCurrentHeight,
+	setPendingIndexIsReady,
+	startIndexingPendingNewBlock,
+} = require('./pendingBlockchainIndex');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
@@ -38,6 +42,11 @@ const getBlocksTable = () => getTableInstance(blocksTableSchema, MYSQL_ENDPOINT)
 let isIndexReady = false;
 const setIndexReadyStatus = isReady => (isIndexReady = isReady);
 const getIndexReadyStatus = () => isIndexReady;
+
+const getNumBlocksIndexed = async () => {
+	const blocksTable = await getBlocksTable();
+	return await blocksTable.count();
+};
 
 const getIndexStats = async () => {
 	try {
@@ -85,6 +94,19 @@ const checkIndexReadiness = async () => {
 	}
 };
 
+const checkIndexReadinessWithoutPendingIndex = async () => {
+	const numBlocksIndexed = await getNumBlocksIndexed();
+	if (
+		!getIndexReadyStatus() &&
+		numBlocksIndexed > 1 &&
+		numBlocksIndexed - 1 === getIndexerLastCurrentHeight()
+	) {
+		Signals.get('newBlock').remove(checkIndexReadinessWithoutPendingIndex);
+		setPendingIndexIsReady();
+		await startIndexingPendingNewBlock(numBlocksIndexed);
+	}
+};
+
 const reportIndexStatus = async () => {
 	const indexStats = await getIndexStats();
 	const {
@@ -116,7 +138,7 @@ const init = async () => {
 
 	// Register event listeners
 	Signals.get('newBlock').add(checkIndexReadiness);
-	await registerPendingNewBlockSignal();
+	Signals.get('newBlock').add(checkIndexReadinessWithoutPendingIndex);
 };
 
 module.exports = {

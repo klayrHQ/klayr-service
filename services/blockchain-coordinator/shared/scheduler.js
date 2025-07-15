@@ -36,7 +36,7 @@ const { getCurrentHeight, getGenesisHeight, initNodeConstants } = require('./con
 const { range } = require('./utils/array');
 const delay = require('./utils/delay');
 const config = require('../config');
-const { requestConnector } = require('./utils/request');
+const { requestConnector, requestIndexer } = require('./utils/request');
 
 const blockMessageQueue = new MessageQueue(config.queue.block.name, config.endpoints.messageQueue, {
 	defaultJobOptions: config.queue.defaultJobOptions,
@@ -217,6 +217,7 @@ const initIndexingScheduler = async () => {
 
 		// Schedule indexing for the missing blocks
 		if (Array.isArray(missingBlockHeights) && missingBlockHeights.length) {
+			await requestIndexer('setPendingIndexerLastCurrentHeight', { currentHeight });
 			logger.info(
 				`${missingBlockHeights.length} missing blocks found between heights: ${lastVerifiedHeight} - ${currentHeight}. Attempting to schedule indexing.`,
 			);

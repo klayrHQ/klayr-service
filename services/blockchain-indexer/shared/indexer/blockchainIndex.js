@@ -214,7 +214,11 @@ const indexBlock = async job => {
 			);
 		}
 
-		if (lastIndexedBlock && lastIndexedBlock.height + 1 !== blockFromJobData.height) {
+		if (
+			lastIndexedBlock &&
+			lastIndexedBlock.height + 1 !==
+				(blockFromJobData ? blockFromJobData.header.height : blockHeightFromJobData)
+		) {
 			const [currentBlockInDB = {}] = await blocksTable.find(
 				{
 					where: { height: blockHeightToIndex },
@@ -809,12 +813,16 @@ function createMissingBlockArray(lastIndexedBlockHeight, newBlockHeight) {
 	return result;
 }
 
-const indexNewBlock = async block => {
+const indexNewBlock = async (block, skipCheckingMissingBlock = false) => {
 	const blocksTable = await getBlocksTable();
 	const lastIndexedBlock = await getLastIndexedBlock();
 
-	// if new block height is not sequential, then schedule for indexing
-	if (lastIndexedBlock && block.header.height > lastIndexedBlock.height + 1) {
+	// if new block height is not sequential, then schedule for indexing (if not skipped)
+	if (
+		!skipCheckingMissingBlock &&
+		lastIndexedBlock &&
+		block.header.height > lastIndexedBlock.height + 1
+	) {
 		logger.info(
 			`Detected missing block between last indexed block at height: ${lastIndexedBlock.height} until new block at height: ${block.header.height}`,
 		);
