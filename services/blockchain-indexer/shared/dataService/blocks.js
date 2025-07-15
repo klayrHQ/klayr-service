@@ -31,7 +31,7 @@ const setLastBlock = async block => lastBlockCache.set(LAST_BLOCK_KEY, JSON.stri
 
 const getLastBlock = async () => {
 	const lastBlockString = await lastBlockCache.get(LAST_BLOCK_KEY);
-	const lastBlock = lastBlockString ? JSON.parse(lastBlockString) : {};
+	const lastBlock = lastBlockString ? JSON.parse(lastBlockString) : { height: -1 };
 	return lastBlock;
 };
 
