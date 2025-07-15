@@ -54,7 +54,21 @@ const getEventsInfoToIndex = (block, events) => {
 		eventTopicsInfo: [],
 	};
 
-	events.forEach((event, eventIndex) => {
+	// Precompute the next COMMAND_EXECUTION_RESULT event for each index
+	const nextCommandExecResultEvent = new Array(events.length);
+	let next = null;
+	for (let i = events.length - 1; i >= 0; i--) {
+		if (events[i].name === EVENT.COMMAND_EXECUTION_RESULT) {
+			next = events[i];
+		}
+		nextCommandExecResultEvent[i] = next;
+	}
+
+	for (let eventIndex = 0; eventIndex < events.length; eventIndex++) {
+		const event = events[eventIndex];
+
+		// Store whole event is now the default behavior
+		// Storing whole event is required to fetch events of a deleted block, and to make event retrieval faster
 		const eventInfo = {
 			id: event.id,
 			name: event.name,
@@ -63,20 +77,16 @@ const getEventsInfoToIndex = (block, events) => {
 			index: event.index,
 			blockID: block.id,
 			timestamp: block.timestamp,
+			eventStr: JSON.stringify(event),
 		};
-
-		// Store whole event is now the default behavior
-		// Storing whole event is required to fetch events of a deleted block, and to make event retrieval faster
-		eventInfo.eventStr = JSON.stringify(event);
-
 		eventsInfoToIndex.eventsInfo.push(eventInfo);
 
-		event.topics.forEach(topic => {
-			const eventTopicInfo = {
+		for (let t = 0; t < event.topics.length; t++) {
+			const topic = event.topics[t];
+			eventsInfoToIndex.eventTopicsInfo.push({
 				eventID: event.id,
 				topic,
-			};
-			eventsInfoToIndex.eventTopicsInfo.push(eventTopicInfo);
+			});
 
 			// Add the corresponding transactionID as a topic when not present in the topics list
 			// i.e. only when the topic starts with the CCM ID prefix
@@ -85,34 +95,32 @@ const getEventsInfoToIndex = (block, events) => {
 				topic.startsWith(EVENT_TOPIC_PREFIX.CCM_ID) &&
 				topic.length === EVENT_TOPIC_PREFIX.CCM_ID.length + LENGTH_ID
 			) {
-				const commandExecResultEvent = events
-					.slice(eventIndex)
-					.find(e => e.name === EVENT.COMMAND_EXECUTION_RESULT);
+				const commandExecResultEvent = nextCommandExecResultEvent[eventIndex];
 
-				const [topicTransactionID] = commandExecResultEvent.topics;
+				if (commandExecResultEvent && commandExecResultEvent.topics.length > 0) {
+					const topicTransactionID = commandExecResultEvent.topics[0];
 
-				const transactionID = // Remove the topic prefix from transactionID before indexing
-					topicTransactionID.length === EVENT_TOPIC_PREFIX.TX_ID.length + LENGTH_ID
-						? topicTransactionID.slice(EVENT_TOPIC_PREFIX.TX_ID.length)
-						: topicTransactionID;
+					const transactionID = // Remove the topic prefix from transactionID before indexing
+						topicTransactionID.length === EVENT_TOPIC_PREFIX.TX_ID.length + LENGTH_ID
+							? topicTransactionID.slice(EVENT_TOPIC_PREFIX.TX_ID.length)
+							: topicTransactionID;
 
-				const eventTopicAdditionalInfo = {
-					eventID: event.id,
-					topic: transactionID,
-				};
-				eventsInfoToIndex.eventTopicsInfo.push(eventTopicAdditionalInfo);
+					eventsInfoToIndex.eventTopicsInfo.push({
+						eventID: event.id,
+						topic: transactionID,
+					});
+				}
 			}
-		});
+		}
 
 		// Add validator address as a topic for rewardsAssigned events, required for export microservice
 		if (event.module === MODULE.POS && event.name === EVENT.REWARDS_ASSIGNED) {
-			const eventTopicAdditionalInfo = {
+			eventsInfoToIndex.eventTopicsInfo.push({
 				eventID: event.id,
 				topic: event.data.validatorAddress,
-			};
-			eventsInfoToIndex.eventTopicsInfo.push(eventTopicAdditionalInfo);
+			});
 		}
-	});
+	}
 
 	return eventsInfoToIndex;
 };
