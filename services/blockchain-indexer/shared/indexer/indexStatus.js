@@ -98,11 +98,13 @@ const checkIndexReadiness = async () => {
 const checkIndexReadinessWithoutPendingIndex = async () => {
 	const numBlocksIndexed = await getNumBlocksIndexed();
 	const indexReadyStatus = getIndexReadyStatus();
+	const lastCurrentHeight = getIndexerLastCurrentHeight();
 
 	if (
 		!indexReadyStatus &&
 		numBlocksIndexed > 1 &&
-		numBlocksIndexed >= getIndexerLastCurrentHeight()
+		lastCurrentHeight !== -1 &&
+		numBlocksIndexed >= lastCurrentHeight
 	) {
 		Signals.get('newBlock').remove(checkIndexReadinessWithoutPendingIndex);
 		if (getPendingIndexReady()) return;
