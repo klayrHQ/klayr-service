@@ -344,8 +344,10 @@ const indexBlock = async job => {
 
 			const { eventsInfo, eventTopicsInfo } = getEventsInfoToIndex(blockToIndexFromNode, events);
 
-			await eventsTable.upsert(eventsInfo, dbTrx);
-			await eventTopicsTable.upsert(eventTopicsInfo, dbTrx);
+			await Promise.all([
+				eventsTable.upsert(eventsInfo, dbTrx),
+				eventTopicsTable.upsert(eventTopicsInfo, dbTrx),
+			]);
 
 			// Update block generator's rewards
 			const blockRewardEvent = events.find(
@@ -371,25 +373,27 @@ const indexBlock = async job => {
 					logger.trace(
 						`Increasing commission for validator ${blockToIndexFromNode.generatorAddress} by ${commissionAmount}.`,
 					);
-					await validatorsTable.increment(
-						{
-							increment: { totalCommission: BigInt(commissionAmount) },
-							where: { address: blockToIndexFromNode.generatorAddress },
-						},
-						dbTrx,
-					);
-					logger.debug(
-						`Increased commission for validator ${blockToIndexFromNode.generatorAddress} by ${commissionAmount}.`,
-					);
 					logger.trace(
 						`Increasing self-stake rewards for validator ${blockToIndexFromNode.generatorAddress} by ${selfStakeReward}.`,
 					);
-					await validatorsTable.increment(
-						{
-							increment: { totalSelfStakeRewards: BigInt(selfStakeReward) },
-							where: { address: blockToIndexFromNode.generatorAddress },
-						},
-						dbTrx,
+					await Promise.all([
+						validatorsTable.increment(
+							{
+								increment: { totalCommission: BigInt(commissionAmount) },
+								where: { address: blockToIndexFromNode.generatorAddress },
+							},
+							dbTrx,
+						),
+						validatorsTable.increment(
+							{
+								increment: { totalSelfStakeRewards: BigInt(selfStakeReward) },
+								where: { address: blockToIndexFromNode.generatorAddress },
+							},
+							dbTrx,
+						),
+					]);
+					logger.debug(
+						`Increased commission for validator ${blockToIndexFromNode.generatorAddress} by ${commissionAmount}.`,
 					);
 					logger.debug(
 						`Increased self-stake rewards for validator ${blockToIndexFromNode.generatorAddress} by ${selfStakeReward}.`,
@@ -399,8 +403,9 @@ const indexBlock = async job => {
 
 			// Calculate locked amount change and update in key_value_store table for affected tokens
 			const tokenIDLockedAmountChangeMap = {};
-			events.forEach(event => {
-				const { data: eventData } = event;
+			for (let i = 0; i < events.length; i++) {
+				const event = events[i];
+				const eventData = event.data;
 				// Initialize map entry with BigInt
 				if (
 					[EVENT.LOCK, EVENT.UNLOCK].includes(event.name) &&
@@ -408,13 +413,12 @@ const indexBlock = async job => {
 				) {
 					tokenIDLockedAmountChangeMap[eventData.tokenID] = BigInt('0');
 				}
-
 				if (event.name === EVENT.LOCK) {
 					tokenIDLockedAmountChangeMap[eventData.tokenID] += BigInt(eventData.amount);
 				} else if (event.name === EVENT.UNLOCK) {
 					tokenIDLockedAmountChangeMap[eventData.tokenID] -= BigInt(eventData.amount);
 				}
-			});
+			}
 			await updateTotalLockedAmounts(tokenIDLockedAmountChangeMap, dbTrx);
 
 			// Get addresses to schedule account balance updates from token module events
@@ -431,6 +435,7 @@ const indexBlock = async job => {
 		await blocksTable.upsert(blockToIndex, dbTrx);
 		await commitDBTransaction(dbTrx);
 		await setLastIndexedBlock(blockToIndex);
+
 		logger.debug(
 			`Committed MySQL transaction to index block ${blockToIndexFromNode.id} at height ${blockToIndexFromNode.height}.`,
 		);
