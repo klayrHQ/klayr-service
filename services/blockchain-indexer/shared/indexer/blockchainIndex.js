@@ -92,8 +92,10 @@ const getValidatorsTable = () => getTableInstance(validatorsTableSchema, MYSQL_E
 const validateBlock = block => !!block && block.height >= 0;
 
 const LAST_INDEXED_BLOCK_CACHE_KEY = 'lastIndexedBlock';
+const LARGEST_MISSING_BLOCK_HEIGHT_CACHE_KEY = 'largestMissingBlockHeight';
 
 const lastIndexedBlockCache = CacheLRU('lastIndexedBlock', { max: 1 });
+const largestMissingBlockHeightCache = CacheLRU('largestMissingBlockHeight', { max: 1 });
 
 const getLastIndexedBlockFromDB = async () => {
 	const blocksTable = await getBlocksTable();
@@ -126,6 +128,24 @@ const setLastIndexedBlock = async block => {
 	} else {
 		await getLastIndexedBlockFromDB();
 	}
+};
+
+const setLargestMissingBlockHeight = async missingBlockHeight => {
+	await largestMissingBlockHeightCache.set(
+		LARGEST_MISSING_BLOCK_HEIGHT_CACHE_KEY,
+		missingBlockHeight,
+	);
+};
+
+const getLargestMissingBlockHeight = async () => {
+	const largestMissingBlockHeight = await largestMissingBlockHeightCache.get(
+		LARGEST_MISSING_BLOCK_HEIGHT_CACHE_KEY,
+	);
+	if (largestMissingBlockHeight === undefined) {
+		const lastIndexedBlock = await getLastIndexedBlock();
+		return lastIndexedBlock.height;
+	}
+	return largestMissingBlockHeight;
 };
 
 const DB_STATUS = Object.freeze({
@@ -838,19 +858,31 @@ const indexNewBlock = async (block, skipCheckingMissingBlock = false) => {
 		);
 		const missingBlocks = createMissingBlockArray(lastIndexedBlock.height, block.header.height);
 
+		// largestMissingBlock is tracked to prevent re-queuing missing block
+		const largestMissingBlockHeight = await getLargestMissingBlockHeight();
+		let currentLargestMissingBlockHeight = 0;
+
 		for (const missingBlockHeight of missingBlocks) {
-			logger.info(`Scheduling indexing of missing block at height ${missingBlockHeight}`);
+			if (missingBlockHeight > largestMissingBlockHeight) {
+				logger.info(`Scheduling indexing of missing block at height ${missingBlockHeight}`);
 
-			const [blockFromDB] = await blocksTable.find({ height: missingBlockHeight, limit: 1 }, [
-				'id',
-			]);
+				const [blockFromDB] = await blocksTable.find({ height: missingBlockHeight, limit: 1 }, [
+					'id',
+				]);
 
-			if (!blockFromDB) {
-				await indexBlocksQueue.add({ height: missingBlockHeight });
-			} else {
-				logger.info(`Block at height ${missingBlockHeight} already indexed`);
+				if (!blockFromDB) {
+					if (missingBlockHeight > currentLargestMissingBlockHeight)
+						currentLargestMissingBlockHeight = missingBlockHeight;
+
+					await indexBlocksQueue.add({ height: missingBlockHeight });
+				} else {
+					logger.info(`Block at height ${missingBlockHeight} already indexed`);
+				}
 			}
 		}
+
+		if (currentLargestMissingBlockHeight)
+			await setLargestMissingBlockHeight(currentLargestMissingBlockHeight);
 	}
 
 	logger.info(
