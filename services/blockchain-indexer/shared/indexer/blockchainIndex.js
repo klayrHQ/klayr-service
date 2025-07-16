@@ -860,10 +860,10 @@ const indexNewBlock = async (block, skipCheckingMissingBlock = false) => {
 
 		// largestMissingBlock is tracked to prevent re-queuing missing block
 		const largestMissingBlockHeight = await getLargestMissingBlockHeight();
-		let currentLargestMissingBlockHeight = 0;
+		let currentLargestMissingBlockHeight = largestMissingBlockHeight;
 
 		for (const missingBlockHeight of missingBlocks) {
-			if (missingBlockHeight > largestMissingBlockHeight) {
+			if (missingBlockHeight > currentLargestMissingBlockHeight) {
 				logger.info(`Scheduling indexing of missing block at height ${missingBlockHeight}`);
 
 				const [blockFromDB] = await blocksTable.find({ height: missingBlockHeight, limit: 1 }, [
@@ -871,9 +871,7 @@ const indexNewBlock = async (block, skipCheckingMissingBlock = false) => {
 				]);
 
 				if (!blockFromDB) {
-					if (missingBlockHeight > currentLargestMissingBlockHeight)
-						currentLargestMissingBlockHeight = missingBlockHeight;
-
+					currentLargestMissingBlockHeight = missingBlockHeight;
 					await indexBlocksQueue.add({ height: missingBlockHeight });
 				} else {
 					logger.info(`Block at height ${missingBlockHeight} already indexed`);
