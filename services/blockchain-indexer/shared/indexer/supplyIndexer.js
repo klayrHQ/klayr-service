@@ -43,6 +43,7 @@ const getSupplyTokenID = async () => {
 		} else {
 			const tokenSupply = await requestConnector('getTotalSupply');
 			await setIndexedSupplyTokenID(tokenSupply.totalSupply[0].tokenID);
+			supplyTokenID = tokenSupply.totalSupply[0].tokenID;
 		}
 	}
 	return supplyTokenID;
