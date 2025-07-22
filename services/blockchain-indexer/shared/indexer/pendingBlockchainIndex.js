@@ -9,6 +9,8 @@ const { indexNewBlock } = require('./blockchainIndex');
 
 const blocksTableSchema = require('../database/schema/blocks');
 const config = require('../../config');
+const { getPendingIndexReady, setPendingIndexIsReady } = require('./readyIndex');
+const { applySupplyDiff } = require('./supplyIndexer');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
@@ -16,13 +18,9 @@ const getBlocksTable = () => getTableInstance(blocksTableSchema, MYSQL_ENDPOINT)
 
 const logger = Logger();
 
-let indexReady = false;
-
 let indexerLastCurrentHeight = -1;
 
 const pendingBlockToIndex = [];
-
-const getPendingIndexReady = () => indexReady;
 
 const getPendingBlockToIndexLength = () => pendingBlockToIndex.length;
 
@@ -35,13 +33,6 @@ const setPendingIndexerLastCurrentHeight = height => {
 			`setPendingIndexerLastCurrentHeight is setting indexerLastCurrentHeight as ${height} on pendingBlockchainIndex.js`,
 		);
 		indexerLastCurrentHeight = height;
-	}
-};
-
-const setPendingIndexIsReady = () => {
-	if (!indexReady) {
-		logger.trace('setIndexIsReady is setting indexReady as true on pendingBlockchainIndex.js');
-		indexReady = true;
 	}
 };
 
@@ -74,10 +65,13 @@ const startIndexingPendingNewBlock = async numBlocksIndexed => {
 
 	pendingBlockToIndex.length = 0;
 	logger.info('Indexing pending blocks completed, pendingBlockToIndex successfully cleared');
+
+	// Apply supplyDiff to total supply after pending new block is indexed
+	await applySupplyDiff();
 };
 
 const indexPendingNewBlock = async block => {
-	if (indexReady) {
+	if (getPendingIndexReady()) {
 		await indexNewBlock(block);
 	} else {
 		if (!pendingBlockToIndex.some(b => b.header.id === block.header.id)) {
@@ -94,7 +88,7 @@ const indexPendingNewBlock = async block => {
 const registerPendingIndexReadySignal = () => {
 	const pendingIndexReadySignalListener = async () => {
 		Signals.get('blockIndexReady').remove(pendingIndexReadySignalListener);
-		if (indexReady) return;
+		if (getPendingIndexReady()) return;
 
 		const numBlocksIndexed = await getNumBlocksIndexed();
 		setPendingIndexIsReady();
@@ -109,8 +103,6 @@ module.exports = {
 	getPendingBlockToIndexLength,
 	getIndexerLastCurrentHeight,
 	setPendingIndexerLastCurrentHeight,
-	setPendingIndexIsReady,
 	getNumBlocksIndexed,
 	registerPendingIndexReadySignal,
-	getPendingIndexReady,
 };

@@ -78,6 +78,7 @@ const eventTopicsTableSchema = require('../database/schema/eventTopics');
 const transactionsTableSchema = require('../database/schema/transactions');
 const validatorsTableSchema = require('../database/schema/validators');
 const { normalizeBlock } = require('../dataService/business/blocks');
+const { indexTokenSupply } = require('./supplyIndexer');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
@@ -468,6 +469,11 @@ const indexBlock = async job => {
 
 		// Only schedule address balance updates if the block is indexed successfully
 		await scheduleAddressesBalanceUpdate(addressesToUpdateBalance);
+
+		// Index token total supply based on data from blocks
+		const supplyDiff = BigInt(blockToIndex.reward) - BigInt(blockToIndex.totalBurnt);
+		await indexTokenSupply(supplyDiff);
+
 		logger.info(
 			`Successfully indexed block ${blockToIndexFromNode.id} at height ${blockToIndexFromNode.height}.`,
 		);
@@ -720,6 +726,10 @@ const deleteIndexedBlocks = async job => {
 
 					// Get addresses to schedule account balance updates from token module events
 					addressesToUpdateBalance = await getAddressesFromTokenEvents(events);
+
+					// update total supply by reversing increase/decrease
+					const supplyDiff = BigInt(blockFromJob.reward) - BigInt(blockFromJob.totalBurnt);
+					await indexTokenSupply(supplyDiff, true);
 				}
 
 				// Invalidate cached events for this block. Must be done after processing all event related calculations

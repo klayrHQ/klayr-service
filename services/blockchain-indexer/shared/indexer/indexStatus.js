@@ -31,12 +31,11 @@ const config = require('../../config');
 const { stopIndexSpeedRecord } = require('../utils/indexSpeed');
 const {
 	getIndexerLastCurrentHeight,
-	setPendingIndexIsReady,
 	startIndexingPendingNewBlock,
 	getNumBlocksIndexed,
-	getPendingIndexReady,
 	registerPendingIndexReadySignal,
 } = require('./pendingBlockchainIndex');
+const { getPendingIndexReady, setPendingIndexIsReady } = require('./readyIndex');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 

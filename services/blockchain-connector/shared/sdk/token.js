@@ -70,11 +70,11 @@ const hasEscrowAccount = async ({ tokenID, escrowChainID }) =>
 	invokeEndpoint('token_hasEscrowAccount', { tokenID, escrowChainID });
 
 const updateTokenInfo = async () => {
-	// TODO: apply after block totalSupply indexing, without calling to node (by using totalBurnt, totalForged, etc)
-
 	escrowedAmounts = await getEscrowedAmounts(true);
 	if (!(await isMainchain()) || !supportedTokens) supportedTokens = await getSupportedTokens(true);
-	totalSupply = await getTotalSupply(true);
+
+	// NOTE: total supply now already indexed dynamically on each block indexing
+	// totalSupply = await getTotalSupply(true);
 };
 
 const getTokenBalancesAtGenesis = async address => {

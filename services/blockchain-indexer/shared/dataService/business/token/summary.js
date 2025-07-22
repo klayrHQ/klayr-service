@@ -20,6 +20,7 @@ const {
 	PATTERN_ANY_TOKEN_ID,
 	PATTERN_ANY_CHAIN_TOKEN_ID,
 } = require('../../../constants');
+const { getTotalSupplyFromDB, getSupplyTokenID } = require('../../../indexer/supplyIndexer');
 
 const getTokenSummary = async () => {
 	const summary = {
@@ -28,8 +29,10 @@ const getTokenSummary = async () => {
 	};
 
 	const { escrowedAmounts } = await requestConnector('getEscrowedAmounts');
-	const { totalSupply } = await requestConnector('getTotalSupply');
 	const { supportedTokens: supportedTokenIDs } = await requestConnector('getSupportedTokens');
+
+	const totalSupply = await getTotalSupplyFromDB();
+	const supplyTokenID = await getSupplyTokenID();
 
 	const supportedTokens = {
 		isSupportAllTokens: false,
@@ -54,7 +57,12 @@ const getTokenSummary = async () => {
 			exactTokenIDs: [...new Set(supportedTokens.exactTokenIDs)],
 			patternTokenIDs: [...new Set(supportedTokens.patternTokenIDs)],
 		},
-		totalSupply,
+		totalSupply: [
+			{
+				tokenID: supplyTokenID.toString(),
+				amount: totalSupply.toString(),
+			},
+		],
 	};
 
 	return summary;
