@@ -183,11 +183,11 @@ const getUniqueNetworkAppDirPairs = async files => {
 	const filesInput = files || [];
 	const map = new Map();
 
-	filesInput.forEach(file => {
-		const [network, appDirName] = file.split('/');
-		const updatedAppDir = `${network}/${appDirName}`;
-		map.set(updatedAppDir, { network, appDirName });
-	});
+	for (let i = 0; i < filesInput.length; i++) {
+		const parts = filesInput[i].split('/');
+		const updatedAppDir = `${parts[0]}/${parts[1]}`; // `${network}/${appDirName}`
+		map.set(updatedAppDir, { network: parts[0], appDirName: parts[1] });
+	}
 
 	return [...map.values()];
 };
@@ -236,30 +236,36 @@ const groupFilesByNetworkAndApp = fileInfos => {
 	// Otherwise the indexing may fail as token metadata indexing is dependant on app metadata
 	fileInfos.sort((first, second) => first.filename.localeCompare(second.filename));
 
-	fileInfos.forEach(fileInfo => {
-		const [network, appName, fileName] = fileInfo.filename.split('/').slice(-3);
+	for (let i = 0; i < fileInfos.length; i++) {
+		const [network, appName, fileName] = fileInfos[i].filename.split('/').slice(-3);
 
 		// Only process metadata files
-		if (!config.supportedNetworks.includes(network) || !isMetadataFile(fileName)) return;
+		if (!config.supportedNetworks.includes(network) || !isMetadataFile(fileName)) continue;
 
 		if (!(network in groupedFiles)) groupedFiles[network] = {};
 		if (!(appName in groupedFiles[network])) groupedFiles[network][appName] = [];
-		groupedFiles[network][appName].push(fileInfo);
-	});
+		groupedFiles[network][appName].push(fileInfos[i]);
+	}
 	return groupedFiles;
 };
 
 const getModifiedFileNames = groupedFiles => {
 	const fileNames = [];
 
-	Object.keys(groupedFiles).forEach(network => {
-		const appsInNetwork = groupedFiles[network];
+	const networks = Object.keys(groupedFiles);
+	for (let i = 0; i < networks.length; i++) {
+		const appsInNetwork = groupedFiles[networks[i]];
+		const appNames = Object.keys(appsInNetwork);
 
-		Object.keys(appsInNetwork).forEach(appName => {
-			const appFiles = appsInNetwork[appName];
-			appFiles.forEach(file => fileNames.push(file.filename));
-		});
-	});
+		for (let j = 0; j < appNames.length; j++) {
+			const appFiles = appsInNetwork[appNames[j]];
+
+			for (let k = 0; k < appFiles.length; k++) {
+				fileNames.push(appFiles[k].filename);
+			}
+		}
+	}
+
 	return fileNames;
 };
 

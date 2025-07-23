@@ -153,10 +153,10 @@ const getBlockchainAppsMetadata = async params => {
 
 		if (!('network' in params)) {
 			const networkSet = new Set();
-			chainIDs.forEach(_chainID => {
-				const network = config.CHAIN_ID_PREFIX_NETWORK_MAP[_chainID.substring(0, 2)];
+			for (let i = 0; i < chainIDs.length; i++) {
+				const network = config.CHAIN_ID_PREFIX_NETWORK_MAP[chainIDs[i].substring(0, 2)];
 				networkSet.add(network);
-			});
+			}
 			params.network = Array.from(networkSet).join(',');
 		}
 	}
@@ -323,11 +323,11 @@ const getBlockchainAppsTokenMetadata = async params => {
 	const uniqueChainMap = {};
 	// Used to only return the filtered token details in response
 	const resultTokenIDSet = new Set();
-	tokensResultSet.forEach(tokenMeta => {
-		const chainID = tokenMeta.tokenID.substring(0, LENGTH_CHAIN_ID);
-		uniqueChainMap[chainID] = tokenMeta;
-		resultTokenIDSet.add(tokenMeta.tokenID);
-	});
+	for (let i = 0; i < tokensResultSet.length; i++) {
+		const chainID = tokensResultSet[i].tokenID.substring(0, LENGTH_CHAIN_ID);
+		uniqueChainMap[chainID] = tokensResultSet[i];
+		resultTokenIDSet.add(tokensResultSet[i].tokenID);
+	}
 	const uniqueChainList = Object.values(uniqueChainMap);
 
 	await BluebirdPromise.map(
@@ -344,16 +344,16 @@ const getBlockchainAppsTokenMetadata = async params => {
 				appDirName,
 				config.FILENAME.NATIVETOKENS_JSON,
 			);
-			parsedTokenMeta.tokens.forEach(token => {
-				if (resultTokenIDSet.has(token.tokenID)) {
+			for (let i = 0; i < parsedTokenMeta.tokens.length; i++) {
+				if (resultTokenIDSet.has(parsedTokenMeta.tokens[i].tokenID)) {
 					blockchainAppsTokenMetadata.data.push({
-						...token,
+						...parsedTokenMeta.tokens[i],
 						chainID,
 						chainName: tokenMeta.chainName,
 						network: tokenMeta.network,
 					});
 				}
-			});
+			}
 		},
 		{ concurrency: uniqueChainList.length },
 	);
