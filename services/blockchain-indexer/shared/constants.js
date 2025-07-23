@@ -177,6 +177,7 @@ const TRANSACTION_STATUS = Object.freeze({
 });
 
 const EVENT = Object.freeze({
+	BURN: 'burn',
 	LOCK: 'lock',
 	UNLOCK: 'unlock',
 	COMMAND_EXECUTION_RESULT: 'commandExecutionResult',

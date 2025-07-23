@@ -290,7 +290,7 @@ const normalizeBlock = async (originalBlock, isDeletedBlock = false, forceFromNo
 						return Object.entries(response).length;
 				  })();
 
-		const { numberOfEvents, reward } = await (async () => {
+		const { numberOfEvents, reward, totalBurnt } = await (async () => {
 			if (!forceFromNode) {
 				const [dbResponse] = await blocksTable.find({ height: block.height, limit: 1 }, [
 					'numberOfEvents',
@@ -313,10 +313,16 @@ const normalizeBlock = async (originalBlock, isDeletedBlock = false, forceFromNo
 					[MODULE.REWARD, MODULE.DYNAMIC_REWARD].includes(e.module) &&
 					e.name === EVENT.REWARD_MINTED,
 			);
+			const totalBurnt = events.reduce(
+				(sum, e) =>
+					e.module === MODULE.TOKEN && e.name === EVENT.BURN ? sum + BigInt(e.data.amount) : sum,
+				BigInt(0),
+			);
 
 			return {
 				numberOfEvents: events.length,
 				reward: blockRewardEvent ? blockRewardEvent.data.amount : null,
+				totalBurnt,
 			};
 		})();
 
@@ -324,7 +330,7 @@ const normalizeBlock = async (originalBlock, isDeletedBlock = false, forceFromNo
 		block.size = 0;
 		block.reward = reward;
 		block.totalForged = BigInt(reward || '0');
-		block.totalBurnt = BigInt('0');
+		block.totalBurnt = totalBurnt;
 		block.networkFee = BigInt('0');
 
 		block.transactions = await BluebirdPromise.map(
@@ -334,8 +340,11 @@ const normalizeBlock = async (originalBlock, isDeletedBlock = false, forceFromNo
 
 				block.size += txn.size;
 				block.totalForged += BigInt(txn.fee);
-				block.totalBurnt += BigInt(txn.minFee);
 				block.networkFee += BigInt(txn.fee) - BigInt(txn.minFee);
+
+				// NOTE: totalBurnt should be based on EVENT.BURN event data, not minFee
+				// for example, if fee is transferred to token.feePoolAddress config, then minFee will not be burnt
+				// block.totalBurnt += BigInt(txn.minFee);
 				return txn;
 			},
 			{ concurrency: block.transactions.length },
