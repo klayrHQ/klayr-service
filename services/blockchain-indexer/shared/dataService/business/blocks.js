@@ -295,12 +295,14 @@ const normalizeBlock = async (originalBlock, isDeletedBlock = false, forceFromNo
 				const [dbResponse] = await blocksTable.find({ height: block.height, limit: 1 }, [
 					'numberOfEvents',
 					'reward',
+					'totalBurnt',
 				]);
 
 				if (dbResponse) {
 					return {
 						numberOfEvents: dbResponse.numberOfEvents,
 						reward: dbResponse.reward,
+						totalBurnt: dbResponse.totalBurnt,
 					};
 				}
 			}
