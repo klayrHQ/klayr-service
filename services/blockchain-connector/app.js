@@ -47,11 +47,14 @@ nodeStatus.waitForNode().then(async () => {
 		app.addMethods(path.join(__dirname, 'methods'));
 
 		const allBlockchainEndpoints = await require('./methods/proxy/allEndpoints');
-		allBlockchainEndpoints.forEach(method => app.addMethod(method));
+
+		for (let i = 0; i < allBlockchainEndpoints.length; i++)
+			app.addMethod(allBlockchainEndpoints[i]);
 
 		app.addEvents(path.join(__dirname, 'events'));
 		const allBlockchainEvents = await require('./events/proxy/allEvents');
-		allBlockchainEvents.forEach(event => app.addEvent(event));
+
+		for (let i = 0; i < allBlockchainEvents.length; i++) app.addEvent(allBlockchainEvents[i]);
 
 		app.addJobs(path.join(__dirname, 'jobs'));
 

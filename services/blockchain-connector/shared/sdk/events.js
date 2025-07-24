@@ -104,7 +104,8 @@ const subscribeToAllRegisteredEvents = async (newClientPoolIndex = null) => {
 
 	const registeredEvents = await getRegisteredEvents();
 	const allEvents = registeredEvents.concat(events);
-	allEvents.forEach(event => {
+	for (let i = 0; i < allEvents.length; i++) {
+		const event = allEvents[i];
 		apiClient.subscribe(event, async payload => {
 			// Force update necessary caches on new chain events
 			if (event.startsWith('chain_')) {
@@ -118,7 +119,7 @@ const subscribeToAllRegisteredEvents = async (newClientPoolIndex = null) => {
 			Signals.get(event).dispatch(payload);
 		});
 		logger.info(`Subscribed to the API client event: ${event}.`);
-	});
+	}
 };
 
 const getEventsByHeightFormatted = async height => {

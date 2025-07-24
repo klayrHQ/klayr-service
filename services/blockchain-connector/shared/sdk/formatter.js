@@ -165,11 +165,12 @@ const formatEvent = (event, skipDecode) => {
 			);
 		} else {
 			// TODO: Remove after SDK fixes the address format (https://github.com/KlayrHQ/klayr-sdk/issues/7629)
-			Object.keys(eventDataSchema.properties).forEach(prop => {
-				if (prop.endsWith('Address')) {
-					eventData[prop] = getKlayr32Address(eventData[prop].toString('hex'));
+			const props = Object.keys(eventDataSchema.properties);
+			for (let i = 0; i < props.length; i++) {
+				if (props[i].endsWith('Address')) {
+					eventData[props[i]] = getKlayr32Address(eventData[props[i]].toString('hex'));
 				}
-			});
+			}
 		}
 	}
 
