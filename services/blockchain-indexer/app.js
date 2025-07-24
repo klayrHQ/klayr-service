@@ -63,6 +63,10 @@ const defaultBrokerConfig = {
 		},
 	},
 	dependencies: ['connector'],
+	stopped() {
+		logger.debug("indexer's broker stopped() executed, dispatching 'indexerStopped' signal.");
+		Signals.get('indexerStopped').dispatch();
+	},
 };
 
 // Add routes, events & jobs
