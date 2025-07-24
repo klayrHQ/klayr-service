@@ -210,13 +210,16 @@ const getEvents = async params => {
 
 		const topics = topic.split(',');
 		const topicsToQuery = [];
-		topics.forEach(t => {
-			if (t.length === LENGTH_ID) {
-				topicsToQuery.push(EVENT_TOPIC_PREFIX.TX_ID.concat(t), EVENT_TOPIC_PREFIX.CCM_ID.concat(t));
+		for (let i = 0; i < topics.length; i++) {
+			if (topics[i].length === LENGTH_ID) {
+				topicsToQuery.push(
+					EVENT_TOPIC_PREFIX.TX_ID.concat(topics[i]),
+					EVENT_TOPIC_PREFIX.CCM_ID.concat(topics[i]),
+				);
 			} else {
-				topicsToQuery.push(t);
+				topicsToQuery.push(topics[i]);
 			}
-		});
+		}
 
 		params.leftOuterJoin.push({
 			targetTable: `${eventTopicsTableSchema.tableName} as eventTopicsForTopic`,

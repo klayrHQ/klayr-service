@@ -705,23 +705,23 @@ const deleteIndexedBlocks = async job => {
 
 					// Calculate locked amount change and update in key_value_store table for affected tokens
 					const tokenIDLockedAmountChangeMap = {};
-					events.forEach(event => {
-						const { data: eventData } = event;
+					for (let i = 0; i < events.length; i++) {
+						const { data: eventData } = events[i];
 						// Initialize map entry with BigInt
 						if (
-							[EVENT.LOCK, EVENT.UNLOCK].includes(event.name) &&
+							[EVENT.LOCK, EVENT.UNLOCK].includes(events[i].name) &&
 							!(eventData.tokenID in tokenIDLockedAmountChangeMap)
 						) {
 							tokenIDLockedAmountChangeMap[eventData.tokenID] = BigInt(0);
 						}
 
 						// Negate amount to reverse the effect
-						if (event.name === EVENT.LOCK) {
+						if (events[i].name === EVENT.LOCK) {
 							tokenIDLockedAmountChangeMap[eventData.tokenID] -= BigInt(eventData.amount);
-						} else if (event.name === EVENT.UNLOCK) {
+						} else if (events[i].name === EVENT.UNLOCK) {
 							tokenIDLockedAmountChangeMap[eventData.tokenID] += BigInt(eventData.amount);
 						}
-					});
+					}
 					await updateTotalLockedAmounts(tokenIDLockedAmountChangeMap, dbTrx);
 
 					// Get addresses to schedule account balance updates from token module events
@@ -982,9 +982,13 @@ const findMissingBlocksInRange = async (fromHeight, toHeight) => {
 		}
 	}
 
-	result.forEach(({ from, to }) =>
-		logger.info(`Missing blocks in range: ${from}-${to} (${to - from + 1} blocks).`),
-	);
+	for (let i = 0; i < result.length; i++) {
+		logger.info(
+			`Missing blocks in range: ${result[i].from}-${result[i].to} (${
+				result[i].to - result[i].from + 1
+			} blocks).`,
+		);
+	}
 
 	return result;
 };

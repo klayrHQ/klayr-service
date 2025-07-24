@@ -91,11 +91,13 @@ const OPTIONAL_TRANSACTION_PARAMS_PROPERTIES = Object.freeze({
 });
 
 const mockOptionalProperties = (inputObject, inputObjectOptionalProps, additionalParams) => {
-	Object.values(inputObjectOptionalProps).forEach(optionalPropInfo => {
+	const optionalProps = Object.values(inputObjectOptionalProps);
+	for (let i = 0; i < optionalProps.length; i++) {
+		const optionalPropInfo = optionalProps[i];
 		if (!(optionalPropInfo.propName in inputObject)) {
 			inputObject[optionalPropInfo.propName] = optionalPropInfo.defaultValue(additionalParams);
 		}
-	});
+	}
 
 	return inputObject;
 };

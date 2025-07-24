@@ -165,10 +165,12 @@ const indexPosStakesInfo = async (numStakers, dbTrx) => {
 		const stakers = posModuleData[MODULE_SUB_STORE.POS.STAKERS];
 
 		const allStakes = [];
-		stakers.forEach(staker => {
-			const { address: stakerAddress, stakes } = staker;
-			stakes.forEach(stake => {
-				const { validatorAddress, amount } = stake;
+		for (let i = 0; i < stakers.length; i++) {
+			const stakerAddress = stakers[i].address;
+			const stakes = stakers[i].stakes;
+			for (let j = 0; j < stakes.length; j++) {
+				const validatorAddress = stakes[j].validatorAddress;
+				const amount = stakes[j].amount;
 
 				allStakes.push({
 					stakerAddress,
@@ -180,8 +182,8 @@ const indexPosStakesInfo = async (numStakers, dbTrx) => {
 				if (stakerAddress === validatorAddress) {
 					totalSelfStake += BigInt(amount);
 				}
-			});
-		});
+			}
+		}
 
 		await stakesTable.upsert(allStakes, dbTrx);
 		logger.info(`Updated ${allStakes.length} stakes from the genesis block.`);

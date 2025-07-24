@@ -31,7 +31,8 @@ const getGenerators = async params => {
 	const validatorList = await getAllValidators();
 
 	const validatorMap = new Map(validatorList.map(validator => [validator.address, validator]));
-	generatorsList.forEach(generator => {
+	for (let i = 0; i < generatorsList.length; i++) {
+		const generator = generatorsList[i];
 		if (
 			validatorMap.has(generator.address) &&
 			(!('search' in params) ||
@@ -40,7 +41,7 @@ const getGenerators = async params => {
 			const validator = validatorMap.get(generator.address);
 			generators.data.push({ ...generator, status: validator.status });
 		}
-	});
+	}
 
 	generators.meta.total = generators.data.length;
 	generators.data = generators.data.slice(offset, offset + limit);

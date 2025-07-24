@@ -35,11 +35,9 @@ const getKlayr32AddressFromPublicKey = publicKey =>
 
 const updateAccountInfo = async params => {
 	const accountInfo = {};
-	Object.keys(accountsTableSchema.schema).forEach(columnName => {
-		if (columnName in params) {
-			accountInfo[columnName] = params[columnName];
-		}
-	});
+	for (let i = 0, keys = Object.keys(accountsTableSchema.schema); i < keys.length; i++) {
+		if (keys[i] in params) accountInfo[keys[i]] = params[keys[i]];
+	}
 
 	const accountsTable = await getAccountsTable();
 	await accountsTable.upsert(accountInfo);

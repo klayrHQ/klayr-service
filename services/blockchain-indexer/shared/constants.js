@@ -61,11 +61,12 @@ const getGenesisConfig = async () => {
 
 const resolveModuleCommands = systemMeta => {
 	const moduleCommandList = [];
-	systemMeta.forEach(module => {
-		module.commands.forEach(command => {
-			moduleCommandList.push(`${module.name}:${command.name}`);
-		});
-	});
+	for (let i = 0; i < systemMeta.length; i++) {
+		const module = systemMeta[i];
+		for (let j = 0; j < module.commands.length; j++) {
+			moduleCommandList.push(`${module.name}:${module.commands[j].name}`);
+		}
+	}
 	return moduleCommandList;
 };
 

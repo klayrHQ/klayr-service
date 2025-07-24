@@ -40,7 +40,8 @@ const getTokenSummary = async () => {
 		patternTokenIDs: [],
 	};
 
-	supportedTokenIDs.forEach(tokenID => {
+	for (let i = 0; i < supportedTokenIDs.length; i++) {
+		const tokenID = supportedTokenIDs[i];
 		if (tokenID === PATTERN_ANY_TOKEN_ID) {
 			supportedTokens.isSupportAllTokens = true;
 		} else if (tokenID.substring(LENGTH_CHAIN_ID) === PATTERN_ANY_CHAIN_TOKEN_ID) {
@@ -48,7 +49,7 @@ const getTokenSummary = async () => {
 		} else {
 			supportedTokens.exactTokenIDs.push(tokenID);
 		}
-	});
+	}
 
 	summary.data = {
 		escrowedAmounts,

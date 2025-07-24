@@ -102,7 +102,9 @@ initDatabase()
 
 			// First register all the default methods followed by app specific module methods
 			app.addMethods(path.join(__dirname, 'methods', 'dataService'));
-			registeredModules.forEach(module => {
+			for (let i = 0; i < registeredModules.length; i++) {
+				let module = registeredModules[i];
+
 				// Map 'reward' module to the 'dynamicReward' module endpoints
 				if (module === MODULE.REWARD) module = MODULE.DYNAMIC_REWARD;
 
@@ -113,16 +115,17 @@ initDatabase()
 					'modules',
 					`${module}.js`,
 				);
+
 				try {
 					// eslint-disable-next-line import/no-dynamic-require
 					const methods = require(methodsFilePath);
-					methods.forEach(method => app.addMethod(method));
+					for (let j = 0; j < methods.length; j++) app.addMethod(methods[j]);
 				} catch (err) {
 					logger.warn(
 						`Moleculer method definitions missing for module: ${module}. Is this expected?\nWas expected at: ${methodsFilePath}.`,
 					);
 				}
-			});
+			}
 		}
 
 		if (config.operations.isIndexingModeEnabled) {
