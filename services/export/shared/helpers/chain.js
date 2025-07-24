@@ -42,10 +42,10 @@ const resolveReceivingChainID = (tx, currentChainID) =>
 
 const getUniqueChainIDs = async txs => {
 	const chainIDs = new Set();
-	txs.forEach(tx => {
-		if (tx.sendingChainID) chainIDs.add(tx.sendingChainID);
-		if (tx.receivingChainID) chainIDs.add(tx.receivingChainID);
-	});
+	for (let i = 0; i < txs.length; i++) {
+		if (txs[i].sendingChainID) chainIDs.add(txs[i].sendingChainID);
+		if (txs[i].receivingChainID) chainIDs.add(txs[i].receivingChainID);
+	}
 	return Array.from(chainIDs);
 };
 
