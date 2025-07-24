@@ -62,9 +62,10 @@ const mapObject = (rootObj, definition, subObj = rootObj) =>
 					definition[key][0] === '' ? rootObj : resolvePath(rootObj, definition[key][0]);
 				if (Array.isArray(dataSource)) {
 					const tempArr = [];
-					dataSource.forEach(item => {
-						if (validate(mapObject(item, innerDef))) tempArr.push(mapObject(item, innerDef));
-					});
+					for (let i = 0; i < dataSource.length; i++) {
+						const mapped = mapObject(dataSource[i], innerDef);
+						if (validate(mapped)) tempArr.push(mapped);
+					}
 					acc[key] = tempArr;
 				}
 			} else if (definition[key].length === 1) {

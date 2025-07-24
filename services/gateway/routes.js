@@ -51,22 +51,25 @@ const filterApis = (requiredApis, registeredModuleNames) => {
 
 	// Filter the APIs to be registered on the gateway based on 'requiredApis' config
 	const apisToRegister = Object.keys(PATH_API_MAPPINGS).reduce((acc, path) => {
-		requiredApis.forEach(api => {
-			if (PATH_API_MAPPINGS[path].includes(api)) {
+		for (let i = 0; i < requiredApis.length; i++) {
+			if (PATH_API_MAPPINGS[path].includes(requiredApis[i])) {
 				if (Array.isArray(acc[path])) {
-					acc[path].push(api);
+					acc[path].push(requiredApis[i]);
 				} else {
-					acc[path] = [api];
+					acc[path] = [requiredApis[i]];
 				}
 			}
-		});
+		}
 		return acc;
 	}, {});
 
 	// Generate the final routes to be registered at the gateway in moleculer-web
-	Object.entries(apisToRegister).forEach(([path, apis]) => {
+	const paths = Object.keys(apisToRegister);
+	for (let i = 0; i < paths.length; i++) {
+		const path = paths[i];
+		const apis = apisToRegister[path];
 		filteredApis.push(...registerApi(apis, { ...defaultConfig, path }, registeredModuleNames));
-	});
+	}
 
 	return filteredApis;
 };

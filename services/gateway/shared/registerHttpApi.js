@@ -69,24 +69,25 @@ const getAllAPIs = (apiNames, registeredModuleNames) => {
 	const allMethods = {};
 	// Populate allMethods from the js files under apis directory
 	if (typeof apiNames === 'string') apiNames = [apiNames];
-	apiNames.forEach(apiName => {
+	for (let i = 0; i < apiNames.length; i++) {
 		// Assign common endpoints
 		Object.assign(
 			allMethods,
-			Utils.requireAllJs(path.resolve(__dirname, `../apis/${apiName}/methods`)),
+			Utils.requireAllJs(path.resolve(__dirname, `../apis/${apiNames[i]}/methods`)),
 		);
+
 		// Assign registered application module specific endpoints
-		registeredModuleNames.forEach(moduleName => {
-			const dirPath = `../apis/${apiName}/methods/modules/${moduleName}`;
+		for (let j = 0; j < registeredModuleNames.length; j++) {
+			const dirPath = `../apis/${apiNames[i]}/methods/modules/${registeredModuleNames[j]}`;
 			try {
 				Object.assign(allMethods, Utils.requireAllJs(path.resolve(__dirname, dirPath)));
 			} catch (err) {
 				logger.warn(
-					`Moleculer method definitions (HTTP endpoints) missing for module: ${module}. Is this expected?\nWas expected at: ${dirPath}.`,
+					`Moleculer method definitions (HTTP endpoints) missing for module: ${registeredModuleNames[j]}. Is this expected?\nWas expected at: ${dirPath}.`,
 				);
 			}
-		});
-	});
+		}
+	}
 
 	const methods = Object.keys(allMethods).reduce((acc, key) => {
 		const method = allMethods[key];

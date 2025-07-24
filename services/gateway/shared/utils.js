@@ -19,8 +19,8 @@ const fs = require('fs');
 const transformParams = (type, params) => {
 	const data = [];
 	const paramsKeys = Object.keys(params);
-
-	paramsKeys.forEach(paramKey => {
+	for (let i = 0; i < paramsKeys.length; i++) {
+		const paramKey = paramsKeys[i];
 		let value = {};
 
 		if (params[paramKey].altSwaggerKey) {
@@ -51,7 +51,7 @@ const transformParams = (type, params) => {
 		} else value = { $ref: `#/parameters/${paramKey}` };
 
 		data.push(value);
-	});
+	}
 	return data;
 };
 
@@ -71,27 +71,30 @@ const requireAllJson = apiName => {
 	};
 	const dir = path.resolve(__dirname, `../apis/${apiName}/swagger`);
 	const result = fs.readdirSync(dir);
-	result.forEach(fileName => {
+	for (let i = 0; i < result.length; i++) {
+		const fileName = result[i];
 		if (fileName === 'definitions') {
 			const definitions = fs.readdirSync(`${dir}/definitions`);
-			definitions.forEach(definition => {
+			for (let j = 0; j < definitions.length; j++) {
+				const definition = definitions[j];
 				/* eslint-disable-next-line import/no-dynamic-require */
 				const content = require(`${dir}/definitions/${definition}`);
 				Object.assign(data.definitions, content);
-			});
+			}
 		} else if (fileName === 'parameters') {
 			const parameters = fs.readdirSync(`${dir}/parameters`);
-			parameters.forEach(parameter => {
+			for (let j = 0; j < parameters.length; j++) {
+				const parameter = parameters[j];
 				/* eslint-disable-next-line import/no-dynamic-require */
 				const content = require(`${dir}/parameters/${parameter}`);
 				Object.assign(data.parameters, content);
-			});
+			}
 		} else {
 			/* eslint-disable-next-line import/no-dynamic-require */
 			const content = require(`${dir}/${fileName}`);
 			Object.assign(data, content);
 		}
-	});
+	}
 	return data;
 };
 
