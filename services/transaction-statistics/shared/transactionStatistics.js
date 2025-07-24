@@ -75,7 +75,8 @@ const getStatsTimeline = async params => {
 			);
 
 			const unorderedFinalResult = {};
-			result.forEach(entry => {
+			for (let i = 0; i < result.length; i++) {
+				const entry = result[i];
 				const currFormattedDate = moment.unix(entry.date).format(params.dateFormat);
 
 				if (!unorderedFinalResult[currFormattedDate]) {
@@ -86,10 +87,9 @@ const getStatsTimeline = async params => {
 					};
 				}
 
-				const statForDate = unorderedFinalResult[currFormattedDate];
-				statForDate.transactionCount += entry.count;
-				statForDate.volume += entry.volume;
-			});
+				unorderedFinalResult[currFormattedDate].transactionCount += entry.count;
+				unorderedFinalResult[currFormattedDate].volume += entry.volume;
+			}
 
 			if (tokenID !== DB_CONSTANT.UNAVAILABLE) {
 				const timelineRaw = Object.values(unorderedFinalResult)
@@ -128,18 +128,21 @@ const getDistributionByAmount = async params => {
 			).filter(o => o.count > 0);
 
 			const unorderedFinalResult = {};
-			result.forEach(entry => {
+			for (let i = 0; i < result.length; i++) {
+				const entry = result[i];
 				if (!unorderedFinalResult[entry.amount_range]) unorderedFinalResult[entry.amount_range] = 0;
 				unorderedFinalResult[entry.amount_range] += entry.count;
-			});
+			}
 
 			if (tokenID !== DB_CONSTANT.UNAVAILABLE) {
 				const orderedFinalResult = {};
-				Object.keys(unorderedFinalResult)
-					.sort((a, b) => String(a).localeCompare(String(b)))
-					.forEach(amountRange => {
-						orderedFinalResult[amountRange] = unorderedFinalResult[amountRange];
-					});
+				const keys = Object.keys(unorderedFinalResult).sort((a, b) =>
+					String(a).localeCompare(String(b)),
+				);
+
+				for (let i = 0; i < keys.length; i++) {
+					orderedFinalResult[keys[i]] = unorderedFinalResult[keys[i]];
+				}
 
 				tokenDistributionByAmount[tokenID] = orderedFinalResult;
 			}
@@ -158,17 +161,22 @@ const getDistributionByType = async params => {
 	).filter(o => o.count > 0);
 
 	const unorderedFinalResult = {};
-	result.forEach(entry => {
-		if (!unorderedFinalResult[entry.moduleCommand]) unorderedFinalResult[entry.moduleCommand] = 0;
-		unorderedFinalResult[entry.moduleCommand] += entry.count;
-	});
+	for (let i = 0; i < result.length; i++) {
+		if (!unorderedFinalResult[result[i].moduleCommand]) {
+			unorderedFinalResult[result[i].moduleCommand] = 0;
+		}
+
+		unorderedFinalResult[result[i].moduleCommand] += result[i].count;
+	}
 
 	const orderedFinalResult = {};
-	Object.keys(unorderedFinalResult)
-		.sort((a, b) => String(a).localeCompare(String(b)))
-		.forEach(moduleCommand => {
-			orderedFinalResult[moduleCommand] = unorderedFinalResult[moduleCommand];
-		});
+	const sortedKeys = Object.keys(unorderedFinalResult).sort((a, b) =>
+		String(a).localeCompare(String(b)),
+	);
+
+	for (let i = 0; i < sortedKeys.length; i++) {
+		orderedFinalResult[sortedKeys[i]] = unorderedFinalResult[sortedKeys[i]];
+	}
 
 	return orderedFinalResult;
 };
