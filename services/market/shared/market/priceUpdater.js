@@ -44,26 +44,45 @@ const calcTargetPairPrices = (rawPricesBySource, targetPairings = targetPairs) =
 
 	// Flatten the source prices
 	const sourcePrices = [];
-	Object.entries(rawPricesBySource).forEach(([source, prices]) => {
+	const rawPricesEntries = Object.entries(rawPricesBySource);
+	for (let i = 0; i < rawPricesEntries.length; i++) {
+		const source = rawPricesEntries[i][0];
+		const prices = rawPricesEntries[i][1];
+
 		// Append source name to the price code and push to sourcePrices array
 		// Eg: LSK_BTC from binance results in binance_LSK_EUR
-		if (Array.isArray(prices))
-			prices.forEach(item => sourcePrices.push({ ...item, code: `${source}_${item.code}` }));
-		else if (isWarnMessageDisplayed === false) {
+		if (Array.isArray(prices)) {
+			for (let j = 0; j < prices.length; j++) {
+				sourcePrices.push({ ...prices[j], code: `${source}_${prices[j].code}` });
+			}
+		} else if (isWarnMessageDisplayed === false) {
 			logger.warn(`Data from '${source}' is unavailable for market price computation.`);
 			isWarnMessageDisplayed = true;
 		}
-	});
+	}
 
 	// Loop through each target pair and calculate the final prices
-	targetPairings.forEach(targetPair => {
+	for (let i = 0; i < targetPairings.length; i++) {
+		const targetPair = targetPairings[i];
 		finalPrices[targetPair] = [];
 
 		const [tpSource, tpTarget] = targetPair.split('_');
-		const rawPricesWithMatchingSource = sourcePrices.filter(p => p.code.includes(`_${tpSource}_`));
-		const rawPricesWithMatchingTarget = sourcePrices.filter(p => p.code.endsWith(`_${tpTarget}`));
 
-		rawPricesWithMatchingSource.forEach(rps => {
+		const rawPricesWithMatchingSource = [];
+		for (let j = 0; j < sourcePrices.length; j++) {
+			if (sourcePrices[j].code.includes(`_${tpSource}_`))
+				rawPricesWithMatchingSource.push(sourcePrices[j]);
+		}
+
+		const rawPricesWithMatchingTarget = [];
+		for (let j = 0; j < sourcePrices.length; j++) {
+			if (sourcePrices[j].code.endsWith(`_${tpTarget}`))
+				rawPricesWithMatchingTarget.push(sourcePrices[j]);
+		}
+
+		for (let k = 0; k < rawPricesWithMatchingSource.length; k++) {
+			const rps = rawPricesWithMatchingSource[k];
+
 			if (rps.code.endsWith(`_${targetPair}`)) {
 				// If code is an exact match of the target pair, use the prices as is
 				finalPrices[targetPair].push({
@@ -78,10 +97,9 @@ const calcTargetPairPrices = (rawPricesBySource, targetPairings = targetPairs) =
 				// intermediateTarget is BTC in binance_LSK_BTC
 				const [, , intermediateTarget] = rps.code.split('_');
 
-				rawPricesWithMatchingTarget
-					// Eg: if _BTC_ in bittrex_BTC_EUR
-					.filter(rpt => rpt.code.includes(`_${intermediateTarget}_`))
-					.forEach(rpt => {
+				for (let m = 0; m < rawPricesWithMatchingTarget.length; m++) {
+					const rpt = rawPricesWithMatchingTarget[m];
+					if (rpt.code.includes(`_${intermediateTarget}_`)) {
 						if (rps.code !== rpt.code && rps.sources[0] !== rpt.sources[0]) {
 							const finalPrice = {
 								code: targetPair,
@@ -94,12 +112,13 @@ const calcTargetPairPrices = (rawPricesBySource, targetPairings = targetPairs) =
 
 							finalPrices[targetPair].push(finalPrice);
 						}
-					});
+					}
+				}
 			}
 			// Prefer a direct targetPair match from the source prices over calculated rates
 			finalPrices[targetPair].sort((a, b) => a.sources.length - b.sources.length);
-		});
-	});
+		}
+	}
 
 	return finalPrices;
 };

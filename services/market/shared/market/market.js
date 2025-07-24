@@ -45,13 +45,15 @@ const getMarketPrices = async () => {
 	};
 
 	const pricesByPairs = await getMarketPricesFromCache();
-	Object.values(pricesByPairs).forEach(prices => {
+	const pricesByPairsValues = Object.values(pricesByPairs);
+	for (let i = 0; i < pricesByPairsValues.length; i++) {
+		let prices = pricesByPairsValues[i];
 		let price;
 		while (!price && prices.length) {
 			price = prices.shift();
 			marketPrices.data.push(price);
 		}
-	});
+	}
 
 	marketPrices.meta = {
 		count: marketPrices.data.length,

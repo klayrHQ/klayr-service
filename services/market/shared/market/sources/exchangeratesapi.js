@@ -34,12 +34,13 @@ const symbolMap = (() => {
 	// Dynamically generates a map of type '{ "LSK_USD": "LSKUSD" }' based on baseCurrencies
 	// Consistent with other data source implementations
 	const map = {};
-	baseCurrencies.forEach((baseCurrency, index) => {
-		const targetCurrencies = baseCurrencies.slice(index + 1);
-		targetCurrencies.forEach(targetCurrency => {
+	for (let i = 0; i < baseCurrencies.length; i++) {
+		const baseCurrency = baseCurrencies[i];
+		for (let j = i + 1; j < baseCurrencies.length; j++) {
+			const targetCurrency = baseCurrencies[j];
 			map[`${baseCurrency}_${targetCurrency}`] = `${baseCurrency}${targetCurrency}`;
-		});
-	});
+		}
+	}
 	return map;
 })();
 
