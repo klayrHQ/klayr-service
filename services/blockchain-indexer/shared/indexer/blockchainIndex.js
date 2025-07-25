@@ -471,8 +471,7 @@ const indexBlock = async job => {
 		await scheduleAddressesBalanceUpdate(addressesToUpdateBalance);
 
 		// Index token total supply based on data from blocks
-		const supplyDiff = BigInt(blockToIndex.reward) - BigInt(blockToIndex.totalBurnt);
-		await indexTokenSupply(supplyDiff);
+		await indexTokenSupply(blockToIndex);
 
 		logger.info(
 			`Successfully indexed block ${blockToIndexFromNode.id} at height ${blockToIndexFromNode.height}.`,
@@ -728,8 +727,7 @@ const deleteIndexedBlocks = async job => {
 					addressesToUpdateBalance = await getAddressesFromTokenEvents(events);
 
 					// update total supply by reversing increase/decrease
-					const supplyDiff = BigInt(blockFromJob.reward) - BigInt(blockFromJob.totalBurnt);
-					await indexTokenSupply(supplyDiff, true);
+					await indexTokenSupply(blockFromJob, true);
 				}
 
 				// Invalidate cached events for this block. Must be done after processing all event related calculations

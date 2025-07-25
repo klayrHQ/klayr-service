@@ -2,6 +2,7 @@ const {
 	DB: {
 		MySQL: { getTableInstance },
 	},
+	Signals,
 	Logger,
 } = require('klayr-service-framework');
 const { requestConnector } = require('../utils/request');
@@ -13,6 +14,7 @@ const tokenSummaryTableSchema = require('../database/schema/tokenSummary');
 const config = require('../../config');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
+const INDEX_SUPPLY_BLOCK_FREQUENCY = config.supplyIndexing.blockFrequency;
 
 const logger = Logger();
 
@@ -20,6 +22,22 @@ const getTokenSummaryTable = () => getTableInstance(tokenSummaryTableSchema, MYS
 
 let supplyTokenID;
 let supplyDiff = BigInt(0);
+let lastBlockHeight = 0;
+
+const checkBlockCounter = block => {
+	if (block === undefined) return false;
+	if (INDEX_SUPPLY_BLOCK_FREQUENCY === -1) return false;
+
+	// If frequency is 1 or 0, treat as “always flush” and skip delta math.
+	if (INDEX_SUPPLY_BLOCK_FREQUENCY <= 1) return true;
+
+	if (Math.abs(block.height - lastBlockHeight) >= INDEX_SUPPLY_BLOCK_FREQUENCY) {
+		lastBlockHeight = block.height;
+		return true;
+	} else {
+		return false;
+	}
+};
 
 const getTotalSupplyFromDB = async () => {
 	const tokenSummaryTable = await getTokenSummaryTable();
@@ -49,9 +67,8 @@ const getSupplyTokenID = async () => {
 	return supplyTokenID;
 };
 
-const indexTokenSupply = async (indexedTotalSupply, isBlockDeletion) => {
-	if (typeof indexedTotalSupply !== 'bigint')
-		throw new Error(`indexTokenSupply assigned indexedTotalSupply is not bigint`);
+const indexTokenSupply = async (block, isBlockDeletion) => {
+	const indexedTotalSupply = BigInt(block.reward) - BigInt(block.totalBurnt);
 
 	if (indexedTotalSupply === BigInt(0)) return;
 
@@ -60,15 +77,15 @@ const indexTokenSupply = async (indexedTotalSupply, isBlockDeletion) => {
 
 	if (isBlockDeletion) {
 		if (indexedTotalSupply > BigInt(0)) {
-			await decreaseIndexedSupply(absSupply);
+			await decreaseIndexedSupply(absSupply, block);
 		} else {
-			await increaseIndexedSupply(absSupply);
+			await increaseIndexedSupply(absSupply, block);
 		}
 	} else {
 		if (indexedTotalSupply > BigInt(0)) {
-			await increaseIndexedSupply(absSupply);
+			await increaseIndexedSupply(absSupply, block);
 		} else {
-			await decreaseIndexedSupply(absSupply);
+			await decreaseIndexedSupply(absSupply, block);
 		}
 	}
 };
@@ -80,25 +97,28 @@ const applySupplyDiff = async () => {
 		const addedSupply = supplyDiff;
 		supplyDiff = BigInt(0);
 		logger.debug(`Applying supplyDiff of ${addedSupply} by increasing total supply`);
-		await increaseIndexedSupply(addedSupply, true);
+		await increaseIndexedSupply(addedSupply, undefined);
 	}
 
 	if (supplyDiff < BigInt(0)) {
 		const removedSupply = supplyDiff * BigInt(-1);
 		supplyDiff = BigInt(0);
 		logger.debug(`Applying supplyDiff of ${removedSupply} by decreasing total supply`);
-		await decreaseIndexedSupply(removedSupply, true);
+		await decreaseIndexedSupply(removedSupply, undefined);
 	}
 
 	logger.debug('Indexing supply diff completed, supplyDiff successfully cleared');
 };
 
-const increaseIndexedSupply = async (addedSupply, force = false) => {
+const increaseIndexedSupply = async (addedSupply, block) => {
 	if (typeof addedSupply !== 'bigint')
 		throw new Error(`increaseIndexedSupply assigned addedSupply is not bigint`);
 
+	const blockFrequencyCounterCheck = checkBlockCounter(block);
 	const indexReady = getPendingIndexReady();
-	if (force || indexReady) {
+
+	// if block is undefined, then it's called from applySupplyDiff, which means, index immediately
+	if (block === undefined || blockFrequencyCounterCheck || indexReady) {
 		logger.debug(`Increasing indexed total supply by ${addedSupply}`);
 		const tokenSummaryTable = await getTokenSummaryTable();
 
@@ -112,12 +132,15 @@ const increaseIndexedSupply = async (addedSupply, force = false) => {
 	}
 };
 
-const decreaseIndexedSupply = async (removedSupply, force = false) => {
+const decreaseIndexedSupply = async (removedSupply, block) => {
 	if (typeof removedSupply !== 'bigint')
 		throw new Error(`decreaseIndexedSupply assigned removedSupply is not bigint`);
 
+	const blockFrequencyCounterCheck = checkBlockCounter(block);
 	const indexReady = getPendingIndexReady();
-	if (force || indexReady) {
+
+	// if block is undefined, then it's called from applySupplyDiff, which means, index immediately
+	if (block === undefined || blockFrequencyCounterCheck || indexReady) {
 		logger.debug(`Decreasing indexed total supply by ${removedSupply}`);
 		const tokenSummaryTable = await getTokenSummaryTable();
 
