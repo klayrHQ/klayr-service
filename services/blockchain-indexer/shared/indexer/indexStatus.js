@@ -36,6 +36,7 @@ const {
 	registerPendingIndexReadySignal,
 } = require('./pendingBlockchainIndex');
 const { getPendingIndexReady, setPendingIndexIsReady } = require('./readyIndex');
+const { registerSupplyIndexerOnTerminatedSignal } = require('./supplyIndexer');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
@@ -147,6 +148,7 @@ const init = async () => {
 	Signals.get('newBlock').add(checkIndexReadinessWithoutPendingIndex);
 	Signals.get('newBlock').add(checkIndexReadiness);
 	registerPendingIndexReadySignal();
+	registerSupplyIndexerOnTerminatedSignal();
 
 	// Initialize index status reporting and schedule regular updates
 	await reportIndexStatus();

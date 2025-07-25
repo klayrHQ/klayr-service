@@ -80,25 +80,25 @@ const applySupplyDiff = async () => {
 		const addedSupply = supplyDiff;
 		supplyDiff = BigInt(0);
 		logger.info(`Applying supplyDiff of ${addedSupply} by increasing total supply`);
-		await increaseIndexedSupply(addedSupply);
+		await increaseIndexedSupply(addedSupply, true);
 	}
 
 	if (supplyDiff < BigInt(0)) {
 		const removedSupply = supplyDiff * BigInt(-1);
 		supplyDiff = BigInt(0);
 		logger.info(`Applying supplyDiff of ${removedSupply} by decreasing total supply`);
-		await decreaseIndexedSupply(removedSupply);
+		await decreaseIndexedSupply(removedSupply, true);
 	}
 
 	logger.info('Indexing supply diff completed, supplyDiff successfully cleared');
 };
 
-const increaseIndexedSupply = async addedSupply => {
+const increaseIndexedSupply = async (addedSupply, force = false) => {
 	if (typeof addedSupply !== 'bigint')
 		throw new Error(`increaseIndexedSupply assigned addedSupply is not bigint`);
 
 	const indexReady = getPendingIndexReady();
-	if (indexReady) {
+	if (force || indexReady) {
 		logger.info(`Increasing indexed total supply by ${addedSupply}`);
 		const tokenSummaryTable = await getTokenSummaryTable();
 
@@ -112,12 +112,12 @@ const increaseIndexedSupply = async addedSupply => {
 	}
 };
 
-const decreaseIndexedSupply = async removedSupply => {
+const decreaseIndexedSupply = async (removedSupply, force = false) => {
 	if (typeof removedSupply !== 'bigint')
 		throw new Error(`decreaseIndexedSupply assigned removedSupply is not bigint`);
 
 	const indexReady = getPendingIndexReady();
-	if (indexReady) {
+	if (force || indexReady) {
 		logger.info(`Decreasing indexed total supply by ${removedSupply}`);
 		const tokenSummaryTable = await getTokenSummaryTable();
 
@@ -167,10 +167,19 @@ const initIndexedSupply = async (optionalSupplyDiff = BigInt(0)) => {
 	await setIndexedSupplyTokenID(tokenTotalSupplyInfos.tokenID);
 };
 
+const registerSupplyIndexerOnTerminatedSignal = () => {
+	const supplyIndexerOnTerminatedSignalListeder = async () => {
+		Signals.get('indexerStopped').remove(supplyIndexerOnTerminatedSignalListeder);
+		await applySupplyDiff();
+	};
+	Signals.get('indexerStopped').add(supplyIndexerOnTerminatedSignalListeder);
+};
+
 module.exports = {
 	initIndexedSupply,
 	indexTokenSupply,
 	getTotalSupplyFromDB,
 	applySupplyDiff,
 	getSupplyTokenID,
+	registerSupplyIndexerOnTerminatedSignal,
 };
