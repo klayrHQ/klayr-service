@@ -74,23 +74,23 @@ const indexTokenSupply = async (indexedTotalSupply, isBlockDeletion) => {
 };
 
 const applySupplyDiff = async () => {
-	logger.info('Start indexing supply diff to token total supply...');
+	logger.debug('Start indexing supply diff to token total supply...');
 
 	if (supplyDiff > BigInt(0)) {
 		const addedSupply = supplyDiff;
 		supplyDiff = BigInt(0);
-		logger.info(`Applying supplyDiff of ${addedSupply} by increasing total supply`);
+		logger.debug(`Applying supplyDiff of ${addedSupply} by increasing total supply`);
 		await increaseIndexedSupply(addedSupply, true);
 	}
 
 	if (supplyDiff < BigInt(0)) {
 		const removedSupply = supplyDiff * BigInt(-1);
 		supplyDiff = BigInt(0);
-		logger.info(`Applying supplyDiff of ${removedSupply} by decreasing total supply`);
+		logger.debug(`Applying supplyDiff of ${removedSupply} by decreasing total supply`);
 		await decreaseIndexedSupply(removedSupply, true);
 	}
 
-	logger.info('Indexing supply diff completed, supplyDiff successfully cleared');
+	logger.debug('Indexing supply diff completed, supplyDiff successfully cleared');
 };
 
 const increaseIndexedSupply = async (addedSupply, force = false) => {
@@ -99,7 +99,7 @@ const increaseIndexedSupply = async (addedSupply, force = false) => {
 
 	const indexReady = getPendingIndexReady();
 	if (force || indexReady) {
-		logger.info(`Increasing indexed total supply by ${addedSupply}`);
+		logger.debug(`Increasing indexed total supply by ${addedSupply}`);
 		const tokenSummaryTable = await getTokenSummaryTable();
 
 		const numRowsAffected = await tokenSummaryTable.increment({
@@ -118,7 +118,7 @@ const decreaseIndexedSupply = async (removedSupply, force = false) => {
 
 	const indexReady = getPendingIndexReady();
 	if (force || indexReady) {
-		logger.info(`Decreasing indexed total supply by ${removedSupply}`);
+		logger.debug(`Decreasing indexed total supply by ${removedSupply}`);
 		const tokenSummaryTable = await getTokenSummaryTable();
 
 		const numRowsAffected = await tokenSummaryTable.decrement({
@@ -140,7 +140,7 @@ const setIndexedSupply = async value => {
 		value,
 	});
 
-	logger.info(`Token supply updated with value of ${value}`);
+	logger.debug(`Token supply updated with value of ${value}`);
 };
 
 const setIndexedSupplyTokenID = async value => {
@@ -153,11 +153,11 @@ const setIndexedSupplyTokenID = async value => {
 		value,
 	});
 
-	logger.info(`Supply token ID updated with value of ${value}`);
+	logger.debug(`Supply token ID updated with value of ${value}`);
 };
 
 const initIndexedSupply = async (optionalSupplyDiff = BigInt(0)) => {
-	logger.info('Initializing token supply index...');
+	logger.debug('Initializing token supply index...');
 	const tokenTotalSupplyData = await requestConnector('getGenesisAssetByModule', {
 		module: MODULE.TOKEN,
 		subStore: MODULE_SUB_STORE.TOKEN.SUPPLY,
