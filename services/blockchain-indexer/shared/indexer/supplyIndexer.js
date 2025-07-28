@@ -21,10 +21,10 @@ const logger = Logger();
 const getTokenSummaryTable = () => getTableInstance(tokenSummaryTableSchema, MYSQL_ENDPOINT);
 
 let supplyTokenID;
+let lastBlockHeight;
 let supplyDiff = BigInt(0);
-let lastBlockHeight = 0;
 
-const checkBlockCounter = block => {
+const checkBlockCounter = async block => {
 	if (block === undefined) return false;
 	if (INDEX_SUPPLY_BLOCK_FREQUENCY === -1) return false;
 
@@ -32,6 +32,7 @@ const checkBlockCounter = block => {
 	if (INDEX_SUPPLY_BLOCK_FREQUENCY <= 1) return true;
 
 	if (Math.abs(block.height - lastBlockHeight) >= INDEX_SUPPLY_BLOCK_FREQUENCY) {
+		await setLastIndexedSupplyHeight(block.height);
 		lastBlockHeight = block.height;
 		return true;
 	} else {
@@ -46,6 +47,22 @@ const getTotalSupplyFromDB = async () => {
 		'value',
 	]);
 	return data.value !== undefined ? BigInt(data.value) : BigInt(0);
+};
+
+const getLastIndexedSupplyHeightFromDB = async () => {
+	const tokenSummaryTable = await getTokenSummaryTable();
+	const [data = {}] = await tokenSummaryTable.find({ key: `lastIndexedSupplyHeight`, limit: 1 }, [
+		'key',
+		'value',
+	]);
+	return data.value !== undefined ? Number(data.value) : 0;
+};
+
+const getlastIndexedSupplyHeight = async () => {
+	if (lastBlockHeight === undefined) {
+		lastBlockHeight = await getLastIndexedSupplyHeightFromDB();
+	}
+	return lastBlockHeight;
 };
 
 const getSupplyTokenID = async () => {
@@ -114,7 +131,7 @@ const increaseIndexedSupply = async (addedSupply, block) => {
 	if (typeof addedSupply !== 'bigint')
 		throw new Error(`increaseIndexedSupply assigned addedSupply is not bigint`);
 
-	const blockFrequencyCounterCheck = checkBlockCounter(block);
+	const blockFrequencyCounterCheck = await checkBlockCounter(block);
 	const indexReady = getPendingIndexReady();
 
 	// if block is undefined, then it's called from applySupplyDiff, which means, index immediately
@@ -136,7 +153,7 @@ const decreaseIndexedSupply = async (removedSupply, block) => {
 	if (typeof removedSupply !== 'bigint')
 		throw new Error(`decreaseIndexedSupply assigned removedSupply is not bigint`);
 
-	const blockFrequencyCounterCheck = checkBlockCounter(block);
+	const blockFrequencyCounterCheck = await checkBlockCounter(block);
 	const indexReady = getPendingIndexReady();
 
 	// if block is undefined, then it's called from applySupplyDiff, which means, index immediately
@@ -177,6 +194,19 @@ const setIndexedSupplyTokenID = async value => {
 	});
 
 	logger.debug(`Supply token ID updated with value of ${value}`);
+};
+
+const setLastIndexedSupplyHeight = async value => {
+	if (typeof value !== 'number')
+		throw new Error(`setIndexedSupplyTokenID assigned value is not number`);
+
+	const tokenSummaryTable = await getTokenSummaryTable();
+	await tokenSummaryTable.upsert({
+		key: 'lastIndexedSupplyHeight',
+		value: value.toString(),
+	});
+
+	logger.debug(`Last indexed supply height updated with value of ${value}`);
 };
 
 const initIndexedSupply = async (optionalSupplyDiff = BigInt(0)) => {
