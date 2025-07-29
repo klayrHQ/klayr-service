@@ -1,6 +1,7 @@
 const {
 	setPendingIndexerLastCurrentHeight,
 } = require('../../shared/indexer/pendingBlockchainIndex');
+const { scheduleIndexMissingTotalSupply } = require('../../shared/indexer/supplyIndexer');
 
 module.exports = [
 	{
@@ -9,5 +10,10 @@ module.exports = [
 		params: {
 			currentHeight: { optional: false, type: 'number' },
 		},
+	},
+	{
+		name: 'scheduleIndexMissingTotalSupply',
+		controller: async () => scheduleIndexMissingTotalSupply(),
+		params: {},
 	},
 ];

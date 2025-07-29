@@ -197,6 +197,9 @@ const initIndexingScheduler = async () => {
 	}
 	logger.info('Validator indexing initialization completed successfully.');
 
+	// schedule index missing total supply until last indexed block height
+	await requestIndexer('scheduleIndexMissingTotalSupply');
+
 	// Skip scheduling jobs for missing blocks when the jobCount is greater than the threshold
 	const jobCount = await getLiveIndexingJobCount();
 	if (jobCount > config.job.indexMissingBlocks.skipThreshold) {

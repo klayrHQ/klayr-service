@@ -10,8 +10,10 @@ const { getPendingIndexReady } = require('./readyIndex');
 const { MODULE, MODULE_SUB_STORE } = require('../constants');
 
 const tokenSummaryTableSchema = require('../database/schema/tokenSummary');
+const blocksTableSchema = require('../database/schema/blocks');
 
 const config = require('../../config');
+const { getLastIndexedBlock } = require('./lastIndexedBlock');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 const INDEX_SUPPLY_BLOCK_FREQUENCY = config.supplyIndexing.blockFrequency;
@@ -19,24 +21,41 @@ const INDEX_SUPPLY_BLOCK_FREQUENCY = config.supplyIndexing.blockFrequency;
 const logger = Logger();
 
 const getTokenSummaryTable = () => getTableInstance(tokenSummaryTableSchema, MYSQL_ENDPOINT);
+const getBlocksTable = () => getTableInstance(blocksTableSchema, MYSQL_ENDPOINT);
 
 let supplyTokenID;
 let lastBlockHeight;
 let supplyDiff = BigInt(0);
 
 const checkBlockCounter = async block => {
-	if (block === undefined) return false;
 	if (INDEX_SUPPLY_BLOCK_FREQUENCY === -1) return false;
 
 	// If frequency is 1 or 0, treat as “always flush” and skip delta math.
 	if (INDEX_SUPPLY_BLOCK_FREQUENCY <= 1) return true;
 
-	if (Math.abs(block.height - lastBlockHeight) >= INDEX_SUPPLY_BLOCK_FREQUENCY) {
-		await setLastIndexedSupplyHeight(block.height);
-		lastBlockHeight = block.height;
+	const lastIndexedSupplyHeight = (await getLastIndexedSupplyHeight()) ?? 0;
+	if (Math.abs(block.height - lastIndexedSupplyHeight) >= INDEX_SUPPLY_BLOCK_FREQUENCY) {
 		return true;
+	}
+
+	return false;
+};
+
+const adjustSupplyMethod = async (adjustedSupply, block, isBlockDeletion) => {
+	const absSupply = adjustedSupply < BigInt(0) ? adjustedSupply * BigInt(-1) : adjustedSupply;
+
+	if (isBlockDeletion) {
+		if (adjustedSupply > BigInt(0)) {
+			await decreaseIndexedSupply(absSupply, block);
+		} else {
+			await increaseIndexedSupply(absSupply, block);
+		}
 	} else {
-		return false;
+		if (adjustedSupply > BigInt(0)) {
+			await increaseIndexedSupply(absSupply, block);
+		} else {
+			await decreaseIndexedSupply(absSupply, block);
+		}
 	}
 };
 
@@ -55,10 +74,10 @@ const getLastIndexedSupplyHeightFromDB = async () => {
 		'key',
 		'value',
 	]);
-	return data.value !== undefined ? Number(data.value) : 0;
+	return data.value !== undefined ? Number(data.value) : undefined;
 };
 
-const getlastIndexedSupplyHeight = async () => {
+const getLastIndexedSupplyHeight = async () => {
 	if (lastBlockHeight === undefined) {
 		lastBlockHeight = await getLastIndexedSupplyHeightFromDB();
 	}
@@ -89,22 +108,7 @@ const indexTokenSupply = async (block, isBlockDeletion) => {
 
 	if (indexedTotalSupply === BigInt(0)) return;
 
-	const absSupply =
-		indexedTotalSupply < BigInt(0) ? indexedTotalSupply * BigInt(-1) : indexedTotalSupply;
-
-	if (isBlockDeletion) {
-		if (indexedTotalSupply > BigInt(0)) {
-			await decreaseIndexedSupply(absSupply, block);
-		} else {
-			await increaseIndexedSupply(absSupply, block);
-		}
-	} else {
-		if (indexedTotalSupply > BigInt(0)) {
-			await increaseIndexedSupply(absSupply, block);
-		} else {
-			await decreaseIndexedSupply(absSupply, block);
-		}
-	}
+	await adjustSupplyMethod(indexedTotalSupply, block, isBlockDeletion);
 };
 
 const applySupplyDiff = async () => {
@@ -113,29 +117,34 @@ const applySupplyDiff = async () => {
 	if (supplyDiff > BigInt(0)) {
 		const addedSupply = supplyDiff;
 		supplyDiff = BigInt(0);
-		logger.debug(`Applying supplyDiff of ${addedSupply} by increasing total supply`);
-		await increaseIndexedSupply(addedSupply, undefined);
+		const lastIndexedBlock = await getLastIndexedBlock();
+		logger.debug(
+			`Applying supplyDiff of ${addedSupply} until block height ${lastIndexedBlock.height} by increasing total supply`,
+		);
+		await increaseIndexedSupply(addedSupply, lastIndexedBlock, true);
 	}
 
 	if (supplyDiff < BigInt(0)) {
 		const removedSupply = supplyDiff * BigInt(-1);
 		supplyDiff = BigInt(0);
-		logger.debug(`Applying supplyDiff of ${removedSupply} by decreasing total supply`);
-		await decreaseIndexedSupply(removedSupply, undefined);
+		const lastIndexedBlock = await getLastIndexedBlock();
+		logger.debug(
+			`Applying supplyDiff of ${removedSupply} until block height ${lastIndexedBlock.height} by decreasing total supply`,
+		);
+		await decreaseIndexedSupply(removedSupply, lastIndexedBlock, true);
 	}
 
 	logger.debug('Indexing supply diff completed, supplyDiff successfully cleared');
 };
 
-const increaseIndexedSupply = async (addedSupply, block) => {
+const increaseIndexedSupply = async (addedSupply, block, forceDBWrite) => {
 	if (typeof addedSupply !== 'bigint')
 		throw new Error(`increaseIndexedSupply assigned addedSupply is not bigint`);
 
 	const blockFrequencyCounterCheck = await checkBlockCounter(block);
 	const indexReady = getPendingIndexReady();
 
-	// if block is undefined, then it's called from applySupplyDiff, which means, index immediately
-	if (block === undefined || blockFrequencyCounterCheck || indexReady) {
+	if (forceDBWrite === true || blockFrequencyCounterCheck || indexReady) {
 		logger.debug(`Increasing indexed total supply by ${addedSupply}`);
 		const tokenSummaryTable = await getTokenSummaryTable();
 
@@ -144,20 +153,21 @@ const increaseIndexedSupply = async (addedSupply, block) => {
 			where: { key: 'totalSupply' },
 		});
 		if (numRowsAffected === 0) await initIndexedSupply(addedSupply);
+
+		await setLastIndexedSupplyHeight(block.height);
 	} else {
 		supplyDiff += addedSupply;
 	}
 };
 
-const decreaseIndexedSupply = async (removedSupply, block) => {
+const decreaseIndexedSupply = async (removedSupply, block, forceDBWrite) => {
 	if (typeof removedSupply !== 'bigint')
 		throw new Error(`decreaseIndexedSupply assigned removedSupply is not bigint`);
 
 	const blockFrequencyCounterCheck = await checkBlockCounter(block);
 	const indexReady = getPendingIndexReady();
 
-	// if block is undefined, then it's called from applySupplyDiff, which means, index immediately
-	if (block === undefined || blockFrequencyCounterCheck || indexReady) {
+	if (forceDBWrite === true || blockFrequencyCounterCheck || indexReady) {
 		logger.debug(`Decreasing indexed total supply by ${removedSupply}`);
 		const tokenSummaryTable = await getTokenSummaryTable();
 
@@ -166,6 +176,8 @@ const decreaseIndexedSupply = async (removedSupply, block) => {
 			where: { key: 'totalSupply' },
 		});
 		if (numRowsAffected === 0) await initIndexedSupply(removedSupply * BigInt(-1));
+
+		await setLastIndexedSupplyHeight(block.height);
 	} else {
 		supplyDiff -= removedSupply;
 	}
@@ -206,6 +218,7 @@ const setLastIndexedSupplyHeight = async value => {
 		value: value.toString(),
 	});
 
+	lastBlockHeight = value;
 	logger.debug(`Last indexed supply height updated with value of ${value}`);
 };
 
@@ -221,11 +234,60 @@ const initIndexedSupply = async (optionalSupplyDiff = BigInt(0)) => {
 };
 
 const registerSupplyIndexerOnTerminatedSignal = () => {
-	const supplyIndexerOnTerminatedSignalListeder = async () => {
-		Signals.get('indexerStopped').remove(supplyIndexerOnTerminatedSignalListeder);
+	const supplyIndexerOnTerminatedSignalListener = async () => {
+		Signals.get('indexerStopped').remove(supplyIndexerOnTerminatedSignalListener);
 		await applySupplyDiff();
 	};
-	Signals.get('indexerStopped').add(supplyIndexerOnTerminatedSignalListeder);
+	Signals.get('indexerStopped').add(supplyIndexerOnTerminatedSignalListener);
+};
+
+const getMissingTotalSupplyDiff = async (from, to) => {
+	if (typeof from !== 'number')
+		throw new Error(`getMissingTotalSupply assigned from is not number`);
+	if (typeof to !== 'number') throw new Error(`getMissingTotalSupply assigned to is not number`);
+	if (from > to) throw new Error(`getMissingTotalSupply assigned from can't be greater than to`);
+	if (from === to) return BigInt(0);
+
+	const blocksTable = await getBlocksTable();
+	const query = `
+		SELECT
+			SUM(reward - totalBurnt) AS missingTotalSupply
+		FROM
+			blocks
+		WHERE
+			height BETWEEN ${from} AND ${to};
+	`;
+	const data = await blocksTable.rawQuery(query);
+	return BigInt(data.missingTotalSupply);
+};
+
+const scheduleIndexMissingTotalSupply = async () => {
+	// TODO: should implement this function in a "scheduled" manner to prevent requestIndexer timeout
+	const lastIndexedBlock = await getLastIndexedBlock();
+	const lastIndexedSupplyHeight = await getLastIndexedSupplyHeightFromDB();
+
+	if (
+		lastIndexedSupplyHeight === undefined ||
+		lastIndexedBlock === undefined ||
+		lastIndexedBlock.height === lastIndexedSupplyHeight
+	) {
+		return;
+	}
+
+	// Determine direction of indexing (forward or backward)
+	const fromHeight = Math.min(lastIndexedBlock.height, lastIndexedSupplyHeight);
+	const toHeight = Math.max(lastIndexedBlock.height, lastIndexedSupplyHeight);
+
+	const missingSupplyDiff = await getMissingTotalSupplyDiff(fromHeight, toHeight);
+	if (missingSupplyDiff === BigInt(0)) return;
+
+	const isBlockDeletion = lastIndexedSupplyHeight > lastIndexedBlock.height;
+
+	logger.info(
+		`Found missing unindexed total supply of ${missingSupplyDiff} between height ${fromHeight}-${toHeight}`,
+	);
+
+	await adjustSupplyMethod(missingSupplyDiff, lastIndexedBlock, isBlockDeletion);
 };
 
 module.exports = {
@@ -235,4 +297,5 @@ module.exports = {
 	applySupplyDiff,
 	getSupplyTokenID,
 	registerSupplyIndexerOnTerminatedSignal,
+	scheduleIndexMissingTotalSupply,
 };
