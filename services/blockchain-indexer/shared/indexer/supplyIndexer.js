@@ -241,7 +241,7 @@ const registerSupplyIndexerOnTerminatedSignal = () => {
 	Signals.get('indexerStopped').add(supplyIndexerOnTerminatedSignalListener);
 };
 
-const getMissingTotalSupplyDiff = async (from, to) => {
+const getMissingTotalSupplyDiff = async (from, to, batchSize = 10000) => {
 	if (typeof from !== 'number')
 		throw new Error(`getMissingTotalSupply assigned from is not number`);
 	if (typeof to !== 'number') throw new Error(`getMissingTotalSupply assigned to is not number`);
@@ -249,16 +249,28 @@ const getMissingTotalSupplyDiff = async (from, to) => {
 	if (from === to) return BigInt(0);
 
 	const blocksTable = await getBlocksTable();
-	const query = `
-		SELECT
-			SUM(reward - totalBurnt) AS missingTotalSupply
-		FROM
-			blocks
-		WHERE
-			height BETWEEN ${from} AND ${to};
-	`;
-	const data = await blocksTable.rawQuery(query);
-	return BigInt(data.missingTotalSupply);
+	let totalDiff = BigInt(0);
+	let currentFrom = from;
+
+	while (currentFrom <= to) {
+		const currentTo = Math.min(currentFrom + batchSize - 1, to);
+		const query = `
+			SELECT
+				COALESCE(SUM(reward - totalBurnt), 0) AS missingTotalSupply
+			FROM
+				blocks
+			WHERE
+				height BETWEEN ${currentFrom} AND ${currentTo};
+		`;
+
+		const [data] = await blocksTable.rawQuery(query);
+		const batchDiff = BigInt(data?.missingTotalSupply ?? 0);
+		totalDiff += batchDiff;
+
+		currentFrom = currentTo + 1;
+	}
+
+	return totalDiff;
 };
 
 const scheduleIndexMissingTotalSupply = async () => {
