@@ -209,6 +209,9 @@ const setIndexedSupplyTokenID = async value => {
 };
 
 const setLastIndexedSupplyHeight = async value => {
+	// if blockFrequency is 0 or 1, it means we are indexing every block, hence we could skip this operation for oprimization
+	if ([0, 1].includes(INDEX_SUPPLY_BLOCK_FREQUENCY)) return;
+
 	if (typeof value !== 'number')
 		throw new Error(`setIndexedSupplyTokenID assigned value is not number`);
 
@@ -274,6 +277,9 @@ const getMissingTotalSupplyDiff = async (from, to, batchSize = 10000) => {
 };
 
 const scheduleIndexMissingTotalSupply = async () => {
+	// if blockFrequency is 0 or 1, it means we are indexing every block, hence we could skip this operation for oprimization
+	if ([0, 1].includes(INDEX_SUPPLY_BLOCK_FREQUENCY)) return;
+
 	// TODO: should implement this function in a "scheduled" manner to prevent requestIndexer timeout
 	const lastIndexedBlock = await getLastIndexedBlock();
 	const lastIndexedSupplyHeight = await getLastIndexedSupplyHeightFromDB();
