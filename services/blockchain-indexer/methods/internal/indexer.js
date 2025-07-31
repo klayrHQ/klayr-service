@@ -1,7 +1,7 @@
 const {
 	setPendingIndexerLastCurrentHeight,
 } = require('../../shared/indexer/pendingBlockchainIndex');
-const { scheduleIndexMissingTotalSupply } = require('../../shared/indexer/supplyIndexer');
+const { scheduleIndexMissingTotalSupply } = require('../../shared/indexer/blockchainIndex');
 
 module.exports = [
 	{

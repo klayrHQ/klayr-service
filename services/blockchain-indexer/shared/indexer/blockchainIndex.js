@@ -78,7 +78,11 @@ const eventTopicsTableSchema = require('../database/schema/eventTopics');
 const transactionsTableSchema = require('../database/schema/transactions');
 const validatorsTableSchema = require('../database/schema/validators');
 const { normalizeBlock } = require('../dataService/business/blocks');
-const { indexTokenSupply } = require('./supplyIndexer');
+const {
+	indexTokenSupply,
+	indexMissingTotalSupply,
+	getSupplyIndexerBlockFrequency,
+} = require('./supplyIndexer');
 const { getLastIndexedBlock, setLastIndexedBlock } = require('./lastIndexedBlock');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
@@ -745,7 +749,7 @@ const deleteIndexedBlocksWrapper = async job => {
 	/* eslint-disable no-use-before-define */
 	try {
 		if (!(await indexBlocksQueue.queue.isPaused())) {
-			await indexBlocksQueue.queue.pause();
+			await pauseIndexBlocksQueue();
 		}
 		await deleteIndexedBlocks(job);
 	} catch (err) {
@@ -755,10 +759,39 @@ const deleteIndexedBlocksWrapper = async job => {
 	} finally {
 		// Resume indexing once all deletion jobs are processed
 		if ((await getPendingDeleteJobCount()) === 0) {
-			await indexBlocksQueue.queue.resume();
+			await resumeIndexBlocksQueue();
 		}
 	}
 	/* eslint-enable no-use-before-define */
+};
+
+const scheduleIndexMissingTotalSupply = async () => {
+	setTimeout(async () => {
+		// if blockFrequency is 0 or 1, it means we are indexing every block, hence we could skip this operation for optimization
+		const blockFrequency = await getSupplyIndexerBlockFrequency();
+		if ([0, 1].includes(blockFrequency)) {
+			logger.info(
+				'Skipping indexing missing total supply as blockFrequency is set to 0 or 1. (indexing every block)',
+			);
+			return;
+		}
+
+		/* eslint-disable no-use-before-define */
+		try {
+			if (!(await indexBlocksQueue.queue.isPaused())) {
+				await pauseIndexBlocksQueue();
+			}
+			await indexMissingTotalSupply();
+		} catch (err) {
+			logger.warn(
+				`Error occurred while scheduling indexing of missing total supply: ${err.message}.`,
+			);
+			logger.debug(err.stack);
+		} finally {
+			await resumeIndexBlocksQueue();
+		}
+		/* eslint-enable no-use-before-define */
+	}, 0);
 };
 
 // Initialize queues
@@ -779,6 +812,14 @@ const initBlockProcessingQueues = async () => {
 		deleteIndexedBlocksWrapper,
 		config.queue.deleteIndexedBlocks.concurrency,
 	);
+};
+
+const pauseIndexBlocksQueue = async () => {
+	if (indexBlocksQueue && indexBlocksQueue.queue) await indexBlocksQueue.queue.pause();
+};
+
+const resumeIndexBlocksQueue = async () => {
+	if (indexBlocksQueue && indexBlocksQueue.queue) await indexBlocksQueue.queue.resume();
 };
 
 const getLiveIndexingJobCount = async () => {
@@ -1026,4 +1067,5 @@ module.exports = {
 	getLiveIndexingJobCount,
 	isGenesisBlockIndexed,
 	initBlockProcessingQueues,
+	scheduleIndexMissingTotalSupply,
 };

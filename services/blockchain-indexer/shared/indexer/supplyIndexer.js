@@ -107,7 +107,7 @@ const getSupplyTokenID = async () => {
 	return supplyTokenID;
 };
 
-const getBlockFrequency = async () => {
+const getSupplyIndexerBlockFrequency = async () => {
 	if (previousBlockFrequency === undefined) {
 		// NOTE: we don't assign global previousBlockFrequency if it's not set, instead it will be assigned on setPreviousBlockFrequency
 		const tokenSummaryTable = await getTokenSummaryTable();
@@ -240,7 +240,7 @@ const setIndexedSupplyTokenID = async value => {
 
 const setLastIndexedSupplyHeight = async value => {
 	// if blockFrequency is 0 or 1, it means we are indexing every block, hence we could skip this operation for oprimization
-	const blockFrequency = await getBlockFrequency();
+	const blockFrequency = await getSupplyIndexerBlockFrequency();
 	if ([0, 1].includes(blockFrequency)) return;
 
 	if (typeof value !== 'number')
@@ -307,15 +307,7 @@ const getMissingTotalSupplyDiff = async (from, to, batchSize = 10000) => {
 	return totalDiff;
 };
 
-const scheduleIndexMissingTotalSupply = async () => {
-	setTimeout(async () => await indexMissingTotalSupply(), 0);
-};
-
 const indexMissingTotalSupply = async () => {
-	// if blockFrequency is 0 or 1, it means we are indexing every block, hence we could skip this operation for oprimization
-	const blockFrequency = await getBlockFrequency();
-	if ([0, 1].includes(blockFrequency)) return;
-
 	const lastIndexedBlock = await getLastIndexedBlock();
 	const lastIndexedSupplyHeight = await getLastIndexedSupplyHeightFromDB();
 
@@ -353,5 +345,6 @@ module.exports = {
 	applySupplyDiff,
 	getSupplyTokenID,
 	registerSupplyIndexerOnTerminatedSignal,
-	scheduleIndexMissingTotalSupply,
+	indexMissingTotalSupply,
+	getSupplyIndexerBlockFrequency,
 };
