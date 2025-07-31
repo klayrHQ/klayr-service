@@ -313,7 +313,7 @@ const getMissingTotalSupplyDiff = async (from, to, batchSize = 10000) => {
 	return totalDiff;
 };
 
-const indexMissingTotalSupply = async () => {
+const indexMissingTotalSupply = async ({ onBeforeSupplyAdjustment, onAfterSupplyAdjustment }) => {
 	const lastIndexedBlock = await getLastIndexedBlock();
 	const lastIndexedSupplyHeight = await getLastIndexedSupplyHeightFromDB();
 
@@ -332,6 +332,10 @@ const indexMissingTotalSupply = async () => {
 	const missingSupplyDiff = await getMissingTotalSupplyDiff(fromHeight, toHeight);
 	if (missingSupplyDiff === BigInt(0)) return;
 
+	if (onBeforeSupplyAdjustment && typeof onBeforeSupplyAdjustment === 'function') {
+		await onBeforeSupplyAdjustment();
+	}
+
 	const isBlockDeletion = lastIndexedSupplyHeight > lastIndexedBlock.height;
 
 	logger.info(
@@ -342,6 +346,10 @@ const indexMissingTotalSupply = async () => {
 
 	// update blockFrequency config for future reference
 	await setPreviousBlockFrequency();
+
+	if (onAfterSupplyAdjustment && typeof onAfterSupplyAdjustment === 'function') {
+		await onAfterSupplyAdjustment();
+	}
 };
 
 module.exports = {

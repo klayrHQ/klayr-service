@@ -779,17 +779,21 @@ const scheduleIndexMissingTotalSupply = async () => {
 
 		/* eslint-disable no-use-before-define */
 		try {
-			if (!(await indexBlocksQueue.queue.isPaused())) {
-				await pauseIndexBlocksQueue();
-			}
-			await indexMissingTotalSupply();
+			await indexMissingTotalSupply({
+				onBeforeSupplyAdjustment: async () => {
+					if (!(await indexBlocksQueue.queue.isPaused())) {
+						await pauseIndexBlocksQueue();
+					}
+				},
+				onAfterSupplyAdjustment: async () => {
+					await resumeIndexBlocksQueue();
+				},
+			});
 		} catch (err) {
 			logger.warn(
 				`Error occurred while scheduling indexing of missing total supply: ${err.message}.`,
 			);
 			logger.debug(err.stack);
-		} finally {
-			await resumeIndexBlocksQueue();
 		}
 		/* eslint-enable no-use-before-define */
 	}, 0);
