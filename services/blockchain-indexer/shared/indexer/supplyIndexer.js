@@ -45,20 +45,20 @@ const checkBlockCounter = async block => {
 	return false;
 };
 
-const adjustSupplyMethod = async (adjustedSupply, block, isBlockDeletion) => {
+const adjustSupplyMethod = async (adjustedSupply, block, isBlockDeletion, dbTrx) => {
 	const absSupply = adjustedSupply < BigInt(0) ? adjustedSupply * BigInt(-1) : adjustedSupply;
 
 	if (isBlockDeletion) {
 		if (adjustedSupply > BigInt(0)) {
-			await decreaseIndexedSupply(absSupply, block);
+			await decreaseIndexedSupply(absSupply, block, dbTrx);
 		} else {
-			await increaseIndexedSupply(absSupply, block);
+			await increaseIndexedSupply(absSupply, block, dbTrx);
 		}
 	} else {
 		if (adjustedSupply > BigInt(0)) {
-			await increaseIndexedSupply(absSupply, block);
+			await increaseIndexedSupply(absSupply, block, dbTrx);
 		} else {
-			await decreaseIndexedSupply(absSupply, block);
+			await decreaseIndexedSupply(absSupply, block, dbTrx);
 		}
 	}
 };
@@ -121,12 +121,12 @@ const getSupplyIndexerBlockFrequency = async () => {
 	return previousBlockFrequency;
 };
 
-const indexTokenSupply = async (block, isBlockDeletion) => {
+const indexTokenSupply = async (block, dbTrx, isBlockDeletion) => {
 	const indexedTotalSupply = BigInt(block.reward) - BigInt(block.totalBurnt);
 
 	if (indexedTotalSupply === BigInt(0)) return;
 
-	await adjustSupplyMethod(indexedTotalSupply, block, isBlockDeletion);
+	await adjustSupplyMethod(indexedTotalSupply, block, isBlockDeletion, dbTrx);
 };
 
 const applySupplyDiff = async () => {
@@ -139,7 +139,7 @@ const applySupplyDiff = async () => {
 		logger.debug(
 			`Applying supplyDiff of ${addedSupply} until block height ${lastIndexedBlock.height} by increasing total supply`,
 		);
-		await increaseIndexedSupply(addedSupply, lastIndexedBlock, true);
+		await increaseIndexedSupply(addedSupply, lastIndexedBlock, undefined, true);
 	}
 
 	if (supplyDiff < BigInt(0)) {
@@ -149,13 +149,13 @@ const applySupplyDiff = async () => {
 		logger.debug(
 			`Applying supplyDiff of ${removedSupply} until block height ${lastIndexedBlock.height} by decreasing total supply`,
 		);
-		await decreaseIndexedSupply(removedSupply, lastIndexedBlock, true);
+		await decreaseIndexedSupply(removedSupply, lastIndexedBlock, undefined, true);
 	}
 
 	logger.debug('Indexing supply diff completed, supplyDiff successfully cleared');
 };
 
-const increaseIndexedSupply = async (addedSupply, block, forceDBWrite) => {
+const increaseIndexedSupply = async (addedSupply, block, dbTrx, forceDBWrite) => {
 	if (typeof addedSupply !== 'bigint')
 		throw new Error(`increaseIndexedSupply assigned addedSupply is not bigint`);
 
@@ -166,10 +166,13 @@ const increaseIndexedSupply = async (addedSupply, block, forceDBWrite) => {
 		logger.debug(`Increasing indexed total supply by ${addedSupply}`);
 		const tokenSummaryTable = await getTokenSummaryTable();
 
-		const numRowsAffected = await tokenSummaryTable.increment({
-			increment: { value: addedSupply },
-			where: { key: 'totalSupply' },
-		});
+		const numRowsAffected = await tokenSummaryTable.increment(
+			{
+				increment: { value: addedSupply },
+				where: { key: 'totalSupply' },
+			},
+			dbTrx,
+		);
 		if (numRowsAffected === 0) await initIndexedSupply(addedSupply);
 
 		await setLastIndexedSupplyHeight(block.height);
@@ -178,7 +181,7 @@ const increaseIndexedSupply = async (addedSupply, block, forceDBWrite) => {
 	}
 };
 
-const decreaseIndexedSupply = async (removedSupply, block, forceDBWrite) => {
+const decreaseIndexedSupply = async (removedSupply, block, dbTrx, forceDBWrite) => {
 	if (typeof removedSupply !== 'bigint')
 		throw new Error(`decreaseIndexedSupply assigned removedSupply is not bigint`);
 
@@ -189,10 +192,13 @@ const decreaseIndexedSupply = async (removedSupply, block, forceDBWrite) => {
 		logger.debug(`Decreasing indexed total supply by ${removedSupply}`);
 		const tokenSummaryTable = await getTokenSummaryTable();
 
-		const numRowsAffected = await tokenSummaryTable.decrement({
-			decrement: { value: removedSupply },
-			where: { key: 'totalSupply' },
-		});
+		const numRowsAffected = await tokenSummaryTable.decrement(
+			{
+				decrement: { value: removedSupply },
+				where: { key: 'totalSupply' },
+			},
+			dbTrx,
+		);
 		if (numRowsAffected === 0) await initIndexedSupply(removedSupply * BigInt(-1));
 
 		await setLastIndexedSupplyHeight(block.height);
@@ -332,7 +338,7 @@ const indexMissingTotalSupply = async () => {
 		`Found missing unindexed total supply of ${missingSupplyDiff} between height ${fromHeight}-${toHeight}`,
 	);
 
-	await adjustSupplyMethod(missingSupplyDiff, lastIndexedBlock, isBlockDeletion);
+	await adjustSupplyMethod(missingSupplyDiff, lastIndexedBlock, isBlockDeletion, undefined);
 
 	// update blockFrequency config for future reference
 	await setPreviousBlockFrequency();

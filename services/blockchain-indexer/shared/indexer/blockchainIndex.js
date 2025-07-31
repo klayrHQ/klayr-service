@@ -424,6 +424,10 @@ const indexBlock = async job => {
 		};
 
 		await blocksTable.upsert(blockToIndex, dbTrx);
+
+		// Index token total supply based on data from blocks
+		await indexTokenSupply(blockToIndex, dbTrx);
+
 		await commitDBTransaction(dbTrx);
 		await setLastIndexedBlock(blockToIndex);
 
@@ -439,9 +443,6 @@ const indexBlock = async job => {
 
 		// Only schedule address balance updates if the block is indexed successfully
 		await scheduleAddressesBalanceUpdate(addressesToUpdateBalance);
-
-		// Index token total supply based on data from blocks
-		await indexTokenSupply(blockToIndex);
 
 		logger.info(
 			`Successfully indexed block ${blockToIndexFromNode.id} at height ${blockToIndexFromNode.height}.`,
@@ -697,7 +698,7 @@ const deleteIndexedBlocks = async job => {
 					addressesToUpdateBalance = await getAddressesFromTokenEvents(events);
 
 					// update total supply by reversing increase/decrease
-					await indexTokenSupply(blockFromJob, true);
+					await indexTokenSupply(blockFromJob, dbTrx, true);
 				}
 
 				// Invalidate cached events for this block. Must be done after processing all event related calculations
