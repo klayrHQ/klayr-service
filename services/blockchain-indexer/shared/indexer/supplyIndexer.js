@@ -24,8 +24,12 @@ const getTokenSummaryTable = () => getTableInstance(tokenSummaryTableSchema, MYS
 const getBlocksTable = () => getTableInstance(blocksTableSchema, MYSQL_ENDPOINT);
 
 let supplyTokenID;
-let lastBlockHeight;
 let supplyDiff = BigInt(0);
+
+// 'lastIndexedSupplyHeight' key in db is used to check periodic flush, and more improtantly, to recover unindexed supply height in case of crash or unexpected shutdown
+let lastBlockHeight;
+// 'previousBlockFrequency' key in db is used to store latest blockFrequency config used other than 0/1, which useful for safely skip/optimize certain supply indexing operations
+let previousBlockFrequency;
 
 const checkBlockCounter = async block => {
 	if (INDEX_SUPPLY_BLOCK_FREQUENCY === -1) return false;
@@ -101,6 +105,20 @@ const getSupplyTokenID = async () => {
 		}
 	}
 	return supplyTokenID;
+};
+
+const getBlockFrequency = async () => {
+	if (previousBlockFrequency === undefined) {
+		// NOTE: we don't assign global previousBlockFrequency if it's not set, instead it will be assigned on setPreviousBlockFrequency
+		const tokenSummaryTable = await getTokenSummaryTable();
+		const [data = {}] = await tokenSummaryTable.find({ key: 'previousBlockFrequency', limit: 1 }, [
+			'key',
+			'value',
+		]);
+		if (data.value) return Number(data.value);
+		return INDEX_SUPPLY_BLOCK_FREQUENCY;
+	}
+	return previousBlockFrequency;
 };
 
 const indexTokenSupply = async (block, isBlockDeletion) => {
@@ -183,6 +201,18 @@ const decreaseIndexedSupply = async (removedSupply, block, forceDBWrite) => {
 	}
 };
 
+const setPreviousBlockFrequency = async () => {
+	if (previousBlockFrequency !== undefined) return;
+
+	const tokenSummaryTable = await getTokenSummaryTable();
+	await tokenSummaryTable.upsert({
+		key: 'previousBlockFrequency',
+		value: INDEX_SUPPLY_BLOCK_FREQUENCY.toString(),
+	});
+
+	previousBlockFrequency = INDEX_SUPPLY_BLOCK_FREQUENCY;
+};
+
 const setIndexedSupply = async value => {
 	if (typeof value !== 'bigint') throw new Error(`setIndexedSupply assigned value is not bigint`);
 
@@ -210,7 +240,8 @@ const setIndexedSupplyTokenID = async value => {
 
 const setLastIndexedSupplyHeight = async value => {
 	// if blockFrequency is 0 or 1, it means we are indexing every block, hence we could skip this operation for oprimization
-	if ([0, 1].includes(INDEX_SUPPLY_BLOCK_FREQUENCY)) return;
+	const blockFrequency = await getBlockFrequency();
+	if ([0, 1].includes(blockFrequency)) return;
 
 	if (typeof value !== 'number')
 		throw new Error(`setIndexedSupplyTokenID assigned value is not number`);
@@ -278,7 +309,8 @@ const getMissingTotalSupplyDiff = async (from, to, batchSize = 10000) => {
 
 const scheduleIndexMissingTotalSupply = async () => {
 	// if blockFrequency is 0 or 1, it means we are indexing every block, hence we could skip this operation for oprimization
-	if ([0, 1].includes(INDEX_SUPPLY_BLOCK_FREQUENCY)) return;
+	const blockFrequency = await getBlockFrequency();
+	if ([0, 1].includes(blockFrequency)) return;
 
 	// TODO: should implement this function in a "scheduled" manner to prevent requestIndexer timeout
 	const lastIndexedBlock = await getLastIndexedBlock();
@@ -306,6 +338,9 @@ const scheduleIndexMissingTotalSupply = async () => {
 	);
 
 	await adjustSupplyMethod(missingSupplyDiff, lastIndexedBlock, isBlockDeletion);
+
+	// update blockFrequency config for future reference
+	await setPreviousBlockFrequency();
 };
 
 module.exports = {
