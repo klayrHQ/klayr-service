@@ -308,11 +308,14 @@ const getMissingTotalSupplyDiff = async (from, to, batchSize = 10000) => {
 };
 
 const scheduleIndexMissingTotalSupply = async () => {
+	setTimeout(async () => await indexMissingTotalSupply(), 0);
+};
+
+const indexMissingTotalSupply = async () => {
 	// if blockFrequency is 0 or 1, it means we are indexing every block, hence we could skip this operation for oprimization
 	const blockFrequency = await getBlockFrequency();
 	if ([0, 1].includes(blockFrequency)) return;
 
-	// TODO: should implement this function in a "scheduled" manner to prevent requestIndexer timeout
 	const lastIndexedBlock = await getLastIndexedBlock();
 	const lastIndexedSupplyHeight = await getLastIndexedSupplyHeightFromDB();
 
