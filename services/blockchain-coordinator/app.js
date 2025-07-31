@@ -58,6 +58,7 @@ const app = Microservice({
 setAppContext(app);
 
 app.addJobs(path.join(__dirname, 'jobs'));
+app.addMethods(path.join(__dirname, 'methods'));
 
 // Run the application
 app
