@@ -162,6 +162,50 @@ const checkBlockIDsDeleteStatusInDB = async (blockIDs, status) => {
 	);
 };
 
+const clearIndexBlocksQueue = async () => {
+	await pauseIndexBlocksQueue();
+
+	// remove all jobs from the queue
+	await indexBlocksQueue.queue.empty();
+	await indexBlocksQueue.queue.clean(0, 0);
+
+	await resumeIndexBlocksQueue();
+};
+
+const retryIndexingAndCleanIfFailed = async job => {
+	const maxRetries = 5;
+	const currentRetry = job.data.retryCount || 0;
+	const originalJobId = job.data.originalJobId || job.id;
+
+	if (currentRetry < maxRetries) {
+		logger.warn(`Retrying job ${originalJobId} (attempt ${currentRetry + 1}/${maxRetries})`);
+
+		await indexBlocksQueue.queue.add(
+			job.name,
+			{
+				...job.data,
+				retryCount: currentRetry + 1,
+				originalJobId,
+			},
+			{
+				...job.opts,
+				lifo: true,
+				jobId: `${originalJobId}-r${currentRetry + 1}`,
+				attempts: 1,
+				removeOnComplete: true,
+				removeOnFail: true,
+			},
+		);
+
+		logger.warn(`Successfully rescheduled job ${originalJobId}-r${currentRetry + 1} for retry.`);
+	} else {
+		logger.error(
+			`Job ${originalJobId} exceeded max retries. indexBlocksQueue will be cleaned instead to schedule from scratch.`,
+		);
+		await clearIndexBlocksQueue();
+	}
+};
+
 const indexBlock = async job => {
 	const { height: blockHeightFromJobData, block: blockFromJobData } = job.data;
 	if (blockHeightFromJobData === undefined && blockFromJobData === undefined)
@@ -496,6 +540,22 @@ const indexBlock = async job => {
 				: `Error occurred while indexing block at height ${failedBlockInfo.height}. Will retry.`,
 		);
 		logger.debug(error.stack);
+
+		/**
+		 * This blocks means some expected error on "indexer initialization" phase, like:
+		 *
+		 * - connector.getEventsByHeight: when klayr-service is shutting down, thus connector will not be available
+		 * - Non-sequential: when blockFromJobData is not sequential with the last indexed block
+		 *
+		 * In this case, we will retry indexing this block and clean all the queue if it fails again
+		 */
+
+		if (
+			blockFromJobData !== undefined &&
+			['connector.getEventsByHeight', 'Non-sequential'].some(e => error.message.includes(e))
+		) {
+			await retryIndexingAndCleanIfFailed(job);
+		}
 
 		// eslint-disable-next-line no-promise-executor-return
 		await new Promise(r => setTimeout(r, config.indexBlocksRetryDelay)); // reduce stress on core node
