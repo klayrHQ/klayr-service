@@ -27,13 +27,10 @@ const getPendingBlockToIndexLength = () => pendingBlockToIndex.length;
 const getIndexerLastCurrentHeight = () => indexerLastCurrentHeight;
 
 const setPendingIndexerLastCurrentHeight = height => {
-	// only set this once
-	if (indexerLastCurrentHeight === -1) {
-		logger.trace(
-			`setPendingIndexerLastCurrentHeight is setting indexerLastCurrentHeight as ${height} on pendingBlockchainIndex.js`,
-		);
-		indexerLastCurrentHeight = height;
-	}
+	logger.trace(
+		`setPendingIndexerLastCurrentHeight is setting indexerLastCurrentHeight as ${height} on pendingBlockchainIndex.js`,
+	);
+	indexerLastCurrentHeight = height;
 };
 
 const getNumBlocksIndexed = async () => {

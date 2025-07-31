@@ -113,6 +113,9 @@ const waitForGenesisBlockIndexing = (resolve, reject) =>
 	});
 
 const scheduleBlocksIndexing = async heights => {
+	const currentHeight = await getCurrentHeight();
+	await requestIndexer('setPendingIndexerLastCurrentHeight', { currentHeight });
+
 	const blockHeights = Array.isArray(heights) ? heights : [heights];
 
 	blockHeights.sort((h1, h2) => h1 - h2); // sort heights in ascending order
@@ -220,7 +223,6 @@ const initIndexingScheduler = async () => {
 
 		// Schedule indexing for the missing blocks
 		if (Array.isArray(missingBlockHeights) && missingBlockHeights.length) {
-			await requestIndexer('setPendingIndexerLastCurrentHeight', { currentHeight });
 			logger.info(
 				`${missingBlockHeights.length} missing blocks found between heights: ${lastVerifiedHeight} - ${currentHeight}. Attempting to schedule indexing.`,
 			);
