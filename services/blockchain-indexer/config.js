@@ -234,13 +234,12 @@ config.indexBlocksRetryDelay = Number(process.env.INDEX_BLOCKS_RETRY_DELAY) || 1
 /**
  * Supply indexing config
  */
-
+config.supplyIndexing = {};
 /**
  * NOTE:
  * config.supplyIndexing.blockFrequency of -1 means that supply indexing will only occur after initial indexing finished 100%
  * this could speed up initial block indexing, but may break supply indexing if indexing unexpectedly terminated halfway
  */
-
-config.supplyIndexing.blockFrequency = Number(process.end.INDEX_SUPPLY_BLOCK_FREQUENCY) || 1; // Default to every block
+config.supplyIndexing.blockFrequency = Number(process.env.INDEX_SUPPLY_BLOCK_FREQUENCY) || 1; // Default to every block
 
 module.exports = config;
