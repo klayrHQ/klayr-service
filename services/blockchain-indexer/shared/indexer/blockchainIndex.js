@@ -816,11 +816,17 @@ const initBlockProcessingQueues = async () => {
 };
 
 const pauseIndexBlocksQueue = async () => {
-	if (indexBlocksQueue && indexBlocksQueue.queue) await indexBlocksQueue.queue.pause();
+	if (indexBlocksQueue && indexBlocksQueue.queue) {
+		await indexBlocksQueue.queue.pause();
+		logger.info('Indexing blocks queue is paused.');
+	}
 };
 
 const resumeIndexBlocksQueue = async () => {
-	if (indexBlocksQueue && indexBlocksQueue.queue) await indexBlocksQueue.queue.resume();
+	if (indexBlocksQueue && indexBlocksQueue.queue) {
+		await indexBlocksQueue.queue.resume();
+		logger.info('Indexing blocks queue is resumed.');
+	}
 };
 
 const getLiveIndexingJobCount = async () => {
