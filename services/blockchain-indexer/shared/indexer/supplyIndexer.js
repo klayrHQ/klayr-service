@@ -152,6 +152,14 @@ const applySupplyDiff = async () => {
 		await decreaseIndexedSupply(removedSupply, lastIndexedBlock, undefined, true);
 	}
 
+	if (supplyDiff === BigInt(0)) {
+		const lastIndexedBlock = await getLastIndexedBlock();
+		logger.debug(
+			`No supplyDiff detected until ${lastIndexedBlock.height}, hence applySupplyDiff only set last indexed supply height`,
+		);
+		await setLastIndexedSupplyHeight(lastIndexedBlock.height);
+	}
+
 	logger.debug('Indexing supply diff completed, supplyDiff successfully cleared');
 };
 
