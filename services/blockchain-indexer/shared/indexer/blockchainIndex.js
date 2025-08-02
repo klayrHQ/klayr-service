@@ -84,6 +84,8 @@ const {
 	getSupplyIndexerBlockFrequency,
 } = require('./supplyIndexer');
 const { getLastIndexedBlock, setLastIndexedBlock } = require('./lastIndexedBlock');
+const { getIndexReadyStatus } = require('./indexStatus');
+const { requestConnector, requestCoordinator } = require('../utils/request');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
@@ -203,6 +205,7 @@ const retryIndexingAndCleanIfFailed = async job => {
 			`Job ${originalJobId} exceeded max retries. indexBlocksQueue will be cleaned instead to schedule from scratch.`,
 		);
 		await clearIndexBlocksQueue();
+		await requestCoordinator('scheduleMissingBlocksIndexing');
 	}
 };
 
@@ -542,7 +545,7 @@ const indexBlock = async job => {
 		logger.debug(error.stack);
 
 		/**
-		 * This blocks means some expected error on "indexer initialization" phase, like:
+		 * This blocks means some expected error on "indexer initialization" phase (indexReady is false), like:
 		 *
 		 * - connector.getEventsByHeight: when klayr-service is shutting down, thus connector will not be available
 		 * - Non-sequential: when blockFromJobData is not sequential with the last indexed block
@@ -551,6 +554,7 @@ const indexBlock = async job => {
 		 */
 
 		if (
+			!getIndexReadyStatus() &&
 			blockFromJobData !== undefined &&
 			['connector.getEventsByHeight', 'Non-sequential'].some(e => error.message.includes(e))
 		) {
