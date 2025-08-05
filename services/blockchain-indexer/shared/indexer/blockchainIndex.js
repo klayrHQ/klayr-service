@@ -56,6 +56,7 @@ const {
 	getReorderingStatus,
 	reorderIndexBlocksQueueJobs,
 	indexNewMissingBlock,
+	scheduleMissingBlocksIndexing,
 } = require('./utils/blockchainIndex');
 const {
 	startIndexSpeedRecord,
@@ -194,11 +195,17 @@ const retryIndexingAndReorderIfFailed = async job => {
 
 		return RESCHEDULE_STATUS.NO_RETURN;
 	} else {
-		logger.error(
-			`Job ${originalJobId} exceeded max retries, indexBlocksQueue will be re-ordered instead to schedule from scratch.`,
-		);
-		await reorderIndexBlocksQueueJobs(job, indexBlocksQueue);
-		return RESCHEDULE_STATUS.IS_RETURN;
+		try {
+			logger.error(
+				`Job ${originalJobId} exceeded max retries, indexBlocksQueue will be re-ordered instead to schedule from scratch.`,
+			);
+			await reorderIndexBlocksQueueJobs(job, indexBlocksQueue);
+			return RESCHEDULE_STATUS.IS_RETURN;
+		} catch (err) {
+			await clearIndexBlocksQueue();
+			await scheduleMissingBlocksIndexing();
+			return RESCHEDULE_STATUS.IS_RETURN;
+		}
 	}
 };
 

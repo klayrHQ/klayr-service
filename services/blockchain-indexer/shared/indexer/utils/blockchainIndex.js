@@ -32,6 +32,8 @@ const { getLastIndexedBlock } = require('../lastIndexedBlock');
 const config = require('../../../config');
 
 const blocksTableSchema = require('../../database/schema/blocks');
+const { requestCoordinator } = require('../../utils/request');
+const { waitForCoordinatorReady } = require('./coordinator');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
@@ -212,6 +214,11 @@ const updateTotalLockedAmounts = async (tokenIDLockedAmountChangeMap, dbTrx) =>
 		{ concurrency: Object.entries(tokenIDLockedAmountChangeMap).length },
 	);
 
+const scheduleMissingBlocksIndexing = async () => {
+	await waitForCoordinatorReady();
+	await requestCoordinator('scheduleMissingBlocksIndexing');
+};
+
 module.exports = {
 	reorderIndexBlocksQueueJobs,
 	activateReorderingMode,
@@ -221,4 +228,5 @@ module.exports = {
 	setLargestMissingBlockHeight,
 	getLargestMissingBlockHeight,
 	indexNewMissingBlock,
+	scheduleMissingBlocksIndexing,
 };
