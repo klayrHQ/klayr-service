@@ -42,6 +42,7 @@ const {
 	setIndexReadyStatus,
 } = require('./readyIndex');
 const { registerSupplyIndexerOnTerminatedSignal } = require('./supplyIndexer');
+const { unregisterIndexerEvent } = require('./blockchainIndex');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
@@ -91,6 +92,8 @@ const checkIndexReadiness = async () => {
 
 		Signals.get('blockIndexReady').dispatch(true);
 		Signals.get('newBlock').remove(checkIndexReadiness);
+
+		unregisterIndexerEvent();
 
 		if (config.isBenchmarkingIndexing) stopIndexSpeedRecord();
 	}

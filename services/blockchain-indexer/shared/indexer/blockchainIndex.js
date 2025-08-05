@@ -90,6 +90,10 @@ const {
 } = require('./supplyIndexer');
 const { getLastIndexedBlock, setLastIndexedBlock } = require('./lastIndexedBlock');
 const { getIndexReadyStatus } = require('./readyIndex');
+const {
+	registerIndexerEventHook,
+	unregisterIndexerEventHook,
+} = require('./utils/indexerEventHook');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
@@ -881,6 +885,12 @@ const initBlockProcessingQueues = async () => {
 		deleteIndexedBlocksWrapper,
 		config.queue.deleteIndexedBlocks.concurrency,
 	);
+
+	registerIndexerEventHook(indexBlocksQueue);
+};
+
+const unregisterIndexerEvent = () => {
+	if (indexBlocksQueue) unregisterIndexerEventHook(indexBlocksQueue);
 };
 
 const pauseIndexBlocksQueue = async () => {
@@ -1111,4 +1121,5 @@ module.exports = {
 	isGenesisBlockIndexed,
 	initBlockProcessingQueues,
 	scheduleIndexMissingTotalSupply,
+	unregisterIndexerEvent,
 };
