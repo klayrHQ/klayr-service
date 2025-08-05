@@ -2,15 +2,25 @@ const { Logger } = require('klayr-service-framework');
 
 const logger = Logger();
 
-let indexReady = false;
+let isIndexReady = false;
+let pendingIndexReady = false;
 
-const getPendingIndexReady = () => indexReady;
+const getPendingIndexReady = () => pendingIndexReady;
 
 const setPendingIndexIsReady = () => {
-	if (!indexReady) {
-		logger.trace('setPendingIndexIsReady is setting indexReady as true on readyIndex.js');
-		indexReady = true;
+	if (!pendingIndexReady) {
+		logger.trace('setPendingIndexIsReady is setting pendingIndexReady as true on readyIndex.js');
+		pendingIndexReady = true;
 	}
 };
 
-module.exports = { getPendingIndexReady, setPendingIndexIsReady };
+const getIndexReadyStatus = () => isIndexReady;
+
+const setIndexReadyStatus = isReady => (isIndexReady = isReady);
+
+module.exports = {
+	getPendingIndexReady,
+	setPendingIndexIsReady,
+	getIndexReadyStatus,
+	setIndexReadyStatus,
+};

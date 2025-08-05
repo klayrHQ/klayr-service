@@ -35,16 +35,17 @@ const {
 	getNumBlocksIndexed,
 	registerPendingIndexReadySignal,
 } = require('./pendingBlockchainIndex');
-const { getPendingIndexReady, setPendingIndexIsReady } = require('./readyIndex');
+const {
+	getPendingIndexReady,
+	setPendingIndexIsReady,
+	getIndexReadyStatus,
+	setIndexReadyStatus,
+} = require('./readyIndex');
 const { registerSupplyIndexerOnTerminatedSignal } = require('./supplyIndexer');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
 const getBlocksTable = () => getTableInstance(blocksTableSchema, MYSQL_ENDPOINT);
-
-let isIndexReady = false;
-const setIndexReadyStatus = isReady => (isIndexReady = isReady);
-const getIndexReadyStatus = () => isIndexReady;
 
 const getIndexStats = async () => {
 	try {

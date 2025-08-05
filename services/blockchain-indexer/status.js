@@ -15,7 +15,7 @@
  */
 const packageJson = require('./package.json');
 const dataService = require('./shared/dataService');
-const { getIndexReadyStatus } = require('./shared/indexer/indexStatus');
+const { getIndexReadyStatus } = require('./shared/indexer/readyIndex');
 
 const status = {
 	service: packageJson.name,

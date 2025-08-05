@@ -29,7 +29,6 @@ const {
 		},
 	},
 	Utils: { waitForIt },
-	CacheLRU,
 } = require('klayr-service-framework');
 
 const { applyTransaction, revertTransaction } = require('./transactionProcessor');
@@ -52,7 +51,12 @@ const { getEventsInfoToIndex } = require('./utils/events');
 const { calcCommissionAmount, calcSelfStakeReward } = require('./utils/validator');
 const { indexAccountPublicKey } = require('./accountIndex');
 const { getGenesisAssetIntervalTimeout, indexGenesisBlockAssets } = require('./genesisBlock');
-const { updateTotalLockedAmounts } = require('./utils/blockchainIndex');
+const {
+	updateTotalLockedAmounts,
+	getReorderingStatus,
+	reorderIndexBlocksQueueJobs,
+	indexNewMissingBlock,
+} = require('./utils/blockchainIndex');
 const {
 	startIndexSpeedRecord,
 	increaseBlockIndexedForSpeedRecord,
@@ -84,8 +88,7 @@ const {
 	getSupplyIndexerBlockFrequency,
 } = require('./supplyIndexer');
 const { getLastIndexedBlock, setLastIndexedBlock } = require('./lastIndexedBlock');
-const { getIndexReadyStatus } = require('./indexStatus');
-const { requestConnector, requestCoordinator } = require('../utils/request');
+const { getIndexReadyStatus } = require('./readyIndex');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
@@ -99,31 +102,14 @@ const getValidatorsTable = () => getTableInstance(validatorsTableSchema, MYSQL_E
 
 const validateBlock = block => !!block && block.height >= 0;
 
-const LARGEST_MISSING_BLOCK_HEIGHT_CACHE_KEY = 'largestMissingBlockHeight';
-
-const largestMissingBlockHeightCache = CacheLRU('largestMissingBlockHeight', { max: 1 });
-
-const setLargestMissingBlockHeight = async missingBlockHeight => {
-	await largestMissingBlockHeightCache.set(
-		LARGEST_MISSING_BLOCK_HEIGHT_CACHE_KEY,
-		missingBlockHeight,
-	);
-};
-
-const getLargestMissingBlockHeight = async () => {
-	const largestMissingBlockHeight = await largestMissingBlockHeightCache.get(
-		LARGEST_MISSING_BLOCK_HEIGHT_CACHE_KEY,
-	);
-	if (largestMissingBlockHeight === undefined) {
-		const lastIndexedBlock = await getLastIndexedBlock();
-		return lastIndexedBlock.height;
-	}
-	return largestMissingBlockHeight;
-};
-
 const DB_STATUS = Object.freeze({
 	COMMIT: 'commit',
 	ROLLBACK: 'rollback',
+});
+
+const RESCHEDULE_STATUS = Object.freeze({
+	IS_RETURN: 1,
+	NO_RETURN: 0,
 });
 
 // eslint-disable-next-line consistent-return
@@ -174,7 +160,12 @@ const clearIndexBlocksQueue = async () => {
 	await resumeIndexBlocksQueue();
 };
 
-const retryIndexingAndCleanIfFailed = async job => {
+const retryIndexingAndReorderIfFailed = async job => {
+	if (getReorderingStatus()) {
+		await reorderIndexBlocksQueueJobs(job, indexBlocksQueue);
+		return RESCHEDULE_STATUS.IS_RETURN;
+	}
+
 	const maxRetries = 5;
 	const currentRetry = job.data.retryCount || 0;
 	const originalJobId = job.data.originalJobId || job.id;
@@ -200,12 +191,14 @@ const retryIndexingAndCleanIfFailed = async job => {
 		);
 
 		logger.warn(`Successfully rescheduled job ${originalJobId}-r${currentRetry + 1} for retry.`);
+
+		return RESCHEDULE_STATUS.NO_RETURN;
 	} else {
 		logger.error(
-			`Job ${originalJobId} exceeded max retries. indexBlocksQueue will be cleaned instead to schedule from scratch.`,
+			`Job ${originalJobId} exceeded max retries, indexBlocksQueue will be re-ordered instead to schedule from scratch.`,
 		);
-		await clearIndexBlocksQueue();
-		await requestCoordinator('scheduleMissingBlocksIndexing');
+		await reorderIndexBlocksQueueJobs(job, indexBlocksQueue);
+		return RESCHEDULE_STATUS.IS_RETURN;
 	}
 };
 
@@ -537,13 +530,6 @@ const indexBlock = async job => {
 			throw new Error(errMessage);
 		}
 
-		logger.warn(
-			failedBlockInfo.id
-				? `Error occurred while indexing block ${failedBlockInfo.id} at height ${failedBlockInfo.height}. Will retry.`
-				: `Error occurred while indexing block at height ${failedBlockInfo.height}. Will retry.`,
-		);
-		logger.debug(error.stack);
-
 		/**
 		 * This blocks means some expected error on "indexer initialization" phase (indexReady is false), like:
 		 *
@@ -558,8 +544,15 @@ const indexBlock = async job => {
 			blockFromJobData !== undefined &&
 			['connector.getEventsByHeight', 'Non-sequential'].some(e => error.message.includes(e))
 		) {
-			await retryIndexingAndCleanIfFailed(job);
+			if ((await retryIndexingAndReorderIfFailed(job)) === RESCHEDULE_STATUS.IS_RETURN) return;
 		}
+
+		logger.warn(
+			failedBlockInfo.id
+				? `Error occurred while indexing block ${failedBlockInfo.id} at height ${failedBlockInfo.height}. Will retry.`
+				: `Error occurred while indexing block at height ${failedBlockInfo.height}. Will retry.`,
+		);
+		logger.debug(error.stack);
 
 		// eslint-disable-next-line no-promise-executor-return
 		await new Promise(r => setTimeout(r, config.indexBlocksRetryDelay)); // reduce stress on core node
@@ -925,14 +918,6 @@ const scheduleBlockDeletion = async block => {
 	await deleteIndexedBlocksQueue.add({ blocks });
 };
 
-function createMissingBlockArray(lastIndexedBlockHeight, newBlockHeight) {
-	const result = [];
-	for (let i = lastIndexedBlockHeight + 1; i < newBlockHeight; i++) {
-		result.push(i);
-	}
-	return result;
-}
-
 const indexNewBlock = async (block, skipCheckingMissingBlock = false) => {
 	const blocksTable = await getBlocksTable();
 	const lastIndexedBlock = await getLastIndexedBlock();
@@ -946,31 +931,7 @@ const indexNewBlock = async (block, skipCheckingMissingBlock = false) => {
 		logger.info(
 			`Detected missing block between last indexed block at height: ${lastIndexedBlock.height} until new block at height: ${block.header.height}`,
 		);
-		const missingBlocks = createMissingBlockArray(lastIndexedBlock.height, block.header.height);
-
-		// largestMissingBlock is tracked to prevent re-queuing missing block
-		const largestMissingBlockHeight = await getLargestMissingBlockHeight();
-		let currentLargestMissingBlockHeight = largestMissingBlockHeight;
-
-		for (const missingBlockHeight of missingBlocks) {
-			if (missingBlockHeight > currentLargestMissingBlockHeight) {
-				logger.info(`Scheduling indexing of missing block at height ${missingBlockHeight}`);
-
-				const [blockFromDB] = await blocksTable.find({ height: missingBlockHeight, limit: 1 }, [
-					'id',
-				]);
-
-				if (!blockFromDB) {
-					currentLargestMissingBlockHeight = missingBlockHeight;
-					await indexBlocksQueue.add({ height: missingBlockHeight });
-				} else {
-					logger.info(`Block at height ${missingBlockHeight} already indexed`);
-				}
-			}
-		}
-
-		if (currentLargestMissingBlockHeight)
-			await setLargestMissingBlockHeight(currentLargestMissingBlockHeight);
+		await indexNewMissingBlock(lastIndexedBlock, block, indexBlocksQueue);
 	}
 
 	logger.info(
