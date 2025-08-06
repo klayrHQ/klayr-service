@@ -37,6 +37,7 @@ const { range } = require('./utils/array');
 const delay = require('./utils/delay');
 const config = require('../config');
 const { requestConnector, requestIndexer } = require('./utils/request');
+const { getIsScheduling, setIsScheduling } = require('./status');
 
 const blockMessageQueue = new MessageQueue(config.queue.block.name, config.endpoints.messageQueue, {
 	defaultJobOptions: config.queue.defaultJobOptions,
@@ -210,6 +211,8 @@ const initIndexingScheduler = async () => {
 			`Skipping the check for missing blocks. ${jobCount} blocks already queued for indexing.`,
 		);
 	} else {
+		setIsScheduling(true);
+
 		await requestIndexer('setIsSchedulingThroughCoordinator');
 
 		// Check for missing blocks
@@ -237,11 +240,16 @@ const initIndexingScheduler = async () => {
 				`No missing blocks found between heights: ${lastVerifiedHeight} - ${currentHeight}. Nothing to schedule.`,
 			);
 		}
+
+		setIsScheduling(false);
 	}
 	logger.info('Block indexing initialization completed successfully.');
 };
 
 const scheduleMissingBlocksIndexing = async () => {
+	// if the coordinator is already scheduling missing blocks, skip the job
+	if (getIsScheduling()) return;
+
 	if (!(await isGenesisBlockIndexed())) {
 		logger.info('Genesis block is not yet indexed, skipping missing blocks job run.');
 		return;
@@ -255,6 +263,8 @@ const scheduleMissingBlocksIndexing = async () => {
 		);
 		return;
 	}
+
+	setIsScheduling(true);
 
 	const genesisHeight = await getGenesisHeight();
 	const currentHeight = await getCurrentHeight();
@@ -319,6 +329,8 @@ const scheduleMissingBlocksIndexing = async () => {
 	} catch (err) {
 		logger.warn(`Scheduling to index missing blocks failed due to: ${err.message}`);
 		logger.trace(err.stack);
+	} finally {
+		setIsScheduling(false);
 	}
 };
 
