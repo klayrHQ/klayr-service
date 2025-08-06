@@ -224,7 +224,9 @@ const indexBlock = async job => {
 	let blockToIndexFromNode;
 
 	const genesisHeight = await getGenesisHeight();
-	if (config.isBenchmarkingIndexing && blockHeightToIndex === 2) startIndexSpeedRecord();
+
+	if (config.isBenchmarkingIndexing && blockHeightToIndex > genesisHeight + 1)
+		startIndexSpeedRecord();
 
 	try {
 		const blocksTable = await getBlocksTable();
