@@ -888,7 +888,7 @@ const initBlockProcessingQueues = async () => {
 		config.queue.deleteIndexedBlocks.concurrency,
 	);
 
-	registerIndexerEventHook(indexBlocksQueue);
+	await registerIndexerEventHook(indexBlocksQueue);
 };
 
 const unregisterIndexerEvent = () => {

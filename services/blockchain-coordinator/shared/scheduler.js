@@ -209,8 +209,9 @@ const initIndexingScheduler = async () => {
 		logger.info(
 			`Skipping the check for missing blocks. ${jobCount} blocks already queued for indexing.`,
 		);
-		await requestIndexer('setIsSchedulingThroughCoordinator');
 	} else {
+		await requestIndexer('setIsSchedulingThroughCoordinator');
+
 		// Check for missing blocks
 		logger.debug('Initializing block indexing scheduler.');
 		const genesisHeight = await getGenesisHeight();
