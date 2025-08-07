@@ -7,7 +7,7 @@ const {
 } = require('klayr-service-framework');
 const { requestConnector } = require('../utils/request');
 const { getPendingIndexReady } = require('./readyIndex');
-const { MODULE, MODULE_SUB_STORE } = require('../constants');
+const { MODULE, MODULE_SUB_STORE, getGenesisHeight } = require('../constants');
 
 const tokenSummaryTableSchema = require('../database/schema/tokenSummary');
 const blocksTableSchema = require('../database/schema/blocks');
@@ -37,7 +37,14 @@ const checkBlockCounter = async block => {
 	// If frequency is 1 or 0, treat as “always flush” and skip delta math.
 	if (INDEX_SUPPLY_BLOCK_FREQUENCY <= 1) return true;
 
-	const lastIndexedSupplyHeight = (await getLastIndexedSupplyHeight()) ?? 0;
+	let lastIndexedSupplyHeight = await getLastIndexedSupplyHeight();
+
+	if (lastIndexedSupplyHeight === undefined) {
+		const genesisHeight = await getGenesisHeight();
+		await setLastIndexedSupplyHeight(genesisHeight);
+		lastIndexedSupplyHeight = genesisHeight;
+	}
+
 	if (Math.abs(block.height - lastIndexedSupplyHeight) >= INDEX_SUPPLY_BLOCK_FREQUENCY) {
 		return true;
 	}
@@ -279,6 +286,7 @@ const initIndexedSupply = async (optionalSupplyDiff = BigInt(0)) => {
 	const tokenTotalSupplyInfos = tokenTotalSupplyData[MODULE_SUB_STORE.TOKEN.SUPPLY][0];
 	await setIndexedSupply(BigInt(tokenTotalSupplyInfos.totalSupply) + optionalSupplyDiff);
 	await setIndexedSupplyTokenID(tokenTotalSupplyInfos.tokenID);
+	await setLastIndexedSupplyHeight(await getGenesisHeight());
 };
 
 const getMissingTotalSupplyDiff = async (from, to, batchSize = 10000) => {
@@ -323,6 +331,9 @@ const indexMissingTotalSupply = async ({ onBeforeSupplyAdjustment, onAfterSupply
 		lastIndexedBlock === undefined ||
 		lastIndexedBlock.height === lastIndexedSupplyHeight
 	) {
+		// update blockFrequency config for future reference
+		// setPreviousBlockFrequency needs to be executed after adjustSupplyMethod (if any missing supply found)
+		await setPreviousBlockFrequency();
 		return;
 	}
 
@@ -333,10 +344,16 @@ const indexMissingTotalSupply = async ({ onBeforeSupplyAdjustment, onAfterSupply
 	const toHeight = isBlockDeletion ? lastIndexedSupplyHeight : lastIndexedBlock.height;
 
 	// Nothing to index
-	if (fromHeight > toHeight) return;
+	if (fromHeight > toHeight) {
+		await setPreviousBlockFrequency();
+		return;
+	}
 
 	const missingSupplyDiff = await getMissingTotalSupplyDiff(fromHeight, toHeight);
-	if (missingSupplyDiff === BigInt(0)) return;
+	if (missingSupplyDiff === BigInt(0)) {
+		await setPreviousBlockFrequency();
+		return;
+	}
 
 	if (onBeforeSupplyAdjustment && typeof onBeforeSupplyAdjustment === 'function') {
 		await onBeforeSupplyAdjustment();
