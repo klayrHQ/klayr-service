@@ -1124,4 +1124,5 @@ module.exports = {
 	initBlockProcessingQueues,
 	scheduleIndexMissingTotalSupply,
 	unregisterIndexerEvent,
+	pauseIndexBlocksQueue,
 };

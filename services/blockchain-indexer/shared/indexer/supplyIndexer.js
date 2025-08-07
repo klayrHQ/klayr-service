@@ -281,14 +281,6 @@ const initIndexedSupply = async (optionalSupplyDiff = BigInt(0)) => {
 	await setIndexedSupplyTokenID(tokenTotalSupplyInfos.tokenID);
 };
 
-const registerSupplyIndexerOnTerminatedSignal = () => {
-	const supplyIndexerOnTerminatedSignalListener = async () => {
-		Signals.get('indexerStopped').remove(supplyIndexerOnTerminatedSignalListener);
-		await applySupplyDiff();
-	};
-	Signals.get('indexerStopped').add(supplyIndexerOnTerminatedSignalListener);
-};
-
 const getMissingTotalSupplyDiff = async (from, to, batchSize = 10000) => {
 	if (typeof from !== 'number')
 		throw new Error(`getMissingTotalSupply assigned from is not number`);
@@ -366,7 +358,6 @@ module.exports = {
 	getTotalSupplyFromDB,
 	applySupplyDiff,
 	getSupplyTokenID,
-	registerSupplyIndexerOnTerminatedSignal,
 	indexMissingTotalSupply,
 	getSupplyIndexerBlockFrequency,
 };

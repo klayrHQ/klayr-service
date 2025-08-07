@@ -40,6 +40,7 @@ const { initDatabase } = require('./shared/database/init');
 const { setAppContext } = require('./shared/utils/request');
 const { init } = require('./shared/init');
 const { setFeeEstimates } = require('./shared/dataService/business');
+const { onIndexerStopped } = require('./shared/indexer/utils/onIndexerStopped');
 
 const logger = Logger();
 
@@ -63,9 +64,8 @@ const defaultBrokerConfig = {
 		},
 	},
 	dependencies: ['connector'],
-	stopped() {
-		logger.debug("indexer's broker stopped() executed, dispatching 'indexerStopped' signal.");
-		Signals.get('indexerStopped').dispatch();
+	async stopped() {
+		await onIndexerStopped();
 	},
 };
 
