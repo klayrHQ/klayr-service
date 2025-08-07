@@ -314,9 +314,10 @@ const getMissingTotalSupplyDiff = async (from, to, batchSize = 10000) => {
 };
 
 const indexMissingTotalSupply = async ({ onBeforeSupplyAdjustment, onAfterSupplyAdjustment }) => {
-	const lastIndexedBlock = await getLastIndexedBlock();
-	const lastIndexedSupplyHeight = await getLastIndexedSupplyHeightFromDB();
+	const lastIndexedBlock = await getLastIndexedBlock(); // Latest available block
+	const lastIndexedSupplyHeight = await getLastIndexedSupplyHeightFromDB(); // Last height supply was updated for
 
+	// skip if lastIndexedSupplyHeight already at lastIndexedBlock.height (no missing total supply)
 	if (
 		lastIndexedSupplyHeight === undefined ||
 		lastIndexedBlock === undefined ||
@@ -325,9 +326,14 @@ const indexMissingTotalSupply = async ({ onBeforeSupplyAdjustment, onAfterSupply
 		return;
 	}
 
-	// Determine direction of indexing (forward or backward)
-	const fromHeight = Math.min(lastIndexedBlock.height, lastIndexedSupplyHeight);
-	const toHeight = Math.max(lastIndexedBlock.height, lastIndexedSupplyHeight);
+	const isBlockDeletion = lastIndexedSupplyHeight > lastIndexedBlock.height;
+
+	const fromHeight = isBlockDeletion ? lastIndexedBlock.height + 1 : lastIndexedSupplyHeight + 1; // skip already indexed
+
+	const toHeight = isBlockDeletion ? lastIndexedSupplyHeight : lastIndexedBlock.height;
+
+	// Nothing to index
+	if (fromHeight > toHeight) return;
 
 	const missingSupplyDiff = await getMissingTotalSupplyDiff(fromHeight, toHeight);
 	if (missingSupplyDiff === BigInt(0)) return;
@@ -335,8 +341,6 @@ const indexMissingTotalSupply = async ({ onBeforeSupplyAdjustment, onAfterSupply
 	if (onBeforeSupplyAdjustment && typeof onBeforeSupplyAdjustment === 'function') {
 		await onBeforeSupplyAdjustment();
 	}
-
-	const isBlockDeletion = lastIndexedSupplyHeight > lastIndexedBlock.height;
 
 	logger.info(
 		`Found missing unindexed total supply of ${missingSupplyDiff} between height ${fromHeight}-${toHeight}`,
