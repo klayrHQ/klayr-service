@@ -32,9 +32,6 @@ const { apiEndpoint, allowRefreshAfter } = config.market.sources.binance;
 const expireMiliseconds = config.ttl.binance;
 
 const symbolMap = {
-	KLY_BTC: 'KLYBTC',
-	KLY_ETH: 'KLYETH',
-
 	BTC_EUR: 'BTCEUR',
 	BTC_GBP: 'BTCGBP',
 	BTC_RUB: 'BTCRUB',

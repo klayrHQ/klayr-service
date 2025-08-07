@@ -31,7 +31,7 @@ const expireMilliseconds = config.ttl.exchangeratesapi;
 const { apiEndpoint, allowRefreshAfter } = config.market.sources.exchangeratesapi;
 
 const symbolMap = (() => {
-	// Dynamically generates a map of type '{ "LSK_USD": "LSKUSD" }' based on baseCurrencies
+	// Dynamically generates a map of type '{ "KLY_USD": "KLYUSD" }' based on baseCurrencies
 	// Consistent with other data source implementations
 	const map = {};
 	for (let i = 0; i < baseCurrencies.length; i++) {

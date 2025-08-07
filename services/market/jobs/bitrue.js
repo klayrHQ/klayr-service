@@ -19,14 +19,14 @@ const {
 } = require('klayr-service-framework');
 
 const config = require('../config');
-const { reload } = require('../shared/market/sources/kraken');
+const { reload } = require('../shared/market/sources/bitrue');
 
 const logger = Logger();
 
 const reloadMarketPrices = async () =>
 	reload().catch(err => {
 		if (err instanceof ServiceUnavailableException) {
-			logger.warn('Unable to fetch market prices from Kraken right now. Will retry later.');
+			logger.warn('Unable to fetch market prices from Bitrue right now. Will retry later.');
 			return;
 		}
 		throw err;
@@ -34,16 +34,16 @@ const reloadMarketPrices = async () =>
 
 module.exports = [
 	{
-		name: 'prices.retrieve.kraken',
-		description: 'Fetches up-to-date market prices from Kraken',
-		interval: config.job.refreshPricesKraken.interval,
-		schedule: config.job.refreshPricesKraken.schedule,
+		name: 'prices.retrieve.bitrue',
+		description: 'Fetches up-to-date market prices from Bitrue.',
+		interval: config.job.refreshPricesBitrue.interval,
+		schedule: config.job.refreshPricesBitrue.schedule,
 		init: async () => {
-			logger.debug('Initializing market prices from Kraken.');
+			logger.debug('Initializing market prices from Bitrue.');
 			await reloadMarketPrices();
 		},
 		controller: async () => {
-			logger.debug('Job scheduled to update prices from Kraken.');
+			logger.debug('Job scheduled to update prices from Bitrue.');
 			await reloadMarketPrices();
 		},
 	},

@@ -63,8 +63,10 @@ config.access_key.exchangeratesapi = process.env.EXCHANGERATESAPI_IO_API_KEY;
 config.ttl = {
 	exchangeratesapi: 24 * 60 * 60 * 1000, // milliseconds,
 	binance: 15 * 60 * 1000, // milliseconds
-	bittrex: 15 * 60 * 1000, // milliseconds
-	kraken: 15 * 60 * 1000, // milliseconds
+	coinex: 15 * 60 * 1000, // milliseconds
+	bitrue: 15 * 60 * 1000, // milliseconds
+	coinex: 15 * 60 * 1000, // milliseconds
+	probit: 15 * 60 * 1000, // milliseconds
 };
 
 /**
@@ -83,41 +85,46 @@ config.market.targetPairs =
 	process.env.SERVICE_MARKET_TARGET_PAIRS ||
 	'KLY_BTC,KLY_EUR,KLY_USD,KLY_CHF,KLY_PLN,KLY_JPY,KLY_AUD,KLY_GBP,KLY_INR,BTC_EUR,BTC_USD,BTC_CHF';
 config.market.sources = {
-	binance: {
-		apiEndpoint: 'https://api.binance.com/api/v3',
+	bitrue: {
 		allowRefreshAfter: 1 * 60 * 1000, // milliseconds
 	},
-	bittrex: {
-		apiEndpoint: 'https://api.bittrex.com/v3',
+	coinex: {
+		allowRefreshAfter: 1 * 60 * 1000, // milliseconds
+	},
+	probit: {
+		allowRefreshAfter: 1 * 60 * 1000, // milliseconds
+	},
+	binance: {
+		apiEndpoint: 'https://api.binance.com/api/v3',
 		allowRefreshAfter: 1 * 60 * 1000, // milliseconds
 	},
 	exchangeratesapi: {
 		apiEndpoint: 'http://api.exchangeratesapi.io/v1',
 		allowRefreshAfter: 8 * 60 * 60 * 1000, // milliseconds
 	},
-	kraken: {
-		apiEndpoint: 'https://api.kraken.com/0',
-		allowRefreshAfter: 1 * 60 * 1000, // milliseconds
-	},
 };
 
 config.job = {
 	// Interval takes priority over schedule and must be greater than 0 to be valid
+	refreshPricesBitrue: {
+		interval: Number(process.env.JOB_INTERVAL_REFRESH_PRICES_BITRUE) || 0,
+		schedule: process.env.JOB_SCHEDULE_REFRESH_PRICES_BITRUE || '* * * * *',
+	},
+	refreshPricesCoinex: {
+		interval: Number(process.env.JOB_INTERVAL_REFRESH_PRICES_COINEX) || 0,
+		schedule: process.env.JOB_SCHEDULE_REFRESH_PRICES_COINEX || '* * * * *',
+	},
+	refreshPricesProbit: {
+		interval: Number(process.env.JOB_INTERVAL_REFRESH_PRICES_PROBIT) || 0,
+		schedule: process.env.JOB_SCHEDULE_REFRESH_PRICES_PROBIT || '* * * * *',
+	},
 	refreshPricesBinance: {
 		interval: Number(process.env.JOB_INTERVAL_REFRESH_PRICES_BINANCE) || 0,
 		schedule: process.env.JOB_SCHEDULE_REFRESH_PRICES_BINANCE || '* * * * *',
 	},
-	refreshPricesBittrex: {
-		interval: Number(process.env.JOB_INTERVAL_REFRESH_PRICES_BITTREX) || 0,
-		schedule: process.env.JOB_SCHEDULE_REFRESH_PRICES_BITTREX || '* * * * *',
-	},
 	refreshPricesExchangeratesapi: {
 		interval: Number(process.env.JOB_INTERVAL_REFRESH_PRICES_EXCHANGERATESAPI) || 0,
 		schedule: process.env.JOB_SCHEDULE_REFRESH_PRICES_EXCHANGERATESAPI || '* * * * *',
-	},
-	refreshPricesKraken: {
-		interval: Number(process.env.JOB_INTERVAL_REFRESH_PRICES_KRAKEN) || 0,
-		schedule: process.env.JOB_SCHEDULE_REFRESH_PRICES_KRAKEN || '* * * * *',
 	},
 	updatePrices: {
 		interval: Number(process.env.JOB_INTERVAL_UPDATE_PRICES) || 5,

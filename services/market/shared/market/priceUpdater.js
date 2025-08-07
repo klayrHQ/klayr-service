@@ -20,9 +20,10 @@ const { Logger, CacheRedis } = require('klayr-service-framework');
 const config = require('../../config');
 
 const binance = require('./sources/binance');
-const bittrex = require('./sources/bittrex');
+const bitrue = require('./sources/bitrue');
+const coinex = require('./sources/coinex');
+const probit = require('./sources/probit');
 const exchangeratesapi = require('./sources/exchangeratesapi');
-const kraken = require('./sources/kraken');
 const { formatCalculatedRate } = require('../utils/priceUpdater');
 
 const pricesCache = CacheRedis('market_prices', config.endpoints.redis);
@@ -34,9 +35,10 @@ let isWarnMessageDisplayed = false;
 
 const getRawPricesBySource = async () => ({
 	binance: await binance.getFromCache(),
-	bittrex: await bittrex.getFromCache(),
+	bitrue: await bitrue.getFromCache(),
+	coinex: await coinex.getFromCache(),
+	probit: await probit.getFromCache(),
 	exchangeratesapi: await exchangeratesapi.getFromCache(),
-	kraken: await kraken.getFromCache(),
 });
 
 const calcTargetPairPrices = (rawPricesBySource, targetPairings = targetPairs) => {
@@ -50,7 +52,7 @@ const calcTargetPairPrices = (rawPricesBySource, targetPairings = targetPairs) =
 		const prices = rawPricesEntries[i][1];
 
 		// Append source name to the price code and push to sourcePrices array
-		// Eg: LSK_BTC from binance results in binance_LSK_EUR
+		// Eg: KLY_BTC from binance results in binance_LSK_EUR
 		if (Array.isArray(prices)) {
 			for (let j = 0; j < prices.length; j++) {
 				sourcePrices.push({ ...prices[j], code: `${source}_${prices[j].code}` });
@@ -92,9 +94,9 @@ const calcTargetPairPrices = (rawPricesBySource, targetPairings = targetPairs) =
 				});
 			} else {
 				// If exact match not found, check for intermediate pairs and calculate the required price
-				// Eg: LSK_EUR price can be calculated from LSK_BTC and BTC_EUR price values
+				// Eg: KLY_EUR price can be calculated from KLY_BTC and BTC_EUR price values
 
-				// intermediateTarget is BTC in binance_LSK_BTC
+				// intermediateTarget is BTC in binance_KLY_BTC
 				const [, , intermediateTarget] = rps.code.split('_');
 
 				for (let m = 0; m < rawPricesWithMatchingTarget.length; m++) {
