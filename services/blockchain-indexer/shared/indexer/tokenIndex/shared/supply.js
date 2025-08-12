@@ -18,6 +18,18 @@ const getTokenSupplyTable = () => getTableInstance(tokenSupplyTableSchema, MYSQL
 
 const supplyUpdatesMap = new Map();
 
+const getTokenSupplyByTokenID = async tokenID => {
+	const tokenSupplyTable = await getTokenSupplyTable();
+	const [data = {}] = await tokenSupplyTable.find({ tokenID, limit: 1 }, ['tokenID', 'amount']);
+	return data.amount ? BigInt(data.amount) : 0n;
+};
+
+const getTokenSupply = async () => {
+	const tokenSupplyTable = await getTokenSupplyTable();
+	const data = await tokenSupplyTable.find({}, ['tokenID', 'amount']);
+	return data;
+};
+
 const recordTokenSupplyIncrease = (tokenID, addedAmount, isBlockDeletion) => {
 	logger.debug(
 		`Recording token supply increase for tokenID: ${tokenID}, amount: ${addedAmount}, isBlockDeletion: ${isBlockDeletion}`,
@@ -97,4 +109,10 @@ const commitTokenSupplyIndex = async dbTrx => {
 	logger.debug('Committed token supply updates successfully.');
 };
 
-module.exports = { recordTokenSupplyIncrease, recordTokenSupplyDecrease, commitTokenSupplyIndex };
+module.exports = {
+	recordTokenSupplyIncrease,
+	recordTokenSupplyDecrease,
+	commitTokenSupplyIndex,
+	getTokenSupplyByTokenID,
+	getTokenSupply,
+};

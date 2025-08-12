@@ -10,7 +10,6 @@ const { indexNewBlock } = require('./blockchainIndex');
 const blocksTableSchema = require('../database/schema/blocks');
 const config = require('../../config');
 const { getPendingIndexReady, setPendingIndexIsReady } = require('./readyIndex');
-const { applySupplyDiff } = require('./supplyIndexer');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
@@ -62,9 +61,6 @@ const startIndexingPendingNewBlock = async numBlocksIndexed => {
 
 	pendingBlockToIndex.length = 0;
 	logger.info('Indexing pending blocks completed, pendingBlockToIndex successfully cleared');
-
-	// Apply supplyDiff to total supply after pending new block is indexed
-	await applySupplyDiff();
 };
 
 const indexPendingNewBlock = async block => {

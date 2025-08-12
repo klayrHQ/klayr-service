@@ -83,11 +83,6 @@ const eventTopicsTableSchema = require('../database/schema/eventTopics');
 const transactionsTableSchema = require('../database/schema/transactions');
 const validatorsTableSchema = require('../database/schema/validators');
 const { normalizeBlock } = require('../dataService/business/blocks');
-const {
-	indexTokenSupply,
-	indexMissingTotalSupply,
-	getSupplyIndexerBlockFrequency,
-} = require('./supplyIndexer');
 const { getLastIndexedBlock, setLastIndexedBlock } = require('./lastIndexedBlock');
 const { getIndexReadyStatus } = require('./readyIndex');
 const {
@@ -464,7 +459,6 @@ const indexBlock = async job => {
 					tokenIDLockedAmountChangeMap[eventData.tokenID] -= BigInt(eventData.amount);
 				}
 			}
-			// TODO: is this needed? could be deleted?
 			await updateTotalLockedAmounts(tokenIDLockedAmountChangeMap, dbTrx);
 
 			if (blockToIndexFromNode.height > genesisHeight) {
@@ -484,10 +478,6 @@ const indexBlock = async job => {
 		};
 
 		await blocksTable.upsert(blockToIndex, dbTrx);
-
-		// TODO: should this be deleted? please inspect other things that need to be deleted
-		// Index token total supply based on data from blocks
-		await indexTokenSupply(blockToIndex, dbTrx);
 
 		await commitTokenIndex(dbTrx);
 		await commitDBTransaction(dbTrx);
@@ -771,7 +761,6 @@ const deleteIndexedBlocks = async job => {
 							tokenIDLockedAmountChangeMap[eventData.tokenID] += BigInt(eventData.amount);
 						}
 					}
-					// TODO: should this be deleted?
 					await updateTotalLockedAmounts(tokenIDLockedAmountChangeMap, dbTrx);
 
 					// record token data on isBlockDeletion set to true, reversing addition/removal on token database
@@ -779,10 +768,6 @@ const deleteIndexedBlocks = async job => {
 
 					// Get addresses to schedule account balance updates from token module events
 					addressesToUpdateBalance = await getAddressesFromTokenEvents(events);
-
-					// TODO: should this be deleted?
-					// update total supply by reversing increase/decrease
-					await indexTokenSupply(blockFromJob, dbTrx, true);
 				}
 
 				// Invalidate cached events for this block. Must be done after processing all event related calculations
@@ -850,39 +835,6 @@ const deleteIndexedBlocksWrapper = async job => {
 		}
 	}
 	/* eslint-enable no-use-before-define */
-};
-
-const scheduleIndexMissingTotalSupply = async () => {
-	setTimeout(async () => {
-		// if blockFrequency is 0 or 1, it means we are indexing every block, hence we could skip this operation for optimization
-		const blockFrequency = await getSupplyIndexerBlockFrequency();
-		if ([0, 1].includes(blockFrequency)) {
-			logger.info(
-				'Skipping indexing missing total supply as blockFrequency is set to 0 or 1. (indexing every block)',
-			);
-			return;
-		}
-
-		/* eslint-disable no-use-before-define */
-		try {
-			await indexMissingTotalSupply({
-				onBeforeSupplyAdjustment: async () => {
-					if (!(await indexBlocksQueue.queue.isPaused())) {
-						await pauseIndexBlocksQueue();
-					}
-				},
-				onAfterSupplyAdjustment: async () => {
-					await resumeIndexBlocksQueue();
-				},
-			});
-		} catch (err) {
-			logger.warn(
-				`Error occurred while scheduling indexing of missing total supply: ${err.message}.`,
-			);
-			logger.debug(err.stack);
-		}
-		/* eslint-enable no-use-before-define */
-	}, 0);
 };
 
 // Initialize queues
@@ -1138,7 +1090,6 @@ module.exports = {
 	getLiveIndexingJobCount,
 	isGenesisBlockIndexed,
 	initBlockProcessingQueues,
-	scheduleIndexMissingTotalSupply,
 	unregisterIndexerEvent,
 	pauseIndexBlocksQueue,
 	resumeIndexBlocksQueue,

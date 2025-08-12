@@ -1,6 +1,5 @@
 const { Logger } = require('klayr-service-framework');
 const { pauseIndexBlocksQueue, resumeIndexBlocksQueue } = require('../blockchainIndex');
-const { applySupplyDiff } = require('../supplyIndexer');
 
 const logger = Logger();
 
@@ -10,8 +9,6 @@ const onIndexerStopped = async () => {
 	const start = Date.now();
 
 	await pauseIndexBlocksQueue();
-
-	await applySupplyDiff();
 
 	await resumeIndexBlocksQueue();
 

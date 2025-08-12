@@ -198,7 +198,6 @@ module.exports = {
 				// JOB_INTERVAL_TRIGGER_ACCOUNT_UPDATES: 0,
 				// JOB_SCHEDULE_TRIGGER_ACCOUNT_UPDATES: '*/15 * * * *',
 				// INDEX_BLOCKS_RETRY_DELAY: 1000,
-				// INDEX_SUPPLY_BLOCK_FREQUENCY: 1,
 				// INVOKE_ALLOWED_METHODS: 'dynamicReward_getExpectedValidatorRewards,token_hasUserAccount,token_getInitializationFees,interoperability_getMinimumMessageFee,txpool_getTransactionsFromPool,pos_getExpectedSharedRewards',
 			},
 		},

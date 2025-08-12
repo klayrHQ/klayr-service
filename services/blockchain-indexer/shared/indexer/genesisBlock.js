@@ -37,7 +37,6 @@ const commissionsTableSchema = require('../database/schema/commissions');
 const { getKlayr32AddressFromPublicKey } = require('../utils/account');
 const { requestConnector } = require('../utils/request');
 const { INVALID_ED25519_KEY } = require('../constants');
-const { initIndexedSupply } = require('./supplyIndexer');
 const { recordTokenGenesisAssets } = require('./tokenIndex');
 
 const logger = Logger();
@@ -121,9 +120,6 @@ const indexTokenModuleAssets = async dbTrx => {
 			tokenIDLockedAmountChangeMap[tokenID] += BigInt(lockedBalance.amount);
 		}
 	}
-
-	// Init token total supply in database
-	await initIndexedSupply();
 
 	await updateTotalLockedAmounts(tokenIDLockedAmountChangeMap, dbTrx);
 	logger.info('Finished indexing all the genesis assets from the Token module.');

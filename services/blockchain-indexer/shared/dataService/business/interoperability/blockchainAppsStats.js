@@ -31,7 +31,8 @@ const blockchainAppsTableSchema = require('../../../database/schema/blockchainAp
 const { getAnnualInflation } = require('../dynamicReward');
 const { getNetworkStatus } = require('../network');
 const { getTotalStaked } = require('../../../utils/pos');
-const { getTotalSupplyFromDB } = require('../../../indexer/supplyIndexer');
+const { getKLYTokenID } = require('./blockchainApps');
+const { getTokenSupplyByTokenID } = require('../../../indexer/tokenIndex/shared/supply');
 
 const getBlockchainAppsTable = () => getTableInstance(blockchainAppsTableSchema, MYSQL_ENDPOINT);
 
@@ -55,7 +56,8 @@ const reloadBlockchainAppsStats = async () => {
 		const numRegisteredChains = await blockchainAppsTable.count({ status: APP_STATUS.REGISTERED });
 		const numTerminatedChains = await blockchainAppsTable.count({ status: APP_STATUS.TERMINATED });
 
-		const totalSupply = await getTotalSupplyFromDB();
+		const klyTokenID = await getKLYTokenID();
+		const totalSupply = await getTokenSupplyByTokenID(klyTokenID);
 		const {
 			data: { height },
 		} = await getNetworkStatus();
