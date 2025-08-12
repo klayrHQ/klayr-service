@@ -94,6 +94,7 @@ const {
 	registerIndexerEventHook,
 	unregisterIndexerEventHook,
 } = require('./utils/indexerEventHook');
+const { recordTokenEvents, commitTokenIndex } = require('./tokenIndex');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
@@ -463,7 +464,13 @@ const indexBlock = async job => {
 					tokenIDLockedAmountChangeMap[eventData.tokenID] -= BigInt(eventData.amount);
 				}
 			}
+			// TODO: is this needed? could be deleted?
 			await updateTotalLockedAmounts(tokenIDLockedAmountChangeMap, dbTrx);
+
+			if (blockToIndexFromNode.height > genesisHeight) {
+				// record token events for: balance, locked, escrowed, and supply data
+				await recordTokenEvents(blockToIndexFromNode, events);
+			}
 
 			// Get addresses to schedule account balance updates from token module events
 			addressesToUpdateBalance = await getAddressesFromTokenEvents(events);
@@ -478,9 +485,11 @@ const indexBlock = async job => {
 
 		await blocksTable.upsert(blockToIndex, dbTrx);
 
+		// TODO: should this be deleted? please inspect other things that need to be deleted
 		// Index token total supply based on data from blocks
 		await indexTokenSupply(blockToIndex, dbTrx);
 
+		await commitTokenIndex(dbTrx);
 		await commitDBTransaction(dbTrx);
 		await setLastIndexedBlock(blockToIndex);
 
@@ -762,11 +771,16 @@ const deleteIndexedBlocks = async job => {
 							tokenIDLockedAmountChangeMap[eventData.tokenID] += BigInt(eventData.amount);
 						}
 					}
+					// TODO: should this be deleted?
 					await updateTotalLockedAmounts(tokenIDLockedAmountChangeMap, dbTrx);
+
+					// record token data on isBlockDeletion set to true, reversing addition/removal on token database
+					await recordTokenEvents(blockFromJob, events, true);
 
 					// Get addresses to schedule account balance updates from token module events
 					addressesToUpdateBalance = await getAddressesFromTokenEvents(events);
 
+					// TODO: should this be deleted?
 					// update total supply by reversing increase/decrease
 					await indexTokenSupply(blockFromJob, dbTrx, true);
 				}
@@ -778,6 +792,8 @@ const deleteIndexedBlocks = async job => {
 		);
 
 		await blocksTable.delete({ whereIn: { property: 'id', values: blockIDs } }, dbTrx);
+
+		await commitTokenIndex(dbTrx);
 		await commitDBTransaction(dbTrx);
 
 		// Add safety check to ensure that the DB transaction is actually committed

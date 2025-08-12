@@ -38,6 +38,7 @@ const { getKlayr32AddressFromPublicKey } = require('../utils/account');
 const { requestConnector } = require('../utils/request');
 const { INVALID_ED25519_KEY } = require('../constants');
 const { initIndexedSupply } = require('./supplyIndexer');
+const { recordTokenGenesisAssets } = require('./tokenIndex');
 
 const logger = Logger();
 
@@ -57,16 +58,43 @@ const indexTokenModuleAssets = async dbTrx => {
 	logger.info('Starting to index the genesis assets from the Token module.');
 	const genesisBlockAssetsLength = await requestConnector('getGenesisAssetsLength', {
 		module: MODULE.TOKEN,
-		subStore: MODULE_SUB_STORE.TOKEN.USER,
 	});
+
 	const totalUsers = genesisBlockAssetsLength[MODULE.TOKEN][MODULE_SUB_STORE.TOKEN.USER];
-	const tokenModuleData = await requestAll(
+	const totalSupplyItem = genesisBlockAssetsLength[MODULE.TOKEN][MODULE_SUB_STORE.TOKEN.SUPPLY];
+	const totalEscrowItem = genesisBlockAssetsLength[MODULE.TOKEN][MODULE_SUB_STORE.TOKEN.ESCROW];
+
+	const tokenUserModuleData = await requestAll(
 		requestConnector,
 		'getGenesisAssetByModule',
 		{ module: MODULE.TOKEN, subStore: MODULE_SUB_STORE.TOKEN.USER, limit: 1000 },
 		totalUsers,
 	);
-	const userSubStoreInfos = tokenModuleData[MODULE_SUB_STORE.TOKEN.USER];
+
+	const tokenSupplyModuleData = await requestAll(
+		requestConnector,
+		'getGenesisAssetByModule',
+		{ module: MODULE.TOKEN, subStore: MODULE_SUB_STORE.TOKEN.SUPPLY, limit: 1000 },
+		totalSupplyItem,
+	);
+
+	const tokenEscrowedModuleData = await requestAll(
+		requestConnector,
+		'getGenesisAssetByModule',
+		{ module: MODULE.TOKEN, subStore: MODULE_SUB_STORE.TOKEN.ESCROW, limit: 1000 },
+		totalEscrowItem,
+	);
+
+	const userSubStoreInfos = tokenUserModuleData[MODULE_SUB_STORE.TOKEN.USER];
+	const supplySubstoreInfos = tokenSupplyModuleData[MODULE_SUB_STORE.TOKEN.SUPPLY];
+	const escrowSubstoreInfos = tokenEscrowedModuleData[MODULE_SUB_STORE.TOKEN.ESCROW];
+
+	await recordTokenGenesisAssets({
+		userSubstore: userSubStoreInfos,
+		supplySubstore: supplySubstoreInfos,
+		escrowSubstore: escrowSubstoreInfos,
+	});
+
 	const tokenIDLockedAmountChangeMap = {};
 
 	// eslint-disable-next-line no-restricted-syntax
