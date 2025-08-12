@@ -59,8 +59,8 @@ const commitTokenEscrowedIndex = async dbTrx => {
 				`Processing escrowed balance update for chainID: ${escrowChainID}, tokenID: ${tokenID}, amount: ${amount}`,
 			);
 
-			let numRowsAffected = 0;
-			if (amount > 0n) {
+			let numRowsAffected;
+			if (amount >= 0n) {
 				logger.debug(
 					`Incrementing escrowed balance for chainID: ${escrowChainID}, tokenID: ${tokenID} by ${amount}`,
 				);
@@ -86,7 +86,7 @@ const commitTokenEscrowedIndex = async dbTrx => {
 					dbTrx,
 				);
 			}
-			if (numRowsAffected === 0) {
+			if (numRowsAffected === undefined) {
 				logger.debug(
 					`Creating new token escrowed balance entry for chainID: ${escrowChainID}, tokenID: ${tokenID} with balance: ${amount}`,
 				);

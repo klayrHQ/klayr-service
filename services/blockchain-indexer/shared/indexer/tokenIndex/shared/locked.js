@@ -54,16 +54,13 @@ const commitTokenLockedIndex = async dbTrx => {
 	await BluebirdPromise.map(
 		lockedUpdatesMap.entries(),
 		async ([key, amount]) => {
-			// only in token_locked, if amount is 0, then no need to save to database
-			if (amount === 0n) return;
-
 			const [address, tokenID, module] = key.split(':');
 			logger.trace(
 				`Processing locked balance update for account: ${address}, tokenID: ${tokenID}, module: ${module}, amount: ${amount}`,
 			);
 
-			let numRowsAffected = 0;
-			if (amount > 0n) {
+			let numRowsAffected;
+			if (amount >= 0n) {
 				logger.debug(
 					`Incrementing locked balance for account: ${address}, tokenID: ${tokenID}, module: ${module} by ${amount}`,
 				);
@@ -89,7 +86,7 @@ const commitTokenLockedIndex = async dbTrx => {
 					dbTrx,
 				);
 			}
-			if (numRowsAffected === 0) {
+			if (numRowsAffected === undefined) {
 				logger.debug(
 					`Creating new token locked balance entry for account: ${address}, tokenID: ${tokenID}, module: ${module} with balance: ${amount}`,
 				);

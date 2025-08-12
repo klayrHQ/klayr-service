@@ -59,8 +59,8 @@ const commitTokenBalanceIndex = async dbTrx => {
 				`Processing balance update for account: ${address}, tokenID: ${tokenID}, amount: ${amount}`,
 			);
 
-			let numRowsAffected = 0;
-			if (amount > 0n) {
+			let numRowsAffected;
+			if (amount >= 0n) {
 				logger.debug(
 					`Incrementing balance for account: ${address}, tokenID: ${tokenID} by ${amount}`,
 				);
@@ -84,7 +84,7 @@ const commitTokenBalanceIndex = async dbTrx => {
 					dbTrx,
 				);
 			}
-			if (numRowsAffected === 0) {
+			if (numRowsAffected === undefined) {
 				logger.debug(
 					`Creating new token balance entry for account: ${address}, tokenID: ${tokenID} with balance: ${amount}`,
 				);

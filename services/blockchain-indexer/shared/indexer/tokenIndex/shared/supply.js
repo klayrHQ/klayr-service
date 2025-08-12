@@ -56,8 +56,8 @@ const commitTokenSupplyIndex = async dbTrx => {
 		async ([tokenID, amount]) => {
 			logger.trace(`Processing supply update for tokenID: ${tokenID}, amount: ${amount}`);
 
-			let numRowsAffected = 0;
-			if (amount > 0n) {
+			let numRowsAffected;
+			if (amount >= 0n) {
 				logger.debug(`Incrementing supply for tokenID: ${tokenID} by ${amount}`);
 				numRowsAffected = await tokenSuppliesTable.increment(
 					{
@@ -77,7 +77,7 @@ const commitTokenSupplyIndex = async dbTrx => {
 					dbTrx,
 				);
 			}
-			if (numRowsAffected === 0) {
+			if (numRowsAffected === undefined) {
 				logger.debug(
 					`Creating new token supply entry for tokenID: ${tokenID} with supply: ${amount}`,
 				);
