@@ -38,12 +38,11 @@ const { requestConnector } = require('../utils/request');
 const { INVALID_ED25519_KEY } = require('../constants');
 const {
 	increaseTokenBalanceDB,
-	recordTokenBalanceAddition,
-	recordTokenTotalBalanceAddition,
+	increaseTokenTotalBalanceDB,
 } = require('./tokenIndex/shared/balances');
-const { increaseTokenLockedDB, recordTokenLocked } = require('./tokenIndex/shared/locked');
-const { increaseTokenSupplyDB, recordTokenSupplyIncrease } = require('./tokenIndex/shared/supply');
-const { increaseTokenEscrowedDB, recordTokenEscrowed } = require('./tokenIndex/shared/escrowed');
+const { increaseTokenLockedDB } = require('./tokenIndex/shared/locked');
+const { increaseTokenSupplyDB } = require('./tokenIndex/shared/supply');
+const { increaseTokenEscrowedDB } = require('./tokenIndex/shared/escrowed');
 
 const logger = Logger();
 
@@ -298,7 +297,7 @@ const interval = setInterval(async () => {
 		while (genesisTokenBalances.length) {
 			const { address, tokenID, availableBalance } = genesisTokenBalances.shift();
 			try {
-				recordTokenBalanceAddition(address, tokenID, availableBalance, false);
+				await increaseTokenBalanceDB(address, tokenID, availableBalance);
 				numBalanceEntries++;
 			} catch (err) {
 				genesisTokenBalances.push({ address, tokenID, availableBalance });
@@ -313,8 +312,8 @@ const interval = setInterval(async () => {
 		while (genesisTokenLocked.length) {
 			const { address, tokenID, module, amount } = genesisTokenLocked.shift();
 			try {
-				recordTokenLocked(address, tokenID, module, amount, false);
-				recordTokenTotalBalanceAddition(address, tokenID, amount, false);
+				await increaseTokenLockedDB(address, tokenID, module, amount);
+				await increaseTokenTotalBalanceDB(address, tokenID, amount);
 				numLockedEntries++;
 			} catch (err) {
 				genesisTokenLocked.push({ address, tokenID, module, amount });
@@ -329,7 +328,7 @@ const interval = setInterval(async () => {
 		while (genesisTokenSupply.length) {
 			const { tokenID, totalSupply } = genesisTokenSupply.shift();
 			try {
-				recordTokenSupplyIncrease(tokenID, totalSupply, false);
+				await increaseTokenSupplyDB(tokenID, totalSupply);
 				numSupplyEntries++;
 			} catch (err) {
 				genesisTokenSupply.push({ tokenID, totalSupply });
@@ -344,7 +343,7 @@ const interval = setInterval(async () => {
 		while (genesisTokenEscrowed.length) {
 			const { escrowChainID, tokenID, amount } = genesisTokenEscrowed.shift();
 			try {
-				recordTokenEscrowed(escrowChainID, tokenID, amount, false);
+				await increaseTokenEscrowedDB(escrowChainID, tokenID, amount);
 				numEscrowEntries++;
 			} catch (err) {
 				genesisTokenEscrowed.push({ escrowChainID, tokenID, amount });

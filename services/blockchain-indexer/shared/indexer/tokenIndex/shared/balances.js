@@ -40,6 +40,22 @@ const increaseTokenBalanceDB = async (address, tokenID, amount) => {
 	}
 };
 
+const increaseTokenTotalBalanceDB = async (address, tokenID, amount) => {
+	const tokenBalancesTable = await getTokenBalancesTable();
+	const numRowsAffected = await tokenBalancesTable.increment({
+		increment: { balance: amount },
+		where: { address, tokenID },
+	});
+	if (numRowsAffected === 0) {
+		await tokenBalancesTable.upsert({
+			address,
+			tokenID,
+			availableBalance: amount,
+			balance: amount,
+		});
+	}
+};
+
 const recordTokenBalanceAddition = (account, tokenID, addedBalance, isBlockDeletion) => {
 	logger.debug(
 		`Recording token balance addition for account: ${account}, tokenID: ${tokenID}, amount: ${addedBalance}, isBlockDeletion: ${isBlockDeletion}`,
@@ -215,4 +231,5 @@ module.exports = {
 	recordTokenTotalBalanceRemoval,
 	commitTokenBalanceIndex,
 	increaseTokenBalanceDB,
+	increaseTokenTotalBalanceDB,
 };
