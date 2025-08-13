@@ -119,13 +119,6 @@ config.queue = {
 	},
 };
 
-config.set = {
-	accountBalanceUpdate: {
-		name: 'AccountBalanceUpdate',
-		batchSize: Number(process.env.ACCOUNT_BALANCE_UPDATE_BATCH_SIZE) || 1000,
-	},
-};
-
 config.operations = {
 	isDataRetrievalModeEnabled: Boolean(
 		String(process.env.ENABLE_DATA_RETRIEVAL_MODE).toLowerCase() !== 'false',
@@ -207,10 +200,6 @@ config.job = {
 	triggerAccountUpdates: {
 		interval: Number(process.env.JOB_INTERVAL_TRIGGER_ACCOUNT_UPDATES) || 0,
 		schedule: process.env.JOB_SCHEDULE_TRIGGER_ACCOUNT_UPDATES || '*/15 * * * *',
-	},
-	triggerAccountBalanceUpdates: {
-		interval: Number(process.env.JOB_INTERVAL_TRIGGER_ACCOUNT_BALANCE_UPDATES) || 10,
-		schedule: process.env.JOB_SCHEDULE_TRIGGER_ACCOUNT_BALANCE_UPDATES || '',
 	},
 };
 

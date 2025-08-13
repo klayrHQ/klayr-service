@@ -18,6 +18,21 @@ const getTokenEscrowedTable = () => getTableInstance(tokenEscrowedTableSchema, M
 
 const escrowedUpdatesMap = new Map();
 
+const increaseTokenEscrowedDB = async (escrowChainID, tokenID, amount) => {
+	const tokenEscrowedTable = await getTokenEscrowedTable();
+	const numRowsAffected = await tokenEscrowedTable.increment({
+		increment: { balance: amount },
+		where: { escrowChainID, tokenID },
+	});
+	if (numRowsAffected === 0) {
+		await tokenEscrowedTable.upsert({
+			escrowChainID,
+			tokenID,
+			balance: amount,
+		});
+	}
+};
+
 const recordTokenEscrowed = (escrowChainID, tokenID, escrowedBalance, isBlockDeletion) => {
 	logger.debug(
 		`Recording token escrowed for chainID: ${escrowChainID}, tokenID: ${tokenID}, amount: ${escrowedBalance}, isBlockDeletion: ${isBlockDeletion}`,
@@ -111,4 +126,5 @@ module.exports = {
 	recordTokenEscrowed,
 	recordTokenUnescrowed,
 	commitTokenEscrowedIndex,
+	increaseTokenEscrowedDB,
 };

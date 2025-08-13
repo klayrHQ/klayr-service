@@ -179,7 +179,6 @@ module.exports = {
 				// KLAYR_STATIC: 'https://static-data.klayr.com',
 				// DEVNET_MAINCHAIN_URL: 'http://devnet-service.klayrdev.net:9901',
 				// ESTIMATES_BUFFER_BYTES_LENGTH: 0,
-				// ACCOUNT_BALANCE_UPDATE_BATCH_SIZE: 1000,
 				// INDEX_BLOCKS_QUEUE_SCHEDULED_JOB_MAX_COUNT: 100000,
 				// JOB_INTERVAL_DELETE_SERIALIZED_EVENTS: 0,
 				// JOB_SCHEDULE_DELETE_SERIALIZED_EVENTS: '*/5 * * * *',

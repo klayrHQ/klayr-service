@@ -16,39 +16,6 @@ const commitTokenControllers = [
 	commitTokenEscrowedIndex,
 ];
 
-const recordTokenGenesisAssets = async data => {
-	// Indexing userSubstore genesis asset
-	for (let i = 0; i < data.userSubstore.length; i++) {
-		const userSubstoreData = data.userSubstore[i];
-		recordTokenBalanceAddition(
-			userSubstoreData.address,
-			userSubstoreData.tokenID,
-			userSubstoreData.availableBalance,
-		);
-		for (let k = 0; k < userSubstoreData.lockedBalances.length; k++) {
-			const lockedBalance = userSubstoreData.lockedBalances[k];
-			recordTokenLocked(
-				userSubstoreData.address,
-				userSubstoreData.tokenID,
-				lockedBalance.module,
-				lockedBalance.amount,
-			);
-		}
-	}
-
-	// Indexing supplySubstore genesis asset
-	for (let i = 0; i < data.supplySubstore.length; i++) {
-		const supplyData = data.supplySubstore[i];
-		recordTokenSupplyIncrease(supplyData.tokenID, supplyData.totalSupply);
-	}
-
-	// Indexing escrowSubstore genesis asset
-	for (let i = 0; i < data.escrowSubstore.length; i++) {
-		const escrowData = data.escrowSubstore[i];
-		recordTokenEscrowed(escrowData.escrowChainID, escrowData.tokenID, escrowData.amount);
-	}
-};
-
 const recordTokenEvents = async (block, events, isBlockDeletion) => {
 	await initTokenIndexerContext(block, events);
 
@@ -71,4 +38,4 @@ const commitTokenIndex = async dbTrx => {
 	clearTokenIndexerContext();
 };
 
-module.exports = { recordTokenEvents, commitTokenIndex, recordTokenGenesisAssets };
+module.exports = { recordTokenEvents, commitTokenIndex };

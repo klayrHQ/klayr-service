@@ -30,6 +30,20 @@ const getTokenSupply = async () => {
 	return data;
 };
 
+const increaseTokenSupplyDB = async (tokenID, amount) => {
+	const tokenSuppliesTable = await getTokenSupplyTable();
+	const numRowsAffected = await tokenSuppliesTable.increment({
+		increment: { amount },
+		where: { tokenID },
+	});
+	if (numRowsAffected === 0) {
+		await tokenSuppliesTable.upsert({
+			tokenID,
+			amount,
+		});
+	}
+};
+
 const recordTokenSupplyIncrease = (tokenID, addedAmount, isBlockDeletion) => {
 	logger.debug(
 		`Recording token supply increase for tokenID: ${tokenID}, amount: ${addedAmount}, isBlockDeletion: ${isBlockDeletion}`,
@@ -115,4 +129,5 @@ module.exports = {
 	commitTokenSupplyIndex,
 	getTokenSupplyByTokenID,
 	getTokenSupply,
+	increaseTokenSupplyDB,
 };

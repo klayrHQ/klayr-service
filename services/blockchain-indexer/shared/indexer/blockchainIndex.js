@@ -62,10 +62,6 @@ const {
 	startIndexSpeedRecord,
 	increaseBlockIndexedForSpeedRecord,
 } = require('../utils/indexSpeed');
-const {
-	getAddressesFromTokenEvents,
-	scheduleAddressesBalanceUpdate,
-} = require('./accountBalanceIndex');
 
 const {
 	getFinalizedHeight,
@@ -215,7 +211,6 @@ const indexBlock = async job => {
 		throw new Error('invalid indexBlock job.data');
 
 	let blockHeightToIndex = blockHeightFromJobData || blockFromJobData.header.height;
-	let addressesToUpdateBalance = [];
 	let dbTrx;
 	let blockToIndexFromNode;
 
@@ -465,9 +460,6 @@ const indexBlock = async job => {
 				// record token events for: balance, locked, escrowed, and supply data
 				await recordTokenEvents(blockToIndexFromNode, events);
 			}
-
-			// Get addresses to schedule account balance updates from token module events
-			addressesToUpdateBalance = await getAddressesFromTokenEvents(events);
 		}
 
 		const blockToIndex = {
@@ -492,9 +484,6 @@ const indexBlock = async job => {
 			checkBlockHeightIndexStatusInDB.bind(null, blockToIndexFromNode.height, DB_STATUS.COMMIT),
 			config.db.durabilityVerifyFrequency,
 		);
-
-		// Only schedule address balance updates if the block is indexed successfully
-		await scheduleAddressesBalanceUpdate(addressesToUpdateBalance);
 
 		logger.info(
 			`Successfully indexed block ${blockToIndexFromNode.id} at height ${blockToIndexFromNode.height}.`,
@@ -600,7 +589,6 @@ const getBlocksToDelete = async blocks => {
 };
 
 const deleteIndexedBlocks = async job => {
-	let addressesToUpdateBalance = [];
 	const { blocks: blocksFromJob } = job.data;
 	const blocksToDelete = await getBlocksToDelete(blocksFromJob);
 	const blockIDs = blocksToDelete.map(b => b.id);
@@ -765,9 +753,6 @@ const deleteIndexedBlocks = async job => {
 
 					// record token data on isBlockDeletion set to true, reversing addition/removal on token database
 					await recordTokenEvents(blockFromJob, events, true);
-
-					// Get addresses to schedule account balance updates from token module events
-					addressesToUpdateBalance = await getAddressesFromTokenEvents(events);
 				}
 
 				// Invalidate cached events for this block. Must be done after processing all event related calculations
@@ -787,8 +772,6 @@ const deleteIndexedBlocks = async job => {
 			config.db.durabilityVerifyFrequency,
 		);
 
-		// Only schedule address balance updates if the block is deleted successfully
-		await scheduleAddressesBalanceUpdate(addressesToUpdateBalance);
 		logger.debug(`Committed MySQL transaction to delete block(s) with ID(s): ${blockIDs}.`);
 
 		// Pass nothing as argument, means that it will set last indexed block from db

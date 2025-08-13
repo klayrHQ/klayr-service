@@ -20,14 +20,13 @@ const {
 } = require('klayr-service-framework');
 
 const config = require('../../../../config');
-const accountBalancesTableSchema = require('../../../database/schema/accountBalances');
-const accountTableSchema = require('../../../database/schema/accounts');
+const tokenBalancesTableSchema = require('../../../database/schema/tokenBalances');
 
 const { getAccountKnowledge } = require('../../knownAccounts');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
-const getAccountBalancesTable = () => getTableInstance(accountBalancesTableSchema, MYSQL_ENDPOINT);
+const getTokenBalancesTable = () => getTableInstance(tokenBalancesTableSchema, MYSQL_ENDPOINT);
 
 const getTokenTopBalances = async params => {
 	const response = {
@@ -35,53 +34,77 @@ const getTokenTopBalances = async params => {
 		meta: {},
 	};
 
-	const accountBalancesTable = await getAccountBalancesTable();
+	const { search, tokenID, limit, offset, sort } = params;
 
-	const { search, tokenID, ...remParams } = params;
-	params = remParams;
+	const tokenBalancesTable = await getTokenBalancesTable();
 
-	params[`${accountBalancesTableSchema.tableName}.tokenID`] = tokenID;
-
-	params.leftOuterJoin = {
-		targetTable: accountTableSchema.tableName,
-		leftColumn: `${accountBalancesTableSchema.tableName}.address`,
-		rightColumn: `${accountTableSchema.tableName}.address`,
-	};
+	let dataQuery = `
+		SELECT
+			tb.address,
+			tb.balance,
+			acc.name,
+			acc.publicKey,
+			locked.lockedBalance
+		FROM
+			token_balances tb
+		LEFT JOIN
+			accounts acc ON tb.address = acc.address
+		LEFT JOIN
+			(SELECT
+				address,
+				tokenID,
+				SUM(balance) AS lockedBalance
+			FROM
+				token_locked
+			GROUP BY
+				address, tokenID
+			) AS locked ON tb.address = locked.address AND tb.tokenID = locked.tokenID
+		WHERE
+			tb.tokenID = ${tokenID}
+	`;
 
 	if (search) {
-		params.orSearch = [
-			{
-				property: `${accountTableSchema.tableName}.name`,
-				pattern: search,
-			},
-			{
-				property: `${accountTableSchema.tableName}.address`,
-				pattern: search,
-			},
-			{
-				property: `${accountTableSchema.tableName}.publicKey`,
-				pattern: search,
-			},
-		];
+		dataQuery += ` AND (tb.address LIKE '%${search}%' OR acc.name LIKE '%${search}%' OR acc.publicKey LIKE '%${search}%')`;
 	}
 
-	const tokenInfos = await accountBalancesTable.find(params, [
-		`${accountBalancesTableSchema.tableName}.balance`,
-		`${accountBalancesTableSchema.tableName}.address`,
-		`${accountTableSchema.tableName}.publicKey`,
-		`${accountTableSchema.tableName}.name`,
-	]);
+	const sortOrder = sort && sort.endsWith(':asc') ? 'ASC' : 'DESC';
+	dataQuery += ` ORDER BY (CAST(tb.balance AS SIGNED) + CAST(COALESCE(locked.lockedBalance, 0) AS SIGNED)) ${sortOrder}, acc.name ASC`;
+
+	if (limit) {
+		dataQuery += ` LIMIT ${limit}`;
+	}
+
+	if (offset) {
+		dataQuery += ` OFFSET ${offset}`;
+	}
+
+	const tokenInfosResult = await tokenBalancesTable.rawQuery(dataQuery);
+	const tokenInfos = tokenInfosResult;
+
+	// --- Count Query ---
+	let countQuery = `
+        SELECT COUNT(tb.address) AS count
+        FROM token_balances tb
+        JOIN accounts acc ON tb.address = acc.address
+        WHERE tb.tokenID = ${tokenID}
+    `;
+	if (search) {
+		countQuery += ` AND (tb.address LIKE '%${search}%' OR acc.name LIKE '%${search}%' OR acc.publicKey LIKE '%${search}%')`;
+	}
+	const totalResult = await tokenBalancesTable.rawQuery(countQuery);
+	const total = totalResult[0].count;
 
 	const filteredTokenInfos = [];
 	// eslint-disable-next-line no-restricted-syntax
 	for (const tokenInfo of tokenInfos) {
 		const knowledge = getAccountKnowledge(tokenInfo.address);
+		const totalBalance = BigInt(tokenInfo.balance) + BigInt(tokenInfo.lockedBalance || 0);
 
 		filteredTokenInfos.push({
 			address: tokenInfo.address,
 			publicKey: tokenInfo.publicKey,
 			name: tokenInfo.name,
-			balance: BigInt(tokenInfo.balance).toString(),
+			balance: totalBalance.toString(),
 			knowledge,
 		});
 	}
@@ -89,11 +112,9 @@ const getTokenTopBalances = async params => {
 	response.data[tokenID] = filteredTokenInfos;
 
 	response.meta = {
-		count: response.data[tokenID].length,
+		count: tokenInfos.length,
 		offset: params.offset,
-		total: await accountBalancesTable.count(params, [
-			`${accountBalancesTableSchema.tableName}.address`,
-		]),
+		total,
 	};
 
 	return response;

@@ -18,6 +18,22 @@ const getTokenLockedTable = () => getTableInstance(tokenLockedTableSchema, MYSQL
 
 const lockedUpdatesMap = new Map();
 
+const increaseTokenLockedDB = async (address, tokenID, module, amount) => {
+	const tokenLockedTable = await getTokenLockedTable();
+	const numRowsAffected = await tokenLockedTable.increment({
+		increment: { balance: amount },
+		where: { address, tokenID, module },
+	});
+	if (numRowsAffected === 0) {
+		await tokenLockedTable.upsert({
+			address,
+			tokenID,
+			module,
+			balance: amount,
+		});
+	}
+};
+
 const recordTokenLocked = (account, tokenID, module, amountLocked, isBlockDeletion) => {
 	logger.debug(
 		`Recording token locked balance for account: ${account}, tokenID: ${tokenID}, module: ${module}, amount: ${amountLocked}, isBlockDeletion: ${isBlockDeletion}`,
@@ -112,4 +128,5 @@ module.exports = {
 	recordTokenLocked,
 	recordTokenUnlocked,
 	commitTokenLockedIndex,
+	increaseTokenLockedDB,
 };

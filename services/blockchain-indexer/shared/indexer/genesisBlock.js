@@ -30,14 +30,16 @@ const { updateTotalLockedAmounts } = require('./utils/blockchainIndex');
 const requestAll = require('../utils/requestAll');
 const config = require('../../config');
 const accountsTableSchema = require('../database/schema/accounts');
-const accountBalancesTableSchema = require('../database/schema/accountBalances');
 const stakesTableSchema = require('../database/schema/stakes');
 const commissionsTableSchema = require('../database/schema/commissions');
 
 const { getKlayr32AddressFromPublicKey } = require('../utils/account');
 const { requestConnector } = require('../utils/request');
 const { INVALID_ED25519_KEY } = require('../constants');
-const { recordTokenGenesisAssets } = require('./tokenIndex');
+const { increaseTokenBalanceDB } = require('./tokenIndex/shared/balances');
+const { increaseTokenLockedDB } = require('./tokenIndex/shared/locked');
+const { increaseTokenSupplyDB } = require('./tokenIndex/shared/supply');
+const { increaseTokenEscrowedDB } = require('./tokenIndex/shared/escrowed');
 
 const logger = Logger();
 
@@ -45,11 +47,13 @@ const MYSQL_ENDPOINT = config.endpoints.mysql;
 
 const getStakesTable = () => getTableInstance(stakesTableSchema, MYSQL_ENDPOINT);
 const getAccountsTable = () => getTableInstance(accountsTableSchema, MYSQL_ENDPOINT);
-const getAccountBalancesTable = () => getTableInstance(accountBalancesTableSchema, MYSQL_ENDPOINT);
 const getCommissionsTable = () => getTableInstance(commissionsTableSchema, MYSQL_ENDPOINT);
 
 let intervalTimeout;
-const genesisAccountBalances = [];
+const genesisTokenBalances = [];
+const genesisTokenLocked = [];
+const genesisTokenSupply = [];
+const genesisTokenEscrowed = [];
 
 const getGenesisAssetIntervalTimeout = () => intervalTimeout;
 
@@ -88,40 +92,57 @@ const indexTokenModuleAssets = async dbTrx => {
 	const supplySubstoreInfos = tokenSupplyModuleData[MODULE_SUB_STORE.TOKEN.SUPPLY];
 	const escrowSubstoreInfos = tokenEscrowedModuleData[MODULE_SUB_STORE.TOKEN.ESCROW];
 
-	await recordTokenGenesisAssets({
-		userSubstore: userSubStoreInfos,
-		supplySubstore: supplySubstoreInfos,
-		escrowSubstore: escrowSubstoreInfos,
-	});
-
-	const tokenIDLockedAmountChangeMap = {};
+	const lockedChangeMap = {};
 
 	// eslint-disable-next-line no-restricted-syntax
-	for (const userInfo of userSubStoreInfos) {
-		const { address, tokenID, availableBalance, lockedBalances } = userInfo;
-		const totalLockedBalance = lockedBalances.reduce(
-			(acc, entry) => BigInt(acc) + BigInt(entry.amount),
-			BigInt('0'),
-		);
+	for (let i = 0; i < userSubStoreInfos.length; i++) {
+		const { address, tokenID, availableBalance, lockedBalances } = userSubStoreInfos[i];
 
-		// Add entry to index the genesis account balances
-		const accountBalanceEntry = {
+		// Add entry to index the genesis token balances
+		genesisTokenBalances.push({
 			address,
 			tokenID,
-			balance: BigInt(availableBalance) + BigInt(totalLockedBalance),
-		};
-		genesisAccountBalances.push(accountBalanceEntry);
+			amount: BigInt(availableBalance),
+		});
 
 		// eslint-disable-next-line no-restricted-syntax
-		for (const lockedBalance of userInfo.lockedBalances) {
-			if (!tokenIDLockedAmountChangeMap[tokenID]) {
-				tokenIDLockedAmountChangeMap[tokenID] = BigInt(0);
-			}
-			tokenIDLockedAmountChangeMap[tokenID] += BigInt(lockedBalance.amount);
+		for (let k = 0; k < lockedBalances.length; k++) {
+			const lockedBalance = lockedBalances[i];
+			if (!lockedChangeMap[tokenID]) lockedChangeMap[tokenID] = BigInt(0);
+			lockedChangeMap[tokenID] += BigInt(lockedBalance.amount);
+
+			// Add entry to index the genesis token locked
+			genesisTokenLocked.push({
+				address,
+				tokenID,
+				module: lockedBalance.module,
+				amount: BigInt(lockedBalance.amount),
+			});
 		}
 	}
 
-	await updateTotalLockedAmounts(tokenIDLockedAmountChangeMap, dbTrx);
+	for (let i = 0; i < supplySubstoreInfos.length; i++) {
+		const { tokenID, totalSupply } = supplySubstoreInfos[i];
+
+		// Add entry to index the genesis token supply
+		genesisTokenSupply.push({
+			tokenID,
+			amount: BigInt(totalSupply),
+		});
+	}
+
+	for (let i = 0; i < escrowSubstoreInfos.length; i++) {
+		const { escrowChainID, tokenID, amount } = escrowSubstoreInfos[i];
+
+		// Add entry to index the genesis token escrowed
+		genesisTokenEscrowed.push({
+			escrowChainID,
+			tokenID,
+			balance: BigInt(amount),
+		});
+	}
+
+	await updateTotalLockedAmounts(lockedChangeMap, dbTrx);
 	logger.info('Finished indexing all the genesis assets from the Token module.');
 };
 
@@ -249,38 +270,90 @@ const indexGenesisBlockAssets = async dbTrx => {
 	logger.info('Finished indexing all the genesis assets.');
 };
 
-let indexedGenesisAccountBalances;
+let indexedgenesisTokenBalances;
 const interval = setInterval(async () => {
 	try {
-		if (genesisAccountBalances.length) {
-			if (indexedGenesisAccountBalances === false) return;
+		if (
+			[
+				genesisTokenBalances.length,
+				genesisTokenLocked.length,
+				genesisTokenSupply.length,
+				genesisTokenEscrowed.length,
+			].some(item => item > 0)
+		) {
+			if (indexedgenesisTokenBalances === false) return;
 		} else {
-			if (indexedGenesisAccountBalances === true) clearInterval(interval);
+			if (indexedgenesisTokenBalances === true) clearInterval(interval);
 			return;
 		}
-		indexedGenesisAccountBalances = false;
+		indexedgenesisTokenBalances = false;
 
 		logger.info('Started indexing genesis account balances.');
-		let numEntries = 0;
-		const accountBalancesTable = await getAccountBalancesTable();
-		while (genesisAccountBalances.length) {
-			const accountBalanceEntry = genesisAccountBalances.shift();
-			await accountBalancesTable
-				.upsert(accountBalanceEntry)
-				.then(() => {
-					numEntries++;
-				})
-				.catch(err => {
-					numEntries--;
-					genesisAccountBalances.push(accountBalanceEntry);
-					logger.warn(
-						`Updating account balance for ${accountBalanceEntry.address} failed. Will retry.\nError: ${err.message}`,
-					);
-				});
+
+		let numBalanceEntries = 0;
+		while (genesisTokenBalances.length) {
+			const { address, tokenID, amount } = genesisTokenBalances.shift();
+			try {
+				await increaseTokenBalanceDB(address, tokenID, amount);
+				numBalanceEntries++;
+			} catch (err) {
+				genesisTokenBalances.push({ address, tokenID, amount });
+				numBalanceEntries--;
+				logger.warn(
+					`Updating token balance for ${address} failed. Will retry.\nError: ${err.message}`,
+				);
+			}
 		}
 
-		indexedGenesisAccountBalances = true;
-		logger.info(`Finished indexing genesis account balances. Added ${numEntries} entries.`);
+		let numLockedEntries = 0;
+		while (genesisTokenLocked.length) {
+			const { address, tokenID, module, amount } = genesisTokenLocked.shift();
+			try {
+				await increaseTokenLockedDB(address, tokenID, module, amount);
+				numLockedEntries++;
+			} catch (err) {
+				genesisTokenLocked.push({ address, tokenID, module, amount });
+				numLockedEntries--;
+				logger.warn(
+					`Updating token locked for ${address} failed. Will retry.\nError: ${err.message}`,
+				);
+			}
+		}
+
+		let numSupplyEntries = 0;
+		while (genesisTokenSupply.length) {
+			const { tokenID, totalSupply } = genesisTokenSupply.shift();
+			try {
+				await increaseTokenSupplyDB(tokenID, totalSupply);
+				numSupplyEntries++;
+			} catch (err) {
+				genesisTokenSupply.push({ tokenID, totalSupply });
+				numSupplyEntries--;
+				logger.warn(
+					`Updating token supply for ${tokenID} failed. Will retry.\nError: ${err.message}`,
+				);
+			}
+		}
+
+		let numEscrowEntries = 0;
+		while (genesisTokenEscrowed.length) {
+			const { escrowChainID, tokenID, amount } = genesisTokenEscrowed.shift();
+			try {
+				await increaseTokenEscrowedDB(escrowChainID, tokenID, amount);
+				numEscrowEntries++;
+			} catch (err) {
+				genesisTokenEscrowed.push({ escrowChainID, tokenID, amount });
+				numEscrowEntries--;
+				logger.warn(
+					`Updating token escrowed for ${escrowChainID} failed. Will retry.\nError: ${err.message}`,
+				);
+			}
+		}
+
+		indexedgenesisTokenBalances = true;
+		logger.info(
+			`Finished indexing genesis account balances. Added: ${numBalanceEntries} balance entries, ${numLockedEntries} locked entries, ${numSupplyEntries} supply entries, ${numEscrowEntries} escrow entries.`,
+		);
 	} catch (_) {
 		// No actions required
 	}

@@ -18,6 +18,21 @@ const getTokenBalancesTable = () => getTableInstance(tokenBalancesTableSchema, M
 
 const balancesUpdatesMap = new Map();
 
+const increaseTokenBalanceDB = async (address, tokenID, amount) => {
+	const tokenBalancesTable = await getTokenBalancesTable();
+	const numRowsAffected = await tokenBalancesTable.increment({
+		increment: { balance: amount },
+		where: { address, tokenID },
+	});
+	if (numRowsAffected === 0) {
+		await tokenBalancesTable.upsert({
+			address,
+			tokenID,
+			balance: amount,
+		});
+	}
+};
+
 const recordTokenBalanceAddition = (account, tokenID, addedBalance, isBlockDeletion) => {
 	logger.debug(
 		`Recording token balance addition for account: ${account}, tokenID: ${tokenID}, amount: ${addedBalance}, isBlockDeletion: ${isBlockDeletion}`,
@@ -105,4 +120,9 @@ const commitTokenBalanceIndex = async dbTrx => {
 	logger.debug('Committed token balance updates successfully.');
 };
 
-module.exports = { recordTokenBalanceAddition, recordTokenBalanceRemoval, commitTokenBalanceIndex };
+module.exports = {
+	recordTokenBalanceAddition,
+	recordTokenBalanceRemoval,
+	commitTokenBalanceIndex,
+	increaseTokenBalanceDB,
+};
