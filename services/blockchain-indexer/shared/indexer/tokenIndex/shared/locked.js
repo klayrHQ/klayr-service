@@ -87,11 +87,6 @@ const commitTokenLockedIndex = async dbTrx => {
 					},
 					dbTrx,
 				);
-				if (amount === 0n) {
-					console.log('numRowsAffected when amount is 0:', numRowsAffected);
-					console.log('if numRowsAffected is != 0, then no problem');
-					console.log('if numRowsAffected is 0, then there will be a problem');
-				}
 			}
 			if (amount < 0n) {
 				logger.debug(
