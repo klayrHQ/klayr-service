@@ -33,17 +33,23 @@ const getTokenSupply = async () => {
 	return data;
 };
 
-const increaseTokenSupplyDB = async (tokenID, amount) => {
+const increaseTokenSupplyDB = async (tokenID, amount, dbTrx) => {
 	const tokenSuppliesTable = await getTokenSupplyTable();
-	const numRowsAffected = await tokenSuppliesTable.increment({
-		increment: { totalSupply: amount },
-		where: { tokenID },
-	});
+	const numRowsAffected = await tokenSuppliesTable.increment(
+		{
+			increment: { totalSupply: amount },
+			where: { tokenID },
+		},
+		dbTrx,
+	);
 	if (numRowsAffected === 0) {
-		await tokenSuppliesTable.upsert({
-			tokenID,
-			totalSupply: amount,
-		});
+		await tokenSuppliesTable.upsert(
+			{
+				tokenID,
+				totalSupply: amount,
+			},
+			dbTrx,
+		);
 	}
 };
 

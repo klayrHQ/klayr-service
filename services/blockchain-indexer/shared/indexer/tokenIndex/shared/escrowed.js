@@ -18,18 +18,24 @@ const getTokenEscrowedTable = () => getTableInstance(tokenEscrowedTableSchema, M
 
 const escrowedUpdatesMap = new Map();
 
-const increaseTokenEscrowedDB = async (escrowChainID, tokenID, amount) => {
+const increaseTokenEscrowedDB = async (escrowChainID, tokenID, amount, dbTrx) => {
 	const tokenEscrowedTable = await getTokenEscrowedTable();
-	const numRowsAffected = await tokenEscrowedTable.increment({
-		increment: { amount },
-		where: { escrowChainID, tokenID },
-	});
+	const numRowsAffected = await tokenEscrowedTable.increment(
+		{
+			increment: { amount },
+			where: { escrowChainID, tokenID },
+		},
+		dbTrx,
+	);
 	if (numRowsAffected === 0) {
-		await tokenEscrowedTable.upsert({
-			escrowChainID,
-			tokenID,
-			amount,
-		});
+		await tokenEscrowedTable.upsert(
+			{
+				escrowChainID,
+				tokenID,
+				amount,
+			},
+			dbTrx,
+		);
 	}
 };
 

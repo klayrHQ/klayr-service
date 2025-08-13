@@ -17,7 +17,13 @@ const BluebirdPromise = require('bluebird');
 
 const {
 	DB: {
-		MySQL: { getTableInstance },
+		MySQL: {
+			getTableInstance,
+			getDBConnection,
+			startDBTransaction,
+			commitDBTransaction,
+			rollbackDBTransaction,
+		},
 	},
 	Logger,
 } = require('klayr-service-framework');
@@ -303,23 +309,29 @@ const interval = setInterval(async () => {
 				genesisTokenBalances.push({ address, tokenID, availableBalance });
 				numBalanceEntries--;
 				logger.warn(
-					`Updating token balance for ${address} failed. Will retry.\nError: ${err.message}`,
+					`Updating genesis token balance for ${address} failed. Will retry.\nError: ${err.message}`,
 				);
 			}
 		}
 
 		let numLockedEntries = 0;
+		const connection = await getDBConnection(MYSQL_ENDPOINT);
 		while (genesisTokenLocked.length) {
+			// since there are two db write operation, we use transaction to safely rollback later
+			const dbTrx = await startDBTransaction(connection);
+
 			const { address, tokenID, module, amount } = genesisTokenLocked.shift();
 			try {
-				await increaseTokenLockedDB(address, tokenID, module, amount);
-				await increaseTokenTotalBalanceDB(address, tokenID, amount);
+				await increaseTokenLockedDB(address, tokenID, module, amount, dbTrx);
+				await increaseTokenTotalBalanceDB(address, tokenID, amount, dbTrx);
+				await commitDBTransaction(dbTrx);
 				numLockedEntries++;
 			} catch (err) {
+				await rollbackDBTransaction(dbTrx);
 				genesisTokenLocked.push({ address, tokenID, module, amount });
 				numLockedEntries--;
 				logger.warn(
-					`Updating token locked for ${address} failed. Will retry.\nError: ${err.message}`,
+					`Updating genesis token locked for ${address} failed. Will retry.\nError: ${err.message}`,
 				);
 			}
 		}
@@ -334,7 +346,7 @@ const interval = setInterval(async () => {
 				genesisTokenSupply.push({ tokenID, totalSupply });
 				numSupplyEntries--;
 				logger.warn(
-					`Updating token supply for ${tokenID} failed. Will retry.\nError: ${err.message}`,
+					`Updating genesis token supply for ${tokenID} failed. Will retry.\nError: ${err.message}`,
 				);
 			}
 		}
@@ -349,7 +361,7 @@ const interval = setInterval(async () => {
 				genesisTokenEscrowed.push({ escrowChainID, tokenID, amount });
 				numEscrowEntries--;
 				logger.warn(
-					`Updating token escrowed for ${escrowChainID} failed. Will retry.\nError: ${err.message}`,
+					`Updating genesis token escrowed for ${escrowChainID} failed. Will retry.\nError: ${err.message}`,
 				);
 			}
 		}

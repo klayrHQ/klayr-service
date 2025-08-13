@@ -24,35 +24,47 @@ const getBalanceUpdate = key => {
 	return balanceUpdate;
 };
 
-const increaseTokenBalanceDB = async (address, tokenID, amount) => {
+const increaseTokenBalanceDB = async (address, tokenID, amount, dbTrx) => {
 	const tokenBalancesTable = await getTokenBalancesTable();
-	const numRowsAffected = await tokenBalancesTable.increment({
-		increment: { availableBalance: amount, balance: amount },
-		where: { address, tokenID },
-	});
+	const numRowsAffected = await tokenBalancesTable.increment(
+		{
+			increment: { availableBalance: amount, balance: amount },
+			where: { address, tokenID },
+		},
+		dbTrx,
+	);
 	if (numRowsAffected === 0) {
-		await tokenBalancesTable.upsert({
-			address,
-			tokenID,
-			availableBalance: amount,
-			balance: amount,
-		});
+		await tokenBalancesTable.upsert(
+			{
+				address,
+				tokenID,
+				availableBalance: amount,
+				balance: amount,
+			},
+			dbTrx,
+		);
 	}
 };
 
-const increaseTokenTotalBalanceDB = async (address, tokenID, amount) => {
+const increaseTokenTotalBalanceDB = async (address, tokenID, amount, dbTrx) => {
 	const tokenBalancesTable = await getTokenBalancesTable();
-	const numRowsAffected = await tokenBalancesTable.increment({
-		increment: { balance: amount },
-		where: { address, tokenID },
-	});
+	const numRowsAffected = await tokenBalancesTable.increment(
+		{
+			increment: { balance: amount },
+			where: { address, tokenID },
+		},
+		dbTrx,
+	);
 	if (numRowsAffected === 0) {
-		await tokenBalancesTable.upsert({
-			address,
-			tokenID,
-			availableBalance: amount,
-			balance: amount,
-		});
+		await tokenBalancesTable.upsert(
+			{
+				address,
+				tokenID,
+				availableBalance: amount,
+				balance: amount,
+			},
+			dbTrx,
+		);
 	}
 };
 
