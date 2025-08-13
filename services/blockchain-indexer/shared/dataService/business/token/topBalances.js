@@ -98,7 +98,7 @@ const getTokenTopBalances = async params => {
 	// eslint-disable-next-line no-restricted-syntax
 	for (const tokenInfo of tokenInfos) {
 		const knowledge = getAccountKnowledge(tokenInfo.address);
-		const totalBalance = BigInt(tokenInfo.balance) + BigInt(tokenInfo.lockedBalance || 0);
+		const totalBalance = BigInt(tokenInfo.availableBalance) + BigInt(tokenInfo.lockedBalance || 0);
 
 		filteredTokenInfos.push({
 			address: tokenInfo.address,
