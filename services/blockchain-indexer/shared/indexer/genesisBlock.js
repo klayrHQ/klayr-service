@@ -36,10 +36,14 @@ const commissionsTableSchema = require('../database/schema/commissions');
 const { getKlayr32AddressFromPublicKey } = require('../utils/account');
 const { requestConnector } = require('../utils/request');
 const { INVALID_ED25519_KEY } = require('../constants');
-const { increaseTokenBalanceDB } = require('./tokenIndex/shared/balances');
-const { increaseTokenLockedDB } = require('./tokenIndex/shared/locked');
-const { increaseTokenSupplyDB } = require('./tokenIndex/shared/supply');
-const { increaseTokenEscrowedDB } = require('./tokenIndex/shared/escrowed');
+const {
+	increaseTokenBalanceDB,
+	recordTokenBalanceAddition,
+	recordTokenTotalBalanceAddition,
+} = require('./tokenIndex/shared/balances');
+const { increaseTokenLockedDB, recordTokenLocked } = require('./tokenIndex/shared/locked');
+const { increaseTokenSupplyDB, recordTokenSupplyIncrease } = require('./tokenIndex/shared/supply');
+const { increaseTokenEscrowedDB, recordTokenEscrowed } = require('./tokenIndex/shared/escrowed');
 
 const logger = Logger();
 
@@ -102,12 +106,12 @@ const indexTokenModuleAssets = async dbTrx => {
 		genesisTokenBalances.push({
 			address,
 			tokenID,
-			amount: BigInt(availableBalance),
+			availableBalance: BigInt(availableBalance),
 		});
 
 		// eslint-disable-next-line no-restricted-syntax
 		for (let k = 0; k < lockedBalances.length; k++) {
-			const lockedBalance = lockedBalances[i];
+			const lockedBalance = lockedBalances[k];
 			if (!lockedChangeMap[tokenID]) lockedChangeMap[tokenID] = BigInt(0);
 			lockedChangeMap[tokenID] += BigInt(lockedBalance.amount);
 
@@ -127,7 +131,7 @@ const indexTokenModuleAssets = async dbTrx => {
 		// Add entry to index the genesis token supply
 		genesisTokenSupply.push({
 			tokenID,
-			amount: BigInt(totalSupply),
+			totalSupply: BigInt(totalSupply),
 		});
 	}
 
@@ -138,7 +142,7 @@ const indexTokenModuleAssets = async dbTrx => {
 		genesisTokenEscrowed.push({
 			escrowChainID,
 			tokenID,
-			balance: BigInt(amount),
+			amount: BigInt(amount),
 		});
 	}
 
@@ -292,12 +296,12 @@ const interval = setInterval(async () => {
 
 		let numBalanceEntries = 0;
 		while (genesisTokenBalances.length) {
-			const { address, tokenID, amount } = genesisTokenBalances.shift();
+			const { address, tokenID, availableBalance } = genesisTokenBalances.shift();
 			try {
-				await increaseTokenBalanceDB(address, tokenID, amount);
+				recordTokenBalanceAddition(address, tokenID, availableBalance, false);
 				numBalanceEntries++;
 			} catch (err) {
-				genesisTokenBalances.push({ address, tokenID, amount });
+				genesisTokenBalances.push({ address, tokenID, availableBalance });
 				numBalanceEntries--;
 				logger.warn(
 					`Updating token balance for ${address} failed. Will retry.\nError: ${err.message}`,
@@ -309,7 +313,8 @@ const interval = setInterval(async () => {
 		while (genesisTokenLocked.length) {
 			const { address, tokenID, module, amount } = genesisTokenLocked.shift();
 			try {
-				await increaseTokenLockedDB(address, tokenID, module, amount);
+				recordTokenLocked(address, tokenID, module, amount, false);
+				recordTokenTotalBalanceAddition(address, tokenID, amount, false);
 				numLockedEntries++;
 			} catch (err) {
 				genesisTokenLocked.push({ address, tokenID, module, amount });
@@ -324,7 +329,7 @@ const interval = setInterval(async () => {
 		while (genesisTokenSupply.length) {
 			const { tokenID, totalSupply } = genesisTokenSupply.shift();
 			try {
-				await increaseTokenSupplyDB(tokenID, totalSupply);
+				recordTokenSupplyIncrease(tokenID, totalSupply, false);
 				numSupplyEntries++;
 			} catch (err) {
 				genesisTokenSupply.push({ tokenID, totalSupply });
@@ -339,7 +344,7 @@ const interval = setInterval(async () => {
 		while (genesisTokenEscrowed.length) {
 			const { escrowChainID, tokenID, amount } = genesisTokenEscrowed.shift();
 			try {
-				await increaseTokenEscrowedDB(escrowChainID, tokenID, amount);
+				recordTokenEscrowed(escrowChainID, tokenID, amount, false);
 				numEscrowEntries++;
 			} catch (err) {
 				genesisTokenEscrowed.push({ escrowChainID, tokenID, amount });

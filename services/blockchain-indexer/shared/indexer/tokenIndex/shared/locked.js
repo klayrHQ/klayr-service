@@ -75,7 +75,7 @@ const commitTokenLockedIndex = async dbTrx => {
 				`Processing locked balance update for account: ${address}, tokenID: ${tokenID}, module: ${module}, amount: ${amount}`,
 			);
 
-			let numRowsAffected;
+			let numRowsAffected = 0;
 			if (amount >= 0n) {
 				logger.debug(
 					`Incrementing locked balance for account: ${address}, tokenID: ${tokenID}, module: ${module} by ${amount}`,
@@ -87,6 +87,11 @@ const commitTokenLockedIndex = async dbTrx => {
 					},
 					dbTrx,
 				);
+				if (amount === 0n) {
+					console.log('numRowsAffected when amount is 0:', numRowsAffected);
+					console.log('if numRowsAffected is != 0, then no problem');
+					console.log('if numRowsAffected is 0, then there will be a problem');
+				}
 			}
 			if (amount < 0n) {
 				logger.debug(
@@ -102,7 +107,7 @@ const commitTokenLockedIndex = async dbTrx => {
 					dbTrx,
 				);
 			}
-			if (numRowsAffected === undefined) {
+			if (numRowsAffected === 0) {
 				logger.debug(
 					`Creating new token locked balance entry for account: ${address}, tokenID: ${tokenID}, module: ${module} with balance: ${amount}`,
 				);

@@ -1,10 +1,10 @@
 const { TokenEventResult } = require('../constants');
-const { recordTokenBalanceAddition } = require('../shared/balances');
+const { recordTokenAvailableBalanceAddition } = require('../shared/balances');
 const { recordTokenUnlocked } = require('../shared/locked');
 
 const unlockController = async (event, isBlockDeletion) => {
 	if (event.data.result === TokenEventResult.SUCCESSFUL) {
-		recordTokenBalanceAddition(
+		recordTokenAvailableBalanceAddition(
 			event.data.address,
 			event.data.tokenID,
 			event.data.amount,
