@@ -4,7 +4,7 @@ module.exports = {
 	schema: {
 		address: { type: 'string', null: false },
 		tokenID: { type: 'string', null: false },
-		balance: { type: 'bigInteger', null: false, defaultValue: BigInt('0') },
+		availableBalance: { type: 'bigInteger', null: false, defaultValue: BigInt('0') },
 	},
 	indexes: {
 		address: { type: 'key' },

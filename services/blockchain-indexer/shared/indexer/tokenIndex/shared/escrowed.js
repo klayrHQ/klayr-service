@@ -21,14 +21,14 @@ const escrowedUpdatesMap = new Map();
 const increaseTokenEscrowedDB = async (escrowChainID, tokenID, amount) => {
 	const tokenEscrowedTable = await getTokenEscrowedTable();
 	const numRowsAffected = await tokenEscrowedTable.increment({
-		increment: { balance: amount },
+		increment: { amount },
 		where: { escrowChainID, tokenID },
 	});
 	if (numRowsAffected === 0) {
 		await tokenEscrowedTable.upsert({
 			escrowChainID,
 			tokenID,
-			balance: amount,
+			amount,
 		});
 	}
 };
@@ -81,7 +81,7 @@ const commitTokenEscrowedIndex = async dbTrx => {
 				);
 				numRowsAffected = await tokenEscrowedTable.increment(
 					{
-						increment: { balance: amount },
+						increment: { amount },
 						where: { escrowChainID, tokenID },
 					},
 					dbTrx,
@@ -95,7 +95,7 @@ const commitTokenEscrowedIndex = async dbTrx => {
 				);
 				numRowsAffected = await tokenEscrowedTable.decrement(
 					{
-						decrement: { balance: amount * -1n },
+						decrement: { amount: amount * -1n },
 						where: { escrowChainID, tokenID },
 					},
 					dbTrx,
@@ -109,7 +109,7 @@ const commitTokenEscrowedIndex = async dbTrx => {
 					{
 						escrowChainID,
 						tokenID,
-						balance: amount,
+						amount,
 					},
 					dbTrx,
 				);

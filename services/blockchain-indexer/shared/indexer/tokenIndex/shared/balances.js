@@ -21,14 +21,14 @@ const balancesUpdatesMap = new Map();
 const increaseTokenBalanceDB = async (address, tokenID, amount) => {
 	const tokenBalancesTable = await getTokenBalancesTable();
 	const numRowsAffected = await tokenBalancesTable.increment({
-		increment: { balance: amount },
+		increment: { availableBalance: amount },
 		where: { address, tokenID },
 	});
 	if (numRowsAffected === 0) {
 		await tokenBalancesTable.upsert({
 			address,
 			tokenID,
-			balance: amount,
+			availableBalance: amount,
 		});
 	}
 };
@@ -81,7 +81,7 @@ const commitTokenBalanceIndex = async dbTrx => {
 				);
 				numRowsAffected = await tokenBalancesTable.increment(
 					{
-						increment: { balance: amount },
+						increment: { availableBalance: amount },
 						where: { address, tokenID },
 					},
 					dbTrx,
@@ -93,7 +93,7 @@ const commitTokenBalanceIndex = async dbTrx => {
 				);
 				numRowsAffected = await tokenBalancesTable.decrement(
 					{
-						decrement: { balance: amount * -1n },
+						decrement: { availableBalance: amount * -1n },
 						where: { address, tokenID },
 					},
 					dbTrx,
@@ -107,7 +107,7 @@ const commitTokenBalanceIndex = async dbTrx => {
 					{
 						address,
 						tokenID,
-						balance: amount,
+						availableBalance: amount,
 					},
 					dbTrx,
 				);

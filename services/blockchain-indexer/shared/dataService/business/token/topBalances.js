@@ -41,7 +41,7 @@ const getTokenTopBalances = async params => {
 	let dataQuery = `
 		SELECT
 			tb.address,
-			tb.balance,
+			tb.availableBalance,
 			acc.name,
 			acc.publicKey,
 			locked.lockedBalance
@@ -68,7 +68,7 @@ const getTokenTopBalances = async params => {
 	}
 
 	const sortOrder = sort && sort.endsWith(':asc') ? 'ASC' : 'DESC';
-	dataQuery += ` ORDER BY (CAST(tb.balance AS SIGNED) + CAST(COALESCE(locked.lockedBalance, 0) AS SIGNED)) ${sortOrder}, acc.name ASC`;
+	dataQuery += ` ORDER BY (CAST(tb.availableBalance AS SIGNED) + CAST(COALESCE(locked.lockedBalance, 0) AS SIGNED)) ${sortOrder}, acc.name ASC`;
 
 	if (limit) {
 		dataQuery += ` LIMIT ${limit}`;

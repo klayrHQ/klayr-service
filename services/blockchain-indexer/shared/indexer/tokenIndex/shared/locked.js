@@ -21,7 +21,7 @@ const lockedUpdatesMap = new Map();
 const increaseTokenLockedDB = async (address, tokenID, module, amount) => {
 	const tokenLockedTable = await getTokenLockedTable();
 	const numRowsAffected = await tokenLockedTable.increment({
-		increment: { balance: amount },
+		increment: { amount },
 		where: { address, tokenID, module },
 	});
 	if (numRowsAffected === 0) {
@@ -29,7 +29,7 @@ const increaseTokenLockedDB = async (address, tokenID, module, amount) => {
 			address,
 			tokenID,
 			module,
-			balance: amount,
+			amount,
 		});
 	}
 };
@@ -82,7 +82,7 @@ const commitTokenLockedIndex = async dbTrx => {
 				);
 				numRowsAffected = await tokenLockedTable.increment(
 					{
-						increment: { balance: amount },
+						increment: { amount },
 						where: { address, tokenID, module },
 					},
 					dbTrx,
@@ -96,7 +96,7 @@ const commitTokenLockedIndex = async dbTrx => {
 				);
 				numRowsAffected = await tokenLockedTable.decrement(
 					{
-						decrement: { balance: amount * -1n },
+						decrement: { amount: amount * -1n },
 						where: { address, tokenID, module },
 					},
 					dbTrx,
@@ -111,7 +111,7 @@ const commitTokenLockedIndex = async dbTrx => {
 						address,
 						tokenID,
 						module,
-						balance: amount,
+						amount,
 					},
 					dbTrx,
 				);
