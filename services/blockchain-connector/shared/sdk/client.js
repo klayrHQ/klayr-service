@@ -541,6 +541,17 @@ const invokeEndpoint = async (endpoint, params = {}, numRetries = NUM_REQUEST_RE
 	return await coalescer.coalesce(invokeEndpointCall, endpoint, params);
 };
 
+const invokeEndpointImmediate = async (endpoint, params = {}, numRetries = NUM_REQUEST_RETRIES) => {
+	const invokeEndpointCall = async () => {
+		const node = await getLeastLoadedNode();
+		logger.trace(`invokeEndpointImmediate ${endpoint} dispatching to ${node.url}`);
+		return await invokeEndpointWrapped(node, endpoint, params, numRetries);
+	};
+
+	const coalescer = getCoalescerInstance();
+	return await coalescer.coalesce(invokeEndpointCall, endpoint, params);
+};
+
 const invokeEndpointOnSpecificNode = async (
 	url,
 	endpoint,
@@ -569,4 +580,5 @@ module.exports = {
 	invokeEndpoint,
 	getEventSubscriberNodeURL,
 	invokeEndpointOnSpecificNode,
+	invokeEndpointImmediate,
 };

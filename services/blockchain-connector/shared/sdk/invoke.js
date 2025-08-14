@@ -13,7 +13,7 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { invokeEndpoint } = require('./client');
+const { invokeEndpoint, invokeEndpointImmediate } = require('./client');
 const { formatResponse } = require('./formatter');
 
 const invokeEndpointProxy = async (endpoint, params) => {
@@ -22,6 +22,13 @@ const invokeEndpointProxy = async (endpoint, params) => {
 	return formattedResponse;
 };
 
+const invokeEndpointProxyImmediate = async (endpoint, params) => {
+	const response = await invokeEndpointImmediate(endpoint, params);
+	const formattedResponse = formatResponse(endpoint, response);
+	return formattedResponse;
+};
+
 module.exports = {
 	invokeEndpointProxy,
+	invokeEndpointProxyImmediate,
 };
