@@ -467,7 +467,7 @@ const getBlocksByIDs = async (ids, forceFromNode = false) => {
 	return response;
 };
 
-const getLastBlock = async () => {
+const getLastBlockFromNode = async () => {
 	const response = await requestConnector('getLastBlock');
 	latestBlock = await normalizeBlock(response);
 	if (latestBlock && latestBlock.id) {
@@ -559,7 +559,7 @@ const getBlocks = async params => {
 			if ('offset' in params && params.limit)
 				blocks.data = blocks.data.slice(params.offset, params.offset + params.limit);
 		} else {
-			blocks.data.push(await getLastBlock());
+			blocks.data.push(await getLastBlockFromNode());
 		}
 	} catch (err) {
 		if (!err.message.includes('does not exist')) throw err;
@@ -658,7 +658,7 @@ module.exports = {
 	getFinalizedHeight,
 	normalizeBlock,
 	normalizeBlocks,
-	getLastBlock,
+	getLastBlockFromNode,
 	getBlockByHeight,
 	getBlockByID,
 	getBlocksByIDs,
