@@ -32,6 +32,8 @@ module.exports = {
 				// --- Remember to set the properties below
 				SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
 				SERVICE_GATEWAY_REDIS_VOLATILE: 'redis://klayr:password@127.0.0.1:6379/5',
+				GATEWAY_CACHER_REDIS: 'redis://klayr:password@127.0.0.1:6379/6',
+				GATEWAY_CACHER_GLOBAL_TTL: 300,
 				ENABLE_HTTP_API: 'http-status,http-version3,http-exports',
 				ENABLE_WS_API: 'blockchain,rpc-v3',
 				GATEWAY_DEPENDENCIES: 'indexer,connector',

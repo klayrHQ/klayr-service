@@ -55,6 +55,13 @@ const defaultBrokerConfig = {
 	brokerTimeout: config.brokerTimeout, // in seconds
 	logger: config.log,
 	dependencies: config.brokerDependencies,
+	cacher: {
+		type: 'Redis',
+		options: {
+			ttl: config.cacher.globalTTL,
+			redis: { url: config.cacher.redis },
+		},
+	},
 };
 
 // Use temporary service to fetch registered sdk modules

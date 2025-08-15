@@ -116,6 +116,11 @@ config.rpcCache = {
 	enable: String(process.env.ENABLE_REQUEST_CACHING).toLowerCase() !== 'false',
 };
 
+config.cacher = {
+	globalTTL: Number(process.env.GATEWAY_CACHER_GLOBAL_TTL) || 300,
+	redis: process.env.GATEWAY_CACHER_REDIS || 'redis://klayr:password@127.0.0.1:6379/6',
+};
+
 const DEFAULT_DEPENDENCIES = 'indexer,connector';
 const { GATEWAY_DEPENDENCIES } = process.env;
 
