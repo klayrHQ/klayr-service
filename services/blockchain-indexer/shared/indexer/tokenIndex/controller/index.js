@@ -3,6 +3,7 @@ const { beforeCCMForwardingController } = require('./beforeCCMForwarding');
 const { burnController } = require('./burn');
 const { ccmTransferController } = require('./ccmTransfer');
 const { initializeTokenController } = require('./initializeToken');
+const { initializeUserAccountController } = require('./initializeUserAccount');
 const { lockController } = require('./lock');
 const { mintController } = require('./mint');
 const { recoverController } = require('./recover');
@@ -18,6 +19,7 @@ const tokenIndexController = {
 	burn: burnController,
 	ccmTransferEvent: ccmTransferController,
 	initializeToken: initializeTokenController,
+	initializeUserAccount: initializeUserAccountController, // NOTE: payFee() balance change already handled by burn()
 	lock: lockController,
 	mint: mintController,
 	recover: recoverController,
@@ -31,7 +33,6 @@ const tokenIndexController = {
 	allTokensSupportRemoved: doNothing,
 	allTokensSupported: doNothing,
 	initializeEscrowAccount: doNothing,
-	initializeUserAccount: doNothing, // NOTE: payFee() balance change already handled by burn()
 	tokenIDSupportRemoved: doNothing,
 	tokenIDSupported: doNothing,
 	commandExecutionResult: doNothing,

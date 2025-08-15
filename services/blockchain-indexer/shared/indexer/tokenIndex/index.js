@@ -1,11 +1,12 @@
 const BluebirdPromise = require('bluebird');
 
 const { tokenIndexController } = require('./controller');
-const { commitTokenBalanceIndex, recordTokenBalanceAddition } = require('./shared/balances');
-const { commitTokenLockedIndex, recordTokenLocked } = require('./shared/locked');
-const { commitTokenSupplyIndex, recordTokenSupplyIncrease } = require('./shared/supply');
-const { commitTokenEscrowedIndex, recordTokenEscrowed } = require('./shared/escrowed');
+const { commitTokenBalanceIndex } = require('./shared/balances');
+const { commitTokenLockedIndex } = require('./shared/locked');
+const { commitTokenSupplyIndex } = require('./shared/supply');
+const { commitTokenEscrowedIndex } = require('./shared/escrowed');
 const { initTokenIndexerContext, clearTokenIndexerContext } = require('./shared/context');
+const { commitAccountIndex } = require('./shared/account');
 
 const RECORD_MAX_CONCURRENCY = 16;
 
@@ -14,6 +15,7 @@ const commitTokenControllers = [
 	commitTokenLockedIndex,
 	commitTokenSupplyIndex,
 	commitTokenEscrowedIndex,
+	commitAccountIndex,
 ];
 
 const recordTokenEvents = async (block, events, isBlockDeletion) => {

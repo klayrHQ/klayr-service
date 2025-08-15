@@ -49,6 +49,7 @@ const {
 const { increaseTokenLockedDB } = require('./tokenIndex/shared/locked');
 const { increaseTokenSupplyDB } = require('./tokenIndex/shared/supply');
 const { increaseTokenEscrowedDB } = require('./tokenIndex/shared/escrowed');
+const { updateAccountInitializationDB } = require('./tokenIndex/shared/account');
 
 const logger = Logger();
 
@@ -298,14 +299,21 @@ const interval = setInterval(async () => {
 		indexedgenesisTokenBalances = false;
 
 		logger.info('Started indexing genesis account balances.');
+		const connection = await getDBConnection(MYSQL_ENDPOINT);
 
 		let numBalanceEntries = 0;
 		while (genesisTokenBalances.length) {
+			// since there are two db write operation, we use transaction to safely rollback later
+			const dbTrx = await startDBTransaction(connection);
+
 			const { address, tokenID, availableBalance } = genesisTokenBalances.shift();
 			try {
-				await increaseTokenBalanceDB(address, tokenID, availableBalance);
+				await increaseTokenBalanceDB(address, tokenID, availableBalance, dbTrx);
+				await updateAccountInitializationDB(address, tokenID, dbTrx);
+				await commitDBTransaction(dbTrx);
 				numBalanceEntries++;
 			} catch (err) {
+				await rollbackDBTransaction(dbTrx);
 				genesisTokenBalances.push({ address, tokenID, availableBalance });
 				numBalanceEntries--;
 				logger.warn(
@@ -315,7 +323,6 @@ const interval = setInterval(async () => {
 		}
 
 		let numLockedEntries = 0;
-		const connection = await getDBConnection(MYSQL_ENDPOINT);
 		while (genesisTokenLocked.length) {
 			// since there are two db write operation, we use transaction to safely rollback later
 			const dbTrx = await startDBTransaction(connection);
