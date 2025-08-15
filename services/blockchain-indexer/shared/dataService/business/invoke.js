@@ -104,7 +104,7 @@ const invokeEndpoint = async params => {
 	});
 
 	try {
-		invokeEndpointRes.data = await requestConnector('invokeEndpoint', params);
+		invokeEndpointRes.data = await requestConnector('invokeEndpointImmediate', params);
 		invokeEndpointRes.meta = params;
 	} catch (err) {
 		throw new ServiceUnavailableException(
