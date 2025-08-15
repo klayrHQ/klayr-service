@@ -16,6 +16,7 @@ const {
 	Utils,
 	CacheRedis,
 } = require('klayr-service-framework');
+const stringify = require('json-stable-stringify');
 const { checkWhitelist } = require('./util');
 const config = require('../../config');
 const { BadRequestError } = require('./errors');
@@ -185,7 +186,7 @@ module.exports = {
 				}
 				let res;
 				if (config.rpcCache.enable) {
-					const rpcRequestCacheKey = `${request.method}:${JSON.stringify(request.params)}`;
+					const rpcRequestCacheKey = `${request.method}:${stringify(request.params)}`;
 					const cachedResponse = await rpcCache.get(rpcRequestCacheKey);
 					if (cachedResponse) {
 						res = JSON.parse(cachedResponse);
