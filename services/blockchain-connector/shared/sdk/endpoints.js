@@ -128,7 +128,7 @@ const postTransaction = async transaction => {
 };
 
 const dryRunTransaction = async ({ transaction, skipVerify, strict }) => {
-	const response = await invokeEndpoint('txpool_dryRunTransaction', {
+	const response = await invokeEndpointImmediate('txpool_dryRunTransaction', {
 		transaction,
 		skipVerify,
 		strict,
