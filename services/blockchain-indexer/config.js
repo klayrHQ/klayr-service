@@ -220,4 +220,6 @@ config.invokeAllowedMethods = process.env.INVOKE_ALLOWED_METHODS
 
 config.indexBlocksRetryDelay = Number(process.env.INDEX_BLOCKS_RETRY_DELAY) || 1000;
 
+config.getGeneratorsLimit = Number(process.env.GET_GENERATORS_LIMIT) || 53;
+
 module.exports = config;
