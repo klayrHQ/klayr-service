@@ -175,6 +175,7 @@ module.exports = {
 				// SERVICE_LOG_GELF: false,
 				// SERVICE_LOG_FILE: false,
 				// DOCKER_HOST: 'local',
+				// GET_GENERATORS_LIMIT: 53,
 				// MAINCHAIN_SERVICE_URL: 'https://service.klayr.com',
 				// KLAYR_STATIC: 'https://static-data.klayr.com',
 				// DEVNET_MAINCHAIN_URL: 'http://devnet-service.klayrdev.net:9901',
