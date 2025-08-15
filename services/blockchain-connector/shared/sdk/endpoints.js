@@ -13,7 +13,7 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { invokeEndpoint } = require('./client');
+const { invokeEndpoint, invokeEndpointImmediate } = require('./client');
 const { getGenesisHeight, getGenesisBlockID, getGenesisBlock } = require('./genesisBlock');
 
 const getNetworkConnectedPeers = async () => {
@@ -123,7 +123,7 @@ const getTransactionsFromPool = async () => {
 };
 
 const postTransaction = async transaction => {
-	const response = await invokeEndpoint('txpool_postTransaction', { transaction });
+	const response = await invokeEndpointImmediate('txpool_postTransaction', { transaction });
 	return response;
 };
 
