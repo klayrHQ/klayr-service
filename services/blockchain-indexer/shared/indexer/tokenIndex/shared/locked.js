@@ -18,6 +18,13 @@ const getTokenLockedTable = () => getTableInstance(tokenLockedTableSchema, MYSQL
 
 const lockedUpdatesMap = new Map();
 
+const getLockedBalance = async (address, tokenID) => {
+	const tokenLockedTable = await getTokenLockedTable();
+	const params = tokenID ? { address, tokenID } : { address };
+	const data = await tokenLockedTable.find(params, ['address', 'tokenID', 'module', 'amount']);
+	return data;
+};
+
 const increaseTokenLockedDB = async (address, tokenID, module, amount, dbTrx) => {
 	const tokenLockedTable = await getTokenLockedTable();
 	const numRowsAffected = await tokenLockedTable.increment(
@@ -131,6 +138,7 @@ const commitTokenLockedIndex = async dbTrx => {
 };
 
 module.exports = {
+	getLockedBalance,
 	recordTokenLocked,
 	recordTokenUnlocked,
 	commitTokenLockedIndex,

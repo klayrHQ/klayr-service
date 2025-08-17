@@ -18,6 +18,8 @@ const {
 } = require('klayr-service-framework');
 
 const { requestConnector } = require('../../../utils/request');
+const { getAvailableBalance } = require('../../../indexer/tokenIndex/shared/balances');
+const { getLockedBalance } = require('../../../indexer/tokenIndex/shared/locked');
 
 const getTokenBalances = async params => {
 	const tokensInfo = [];
@@ -32,17 +34,16 @@ const getTokenBalances = async params => {
 		);
 	}
 
-	if (params.tokenID && params.address) {
-		const response = await requestConnector('getTokenBalance', {
-			address: params.address,
+	const response = await getAvailableBalance(params.address, params.tokenID);
+	for (let i = 0; i < response.length; i++) {
+		const balanceInfo = response[i];
+		const lockedBalance = await getLockedBalance(balanceInfo.address, balanceInfo.tokenID);
+		const data = {
 			tokenID: params.tokenID,
-		});
-
-		tokensInfo.push({ ...response, tokenID: params.tokenID });
-	} else {
-		const response = await requestConnector('getTokenBalances', { address: params.address });
-
-		if (response.balances) tokensInfo.push(...response.balances);
+			availableBalance: balanceInfo.availableBalance,
+			lockedBalance,
+		};
+		tokensInfo.push(data);
 	}
 
 	tokens.data =

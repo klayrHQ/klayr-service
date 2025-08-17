@@ -24,6 +24,20 @@ const getBalanceUpdate = key => {
 	return balanceUpdate;
 };
 
+const getAvailableBalance = async (address, tokenID) => {
+	const tokenBalancesTable = await getTokenBalancesTable();
+	const params = tokenID ? { address, tokenID } : { address };
+	const data = await tokenBalancesTable.find(params, ['address', 'tokenID', 'availableBalance']);
+	return data;
+};
+
+const getTotalBalance = async (address, tokenID) => {
+	const tokenBalancesTable = await getTokenBalancesTable();
+	const params = tokenID ? { address, tokenID } : { address };
+	const data = await tokenBalancesTable.find(params, ['address', 'tokenID', 'balance']);
+	return data;
+};
+
 const increaseTokenBalanceDB = async (address, tokenID, amount, dbTrx) => {
 	const tokenBalancesTable = await getTokenBalancesTable();
 	const numRowsAffected = await tokenBalancesTable.increment(
@@ -235,6 +249,8 @@ const commitTokenBalanceIndex = async dbTrx => {
 };
 
 module.exports = {
+	getAvailableBalance,
+	getTotalBalance,
 	recordTokenBalanceAddition,
 	recordTokenBalanceRemoval,
 	recordTokenAvailableBalanceAddition,
