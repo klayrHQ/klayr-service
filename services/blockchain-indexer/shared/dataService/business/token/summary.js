@@ -21,6 +21,7 @@ const {
 	PATTERN_ANY_CHAIN_TOKEN_ID,
 } = require('../../../constants');
 const { getTokenSupply } = require('../../../indexer/tokenIndex/shared/supply');
+const { getTokenEscrowed } = require('../../../indexer/tokenIndex/shared/escrowed');
 
 const getTokenSummary = async () => {
 	const summary = {
@@ -28,7 +29,7 @@ const getTokenSummary = async () => {
 		meta: {},
 	};
 
-	const { escrowedAmounts } = await requestConnector('getEscrowedAmounts');
+	const escrowedAmounts = await getTokenEscrowed();
 	const { supportedTokens: supportedTokenIDs } = await requestConnector('getSupportedTokens');
 
 	const totalSupply = await getTokenSupply();

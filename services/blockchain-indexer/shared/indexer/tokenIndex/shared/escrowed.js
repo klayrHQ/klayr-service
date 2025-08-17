@@ -18,6 +18,12 @@ const getTokenEscrowedTable = () => getTableInstance(tokenEscrowedTableSchema, M
 
 const escrowedUpdatesMap = new Map();
 
+const getTokenEscrowed = async () => {
+	const tokenEscrowedTable = await getTokenEscrowedTable();
+	const data = await tokenEscrowedTable.find({}, ['escrowChainID', 'tokenID', 'amount']);
+	return data;
+};
+
 const increaseTokenEscrowedDB = async (escrowChainID, tokenID, amount, dbTrx) => {
 	const tokenEscrowedTable = await getTokenEscrowedTable();
 	const numRowsAffected = await tokenEscrowedTable.increment(
@@ -129,6 +135,7 @@ const commitTokenEscrowedIndex = async dbTrx => {
 };
 
 module.exports = {
+	getTokenEscrowed,
 	recordTokenEscrowed,
 	recordTokenUnescrowed,
 	commitTokenEscrowedIndex,
