@@ -34,6 +34,13 @@ const getTokenAccountTable = () => getTableInstance(tokenAccountSchema, MYSQL_EN
 // The key is a string 'address:tokenID' and the value is the initialized status (boolean)
 const accountUpdatesMap = new Map();
 
+const getAccountInitialized = async (address, tokenID) => {
+	const tokenAccountTable = await getTokenAccountTable();
+	const data = await tokenAccountTable.find({ address, tokenID, limit: 1 }, ['initialized']);
+	if (data.length && data[0].initialized === true) return true;
+	return false;
+};
+
 const updateAccountInitializationDB = async (address, tokenID, dbTrx) => {
 	const tokenAccountTable = await getTokenAccountTable();
 	await tokenAccountTable.upsert(
@@ -108,6 +115,7 @@ const commitAccountIndex = async dbTrx => {
 };
 
 module.exports = {
+	getAccountInitialized,
 	updateAccountInitializationDB,
 	recordAccountInitialization,
 	recordAccountUninitialization,

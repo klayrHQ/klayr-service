@@ -13,11 +13,11 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { requestConnector } = require('../../../utils/request');
 const { getAddressByName } = require('../../utils/validator');
 
 const { getKlayr32AddressFromPublicKey } = require('../../../utils/account');
 const { getAvailableTokenIDs } = require('./availableIDs');
+const { getAccountInitialized } = require('../../../indexer/tokenIndex/shared/account');
 
 const tokenHasUserAccount = async params => {
 	const response = {
@@ -51,10 +51,7 @@ const tokenHasUserAccount = async params => {
 
 		// eslint-disable-next-line no-restricted-syntax
 		for (const tokenID of tokenIDs) {
-			const { exists: isExists } = await requestConnector('tokenHasUserAccount', {
-				address,
-				tokenID,
-			});
+			const isExists = await getAccountInitialized(address, tokenID);
 
 			if (isExists) {
 				response.data.isExists = isExists;
