@@ -17,7 +17,6 @@ const {
 	Exceptions: { InvalidParamsException },
 } = require('klayr-service-framework');
 
-const { requestConnector } = require('../../../utils/request');
 const { getAvailableBalance } = require('../../../indexer/tokenIndex/shared/balances');
 const { getLockedBalance } = require('../../../indexer/tokenIndex/shared/locked');
 
