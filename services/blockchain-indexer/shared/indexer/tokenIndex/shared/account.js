@@ -67,7 +67,7 @@ const recordAccountUninitialization = (address, tokenID, isBlockDeletion) => {
 		`Recording account uninitialization for address: ${address}, tokenID: ${tokenID}, isBlockDeletion: ${isBlockDeletion}`,
 	);
 	const key = `${address}:${tokenID}`;
-	const finalState = isBlockDeletion;
+	const finalState = !!isBlockDeletion;
 	accountUpdatesMap.set(key, finalState);
 };
 
