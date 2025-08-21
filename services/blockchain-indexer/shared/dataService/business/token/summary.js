@@ -13,8 +13,6 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { requestConnector } = require('../../../utils/request');
-
 const {
 	LENGTH_CHAIN_ID,
 	PATTERN_ANY_TOKEN_ID,
@@ -22,6 +20,7 @@ const {
 } = require('../../../constants');
 const { getTokenSupply } = require('../../../indexer/tokenIndex/shared/supply');
 const { getTokenEscrowed } = require('../../../indexer/tokenIndex/shared/escrowed');
+const { getSupportedTokens } = require('../../../indexer/tokenIndex/shared/supported');
 
 const getTokenSummary = async () => {
 	const summary = {
@@ -30,7 +29,7 @@ const getTokenSummary = async () => {
 	};
 
 	const escrowedAmounts = await getTokenEscrowed();
-	const { supportedTokens: supportedTokenIDs } = await requestConnector('getSupportedTokens');
+	const supportedTokenIDs = await getSupportedTokens();
 
 	const totalSupply = await getTokenSupply();
 
