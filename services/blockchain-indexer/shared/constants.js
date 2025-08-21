@@ -132,6 +132,7 @@ const MODULE_SUB_STORE = Object.freeze({
 		USER: 'userSubstore',
 		SUPPLY: 'supplySubstore',
 		ESCROW: 'escrowSubstore',
+		SUPPORTED: 'supportedTokensSubstore',
 	},
 	POS: {
 		STAKERS: 'stakers',

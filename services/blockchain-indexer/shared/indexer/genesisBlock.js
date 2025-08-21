@@ -50,6 +50,12 @@ const { increaseTokenLockedDB } = require('./tokenIndex/shared/locked');
 const { increaseTokenSupplyDB } = require('./tokenIndex/shared/supply');
 const { increaseTokenEscrowedDB } = require('./tokenIndex/shared/escrowed');
 const { updateAccountInitializationDB } = require('./tokenIndex/shared/account');
+const {
+	updateSupportAllTokensDB,
+	updateSupportAllTokenFromChainIDDB,
+	updateSupportTokenIDDB,
+	initSupportedTokens,
+} = require('./tokenIndex/shared/supported');
 
 const logger = Logger();
 
@@ -64,6 +70,7 @@ const genesisTokenBalances = [];
 const genesisTokenLocked = [];
 const genesisTokenSupply = [];
 const genesisTokenEscrowed = [];
+const genesisTokenSupported = [];
 
 const getGenesisAssetIntervalTimeout = () => intervalTimeout;
 
@@ -76,6 +83,8 @@ const indexTokenModuleAssets = async dbTrx => {
 	const totalUsers = genesisBlockAssetsLength[MODULE.TOKEN][MODULE_SUB_STORE.TOKEN.USER];
 	const totalSupplyItem = genesisBlockAssetsLength[MODULE.TOKEN][MODULE_SUB_STORE.TOKEN.SUPPLY];
 	const totalEscrowItem = genesisBlockAssetsLength[MODULE.TOKEN][MODULE_SUB_STORE.TOKEN.ESCROW];
+	const totalSupportedItem =
+		genesisBlockAssetsLength[MODULE.TOKEN][MODULE_SUB_STORE.TOKEN.SUPPORTED];
 
 	const tokenUserModuleData = await requestAll(
 		requestConnector,
@@ -98,9 +107,17 @@ const indexTokenModuleAssets = async dbTrx => {
 		totalEscrowItem,
 	);
 
+	const tokenSupportedModuleData = await requestAll(
+		requestConnector,
+		'getGenesisAssetByModule',
+		{ module: MODULE.TOKEN, subStore: MODULE_SUB_STORE.TOKEN.SUPPORTED, limit: 1000 },
+		totalSupportedItem,
+	);
+
 	const userSubStoreInfos = tokenUserModuleData[MODULE_SUB_STORE.TOKEN.USER];
 	const supplySubstoreInfos = tokenSupplyModuleData[MODULE_SUB_STORE.TOKEN.SUPPLY];
 	const escrowSubstoreInfos = tokenEscrowedModuleData[MODULE_SUB_STORE.TOKEN.ESCROW];
+	const supportedSubstoreInfos = tokenSupportedModuleData[MODULE_SUB_STORE.TOKEN.SUPPORTED];
 
 	const lockedChangeMap = {};
 
@@ -149,6 +166,16 @@ const indexTokenModuleAssets = async dbTrx => {
 			escrowChainID,
 			tokenID,
 			amount: BigInt(amount),
+		});
+	}
+
+	for (let i = 0; i < supportedSubstoreInfos.length; i++) {
+		const { chainID, supportedTokenIDs } = supportedSubstoreInfos[i];
+
+		// Add entry to index the genesis token supported
+		genesisTokenSupported.push({
+			chainID,
+			supportedTokenIDs,
 		});
 	}
 
@@ -289,6 +316,7 @@ const interval = setInterval(async () => {
 				genesisTokenLocked.length,
 				genesisTokenSupply.length,
 				genesisTokenEscrowed.length,
+				genesisTokenSupported.length,
 			].some(item => item > 0)
 		) {
 			if (indexedgenesisTokenBalances === false) return;
@@ -373,9 +401,73 @@ const interval = setInterval(async () => {
 			}
 		}
 
+		let numSupportedEntries = 0;
+
+		// if only one entry, and chainID is empty buffer, it means support all tokens
+		if (genesisTokenSupported.length === 1 && genesisTokenSupported[0].chainID === '') {
+			while (true) {
+				try {
+					await updateSupportAllTokensDB();
+					numSupportedEntries++;
+					break;
+				} catch (err) {
+					numSupportedEntries--;
+					logger.warn(
+						`Updating genesis token supported for all failed. Will retry.\nError: ${err.message}`,
+					);
+				}
+			}
+		} else {
+			while (genesisTokenSupported.length) {
+				const { chainID, supportedTokenIDs } = genesisTokenSupported.shift();
+				try {
+					if (supportedTokenIDs.length === 0) {
+						await updateSupportAllTokenFromChainIDDB(chainID);
+						numSupportedEntries++;
+					} else {
+						// since there are several db write operation, we use transaction to safely rollback later
+						const dbTrx = await startDBTransaction(connection);
+						try {
+							for (let i = 0; i < supportedTokenIDs.length; i++) {
+								await updateSupportTokenIDDB(supportedTokenIDs[i], dbTrx);
+							}
+							await commitDBTransaction(dbTrx);
+							numSupportedEntries += supportedTokenIDs.length;
+						} catch (err) {
+							await rollbackDBTransaction(dbTrx);
+							throw err;
+						}
+					}
+				} catch (err) {
+					genesisTokenSupported.push({ chainID, supportedTokenIDs });
+					numSupportedEntries--;
+					logger.warn(
+						`Updating genesis token supported for ${chainID} failed. Will retry.\nError: ${err.message}`,
+					);
+				}
+			}
+		}
+
+		// and then we add native chain and token to the supported token list
+		while (true) {
+			const dbTrx = await startDBTransaction(connection);
+			try {
+				await initSupportedTokens(dbTrx);
+				await commitDBTransaction(dbTrx);
+				numSupportedEntries++;
+				break;
+			} catch (err) {
+				await rollbackDBTransaction(dbTrx);
+				numSupportedEntries--;
+				logger.warn(
+					`Updating genesis token supported for native chain failed. Will retry.\nError: ${err.message}`,
+				);
+			}
+		}
+
 		indexedgenesisTokenBalances = true;
 		logger.info(
-			`Finished indexing genesis account balances. Added: ${numBalanceEntries} balance entries, ${numLockedEntries} locked entries, ${numSupplyEntries} supply entries, ${numEscrowEntries} escrow entries.`,
+			`Finished indexing genesis account balances. Added: ${numBalanceEntries} balance entries, ${numLockedEntries} locked entries, ${numSupplyEntries} supply entries, ${numEscrowEntries} escrow entries, ${numSupportedEntries} supported entries.`,
 		);
 	} catch (_) {
 		// No actions required

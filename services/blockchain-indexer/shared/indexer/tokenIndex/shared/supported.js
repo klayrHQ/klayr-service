@@ -11,7 +11,8 @@ const {
 const BluebirdPromise = require('bluebird');
 
 const config = require('../../../../config');
-const tokenSupportedTableSchema = require('../../database/schema/tokenSupported');
+const tokenSupportedTableSchema = require('../../../database/schema/tokenSupported');
+const { getCurrentChainID } = require('../../../dataService/business/interoperability/chain');
 
 const logger = Logger();
 const keyValueTable = getKeyValueTable();
@@ -24,6 +25,54 @@ const SUPPORT_ALL_TOKENS_TABLE_KEY = 'supportAllTokens';
 const supportedTokensMap = new Map();
 
 const getTokenSupportedTable = () => getTableInstance(tokenSupportedTableSchema, MYSQL_ENDPOINT);
+
+const initSupportedTokens = async dbTrx => {
+	const tokenSupportedTable = await getTokenSupportedTable();
+	const currentChainID = await getCurrentChainID();
+	await tokenSupportedTable.upsert(
+		{
+			tokenID: `${currentChainID}00000000`,
+			chainID: currentChainID,
+		},
+		dbTrx,
+	);
+	await tokenSupportedTable.upsert(
+		{
+			tokenID: `*`,
+			chainID: currentChainID,
+		},
+		dbTrx,
+	);
+};
+
+const getSupportedTokens = async () => {
+	const isSupportAllTokens = await keyValueTable.get(SUPPORT_ALL_TOKENS_TABLE_KEY);
+	if (isSupportAllTokens) return ['*'];
+
+	const supportedTokens = [];
+	const tokenSupportedTable = await getTokenSupportedTable();
+	const data = await tokenSupportedTable.find({}, ['tokenID', 'chainID']);
+	for (const row of data) {
+		if (row.chainID && row.tokenID === '*') supportedTokens.push(`${row.chainID}********`);
+		if (row.tokenID !== '*') supportedTokens.push(`${row.tokenID}`);
+	}
+
+	return supportedTokens;
+};
+
+const updateSupportAllTokensDB = async dbTrx => {
+	await keyValueTable.set(SUPPORT_ALL_TOKENS_TABLE_KEY, true, dbTrx);
+};
+
+const updateSupportTokenIDDB = async (tokenID, dbTrx) => {
+	const tokenSupportedTable = await getTokenSupportedTable();
+	await tokenSupportedTable.upsert({ tokenID, chainID: null }, dbTrx);
+};
+
+const updateSupportAllTokenFromChainIDDB = async (chainID, dbTrx) => {
+	const tokenSupportedTable = await getTokenSupportedTable();
+	await tokenSupportedTable.upsert({ tokenID: '*', chainID }, dbTrx);
+};
 
 const recordSupportAllTokens = isBlockDeletion => {
 	const key = SUPPORT_ALL_TOKENS_KEY;
@@ -147,4 +196,9 @@ module.exports = {
 	recordUnsupportAllTokenFromChainID,
 	commitSupportedTokens,
 	isTokenSupported,
+	updateSupportAllTokensDB,
+	updateSupportTokenIDDB,
+	updateSupportAllTokenFromChainIDDB,
+	getSupportedTokens,
+	initSupportedTokens,
 };
