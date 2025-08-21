@@ -343,7 +343,6 @@ const interval = setInterval(async () => {
 			} catch (err) {
 				await rollbackDBTransaction(dbTrx);
 				genesisTokenBalances.push({ address, tokenID, availableBalance });
-				numBalanceEntries--;
 				logger.warn(
 					`Updating genesis token balance for ${address} failed. Will retry.\nError: ${err.message}`,
 				);
@@ -364,7 +363,6 @@ const interval = setInterval(async () => {
 			} catch (err) {
 				await rollbackDBTransaction(dbTrx);
 				genesisTokenLocked.push({ address, tokenID, module, amount });
-				numLockedEntries--;
 				logger.warn(
 					`Updating genesis token locked for ${address} failed. Will retry.\nError: ${err.message}`,
 				);
@@ -379,7 +377,6 @@ const interval = setInterval(async () => {
 				numSupplyEntries++;
 			} catch (err) {
 				genesisTokenSupply.push({ tokenID, totalSupply });
-				numSupplyEntries--;
 				logger.warn(
 					`Updating genesis token supply for ${tokenID} failed. Will retry.\nError: ${err.message}`,
 				);
@@ -394,7 +391,6 @@ const interval = setInterval(async () => {
 				numEscrowEntries++;
 			} catch (err) {
 				genesisTokenEscrowed.push({ escrowChainID, tokenID, amount });
-				numEscrowEntries--;
 				logger.warn(
 					`Updating genesis token escrowed for ${escrowChainID} failed. Will retry.\nError: ${err.message}`,
 				);
@@ -411,7 +407,6 @@ const interval = setInterval(async () => {
 					numSupportedEntries++;
 					break;
 				} catch (err) {
-					numSupportedEntries--;
 					logger.warn(
 						`Updating genesis token supported for all failed. Will retry.\nError: ${err.message}`,
 					);
@@ -440,7 +435,6 @@ const interval = setInterval(async () => {
 					}
 				} catch (err) {
 					genesisTokenSupported.push({ chainID, supportedTokenIDs });
-					numSupportedEntries--;
 					logger.warn(
 						`Updating genesis token supported for ${chainID} failed. Will retry.\nError: ${err.message}`,
 					);
@@ -458,7 +452,6 @@ const interval = setInterval(async () => {
 				break;
 			} catch (err) {
 				await rollbackDBTransaction(dbTrx);
-				numSupportedEntries--;
 				logger.warn(
 					`Updating genesis token supported for native chain failed. Will retry.\nError: ${err.message}`,
 				);
