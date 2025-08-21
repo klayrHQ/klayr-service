@@ -53,6 +53,7 @@ const config = require('../../../config');
 const { getPosConstants } = require('./pos/constants');
 const { getInteroperabilityConstants } = require('./interoperability/constants');
 const { getFeeEstimates } = require('./feeEstimates');
+const { tokenHasEscrowAccount } = require('../../indexer/tokenIndex/shared/escrowed');
 
 const DEFAULT_MESSAGE_FEE = '10000000';
 const DEFAULT_MESSAGE_FEE_TOKEN_ID = '0000000000000000';
@@ -256,10 +257,10 @@ const calcAdditionalFees = async transaction => {
 			// Check if escrow account exists only when tokenID specified in the params is a native token
 			const currentChainID = await getCurrentChainID();
 			if (tokenID.startsWith(currentChainID)) {
-				const { exists: escrowAccountExists } = await requestConnector('tokenHasEscrowAccount', {
+				const escrowAccountExists = await tokenHasEscrowAccount(
+					transaction.params.receivingChainID,
 					tokenID,
-					escrowChainID: transaction.params.receivingChainID,
-				});
+				);
 				if (!escrowAccountExists) {
 					additionalFees.fee = {
 						escrowAccountInitializationFee: extraCommandFees.escrowAccountInitializationFee,
