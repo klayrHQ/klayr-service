@@ -1,5 +1,8 @@
-const { TokenEventResult } = require('../constants');
-const { recordTokenBalanceAddition, recordTokenBalanceRemoval } = require('../shared/balances');
+const {
+	recordTokenBalanceRemoval,
+	recordTokenBalanceAddition,
+} = require('../../../dataService/recorder/token/balances');
+const { TokenEventResult } = require('../../../dataService/recorder/token/constants');
 
 const transferController = async (event, isBlockDeletion) => {
 	if (event.data.result === TokenEventResult.SUCCESSFUL) {

@@ -32,7 +32,7 @@ const { getAnnualInflation } = require('../dynamicReward');
 const { getNetworkStatus } = require('../network');
 const { getTotalStaked } = require('../../../utils/pos');
 const { getKLYTokenID } = require('./blockchainApps');
-const { getTokenSupplyByTokenID } = require('../../../indexer/tokenIndex/shared/supply');
+const { getTokenSupplyByTokenID } = require('../../recorder/token/supply');
 
 const getBlockchainAppsTable = () => getTableInstance(blockchainAppsTableSchema, MYSQL_ENDPOINT);
 

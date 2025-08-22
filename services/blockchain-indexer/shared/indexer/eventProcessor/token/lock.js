@@ -1,6 +1,8 @@
-const { TokenEventResult } = require('../constants');
-const { recordTokenAvailableBalanceRemoval } = require('../shared/balances');
-const { recordTokenLocked } = require('../shared/locked');
+const {
+	recordTokenAvailableBalanceRemoval,
+} = require('../../../dataService/recorder/token/balances');
+const { TokenEventResult } = require('../../../dataService/recorder/token/constants');
+const { recordTokenLocked } = require('../../../dataService/recorder/token/locked');
 
 const lockController = async (event, isBlockDeletion) => {
 	if (event.data.result === TokenEventResult.SUCCESSFUL) {

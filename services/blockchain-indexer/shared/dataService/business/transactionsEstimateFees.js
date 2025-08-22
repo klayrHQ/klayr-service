@@ -53,7 +53,7 @@ const config = require('../../../config');
 const { getPosConstants } = require('./pos/constants');
 const { getInteroperabilityConstants } = require('./interoperability/constants');
 const { getFeeEstimates } = require('./feeEstimates');
-const { tokenHasEscrowAccount } = require('../../indexer/tokenIndex/shared/escrowed');
+const { tokenHasEscrowAccount } = require('../recorder/token/escrowed');
 
 const DEFAULT_MESSAGE_FEE = '10000000';
 const DEFAULT_MESSAGE_FEE_TOKEN_ID = '0000000000000000';

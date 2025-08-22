@@ -1,6 +1,6 @@
-const { TokenEventResult } = require('../constants');
-const { recordTokenBalanceRemoval } = require('../shared/balances');
-const { recordTokenSupplyDecrease } = require('../shared/supply');
+const { recordTokenBalanceRemoval } = require('../../../dataService/recorder/token/balances');
+const { TokenEventResult } = require('../../../dataService/recorder/token/constants');
+const { recordTokenSupplyDecrease } = require('../../../dataService/recorder/token/supply');
 
 const burnController = async (event, isBlockDeletion) => {
 	if (event.data.result === TokenEventResult.SUCCESSFUL) {

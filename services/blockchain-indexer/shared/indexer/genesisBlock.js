@@ -45,17 +45,17 @@ const { INVALID_ED25519_KEY } = require('../constants');
 const {
 	increaseTokenBalanceDB,
 	increaseTokenTotalBalanceDB,
-} = require('./tokenIndex/shared/balances');
-const { increaseTokenLockedDB } = require('./tokenIndex/shared/locked');
-const { increaseTokenSupplyDB } = require('./tokenIndex/shared/supply');
-const { increaseTokenEscrowedDB } = require('./tokenIndex/shared/escrowed');
-const { updateAccountInitializationDB } = require('./tokenIndex/shared/account');
+} = require('../dataService/recorder/token/balances');
+const { increaseTokenLockedDB } = require('../dataService/recorder/token/locked');
+const { increaseTokenSupplyDB } = require('../dataService/recorder/token/supply');
+const { increaseTokenEscrowedDB } = require('../dataService/recorder/token/escrowed');
+const { updateAccountInitializationDB } = require('../dataService/recorder/token/account');
 const {
 	updateSupportAllTokensDB,
 	updateSupportAllTokenFromChainIDDB,
 	updateSupportTokenIDDB,
 	initSupportedTokens,
-} = require('./tokenIndex/shared/supported');
+} = require('../dataService/recorder/token/supported');
 
 const logger = Logger();
 

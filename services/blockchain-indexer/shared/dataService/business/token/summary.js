@@ -18,9 +18,9 @@ const {
 	PATTERN_ANY_TOKEN_ID,
 	PATTERN_ANY_CHAIN_TOKEN_ID,
 } = require('../../../constants');
-const { getTokenSupply } = require('../../../indexer/tokenIndex/shared/supply');
-const { getTokenEscrowed } = require('../../../indexer/tokenIndex/shared/escrowed');
-const { getSupportedTokens } = require('../../../indexer/tokenIndex/shared/supported');
+const { getTokenEscrowed } = require('../../recorder/token/escrowed');
+const { getTokenSupply } = require('../../recorder/token/supply');
+const { getSupportedTokens } = require('../../recorder/token/supported');
 
 const getTokenSummary = async () => {
 	const summary = {

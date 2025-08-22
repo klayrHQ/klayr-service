@@ -1,6 +1,6 @@
-const { TokenEventResult } = require('../constants');
-const { recordTokenBalanceAddition } = require('../shared/balances');
-const { recordTokenUnescrowed } = require('../shared/escrowed');
+const { recordTokenBalanceAddition } = require('../../../dataService/recorder/token/balances');
+const { TokenEventResult } = require('../../../dataService/recorder/token/constants');
+const { recordTokenUnescrowed } = require('../../../dataService/recorder/token/escrowed');
 
 const recoverController = async (event, isBlockDeletion) => {
 	if (event.data.result === TokenEventResult.SUCCESSFUL) {

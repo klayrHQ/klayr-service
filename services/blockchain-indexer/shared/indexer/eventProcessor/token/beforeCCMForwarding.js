@@ -1,7 +1,13 @@
-const { TokenEventResult, CCMProcessedResult } = require('../constants');
-const { recordTokenBalanceAddition } = require('../shared/balances');
-const { getCCM, getRelayer } = require('../shared/context');
-const { recordTokenUnescrowed, recordTokenEscrowed } = require('../shared/escrowed');
+const { recordTokenBalanceAddition } = require('../../../dataService/recorder/token/balances');
+const {
+	TokenEventResult,
+	CCMProcessedResult,
+} = require('../../../dataService/recorder/token/constants');
+const { getCCM, getRelayer } = require('../../../dataService/recorder/token/context');
+const {
+	recordTokenUnescrowed,
+	recordTokenEscrowed,
+} = require('../../../dataService/recorder/token/escrowed');
 
 const beforeCCMForwardingController = async (event, isBlockDeletion) => {
 	if (event.data.result === TokenEventResult.SUCCESSFUL) {

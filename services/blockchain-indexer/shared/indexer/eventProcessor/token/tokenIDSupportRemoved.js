@@ -1,4 +1,4 @@
-const { recordUnsupportTokenID } = require('../shared/supported');
+const { recordUnsupportTokenID } = require('../../../dataService/recorder/token/supported');
 
 const tokenIDSupportRemovedController = async (event, isBlockDeletion) => {
 	recordUnsupportTokenID(event.tokenID, isBlockDeletion);

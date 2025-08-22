@@ -16,9 +16,8 @@
 const {
 	Exceptions: { InvalidParamsException },
 } = require('klayr-service-framework');
-
-const { getAvailableBalance } = require('../../../indexer/tokenIndex/shared/balances');
-const { getLockedBalance } = require('../../../indexer/tokenIndex/shared/locked');
+const { getAvailableBalance } = require('../../recorder/token/balances');
+const { getLockedBalance } = require('../../recorder/token/locked');
 
 const getTokenBalances = async params => {
 	const tokensInfo = [];

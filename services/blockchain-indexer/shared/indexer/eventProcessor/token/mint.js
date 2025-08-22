@@ -1,6 +1,6 @@
-const { TokenEventResult } = require('../constants');
-const { recordTokenBalanceAddition } = require('../shared/balances');
-const { recordTokenSupplyIncrease } = require('../shared/supply');
+const { recordTokenBalanceAddition } = require('../../../dataService/recorder/token/balances');
+const { TokenEventResult } = require('../../../dataService/recorder/token/constants');
+const { recordTokenSupplyIncrease } = require('../../../dataService/recorder/token/supply');
 
 const mintController = async (event, isBlockDeletion) => {
 	if (event.data.result === TokenEventResult.SUCCESSFUL) {

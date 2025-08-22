@@ -1,8 +1,8 @@
 const { getCurrentChainID } = require('../../../dataService/business/interoperability/chain');
-const { TokenEventResult } = require('../constants');
-const { recordTokenBalanceRemoval } = require('../shared/balances');
-const { recordTokenEscrowed } = require('../shared/escrowed');
-const { splitTokenIDString } = require('../utils/token');
+const { recordTokenBalanceRemoval } = require('../../../dataService/recorder/token/balances');
+const { TokenEventResult } = require('../../../dataService/recorder/token/constants');
+const { recordTokenEscrowed } = require('../../../dataService/recorder/token/escrowed');
+const { splitTokenIDString } = require('../../../dataService/utils/token');
 
 const transferCrossChainController = async (event, isBlockDeletion) => {
 	if (event.data.result === TokenEventResult.SUCCESSFUL) {

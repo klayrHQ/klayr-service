@@ -17,7 +17,7 @@ const { getAddressByName } = require('../../utils/validator');
 
 const { getKlayr32AddressFromPublicKey } = require('../../../utils/account');
 const { getAvailableTokenIDs } = require('./availableIDs');
-const { getAccountInitialized } = require('../../../indexer/tokenIndex/shared/account');
+const { getAccountInitialized } = require('../../recorder/token/account');
 
 const tokenHasUserAccount = async params => {
 	const response = {

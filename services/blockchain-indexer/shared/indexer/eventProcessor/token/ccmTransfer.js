@@ -1,10 +1,10 @@
 const { getCurrentChainID } = require('../../../dataService/business/interoperability/chain');
-const { TokenEventResult } = require('../constants');
-const { recordTokenBalanceAddition } = require('../shared/balances');
-const { getCCM } = require('../shared/context');
-const { getCcmIDFromCcmTransferEvent } = require('../shared/context/ccm');
-const { recordTokenUnescrowed } = require('../shared/escrowed');
-const { splitTokenIDString } = require('../utils/token');
+const { recordTokenBalanceAddition } = require('../../../dataService/recorder/token/balances');
+const { TokenEventResult } = require('../../../dataService/recorder/token/constants');
+const { getCCM } = require('../../../dataService/recorder/token/context');
+const { getCcmIDFromCcmTransferEvent } = require('../../../dataService/recorder/token/context/ccm');
+const { recordTokenUnescrowed } = require('../../../dataService/recorder/token/escrowed');
+const { splitTokenIDString } = require('../../../dataService/utils/token');
 
 const ccmTransferController = async (event, isBlockDeletion) => {
 	if (event.data.result === TokenEventResult.SUCCESSFUL) {

@@ -28,7 +28,7 @@ const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
 const blockchainAppsTableSchema = require('../../../database/schema/blockchainApps');
 const { getMainchainID } = require('./mainchain');
-const { getTokenEscrowed } = require('../../../indexer/tokenIndex/shared/escrowed');
+const { getTokenEscrowed } = require('../../recorder/token/escrowed');
 
 const getBlockchainAppsTable = () => getTableInstance(blockchainAppsTableSchema, MYSQL_ENDPOINT);
 

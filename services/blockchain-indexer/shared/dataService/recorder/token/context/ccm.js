@@ -1,7 +1,7 @@
 const { codec } = require('@klayr/codec');
 const { utils } = require('@klayr/cryptography');
 
-const { CCMSchemaConstants } = require('../../constants/ccm');
+const { CCMSchemaConstants } = require('../constants/ccm');
 const { address } = require('@klayr/cryptography');
 
 const ccmSchema = {

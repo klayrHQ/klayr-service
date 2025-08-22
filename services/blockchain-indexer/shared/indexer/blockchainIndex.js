@@ -85,7 +85,7 @@ const {
 	registerIndexerEventHook,
 	unregisterIndexerEventHook,
 } = require('./utils/indexerEventHook');
-const { recordTokenEvents, commitTokenIndex } = require('./tokenIndex');
+const { recordEvents, commitEvent } = require('./eventProcessor');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
@@ -458,7 +458,7 @@ const indexBlock = async job => {
 
 			if (blockToIndexFromNode.height > genesisHeight) {
 				// record token events for: balance, locked, escrowed, and supply data
-				await recordTokenEvents(blockToIndexFromNode, events);
+				await recordEvents(blockToIndexFromNode, events);
 			}
 		}
 
@@ -471,7 +471,7 @@ const indexBlock = async job => {
 
 		await blocksTable.upsert(blockToIndex, dbTrx);
 
-		await commitTokenIndex(dbTrx);
+		await commitEvent(dbTrx);
 		await commitDBTransaction(dbTrx);
 		await setLastIndexedBlock(blockToIndex);
 
@@ -752,7 +752,7 @@ const deleteIndexedBlocks = async job => {
 					await updateTotalLockedAmounts(tokenIDLockedAmountChangeMap, dbTrx);
 
 					// record token data on isBlockDeletion set to true, reversing addition/removal on token database
-					await recordTokenEvents(blockFromJob, events, true);
+					await recordEvents(blockFromJob, events, true);
 				}
 
 				// Invalidate cached events for this block. Must be done after processing all event related calculations
@@ -763,7 +763,7 @@ const deleteIndexedBlocks = async job => {
 
 		await blocksTable.delete({ whereIn: { property: 'id', values: blockIDs } }, dbTrx);
 
-		await commitTokenIndex(dbTrx);
+		await commitEvent(dbTrx);
 		await commitDBTransaction(dbTrx);
 
 		// Add safety check to ensure that the DB transaction is actually committed
