@@ -15,7 +15,7 @@
  */
 const { getIndexedAccountInfo } = require('../../utils/account');
 const { parseToJSONCompatObj } = require('../../../utils/parser');
-const { requestConnector } = require('../../../utils/request');
+const { getAuthAccount } = require('../../recorder/auth/account');
 
 const getAuthAccountInfo = async params => {
 	const authInfo = {
@@ -23,7 +23,7 @@ const getAuthAccountInfo = async params => {
 		meta: {},
 	};
 
-	const response = await requestConnector('getAuthAccount', { address: params.address });
+	const response = await getAuthAccount(params.address);
 	authInfo.data = parseToJSONCompatObj(response);
 
 	const accountInfo = await getIndexedAccountInfo({ address: params.address, limit: 1 }, [

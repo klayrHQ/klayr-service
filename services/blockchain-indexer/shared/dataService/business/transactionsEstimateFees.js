@@ -54,6 +54,7 @@ const { getPosConstants } = require('./pos/constants');
 const { getInteroperabilityConstants } = require('./interoperability/constants');
 const { getFeeEstimates } = require('./feeEstimates');
 const { tokenHasEscrowAccount } = require('../recorder/token/escrowed');
+const { getAuthAccount } = require('../recorder/auth/account');
 
 const DEFAULT_MESSAGE_FEE = '10000000';
 const DEFAULT_MESSAGE_FEE_TOKEN_ID = '0000000000000000';
@@ -146,7 +147,7 @@ const mockTransaction = async (_transaction, numberOfSignatures) => {
 
 const getNumberOfSignatures = async address => {
 	try {
-		const authAccountInfo = await requestConnector('getAuthAccount', { address });
+		const authAccountInfo = await getAuthAccount(address);
 		const numberOfSignatures =
 			authAccountInfo.mandatoryKeys.length + authAccountInfo.optionalKeys.length ||
 			DEFAULT_NUM_OF_SIGNATURES;

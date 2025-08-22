@@ -138,6 +138,9 @@ const MODULE_SUB_STORE = Object.freeze({
 		STAKERS: 'stakers',
 		VALIDATORS: 'validators',
 	},
+	AUTH: {
+		DATA: 'authDataSubstore',
+	},
 });
 
 const COMMAND = Object.freeze({
