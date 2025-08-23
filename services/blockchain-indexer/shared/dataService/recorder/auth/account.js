@@ -29,6 +29,7 @@ const getAuthAccount = async address => {
 	]);
 	if (data.length) {
 		const account = data[0];
+		account.nonce = BigInt(account.nonce);
 		if (account.mandatoryKeys) {
 			account.mandatoryKeys = JSON.parse(account.mandatoryKeys);
 		}
@@ -37,12 +38,33 @@ const getAuthAccount = async address => {
 		}
 		return account;
 	}
-	return undefined;
+
+	// return default auth account data
+	return {
+		nonce: BigInt(0),
+		numberOfSignatures: 0,
+		mandatoryKeys: [],
+		optionalKeys: [],
+	};
 };
 
-const updateAuthAccountDB = (authAccountData, dbTrx) => {
+const updateAuthAccountDB = async (authAccountData, dbTrx) => {
 	const authTable = getAuthTable();
-	return authTable.upsert(authAccountData, dbTrx);
+	return await authTable.upsert(authAccountData, dbTrx);
+};
+
+const recordNonceIncrease = async (address, isBlockDeletion) => {
+	logger.debug(
+		`Recording nonce increase for address: ${address}, isBlockDeletion: ${isBlockDeletion}`,
+	);
+	let account = authUpdatesMap.get(address);
+	if (account && account.nonce === undefined) account.none = BigInt(0);
+	if (!account) account = await getAuthAccount(address);
+
+	if (isBlockDeletion) account.nonce -= BigInt(1);
+	else account.nonce += BigInt(1);
+
+	authUpdatesMap.set(address, account);
 };
 
 const recordAuthAccount = (address, account, isBlockDeletion) => {
@@ -90,6 +112,7 @@ const commitAuthAccount = async dbTrx => {
 };
 
 module.exports = {
+	recordNonceIncrease,
 	recordAuthAccount,
 	getAuthAccount,
 	commitAuthAccount,

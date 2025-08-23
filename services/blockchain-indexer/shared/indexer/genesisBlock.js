@@ -57,7 +57,6 @@ const {
 	initSupportedTokens,
 } = require('../dataService/recorder/token/supported');
 const { updateAuthAccountDB } = require('../dataService/recorder/auth/account');
-const auth = require('../database/schema/auth');
 
 const logger = Logger();
 

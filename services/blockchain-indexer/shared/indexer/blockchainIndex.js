@@ -86,6 +86,7 @@ const {
 	unregisterIndexerEventHook,
 } = require('./utils/indexerEventHook');
 const { recordEvents, commitEvent } = require('./eventProcessor');
+const { recordNonceIncrease } = require('../dataService/recorder/auth/account');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
@@ -345,6 +346,10 @@ const indexBlock = async job => {
 					// Store address -> publicKey mapping
 					indexAccountPublicKey(tx.senderPublicKey);
 
+					// Record increase nonce stored in database, which later will be committed through commitEvent()
+					await recordNonceIncrease(tx.senderAddress);
+
+					// store complete transaction data in database
 					await transactionsTable.upsert(tx, dbTrx);
 
 					// Invoke 'applyTransaction' to execute command specific processing logic
@@ -625,7 +630,12 @@ const deleteIndexedBlocks = async job => {
 					// Invoke 'revertTransaction' to execute command specific reverting logic
 					await BluebirdPromise.map(
 						forkedTransactions,
-						async tx => revertTransaction(blockHeader, tx, events, dbTrx),
+						async tx => {
+							// Record decrease nonce stored in database, which later will be committed through commitEvent()
+							await recordNonceIncrease(tx.senderAddress, true);
+
+							revertTransaction(blockHeader, tx, events, dbTrx);
+						},
 						{ concurrency: 1 },
 					);
 				}
