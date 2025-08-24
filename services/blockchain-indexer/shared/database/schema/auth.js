@@ -4,7 +4,7 @@ module.exports = {
 	schema: {
 		address: { type: 'string', null: false },
 		nonce: { type: 'bigInteger', null: false, defaultValue: BigInt('0') },
-		numberOfSignatures: { type: 'number', null: false },
+		numberOfSignatures: { type: 'integer', null: false },
 		mandatoryKeys: { type: 'json' },
 		optionalKeys: { type: 'json' },
 	},
