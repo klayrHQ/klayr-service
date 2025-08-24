@@ -1,79 +1,40 @@
-/*
- * Klayrhq/klayrservice
- * Copyright © 2023 Lisk Foundation
- *
- * See the LICENSE file at the top-level directory of this distribution
- * for licensing information.
- *
- * Unless otherwise agreed in a custom licensing agreement with the Lisk Foundation,
- * no part of this software, including this file, may be copied, modified,
- * propagated, or distributed except according to the terms contained in the
- * LICENSE file.
- *
- * Removal or modification of this copyright notice is prohibited.
- *
- */
-const BluebirdPromise = require('bluebird');
-
 const {
 	DB: {
-		MySQL: {
-			getTableInstance,
-			getDBConnection,
-			startDBTransaction,
-			commitDBTransaction,
-			rollbackDBTransaction,
-		},
+		MySQL: { getDBConnection, startDBTransaction, commitDBTransaction, rollbackDBTransaction },
 	},
 	Logger,
 } = require('klayr-service-framework');
 
-const { MODULE, MODULE_SUB_STORE, getGenesisHeight } = require('../constants');
-const { updateTotalStake, updateTotalSelfStake } = require('./transactionProcessor/pos/stake');
-const { indexAccountPublicKey, triggerAccountUpdates } = require('./accountIndex');
-const { updateTotalLockedAmounts } = require('./utils/blockchainIndex');
-
-const requestAll = require('../utils/requestAll');
-const config = require('../../config');
-const accountsTableSchema = require('../database/schema/accounts');
-const stakesTableSchema = require('../database/schema/stakes');
-const commissionsTableSchema = require('../database/schema/commissions');
-
-const { getKlayr32AddressFromPublicKey } = require('../utils/account');
-const { requestConnector } = require('../utils/request');
-const { INVALID_ED25519_KEY } = require('../constants');
+const { requestConnector } = require('../../utils/request');
+const { MODULE, MODULE_SUB_STORE } = require('../../constants');
+const requestAll = require('../../utils/requestAll');
+const { updateTotalLockedAmounts } = require('../utils/blockchainIndex');
 const {
 	increaseTokenBalanceDB,
 	increaseTokenTotalBalanceDB,
-} = require('../dataService/recorder/token/balances');
-const { increaseTokenLockedDB } = require('../dataService/recorder/token/locked');
-const { increaseTokenSupplyDB } = require('../dataService/recorder/token/supply');
-const { increaseTokenEscrowedDB } = require('../dataService/recorder/token/escrowed');
-const { updateAccountInitializationDB } = require('../dataService/recorder/token/account');
+} = require('../../dataService/recorder/token/balances');
+const { increaseTokenLockedDB } = require('../../dataService/recorder/token/locked');
+const { increaseTokenSupplyDB } = require('../../dataService/recorder/token/supply');
+const { increaseTokenEscrowedDB } = require('../../dataService/recorder/token/escrowed');
+const { updateAccountInitializationDB } = require('../../dataService/recorder/token/account');
 const {
 	updateSupportAllTokensDB,
 	updateSupportAllTokenFromChainIDDB,
 	updateSupportTokenIDDB,
 	initSupportedTokens,
-} = require('../dataService/recorder/token/supported');
-const { updateAuthAccountDB } = require('../dataService/recorder/auth/account');
+} = require('../../dataService/recorder/token/supported');
 
-const logger = Logger();
+const config = require('../../../config');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
-const getStakesTable = () => getTableInstance(stakesTableSchema, MYSQL_ENDPOINT);
-const getAccountsTable = () => getTableInstance(accountsTableSchema, MYSQL_ENDPOINT);
-const getCommissionsTable = () => getTableInstance(commissionsTableSchema, MYSQL_ENDPOINT);
+const logger = Logger();
 
-let intervalTimeout;
 const genesisTokenBalances = [];
 const genesisTokenLocked = [];
 const genesisTokenSupply = [];
 const genesisTokenEscrowed = [];
 const genesisTokenSupported = [];
-
-const getGenesisAssetIntervalTimeout = () => intervalTimeout;
 
 const indexTokenModuleAssets = async dbTrx => {
 	logger.info('Starting to index the genesis assets from the Token module.');
@@ -182,167 +143,6 @@ const indexTokenModuleAssets = async dbTrx => {
 
 	await updateTotalLockedAmounts(lockedChangeMap, dbTrx);
 	logger.info('Finished indexing all the genesis assets from the Token module.');
-};
-
-const isGeneratorKeyValid = generatorKey => generatorKey !== INVALID_ED25519_KEY;
-
-const indexPosValidatorsInfo = async (numValidators, dbTrx) => {
-	logger.debug('Starting to index the validators information from the genesis PoS module assets.');
-	if (numValidators > 0) {
-		const accountsTable = await getAccountsTable();
-		const commissionsTable = await getCommissionsTable();
-
-		const posModuleData = await requestAll(
-			requestConnector,
-			'getGenesisAssetByModule',
-			{ module: MODULE.POS, subStore: MODULE_SUB_STORE.POS.VALIDATORS, limit: 1000 },
-			numValidators,
-		);
-
-		const validators = posModuleData[MODULE_SUB_STORE.POS.VALIDATORS];
-		const genesisHeight = await getGenesisHeight();
-
-		const commissionEntries = await BluebirdPromise.map(
-			validators,
-			async validator => {
-				// Index all valid public keys
-				if (isGeneratorKeyValid(validator.generatorKey)) {
-					const account = {
-						address: getKlayr32AddressFromPublicKey(validator.generatorKey),
-						publicKey: validator.generatorKey,
-					};
-
-					await accountsTable
-						.upsert(account)
-						.catch(() => indexAccountPublicKey(validator.generatorKey));
-				}
-
-				return {
-					address: validator.address,
-					commission: validator.commission,
-					height: genesisHeight,
-				};
-			},
-			{ concurrency: validators.length },
-		);
-
-		await commissionsTable.upsert(commissionEntries, dbTrx);
-	}
-	logger.debug('Finished indexing the validators information from the genesis PoS module assets.');
-};
-
-const indexPosStakesInfo = async (numStakers, dbTrx) => {
-	logger.debug('Starting to index the stakes information from the genesis PoS module assets.');
-	let totalStake = BigInt(0);
-	let totalSelfStake = BigInt(0);
-
-	if (numStakers > 0) {
-		const stakesTable = await getStakesTable();
-
-		const posModuleData = await requestAll(
-			requestConnector,
-			'getGenesisAssetByModule',
-			{ module: MODULE.POS, subStore: MODULE_SUB_STORE.POS.STAKERS, limit: 1000 },
-			numStakers,
-		);
-		const stakers = posModuleData[MODULE_SUB_STORE.POS.STAKERS];
-
-		const allStakes = [];
-		for (let i = 0; i < stakers.length; i++) {
-			const stakerAddress = stakers[i].address;
-			const stakes = stakers[i].stakes;
-			for (let j = 0; j < stakes.length; j++) {
-				const validatorAddress = stakes[j].validatorAddress;
-				const amount = stakes[j].amount;
-
-				allStakes.push({
-					stakerAddress,
-					validatorAddress,
-					amount: BigInt(amount),
-				});
-
-				totalStake += BigInt(amount);
-				if (stakerAddress === validatorAddress) {
-					totalSelfStake += BigInt(amount);
-				}
-			}
-		}
-
-		await stakesTable.upsert(allStakes, dbTrx);
-		logger.info(`Updated ${allStakes.length} stakes from the genesis block.`);
-	}
-
-	await updateTotalStake(totalStake, dbTrx);
-	logger.info(`Updated total stakes at genesis: ${totalStake.toString()}.`);
-
-	await updateTotalSelfStake(totalSelfStake, dbTrx);
-	logger.info(`Updated total self-stakes information at genesis: ${totalSelfStake.toString()}.`);
-	logger.debug('Finished indexing the stakes information from the genesis PoS module assets.');
-};
-
-const indexPosModuleAssets = async dbTrx => {
-	logger.info('Starting to index the genesis assets from the PoS module.');
-	const genesisBlockAssetsLength = await requestConnector('getGenesisAssetsLength', {
-		module: MODULE.POS,
-	});
-	const numValidators = genesisBlockAssetsLength[MODULE.POS][MODULE_SUB_STORE.POS.VALIDATORS];
-	const numStakers = genesisBlockAssetsLength[MODULE.POS][MODULE_SUB_STORE.POS.STAKERS];
-
-	await indexPosValidatorsInfo(numValidators, dbTrx);
-	await indexPosStakesInfo(numStakers, dbTrx);
-	logger.info('Finished indexing all the genesis assets from the PoS module.');
-};
-
-const indexAuthModuleAssets = async dbTrx => {
-	logger.info('Starting to index the genesis assets from the auth module.');
-
-	const genesisBlockAssetsLength = await requestConnector('getGenesisAssetsLength', {
-		module: MODULE.AUTH,
-	});
-
-	const totalAuthData = genesisBlockAssetsLength[MODULE.AUTH][MODULE_SUB_STORE.AUTH.DATA];
-
-	const authModuleData = await requestAll(
-		requestConnector,
-		'getGenesisAssetByModule',
-		{ module: MODULE.AUTH, subStore: MODULE_SUB_STORE.AUTH.DATA, limit: 1000 },
-		totalAuthData,
-	);
-
-	const authDataSubstoreInfos = authModuleData[MODULE_SUB_STORE.AUTH.DATA];
-
-	const authAccountData = [];
-	for (let i = 0; i < authDataSubstoreInfos.length; i++) {
-		const { address, authAccount } = authDataSubstoreInfos[i];
-
-		authAccountData.push({
-			address,
-			nonce: BigInt(authAccount.nonce),
-			numberOfSignatures: authAccount.numberOfSignatures,
-			mandatoryKeys: authAccount.mandatoryKeys,
-			optionalKeys: authAccount.optionalKeys,
-		});
-	}
-
-	if (authAccountData.length > 0) await updateAuthAccountDB(authAccountData, dbTrx);
-
-	logger.info('Finished indexing all the genesis assets from the Auth module.');
-};
-
-const indexGenesisBlockAssets = async dbTrx => {
-	clearTimeout(intervalTimeout);
-	logger.info('Starting to index the genesis assets.');
-	intervalTimeout = setInterval(
-		() => logger.info('Genesis assets indexing still in progress...'),
-		5000,
-	);
-	await indexTokenModuleAssets(dbTrx);
-	await indexPosModuleAssets(dbTrx);
-	await indexAuthModuleAssets(dbTrx);
-
-	await triggerAccountUpdates();
-	clearInterval(intervalTimeout);
-	logger.info('Finished indexing all the genesis assets.');
 };
 
 let indexedgenesisTokenBalances;
@@ -505,11 +305,4 @@ const interval = setInterval(async () => {
 	}
 }, 5 * 60 * 1000);
 
-module.exports = {
-	getGenesisAssetIntervalTimeout,
-	indexGenesisBlockAssets,
-
-	// For testing
-	indexTokenModuleAssets,
-	indexPosModuleAssets,
-};
+module.exports = { indexTokenModuleAssets };
