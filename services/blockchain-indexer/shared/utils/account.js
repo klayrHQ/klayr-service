@@ -24,11 +24,13 @@ const {
 } = require('klayr-service-framework');
 
 const accountsTableSchema = require('../database/schema/accounts');
+const validatorsTableSchema = require('../database/schema/validators');
 const config = require('../../config');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
 const getAccountsTable = () => getTableInstance(accountsTableSchema, MYSQL_ENDPOINT);
+const getValidatorsTable = () => getTableInstance(validatorsTableSchema, MYSQL_ENDPOINT);
 
 const getKlayr32AddressFromPublicKey = publicKey =>
 	getKlayr32AddressFromPublicKeyHelper(Buffer.from(publicKey, 'hex'));
@@ -41,6 +43,11 @@ const updateAccountInfo = async params => {
 
 	const accountsTable = await getAccountsTable();
 	await accountsTable.upsert(accountInfo);
+
+	if (accountInfo.isValidator && accountInfo.name) {
+		const validatorsTable = await getValidatorsTable();
+		await validatorsTable.upsert(accountInfo);
+	}
 };
 
 module.exports = {

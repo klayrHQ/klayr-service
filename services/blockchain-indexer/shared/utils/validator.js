@@ -22,12 +22,14 @@ const {
 
 const config = require('../../config');
 const accountsTableSchema = require('../database/schema/accounts');
+const validatorsTableSchema = require('../database/schema/validators');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
 const validatorCache = CacheRedis('validator', config.endpoints.cache);
 
 const getAccountsTable = () => getTableInstance(accountsTableSchema, MYSQL_ENDPOINT);
+const getValidatorsTable = () => getTableInstance(validatorsTableSchema, MYSQL_ENDPOINT);
 
 const getNameByAddress = async address => {
 	if (address) {
@@ -36,6 +38,10 @@ const getNameByAddress = async address => {
 			// Update the account index with the name asynchronously
 			const accountsTable = await getAccountsTable();
 			accountsTable.upsert({ address, name });
+
+			// Update the validator index with the name asynchronously
+			const validatorsTable = await getValidatorsTable();
+			validatorsTable.upsert({ address, name });
 
 			return name;
 		}
