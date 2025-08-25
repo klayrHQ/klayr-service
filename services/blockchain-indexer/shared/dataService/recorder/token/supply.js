@@ -20,16 +20,13 @@ const supplyUpdatesMap = new Map();
 
 const getTokenSupplyByTokenID = async tokenID => {
 	const tokenSupplyTable = await getTokenSupplyTable();
-	const [data = {}] = await tokenSupplyTable.find({ tokenID, limit: 1 }, [
-		'tokenID',
-		'totalSupply',
-	]);
-	return data.totalSupply ? BigInt(data.totalSupply) : 0n;
+	const [data = {}] = await tokenSupplyTable.find({ tokenID, limit: 1 }, ['tokenID', 'amount']);
+	return data.amount ? BigInt(data.amount) : 0n;
 };
 
 const getTokenSupply = async () => {
 	const tokenSupplyTable = await getTokenSupplyTable();
-	const data = await tokenSupplyTable.find({}, ['tokenID', 'totalSupply']);
+	const data = await tokenSupplyTable.find({}, ['tokenID', 'amount']);
 	return data;
 };
 
@@ -37,7 +34,7 @@ const increaseTokenSupplyDB = async (tokenID, amount, dbTrx) => {
 	const tokenSuppliesTable = await getTokenSupplyTable();
 	const numRowsAffected = await tokenSuppliesTable.increment(
 		{
-			increment: { totalSupply: amount },
+			increment: { amount: amount },
 			where: { tokenID },
 		},
 		dbTrx,
@@ -46,7 +43,7 @@ const increaseTokenSupplyDB = async (tokenID, amount, dbTrx) => {
 		await tokenSuppliesTable.upsert(
 			{
 				tokenID,
-				totalSupply: amount,
+				amount: amount,
 			},
 			dbTrx,
 		);
@@ -96,7 +93,7 @@ const commitTokenSupplyIndex = async dbTrx => {
 				logger.debug(`Incrementing supply for tokenID: ${tokenID} by ${amount}`);
 				numRowsAffected = await tokenSuppliesTable.increment(
 					{
-						increment: { totalSupply: amount },
+						increment: { amount: amount },
 						where: { tokenID },
 					},
 					dbTrx,
@@ -106,7 +103,7 @@ const commitTokenSupplyIndex = async dbTrx => {
 				logger.debug(`Decrementing supply for tokenID: ${tokenID} by ${amount * -1n}`);
 				numRowsAffected = await tokenSuppliesTable.decrement(
 					{
-						decrement: { totalSupply: amount * -1n },
+						decrement: { amount: amount * -1n },
 						where: { tokenID },
 					},
 					dbTrx,
@@ -119,7 +116,7 @@ const commitTokenSupplyIndex = async dbTrx => {
 				await tokenSuppliesTable.upsert(
 					{
 						tokenID,
-						totalSupply: amount,
+						amount: amount,
 					},
 					dbTrx,
 				);
