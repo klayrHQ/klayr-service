@@ -53,13 +53,25 @@ const updateAuthAccountDB = async (authAccountData, dbTrx) => {
 	return await authTable.upsert(authAccountData, dbTrx);
 };
 
+const getInitialAuthOrEmptyObject = address => {
+	let account = authUpdatesMap.get(address);
+	if (account && account.nonce === undefined) account.none = BigInt(0);
+	if (!account) return {};
+	return account;
+};
+
+const getInitialAuthOrDB = async address => {
+	let account = authUpdatesMap.get(address);
+	if (account && account.nonce === undefined) account.none = BigInt(0);
+	if (!account) return await getAuthAccount(address);
+	return account;
+};
+
 const recordNonceIncrease = async (address, isBlockDeletion) => {
 	logger.debug(
 		`Recording nonce increase for address: ${address}, isBlockDeletion: ${isBlockDeletion}`,
 	);
-	let account = authUpdatesMap.get(address);
-	if (account && account.nonce === undefined) account.none = BigInt(0);
-	if (!account) account = await getAuthAccount(address);
+	const account = await getInitialAuthOrDB(address);
 
 	if (isBlockDeletion) account.nonce -= BigInt(1);
 	else account.nonce += BigInt(1);
@@ -79,7 +91,7 @@ const recordAuthAccount = (address, account, isBlockDeletion) => {
 		authUpdatesMap.set(address, false); // Mark for deletion
 	} else {
 		// If not block deletion, this account should be in the final state.
-		authUpdatesMap.set(address, account); // Mark for upsert
+		authUpdatesMap.set(address, { ...(getInitialAuthOrEmptyObject(address) || {}), ...account }); // Mark for upsert
 	}
 };
 
