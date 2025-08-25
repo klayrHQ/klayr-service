@@ -21,7 +21,7 @@ const lockedUpdatesMap = new Map();
 const getLockedBalance = async (address, tokenID) => {
 	const tokenLockedTable = await getTokenLockedTable();
 	const params = tokenID ? { address, tokenID } : { address };
-	const data = await tokenLockedTable.find(params, ['address', 'tokenID', 'module', 'amount']);
+	const data = await tokenLockedTable.find(params, ['module', 'amount']);
 	return data;
 };
 

@@ -35,12 +35,12 @@ const getTokenBalances = async params => {
 	const response = await getAvailableBalance(params.address, params.tokenID);
 	for (let i = 0; i < response.length; i++) {
 		const balanceInfo = response[i];
-		const lockedBalance = await getLockedBalance(balanceInfo.address, balanceInfo.tokenID);
+		const lockedBalances = await getLockedBalance(balanceInfo.address, balanceInfo.tokenID);
 
 		const data = {
-			tokenID: params.tokenID,
+			tokenID: balanceInfo.tokenID,
 			availableBalance: balanceInfo.availableBalance,
-			lockedBalance: lockedBalance.filter(t => t.amount !== '0'),
+			lockedBalances: lockedBalances.filter(t => t.amount !== '0'),
 		};
 
 		tokensInfo.push(data);
