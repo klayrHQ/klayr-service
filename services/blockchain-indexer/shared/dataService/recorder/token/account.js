@@ -37,7 +37,7 @@ const accountUpdatesMap = new Map();
 const getAccountInitialized = async (address, tokenID) => {
 	const tokenAccountTable = await getTokenAccountTable();
 	const data = await tokenAccountTable.find({ address, tokenID, limit: 1 }, ['initialized']);
-	if (data.length && data[0].initialized === true) return true;
+	if (data.length && data[0].initialized) return true;
 	return false;
 };
 
