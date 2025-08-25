@@ -19,18 +19,21 @@ const { triggerAccountUpdates } = require('../accountIndex');
 const { indexTokenModuleAssets } = require('./token');
 const { indexPosModuleAssets } = require('./pos');
 const { indexAuthModuleAssets } = require('./auth');
+const { indexValidatorModuleGenesisEvents } = require('./validator');
 
 const logger = Logger();
 
-let intervalTimeout;
+let genesisAssetIntervalTimeout;
+let genesisEventsIntervalTimeout;
 
-const getGenesisAssetIntervalTimeout = () => intervalTimeout;
+const getGenesisAssetIntervalTimeout = () => genesisAssetIntervalTimeout;
+const getGenesisEventsIntervalTimeout = () => genesisEventsIntervalTimeout;
 
 const indexGenesisBlockAssets = async dbTrx => {
-	clearTimeout(intervalTimeout);
+	clearTimeout(genesisAssetIntervalTimeout);
 	logger.info('Starting to index the genesis assets.');
 
-	intervalTimeout = setInterval(
+	genesisAssetIntervalTimeout = setInterval(
 		() => logger.info('Genesis assets indexing still in progress...'),
 		5000,
 	);
@@ -40,13 +43,30 @@ const indexGenesisBlockAssets = async dbTrx => {
 	await indexAuthModuleAssets(dbTrx);
 
 	await triggerAccountUpdates();
-	clearInterval(intervalTimeout);
+	clearInterval(genesisAssetIntervalTimeout);
 	logger.info('Finished indexing all the genesis assets.');
+};
+
+const indexGenesisBlockEvents = async (events, _dbTrx) => {
+	clearTimeout(genesisEventsIntervalTimeout);
+	logger.info('Starting to index the genesis events.');
+
+	genesisEventsIntervalTimeout = setInterval(
+		() => logger.info('Genesis events indexing still in progress...'),
+		5000,
+	);
+
+	await indexValidatorModuleGenesisEvents(events);
+
+	clearInterval(genesisEventsIntervalTimeout);
+	logger.info('Finished indexing all the genesis events.');
 };
 
 module.exports = {
 	getGenesisAssetIntervalTimeout,
+	getGenesisEventsIntervalTimeout,
 	indexGenesisBlockAssets,
+	indexGenesisBlockEvents,
 
 	// For testing
 	indexTokenModuleAssets,

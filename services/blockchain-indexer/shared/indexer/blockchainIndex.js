@@ -50,7 +50,12 @@ const { getTransactionExecutionStatus } = require('../utils/transactions');
 const { getEventsInfoToIndex } = require('./utils/events');
 const { calcCommissionAmount, calcSelfStakeReward } = require('./utils/validator');
 const { indexAccountPublicKey } = require('./accountIndex');
-const { getGenesisAssetIntervalTimeout, indexGenesisBlockAssets } = require('./genesisBlock');
+const {
+	getGenesisAssetIntervalTimeout,
+	indexGenesisBlockAssets,
+	indexGenesisBlockEvents,
+	getGenesisEventsIntervalTimeout,
+} = require('./genesisBlock');
 const {
 	updateTotalLockedAmounts,
 	getReorderingStatus,
@@ -465,6 +470,11 @@ const indexBlock = async job => {
 				// record token events for: balance, locked, escrowed, and supply data
 				await recordEvents(blockToIndexFromNode, events);
 			}
+
+			if (blockToIndexFromNode.height === genesisHeight) {
+				// index genesis events asynchronously in the background
+				await indexGenesisBlockEvents(events, dbTrx);
+			}
 		}
 
 		const blockToIndex = {
@@ -494,8 +504,9 @@ const indexBlock = async job => {
 			`Successfully indexed block ${blockToIndexFromNode.id} at height ${blockToIndexFromNode.height}.`,
 		);
 	} catch (error) {
-		// Stop genesisAsset index progress logging on errors
+		// Stop genesisAsset & genesisEvent index progress logging on errors
 		clearInterval(getGenesisAssetIntervalTimeout());
+		clearInterval(getGenesisEventsIntervalTimeout());
 
 		// Block may not have been initialized when error occurred
 		const failedBlockInfo = {

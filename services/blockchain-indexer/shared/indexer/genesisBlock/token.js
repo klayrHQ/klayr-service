@@ -42,111 +42,118 @@ const indexTokenModuleAssets = async dbTrx => {
 		module: MODULE.TOKEN,
 	});
 
-	const totalUsers = genesisBlockAssetsLength[MODULE.TOKEN][MODULE_SUB_STORE.TOKEN.USER];
-	const totalSupplyItem = genesisBlockAssetsLength[MODULE.TOKEN][MODULE_SUB_STORE.TOKEN.SUPPLY];
-	const totalEscrowItem = genesisBlockAssetsLength[MODULE.TOKEN][MODULE_SUB_STORE.TOKEN.ESCROW];
-	const totalSupportedItem =
-		genesisBlockAssetsLength[MODULE.TOKEN][MODULE_SUB_STORE.TOKEN.SUPPORTED];
+	if (Object.keys(genesisBlockAssetsLength).includes(MODULE.TOKEN)) {
+		const totalUsers = genesisBlockAssetsLength[MODULE.TOKEN][MODULE_SUB_STORE.TOKEN.USER];
+		const totalSupplyItem = genesisBlockAssetsLength[MODULE.TOKEN][MODULE_SUB_STORE.TOKEN.SUPPLY];
+		const totalEscrowItem = genesisBlockAssetsLength[MODULE.TOKEN][MODULE_SUB_STORE.TOKEN.ESCROW];
+		const totalSupportedItem =
+			genesisBlockAssetsLength[MODULE.TOKEN][MODULE_SUB_STORE.TOKEN.SUPPORTED];
 
-	const tokenUserModuleData = await requestAll(
-		requestConnector,
-		'getGenesisAssetByModule',
-		{ module: MODULE.TOKEN, subStore: MODULE_SUB_STORE.TOKEN.USER, limit: 1000 },
-		totalUsers,
-	);
+		const tokenUserModuleData = await requestAll(
+			requestConnector,
+			'getGenesisAssetByModule',
+			{ module: MODULE.TOKEN, subStore: MODULE_SUB_STORE.TOKEN.USER, limit: 1000 },
+			totalUsers,
+		);
 
-	const tokenSupplyModuleData = await requestAll(
-		requestConnector,
-		'getGenesisAssetByModule',
-		{ module: MODULE.TOKEN, subStore: MODULE_SUB_STORE.TOKEN.SUPPLY, limit: 1000 },
-		totalSupplyItem,
-	);
+		const tokenSupplyModuleData = await requestAll(
+			requestConnector,
+			'getGenesisAssetByModule',
+			{ module: MODULE.TOKEN, subStore: MODULE_SUB_STORE.TOKEN.SUPPLY, limit: 1000 },
+			totalSupplyItem,
+		);
 
-	const tokenEscrowedModuleData = await requestAll(
-		requestConnector,
-		'getGenesisAssetByModule',
-		{ module: MODULE.TOKEN, subStore: MODULE_SUB_STORE.TOKEN.ESCROW, limit: 1000 },
-		totalEscrowItem,
-	);
+		const tokenEscrowedModuleData = await requestAll(
+			requestConnector,
+			'getGenesisAssetByModule',
+			{ module: MODULE.TOKEN, subStore: MODULE_SUB_STORE.TOKEN.ESCROW, limit: 1000 },
+			totalEscrowItem,
+		);
 
-	const tokenSupportedModuleData = await requestAll(
-		requestConnector,
-		'getGenesisAssetByModule',
-		{ module: MODULE.TOKEN, subStore: MODULE_SUB_STORE.TOKEN.SUPPORTED, limit: 1000 },
-		totalSupportedItem,
-	);
+		const tokenSupportedModuleData = await requestAll(
+			requestConnector,
+			'getGenesisAssetByModule',
+			{ module: MODULE.TOKEN, subStore: MODULE_SUB_STORE.TOKEN.SUPPORTED, limit: 1000 },
+			totalSupportedItem,
+		);
 
-	const userSubStoreInfos = tokenUserModuleData[MODULE_SUB_STORE.TOKEN.USER];
-	const supplySubstoreInfos = tokenSupplyModuleData[MODULE_SUB_STORE.TOKEN.SUPPLY];
-	const escrowSubstoreInfos = tokenEscrowedModuleData[MODULE_SUB_STORE.TOKEN.ESCROW];
-	const supportedSubstoreInfos = tokenSupportedModuleData[MODULE_SUB_STORE.TOKEN.SUPPORTED];
+		const userSubStoreInfos = tokenUserModuleData[MODULE_SUB_STORE.TOKEN.USER];
+		const supplySubstoreInfos = tokenSupplyModuleData[MODULE_SUB_STORE.TOKEN.SUPPLY];
+		const escrowSubstoreInfos = tokenEscrowedModuleData[MODULE_SUB_STORE.TOKEN.ESCROW];
+		const supportedSubstoreInfos = tokenSupportedModuleData[MODULE_SUB_STORE.TOKEN.SUPPORTED];
 
-	const lockedChangeMap = {};
-
-	// eslint-disable-next-line no-restricted-syntax
-	for (let i = 0; i < userSubStoreInfos.length; i++) {
-		const { address, tokenID, availableBalance, lockedBalances } = userSubStoreInfos[i];
-
-		// Add entry to index the genesis token balances
-		genesisTokenBalances.push({
-			address,
-			tokenID,
-			availableBalance: BigInt(availableBalance),
-		});
+		const lockedChangeMap = {};
 
 		// eslint-disable-next-line no-restricted-syntax
-		for (let k = 0; k < lockedBalances.length; k++) {
-			const lockedBalance = lockedBalances[k];
-			if (!lockedChangeMap[tokenID]) lockedChangeMap[tokenID] = BigInt(0);
-			lockedChangeMap[tokenID] += BigInt(lockedBalance.amount);
+		for (let i = 0; i < userSubStoreInfos.length; i++) {
+			const { address, tokenID, availableBalance, lockedBalances } = userSubStoreInfos[i];
 
-			// Add entry to index the genesis token locked
-			genesisTokenLocked.push({
+			// Add entry to index the genesis token balances
+			genesisTokenBalances.push({
 				address,
 				tokenID,
-				module: lockedBalance.module,
-				amount: BigInt(lockedBalance.amount),
+				availableBalance: BigInt(availableBalance),
+			});
+
+			// eslint-disable-next-line no-restricted-syntax
+			for (let k = 0; k < lockedBalances.length; k++) {
+				const lockedBalance = lockedBalances[k];
+				if (!lockedChangeMap[tokenID]) lockedChangeMap[tokenID] = BigInt(0);
+				lockedChangeMap[tokenID] += BigInt(lockedBalance.amount);
+
+				// Add entry to index the genesis token locked
+				genesisTokenLocked.push({
+					address,
+					tokenID,
+					module: lockedBalance.module,
+					amount: BigInt(lockedBalance.amount),
+				});
+			}
+		}
+
+		for (let i = 0; i < supplySubstoreInfos.length; i++) {
+			const { tokenID, totalSupply } = supplySubstoreInfos[i];
+
+			// Add entry to index the genesis token supply
+			genesisTokenSupply.push({
+				tokenID,
+				totalSupply: BigInt(totalSupply),
 			});
 		}
+
+		for (let i = 0; i < escrowSubstoreInfos.length; i++) {
+			const { escrowChainID, tokenID, amount } = escrowSubstoreInfos[i];
+
+			// Add entry to index the genesis token escrowed
+			genesisTokenEscrowed.push({
+				escrowChainID,
+				tokenID,
+				amount: BigInt(amount),
+			});
+		}
+
+		for (let i = 0; i < supportedSubstoreInfos.length; i++) {
+			const { chainID, supportedTokenIDs } = supportedSubstoreInfos[i];
+
+			// Add entry to index the genesis token supported
+			genesisTokenSupported.push({
+				chainID,
+				supportedTokenIDs,
+			});
+		}
+
+		await updateTotalLockedAmounts(lockedChangeMap, dbTrx);
 	}
 
-	for (let i = 0; i < supplySubstoreInfos.length; i++) {
-		const { tokenID, totalSupply } = supplySubstoreInfos[i];
+	startGenesisTokenIndexing();
 
-		// Add entry to index the genesis token supply
-		genesisTokenSupply.push({
-			tokenID,
-			totalSupply: BigInt(totalSupply),
-		});
-	}
-
-	for (let i = 0; i < escrowSubstoreInfos.length; i++) {
-		const { escrowChainID, tokenID, amount } = escrowSubstoreInfos[i];
-
-		// Add entry to index the genesis token escrowed
-		genesisTokenEscrowed.push({
-			escrowChainID,
-			tokenID,
-			amount: BigInt(amount),
-		});
-	}
-
-	for (let i = 0; i < supportedSubstoreInfos.length; i++) {
-		const { chainID, supportedTokenIDs } = supportedSubstoreInfos[i];
-
-		// Add entry to index the genesis token supported
-		genesisTokenSupported.push({
-			chainID,
-			supportedTokenIDs,
-		});
-	}
-
-	await updateTotalLockedAmounts(lockedChangeMap, dbTrx);
 	logger.info('Finished indexing all the genesis assets from the Token module.');
 };
 
 let indexedgenesisTokenBalances;
-const interval = setInterval(async () => {
+let interval;
+
+const processGenesisTokenIndexing = async () => {
 	try {
 		if (
 			[
@@ -303,6 +310,11 @@ const interval = setInterval(async () => {
 	} catch (_) {
 		// No actions required
 	}
-}, 5 * 60 * 1000);
+};
+
+const startGenesisTokenIndexing = () => {
+	setTimeout(processGenesisTokenIndexing, 0);
+	interval = setInterval(processGenesisTokenIndexing, 5 * 60 * 1000);
+};
 
 module.exports = { indexTokenModuleAssets };

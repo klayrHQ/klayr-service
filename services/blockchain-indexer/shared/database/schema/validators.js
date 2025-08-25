@@ -27,6 +27,7 @@ module.exports = {
 		totalSelfStakeRewards: { type: 'bigInteger', null: false, defaultValue: 0 },
 	},
 	indexes: {
+		address: { type: 'key' },
 		name: { type: 'key' },
 		generatorKey: { type: 'key' },
 		blsKey: { type: 'key' },

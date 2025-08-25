@@ -7,6 +7,7 @@ const {
 	Logger,
 } = require('klayr-service-framework');
 
+const { requestConnector } = require('../../utils/request');
 const { MODULE, MODULE_SUB_STORE, getGenesisHeight } = require('../../constants');
 const { updateTotalStake, updateTotalSelfStake } = require('../transactionProcessor/pos/stake');
 const { indexAccountPublicKey } = require('../accountIndex');
@@ -129,11 +130,15 @@ const indexPosModuleAssets = async dbTrx => {
 	const genesisBlockAssetsLength = await requestConnector('getGenesisAssetsLength', {
 		module: MODULE.POS,
 	});
-	const numValidators = genesisBlockAssetsLength[MODULE.POS][MODULE_SUB_STORE.POS.VALIDATORS];
-	const numStakers = genesisBlockAssetsLength[MODULE.POS][MODULE_SUB_STORE.POS.STAKERS];
 
-	await indexPosValidatorsInfo(numValidators, dbTrx);
-	await indexPosStakesInfo(numStakers, dbTrx);
+	if (Object.keys(genesisBlockAssetsLength).includes(MODULE.POS)) {
+		const numValidators = genesisBlockAssetsLength[MODULE.POS][MODULE_SUB_STORE.POS.VALIDATORS];
+		const numStakers = genesisBlockAssetsLength[MODULE.POS][MODULE_SUB_STORE.POS.STAKERS];
+
+		await indexPosValidatorsInfo(numValidators, dbTrx);
+		await indexPosStakesInfo(numStakers, dbTrx);
+	}
+
 	logger.info('Finished indexing all the genesis assets from the PoS module.');
 };
 
