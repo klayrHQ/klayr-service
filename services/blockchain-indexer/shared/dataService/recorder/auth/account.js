@@ -98,7 +98,7 @@ const commitAuthAccount = async dbTrx => {
 			logger.trace(`Processing auth account update for address: ${address}`);
 			if (accountData) {
 				// If accountData is an object, it's an upsert
-				await authTable.upsert(accountData, dbTrx);
+				await authTable.upsert({ address, ...accountData }, dbTrx);
 			} else {
 				// If accountData is false, it's a deletion
 				await authTable.delete({ address }, dbTrx);
