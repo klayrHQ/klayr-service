@@ -98,7 +98,7 @@ const commitAccountIndex = async dbTrx => {
 				);
 			} else {
 				logger.trace(`Deleting token account entry for address: ${address}, tokenID: ${tokenID}`);
-				await tokenAccountTable.delete(
+				await tokenAccountTable.deleteByPrimaryKey(
 					{
 						address,
 						tokenID,

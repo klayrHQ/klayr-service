@@ -113,7 +113,7 @@ const commitAuthAccount = async dbTrx => {
 				await authTable.upsert({ address, ...accountData }, dbTrx);
 			} else {
 				// If accountData is false, it's a deletion
-				await authTable.delete({ address }, dbTrx);
+				await authTable.deleteByPrimaryKey({ address }, dbTrx);
 			}
 		},
 		{ concurrency: Math.min(authUpdatesMap.size, COMMIT_MAX_CONCURRENCY) },
