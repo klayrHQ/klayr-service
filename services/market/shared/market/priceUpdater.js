@@ -21,7 +21,6 @@ const config = require('../../config');
 
 const binance = require('./sources/binance');
 const bitrue = require('./sources/bitrue');
-const coinex = require('./sources/coinex');
 const probit = require('./sources/probit');
 const exchangeratesapi = require('./sources/exchangeratesapi');
 const { formatCalculatedRate } = require('../utils/priceUpdater');
@@ -36,7 +35,6 @@ let isWarnMessageDisplayed = false;
 const getRawPricesBySource = async () => ({
 	binance: await binance.getFromCache(),
 	bitrue: await bitrue.getFromCache(),
-	coinex: await coinex.getFromCache(),
 	probit: await probit.getFromCache(),
 	exchangeratesapi: await exchangeratesapi.getFromCache(),
 });
