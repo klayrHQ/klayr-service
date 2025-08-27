@@ -21,6 +21,12 @@ const getEventsInfoToIndex = (block, events) => {
 		eventTopicsInfo: [],
 	};
 
+	// eventsInfoKeys is used to prevent duplicate entry with lookup complexity of O(1)
+	const eventsInfoKeys = {
+		eventsInfo: {},
+		eventTopicsInfo: {},
+	};
+
 	// Precompute the next COMMAND_EXECUTION_RESULT event for each index
 	const nextCommandExecResultEvent = new Array(events.length);
 	let next = null;
@@ -46,14 +52,22 @@ const getEventsInfoToIndex = (block, events) => {
 			timestamp: block.timestamp,
 			eventStr: JSON.stringify(event),
 		};
-		eventsInfoToIndex.eventsInfo.push(eventInfo);
+
+		if (!eventsInfoKeys.eventsInfo[`${event.id}`]) {
+			eventsInfoKeys.eventsInfo[`${event.id}`] = true;
+			eventsInfoToIndex.eventsInfo.push(eventInfo);
+		}
 
 		for (let t = 0; t < event.topics.length; t++) {
 			const topic = event.topics[t];
-			eventsInfoToIndex.eventTopicsInfo.push({
-				eventID: event.id,
-				topic,
-			});
+
+			if (!eventsInfoKeys.eventTopicsInfo[`${event.id}-${topic}`]) {
+				eventsInfoKeys.eventTopicsInfo[`${event.id}-${topic}`] = true;
+				eventsInfoToIndex.eventTopicsInfo.push({
+					eventID: event.id,
+					topic,
+				});
+			}
 
 			// Add the corresponding transactionID as a topic when not present in the topics list
 			// i.e. only when the topic starts with the CCM ID prefix
@@ -72,20 +86,26 @@ const getEventsInfoToIndex = (block, events) => {
 							? topicTransactionID.slice(EVENT_TOPIC_PREFIX.TX_ID.length)
 							: topicTransactionID;
 
-					eventsInfoToIndex.eventTopicsInfo.push({
-						eventID: event.id,
-						topic: transactionID,
-					});
+					if (!eventsInfoKeys.eventTopicsInfo[`${event.id}-${transactionID}`]) {
+						eventsInfoKeys.eventTopicsInfo[`${event.id}-${transactionID}`] = true;
+						eventsInfoToIndex.eventTopicsInfo.push({
+							eventID: event.id,
+							topic: transactionID,
+						});
+					}
 				}
 			}
 		}
 
 		// Add validator address as a topic for rewardsAssigned events, required for export microservice
 		if (event.module === MODULE.POS && event.name === EVENT.REWARDS_ASSIGNED) {
-			eventsInfoToIndex.eventTopicsInfo.push({
-				eventID: event.id,
-				topic: event.data.validatorAddress,
-			});
+			if (!eventsInfoKeys.eventTopicsInfo[`${event.id}-${event.data.validatorAddress}`]) {
+				eventsInfoKeys.eventTopicsInfo[`${event.id}-${event.data.validatorAddress}`] = true;
+				eventsInfoToIndex.eventTopicsInfo.push({
+					eventID: event.id,
+					topic: event.data.validatorAddress,
+				});
+			}
 		}
 	}
 
