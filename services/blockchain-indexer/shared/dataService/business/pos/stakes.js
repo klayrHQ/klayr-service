@@ -14,13 +14,33 @@
  *
  */
 const BluebirdPromise = require('bluebird');
+const {
+	DB: {
+		MySQL: { getTableInstance },
+	},
+} = require('klayr-service-framework');
 
 const { getIndexedAccountInfo } = require('../../utils/account');
 const { getAddressByName } = require('../../utils/validator');
 const { parseToJSONCompatObj } = require('../../../utils/parser');
-const { requestConnector } = require('../../../utils/request');
 const { getKlayr32AddressFromPublicKey } = require('../../../utils/account');
 const { indexAccountPublicKey } = require('../../../indexer/accountIndex');
+const stakesTableSchema = require('../../../database/schema/stakes');
+
+const config = require('../../../../config');
+
+const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
+
+const getStakesTable = () => getTableInstance(stakesTableSchema, MYSQL_ENDPOINT);
+
+const getStakerDB = async address => {
+	const stakesTable = await getStakesTable();
+	const stakesData = await stakesTable.find({ stakerAddress: address }, [
+		'validatorAddress',
+		'amount',
+	]);
+	return stakesData;
+};
 
 const normalizeStake = stake => parseToJSONCompatObj(stake);
 
@@ -46,7 +66,7 @@ const getStakes = async params => {
 		indexAccountPublicKey(params.publicKey);
 	}
 
-	const stakerInfo = await requestConnector('getStaker', { address: params.address });
+	const stakerInfo = await getStakerDB(params.address);
 
 	// Filter stakes by user specified search param (validator name) and add to response
 	const accountInfoQueryFilter = {};
@@ -68,7 +88,7 @@ const getStakes = async params => {
 	}
 
 	await BluebirdPromise.map(
-		stakerInfo.stakes,
+		stakerInfo,
 		async stake => {
 			const normalizedStake = normalizeStake(stake);
 			// Get validator name filtered by user specified search param
@@ -90,7 +110,7 @@ const getStakes = async params => {
 				});
 			}
 		},
-		{ concurrency: stakerInfo.stakes.length },
+		{ concurrency: stakerInfo.length },
 	);
 
 	// Populate staker account name
