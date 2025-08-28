@@ -52,7 +52,7 @@ const getPosPendingUnlocksDB = async address => {
 	const lastBlock = await getBlockByID(lastBlockID);
 
 	const height = lastBlock ? lastBlock.height : 0;
-	const aggregateCommitHeight = lastBlock ? JSON.parse(lastBlock.aggregateCommit).height : 0;
+	const aggregateCommitHeight = lastBlock ? lastBlock.aggregateCommit.height : 0;
 	const genesisHeight = await getGenesisHeight();
 	const roundLength = await getPosRoundLength();
 
