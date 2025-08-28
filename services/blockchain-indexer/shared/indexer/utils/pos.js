@@ -1,3 +1,17 @@
+const {
+	DB: {
+		MySQL: { getTableInstance },
+	},
+} = require('klayr-service-framework');
+
+const config = require('../../../config');
+const validatorsTableSchema = require('../../database/schema/validators');
+const { getPosPunishmentLockingPeriods } = require('../../dataService/business/pos/constants');
+
+const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
+
+const getValidatorsTable = () => getTableInstance(validatorsTableSchema, MYSQL_ENDPOINT);
+
 const getWaitTime = (senderAddress, validatorAddress, punishmentLockingPeriods) =>
 	validatorAddress === senderAddress
 		? punishmentLockingPeriods.lockingPeriodSelfStaking
@@ -86,9 +100,44 @@ const isEligibleUnlock = (
 	);
 };
 
+const getExpectedUnlockHeight = async (stakerAddress, validatorAddress, unstakeHeight) => {
+	const validatorAccount = { reportMisbehaviorHeights: [] };
+
+	const validatorsTable = await getValidatorsTable();
+	const validatorAccountData = await validatorsTable.find({ address: validatorAddress, limit: 1 }, [
+		'reportMisbehaviorHeights',
+	]);
+	if (validatorAccountData.length === 1) {
+		validatorAccount.reportMisbehaviorHeights = JSON.stringify(
+			validatorAccountData[0].reportMisbehaviorHeights,
+		);
+	}
+
+	const punishmentLockingPeriods = await getPosPunishmentLockingPeriods();
+	const waitTime =
+		getWaitTime(stakerAddress, validatorAddress, punishmentLockingPeriods) + unstakeHeight;
+	if (!validatorAccount.reportMisbehaviorHeights.length) {
+		return waitTime;
+	}
+
+	const lastPomHeight =
+		validatorAccount.reportMisbehaviorHeights[validatorAccount.reportMisbehaviorHeights.length - 1];
+
+	// if last pom height is greater than unstake height + wait time, the validator is not punished
+	if (lastPomHeight >= unstakeHeight + waitTime) {
+		return waitTime;
+	}
+
+	return Math.max(
+		getPunishTime(stakerAddress, validatorAddress, punishmentLockingPeriods) + lastPomHeight,
+		waitTime,
+	);
+};
+
 module.exports = {
 	hasWaited,
 	isPunished,
 	isCertificateGenerated,
 	isEligibleUnlock,
+	getExpectedUnlockHeight,
 };

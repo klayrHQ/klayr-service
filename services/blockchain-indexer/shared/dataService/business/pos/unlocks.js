@@ -13,14 +13,73 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { getPosTokenID } = require('./constants');
+const {
+	DB: {
+		MySQL: { getTableInstance },
+	},
+} = require('klayr-service-framework');
+
+const config = require('../../../../config');
+const pendingUnlocksTableSchema = require('../../../database/schema/pendingUnlocks');
+
+const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
+
+const getPendingUnlocksTable = () => getTableInstance(pendingUnlocksTableSchema, MYSQL_ENDPOINT);
+
+const { getPosTokenID, getPosRoundLength } = require('./constants');
 const { getBlockByID } = require('../blocks');
 const { getNetworkStatus } = require('../network');
 const { getAddressByName } = require('../../utils/validator');
 const { getIndexedAccountInfo } = require('../../utils/account');
-const { requestConnector } = require('../../../utils/request');
 const { getKlayr32AddressFromPublicKey } = require('../../../utils/account');
 const { indexAccountPublicKey } = require('../../../indexer/accountIndex');
+const { getExpectedUnlockHeight, isCertificateGenerated } = require('../../../indexer/utils/pos');
+const { getGenesisHeight } = require('../../../constants');
+
+const getPosPendingUnlocksDB = async address => {
+	const pendingUnlocksTable = await getPendingUnlocksTable();
+	const pendingUnlocksData = await pendingUnlocksTable.find({ stakerAddress: address, limit: 1 }, [
+		'validatorAddress',
+		'amount',
+		'unstakeHeight',
+	]);
+
+	const result = [];
+
+	const {
+		data: { lastBlockID },
+	} = await getNetworkStatus();
+	const lastBlock = await getBlockByID(lastBlockID);
+
+	const height = lastBlock ? lastBlock.height : 0;
+	const aggregateCommitHeight = lastBlock ? JSON.parse(lastBlock.aggregateCommit).height : 0;
+	const genesisHeight = await getGenesisHeight();
+	const roundLength = await getPosRoundLength();
+
+	for (let i = 0; i < pendingUnlocksData.length; i++) {
+		const unlock = pendingUnlocksData[i];
+		const expectedUnlockableHeight = await getExpectedUnlockHeight(
+			address,
+			unlock.validatorAddress,
+			unlock.unstakeHeight,
+		);
+		const isCertified = isCertificateGenerated({
+			maxHeightCertified: aggregateCommitHeight,
+			roundLength,
+			unlockObject: unlock,
+			genesisHeight,
+		});
+		result.push({
+			validatorAddress: unlock.validatorAddress,
+			amount: unlock.amount.toString(),
+			unstakeHeight: unlock.unstakeHeight,
+			unlockable: height > expectedUnlockableHeight && isCertified,
+			expectedUnlockableHeight,
+		});
+	}
+
+	return result;
+};
 
 const getPosUnlocks = async params => {
 	const unlocks = {
@@ -39,10 +98,7 @@ const getPosUnlocks = async params => {
 		return unlocks;
 	}
 
-	const { pendingUnlocks = [] } = await requestConnector('getPosPendingUnlocks', {
-		address: params.address,
-	});
-
+	const pendingUnlocks = await getPosPendingUnlocksDB(params.address);
 	const {
 		data: {
 			lastBlockID,
