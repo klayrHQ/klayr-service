@@ -25,6 +25,13 @@ const getLockedBalance = async (address, tokenID) => {
 	return data;
 };
 
+const getLockedBalanceByModule = async (address, tokenID, module) => {
+	const tokenLockedTable = await getTokenLockedTable();
+	const params = { address, tokenID, module };
+	const data = await tokenLockedTable.find(params, ['amount']);
+	return data;
+};
+
 const increaseTokenLockedDB = async (address, tokenID, module, amount, dbTrx) => {
 	const tokenLockedTable = await getTokenLockedTable();
 	const numRowsAffected = await tokenLockedTable.increment(
@@ -138,6 +145,7 @@ const commitTokenLockedIndex = async dbTrx => {
 };
 
 module.exports = {
+	getLockedBalanceByModule,
 	getLockedBalance,
 	recordTokenLocked,
 	recordTokenUnlocked,
