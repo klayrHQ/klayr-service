@@ -44,7 +44,25 @@ const getPosTokenID = async () => {
 	return posTokenID;
 };
 
+const getPosPunishmentLockingPeriods = async () => {
+	const { data } = await getPosConstants();
+	const punishmentLockingPeriods = {
+		punishmentWindowStaking: data.punishmentWindowStaking,
+		punishmentWindowSelfStaking: data.punishmentWindowSelfStaking,
+		lockingPeriodStaking: data.lockingPeriodStaking,
+		lockingPeriodSelfStaking: data.lockingPeriodSelfStaking,
+	};
+	return punishmentLockingPeriods;
+};
+
+const getPosRoundLength = async () => {
+	const { data } = await getPosConstants();
+	return data.roundLength;
+};
+
 module.exports = {
 	getPosConstants,
 	getPosTokenID,
+	getPosPunishmentLockingPeriods,
+	getPosRoundLength,
 };

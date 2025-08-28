@@ -25,6 +25,7 @@ module.exports = {
 		generatedBlocks: { type: 'integer', null: false, defaultValue: 0 },
 		totalCommission: { type: 'bigInteger', null: false, defaultValue: 0 },
 		totalSelfStakeRewards: { type: 'bigInteger', null: false, defaultValue: 0 },
+		reportMisbehaviorHeights: { type: 'string', null: false, defaultValue: '[]' },
 	},
 	indexes: {
 		address: { type: 'key' },

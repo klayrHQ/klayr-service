@@ -33,6 +33,7 @@ const { TRANSACTION_STATUS } = require('../../../constants');
 
 const config = require('../../../../config');
 const stakesTableSchema = require('../../../database/schema/stakes');
+const pendingUnlocksTableSchema = require('../../../database/schema/pendingUnlocks');
 
 const logger = Logger();
 
@@ -40,6 +41,7 @@ const MYSQL_ENDPOINT = config.endpoints.mysql;
 const keyValueTable = getKeyValueTable();
 
 const getStakesTable = () => getTableInstance(stakesTableSchema, MYSQL_ENDPOINT);
+const getPendingUnlocksTable = () => getTableInstance(pendingUnlocksTableSchema, MYSQL_ENDPOINT);
 
 // Command specific constants
 const COMMAND_NAME = 'stake';
@@ -96,6 +98,56 @@ const decrementStakeTrx = async (stake, trx) => {
 	await stakesTable.decrement(decrementParam, trx);
 };
 
+const incrementPendingUnlockTrx = async (
+	stakerAddress,
+	validatorAddress,
+	amount,
+	unstakeHeight,
+	dbTrx,
+) => {
+	const pendingUnlocksTable = await getPendingUnlocksTable();
+
+	const [existingPendingUnlocksData = {}] = await pendingUnlocksTable.find(
+		{ stakerAddress, validatorAddress },
+		['amount', 'unstakeHeight'],
+	);
+
+	const amountBigInt = BigInt(amount);
+	const newAmount =
+		(existingPendingUnlocksData.amount || BigInt(0)) +
+		(amountBigInt < 0n ? -amountBigInt : amountBigInt);
+
+	await pendingUnlocksTable.upsert(
+		{ stakerAddress, validatorAddress, amount: newAmount, unstakeHeight },
+		dbTrx,
+	);
+};
+
+const decrementPendingUnlockTrx = async (
+	stakerAddress,
+	validatorAddress,
+	amount,
+	unstakeHeight,
+	dbTrx,
+) => {
+	const pendingUnlocksTable = await getPendingUnlocksTable();
+
+	const [existingPendingUnlocksData = {}] = await pendingUnlocksTable.find(
+		{ stakerAddress, validatorAddress },
+		['amount'],
+	);
+
+	const amountBigInt = BigInt(amount);
+	const newAmount =
+		(existingPendingUnlocksData.amount || BigInt(0)) -
+		(amountBigInt < 0n ? -amountBigInt : amountBigInt);
+
+	await pendingUnlocksTable.upsert(
+		{ stakerAddress, validatorAddress, amount: newAmount, unstakeHeight },
+		dbTrx,
+	);
+};
+
 const updateTotalStake = async (changeAmount, dbTrx) => {
 	const tokenID = await getPosTokenID();
 	const tokenKey = KV_STORE_KEY.PREFIX.TOTAL_STAKED.concat(tokenID);
@@ -130,6 +182,16 @@ const applyTransaction = async (blockHeader, tx, events, dbTrx) => {
 		async stake => {
 			await incrementStakeTrx(stake, dbTrx);
 
+			if (stake.amount < 0n) {
+				await incrementPendingUnlockTrx(
+					stake.stakerAddress,
+					stake.validatorAddress,
+					stake.amount,
+					tx.height,
+					dbTrx,
+				);
+			}
+
 			if (stake.stakerAddress === stake.validatorAddress) {
 				totalSelfStakeChange += BigInt(stake.amount);
 			}
@@ -158,6 +220,16 @@ const revertTransaction = async (blockHeader, tx, events, dbTrx) => {
 		stakes,
 		async stake => {
 			await decrementStakeTrx(stake, dbTrx);
+
+			if (stake.amount < 0n) {
+				await decrementPendingUnlockTrx(
+					stake.stakerAddress,
+					stake.validatorAddress,
+					stake.amount,
+					tx.height,
+					dbTrx,
+				);
+			}
 
 			// Subtract to reverse the impact
 			if (stake.stakerAddress === stake.validatorAddress) {
