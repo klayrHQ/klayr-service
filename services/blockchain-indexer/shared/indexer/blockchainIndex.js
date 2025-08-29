@@ -596,7 +596,7 @@ const getBlocksToDelete = async blocks => {
 					greaterThanEqualTo: minBlockHeight,
 				},
 			],
-			sort: 'height:desc',
+			sort: 'height:asc',
 		},
 		['id', 'height', 'generatorAddress', 'timestamp', 'isFinal'],
 	);
@@ -608,6 +608,7 @@ const deleteIndexedBlocks = async job => {
 	const { blocks: blocksFromJob } = job.data;
 	const blocksToDelete = await getBlocksToDelete(blocksFromJob);
 	const blockIDs = blocksToDelete.map(b => b.id);
+	if (blockIDs.length === 0) return;
 
 	const blocksTable = await getBlocksTable();
 	const connection = await getDBConnection(MYSQL_ENDPOINT);
@@ -643,7 +644,7 @@ const deleteIndexedBlocks = async job => {
 						forkedTransactions,
 						async tx => {
 							// Record decrease nonce stored in database, which later will be committed through commitEvent()
-							await recordNonceIncrease(tx.senderAddress, true);
+							await recordNonceIncrease(tx.sender.address, true);
 
 							revertTransaction(blockHeader, tx, events, dbTrx);
 						},
@@ -773,11 +774,15 @@ const deleteIndexedBlocks = async job => {
 					await updateTotalLockedAmounts(tokenIDLockedAmountChangeMap, dbTrx);
 
 					// record token data on isBlockDeletion set to true, reversing addition/removal on token database
-					await recordEvents(blockFromJob, events, true);
+					await recordEvents({ ...blockFromJob, transactions: forkedTransactions }, events, true);
 				}
 
 				// Invalidate cached events for this block. Must be done after processing all event related calculations
 				await deleteEventsFromCacheByBlockID(blockFromJob.id);
+
+				logger.info(
+					`Recorded block deletion for ${blockFromJob.id} at height ${blockFromJob.height}.`,
+				);
 			},
 			{ concurrency: 1 },
 		);
@@ -797,6 +802,10 @@ const deleteIndexedBlocks = async job => {
 
 		// Pass nothing as argument, means that it will set last indexed block from db
 		await setLastIndexedBlock();
+
+		logger.info(
+			`Successfully completed deletion of ${blockIDs.length} block(s) and committed changes to the database`,
+		);
 	} catch (error) {
 		logger.debug(`Rolled back MySQL transaction to delete block(s) with ID(s): ${blockIDs}.`);
 		await rollbackDBTransaction(dbTrx);
@@ -910,6 +919,14 @@ const scheduleBlockDeletion = async block => {
 };
 
 const indexNewBlock = async (block, skipCheckingMissingBlock = false) => {
+	// To prevent indexBlocksQueue job failed because of Non-sequential block after block deletion process, we skip scheduling new block while deletion is in progress
+	if (await indexBlocksQueue.queue.isPaused()) {
+		logger.info(
+			`Block deletion currently in progress. Block ${block.header.id} at height ${block.header.height} will be indexed later.`,
+		);
+		return;
+	}
+
 	const blocksTable = await getBlocksTable();
 	const lastIndexedBlock = await getLastIndexedBlock();
 
@@ -935,15 +952,51 @@ const indexNewBlock = async (block, skipCheckingMissingBlock = false) => {
 		'generatorAddress',
 		'timestamp',
 		'isFinal',
+		'previousBlockID',
 	]);
 
 	// Schedule block deletion in case of an unprocessed fork detection
-	if (blockFromDB && blockFromDB.id !== block.header.id) {
+	if (
+		blockFromDB &&
+		blockFromDB.id !== block.header.id &&
+		!(await indexBlocksQueue.queue.isPaused())
+	) {
 		logger.info(
 			`Fork detected while scheduling indexing at height: ${block.header.height}. Actual blockID: ${block.header.id}, indexed blockID: ${blockFromDB.id}.`,
 		);
+		await pauseIndexBlocksQueue();
 
-		await scheduleBlockDeletion(blockFromDB);
+		let blockToCheck = blockFromDB;
+		while (true) {
+			if (blockToCheck.height === 1) {
+				logger.warn(
+					`Fork resolution reached the genesis block. All blocks up to the genesis block will be deleted.`,
+				);
+				await scheduleBlockDeletion(blockToCheck);
+				break;
+			}
+
+			const previousBlockFromNode = await getBlockByHeight(blockToCheck.height - 1, true);
+			if (previousBlockFromNode.id === blockToCheck.previousBlockID) {
+				logger.info(
+					`First divergent block found at height ${blockToCheck.height}. All blocks from this point onward will be scheduled for deletion.`,
+				);
+				await scheduleBlockDeletion(blockToCheck);
+				break;
+			}
+			const [previousBlockFromDB] = await blocksTable.find(
+				{ height: previousBlockFromNode.height, limit: 1 },
+				['id', 'height', 'generatorAddress', 'timestamp', 'isFinal', 'previousBlockID'],
+			);
+			if (!previousBlockFromDB) {
+				throw new Error(
+					`Expected a DB block at height ${previousBlockFromNode.height}, but none was found during fork resolution`,
+				);
+			}
+			blockToCheck = previousBlockFromDB;
+		}
+
+		return;
 	}
 
 	// Schedule indexing of the incoming block if not already indexed or a fork was detected
