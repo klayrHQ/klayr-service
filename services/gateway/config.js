@@ -112,13 +112,12 @@ config.websocket = {
 
 // Gateway RPC cache settings
 config.rpcCache = {
-	ttl: 5, // in seconds
-	enable: String(process.env.ENABLE_RPC_REQUEST_CACHING).toLowerCase() !== 'false',
-};
-
-config.cacher = {
-	globalTTL: Number(process.env.GATEWAY_CACHER_GLOBAL_TTL) || 5, // in seconds
-	redis: process.env.GATEWAY_CACHER_REDIS || 'redis://klayr:password@127.0.0.1:6379/6',
+	ttl: ['blockTime', 'block'].includes(process.env.REQUEST_CACHING_TTL)
+		? process.env.REQUEST_CACHING_TTL
+		: !isNaN(Number(process.env.REQUEST_CACHING_TTL))
+		? Number(process.env.REQUEST_CACHING_TTL) // in seconds
+		: 'blockTime', // default to block time
+	enable: String(process.env.ENABLE_REQUEST_CACHING).toLowerCase() !== 'false', // default to true
 };
 
 const DEFAULT_DEPENDENCIES = 'indexer,connector';

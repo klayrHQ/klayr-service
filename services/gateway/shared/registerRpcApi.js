@@ -67,13 +67,36 @@ const configureApi = (apiNames, apiPrefix, registeredModuleNames) => {
 		[],
 	);
 
-	const aliases = Object.keys(methods).reduce(
-		(acc, key) => ({
+	const aliases = Object.keys(methods).reduce((acc, key) => {
+		const methodConfig = methods[key];
+
+		let callOptions = {};
+
+		// mimic HTTP: only add caching meta if cache is enabled
+		if (
+			methodConfig.cache &&
+			(methodConfig.cache === true ||
+				(Object.keys(methodConfig.cache).length > 0 &&
+					(methodConfig.cache.ttl || methodConfig.cache.keys)))
+		) {
+			callOptions.meta = { $cache: true };
+
+			if (methodConfig.cache.ttl) {
+				callOptions.meta.$cacheTTL = methodConfig.cache.ttl;
+			}
+			if (methodConfig.cache.keys) {
+				callOptions.meta.$cacheKeys = methodConfig.cache.keys;
+			}
+		}
+
+		return {
 			...acc,
-			[`${transformPath(methods[key].rpcMethod)}`]: methods[key].source.method,
-		}),
-		{},
-	);
+			[`${transformPath(methodConfig.rpcMethod)}`]: {
+				action: methodConfig.source.method,
+				...(Object.keys(callOptions).length > 0 && { callOptions }),
+			},
+		};
+	}, {});
 
 	const methodPaths = Object.keys(methods).reduce(
 		(acc, key) => ({

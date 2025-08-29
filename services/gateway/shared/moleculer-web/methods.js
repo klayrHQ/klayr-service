@@ -11,14 +11,14 @@ const _ = require('lodash');
 const kleur = require('kleur');
 const {
 	Exceptions: { ValidationException, NotFoundException },
-	CacheRedis,
 } = require('klayr-service-framework');
 const config = require('../../config');
 const stringify = require('json-stable-stringify');
 const { getBlockTime } = require('../constant');
+const { getGatewayCache, setGatewayCache } = require('../cache');
+const { isValidNonEmptyResponse } = require('../utils');
 
-const webCache = CacheRedis('rpcCache', config.cacher.redis);
-const GLOBAL_CACHE_TTL = config.cacher.globalTTL * 1000;
+const expireMilliseconds = config.rpcCache.ttl * 1000;
 
 module.exports = {
 	methods: {
@@ -131,21 +131,29 @@ module.exports = {
 				let data;
 
 				// Cache handling
-				let ttl = GLOBAL_CACHE_TTL;
-				const meta = req.$alias?.callOptions?.meta;
-				if (meta && meta.$cache) {
-					ttl = meta.$cacheTTL === 'blockTime' ? (await getBlockTime()) * 1000 : meta.$cacheTTL;
-					const keys = meta.$cacheKeys || Object.keys(params);
-					const paramKey = keys.reduce((acc, key) => {
-						if (params.hasOwnProperty(key)) acc[key] = params[key];
-						return acc;
-					}, {});
-					cacheKey = `http:${req.method}:${req.$alias.path}:${stringify(paramKey)}`;
+				let ttl = expireMilliseconds;
+				if (config.rpcCache.enable) {
+					let paramKey = params;
+					const meta = req.$alias?.callOptions?.meta;
+					if (meta && meta.$cache) {
+						ttl = ['blockTime', 'block'].includes(meta.$cacheTTL)
+							? (await getBlockTime()) * 1000
+							: meta.$cacheTTL * 1000;
+						const keys = meta.$cacheKeys || Object.keys(params);
+						paramKey = keys.reduce((acc, key) => {
+							if (params.hasOwnProperty(key)) acc[key] = params[key];
+							return acc;
+						}, {});
+					}
 
-					const cached = await webCache.get(cacheKey);
+					cacheKey = `${req.method.toLowerCase()}.${req.$alias.path.replaceAll(
+						'/',
+						'.',
+					)}:${stringify(paramKey)}`;
+
+					const cached = await getGatewayCache(cacheKey);
 					if (cached != null) {
-						this.logger.debug(`Cache HIT for ${cacheKey}`);
-						data = cached;
+						data = JSON.parse(cached);
 					}
 				}
 
@@ -153,16 +161,15 @@ module.exports = {
 					// Call the action
 					data = await ctx.call(req.$endpoint, params, route.callOptions);
 
-					// Save result to cache if enabled
-					if (cacheKey) {
-						await webCache.set(cacheKey, data, ttl);
-						this.logger.debug(`Cache SET for ${cacheKey}`);
+					// Post-process response
+					if (route.onAfterCall) {
+						data = await route.onAfterCall.call(this, ctx, route, req, res, data);
 					}
-				}
 
-				// Post-process response
-				if (route.onAfterCall) {
-					data = await route.onAfterCall.call(this, ctx, route, req, res, data);
+					// Save result to cache if enabled
+					if (cacheKey && isValidNonEmptyResponse(data)) {
+						await setGatewayCache(cacheKey, JSON.stringify(data), ttl);
+					}
 				}
 
 				// Send back the response

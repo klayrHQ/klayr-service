@@ -14,15 +14,14 @@ const {
 		JSON_RPC: { INVALID_REQUEST, METHOD_NOT_FOUND, SERVER_ERROR },
 	},
 	Utils,
-	CacheRedis,
 } = require('klayr-service-framework');
 const stringify = require('json-stable-stringify');
 const { checkWhitelist } = require('./util');
 const config = require('../../config');
 const { BadRequestError } = require('./errors');
 const { isValidNonEmptyResponse } = require('../utils');
+const { getGatewayCache, setGatewayCache } = require('../cache');
 
-const rpcCache = CacheRedis('rpcCache', config.volatileRedis);
 const expireMilliseconds = config.rpcCache.ttl * 1000;
 
 const rateLimiter = new RateLimiterMemory(config.websocket.rateLimit);
@@ -139,13 +138,13 @@ module.exports = {
 					throw new BadRequestError();
 				}
 				// Handle aliases
-				let aliased = false;
-				const original = action;
+				let callOptions = {};
 				if (handlerItem.aliases) {
 					const alias = handlerItem.aliases[action];
 					if (alias) {
 						aliased = true;
-						action = alias;
+						action = alias.action;
+						callOptions = alias.callOptions;
 					} else if (handlerItem.mappingPolicy === 'restrict') {
 						throw new ServiceNotFoundError({ action });
 					}
@@ -174,6 +173,7 @@ module.exports = {
 						},
 					},
 					handlerItem.callOptions,
+					callOptions,
 				);
 				this.logger.debug('Call action:', action, params, opts);
 				const request = {
@@ -186,8 +186,22 @@ module.exports = {
 				}
 				let res;
 				if (config.rpcCache.enable) {
-					const rpcRequestCacheKey = `${request.method}:${stringify(request.params)}`;
-					const cachedResponse = await rpcCache.get(rpcRequestCacheKey);
+					let ttl = expireMilliseconds;
+					let params = request.params;
+
+					if (opts.meta && opts.meta.$cache) {
+						ttl = ['blockTime', 'block'].includes(opts.meta.$cacheTTL)
+							? (await getBlockTime()) * 1000
+							: opts.meta.$cacheTTL * 1000;
+						const keys = opts.meta.$cacheKeys || Object.keys(request.params);
+						params = keys.reduce((acc, key) => {
+							if (request.params.hasOwnProperty(key)) acc[key] = request.params[key];
+							return acc;
+						}, {});
+					}
+
+					const rpcRequestCacheKey = `${request.method}:${stringify(params)}`;
+					const cachedResponse = await getGatewayCache(rpcRequestCacheKey);
 					if (cachedResponse) {
 						res = JSON.parse(cachedResponse);
 					} else {
@@ -197,7 +211,7 @@ module.exports = {
 						}
 						// Store transformed response in redis cache
 						if (isValidNonEmptyResponse(res)) {
-							await rpcCache.set(rpcRequestCacheKey, JSON.stringify(res), expireMilliseconds);
+							await setGatewayCache(rpcRequestCacheKey, JSON.stringify(res), ttl);
 						}
 					}
 				} else {
