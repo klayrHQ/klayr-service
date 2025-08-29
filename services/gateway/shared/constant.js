@@ -10,6 +10,11 @@ const getBlockTime = async () => {
 	return blockTime;
 };
 
+const getTTLBasedOnBlockTime = async ttl => {
+	return ['blockTime', 'block'].includes(ttl) ? (await getBlockTime()) * 1000 : ttl * 1000;
+};
+
 module.exports = {
 	getBlockTime,
+	getTTLBasedOnBlockTime,
 };

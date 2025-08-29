@@ -14,11 +14,9 @@ const {
 } = require('klayr-service-framework');
 const config = require('../../config');
 const stringify = require('json-stable-stringify');
-const { getBlockTime } = require('../constant');
+const { getTTLBasedOnBlockTime } = require('../constant');
 const { getGatewayCache, setGatewayCache } = require('../cache');
 const { isValidNonEmptyResponse } = require('../utils');
-
-const expireMilliseconds = config.rpcCache.ttl * 1000;
 
 module.exports = {
 	methods: {
@@ -131,15 +129,13 @@ module.exports = {
 				let data;
 
 				// Cache handling
-				let ttl = expireMilliseconds;
+				let ttl = await getTTLBasedOnBlockTime(config.rpcCache.ttl);
 				const requestMethod = `${req.method.toLowerCase()}.${req.$alias.path.replaceAll('/', '.')}`;
 				if (config.rpcCache.enable && !config.rpcCache.excludeList.includes(requestMethod)) {
 					let paramKey = params;
 					const meta = req.$alias?.callOptions?.meta;
 					if (meta && meta.$cache) {
-						ttl = ['blockTime', 'block'].includes(meta.$cacheTTL)
-							? (await getBlockTime()) * 1000
-							: meta.$cacheTTL * 1000;
+						ttl = await getTTLBasedOnBlockTime(meta.$cacheTTL);
 						const keys = meta.$cacheKeys || Object.keys(params);
 						paramKey = keys.reduce((acc, key) => {
 							if (params.hasOwnProperty(key)) acc[key] = params[key];

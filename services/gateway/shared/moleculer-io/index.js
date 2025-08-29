@@ -21,8 +21,7 @@ const config = require('../../config');
 const { BadRequestError } = require('./errors');
 const { isValidNonEmptyResponse } = require('../utils');
 const { getGatewayCache, setGatewayCache } = require('../cache');
-
-const expireMilliseconds = config.rpcCache.ttl * 1000;
+const { getTTLBasedOnBlockTime } = require('../constant');
 
 const rateLimiter = new RateLimiterMemory(config.websocket.rateLimit);
 
@@ -186,13 +185,11 @@ module.exports = {
 				}
 				let res;
 				if (config.rpcCache.enable && !config.rpcCache.excludeList.includes(request.method)) {
-					let ttl = expireMilliseconds;
+					let ttl = await getTTLBasedOnBlockTime(config.rpcCache.ttl);
 					let params = request.params;
 
 					if (opts.meta && opts.meta.$cache) {
-						ttl = ['blockTime', 'block'].includes(opts.meta.$cacheTTL)
-							? (await getBlockTime()) * 1000
-							: opts.meta.$cacheTTL * 1000;
+						ttl = await getTTLBasedOnBlockTime(opts.meta.$cacheTTL);
 						const keys = opts.meta.$cacheKeys || Object.keys(request.params);
 						params = keys.reduce((acc, key) => {
 							if (request.params.hasOwnProperty(key)) acc[key] = request.params[key];
