@@ -18,6 +18,7 @@ const stringify = require('json-stable-stringify');
 const { getBlockTime } = require('../constant');
 
 const webCache = CacheRedis('rpcCache', config.cacher.redis);
+const GLOBAL_CACHE_TTL = config.cacher.globalTTL * 1000;
 
 module.exports = {
 	methods: {
@@ -130,7 +131,7 @@ module.exports = {
 				let data;
 
 				// Cache handling
-				let ttl = config.cacher.globalTTL;
+				let ttl = GLOBAL_CACHE_TTL;
 				const meta = req.$alias?.callOptions?.meta;
 				if (meta && meta.$cache) {
 					ttl = meta.$cacheTTL === 'blockTime' ? (await getBlockTime()) * 1000 : meta.$cacheTTL;
