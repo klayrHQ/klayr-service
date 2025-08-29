@@ -370,8 +370,12 @@ const waitForGetApiClient = (url, intervalMs = 1000, resolveUndefined = false) =
 
 const getApiClient = async (url, poolIndex) => {
 	await initNodeClientPoolIfEmpty();
-	const node = await getNodeClient(url);
+	if (node.clientPool.length === 0) {
+		logger.error('getApiClient Error: node clientPool is empty');
+		throw new Error('node clientPool is empty');
+	}
 
+	const node = await getNodeClient(url);
 	const index = Number.isNaN(Number(poolIndex))
 		? crypto.randomInt(Math.min(node.clientPool.length, MAX_CLIENT_POOL_SIZE))
 		: poolIndex;
