@@ -15,6 +15,7 @@ const {
 } = require('klayr-service-framework');
 const config = require('../../config');
 const stringify = require('json-stable-stringify');
+const { getBlockTime } = require('../constant');
 
 const webCache = CacheRedis('rpcCache', config.cacher.redis);
 
@@ -132,7 +133,7 @@ module.exports = {
 				let ttl = config.cacher.globalTTL;
 				const meta = req.$alias?.callOptions?.meta;
 				if (meta && meta.$cache) {
-					ttl = meta.$cacheTTL;
+					ttl = meta.$cacheTTL === 'blockTime' ? (await getBlockTime()) * 1000 : meta.$cacheTTL;
 					const keys = meta.$cacheKeys || Object.keys(params);
 					const paramKey = keys.reduce((acc, key) => {
 						if (params.hasOwnProperty(key)) acc[key] = params[key];
