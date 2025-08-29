@@ -90,6 +90,9 @@ const getStakes = async params => {
 	await BluebirdPromise.map(
 		stakerInfo,
 		async stake => {
+			// Skip stakes with zero amount
+			if (BigInt(stake.amount) === 0n) return;
+
 			const normalizedStake = normalizeStake(stake);
 			// Get validator name filtered by user specified search param
 			const { name: validatorName = null } = await getIndexedAccountInfo(
