@@ -185,7 +185,7 @@ module.exports = {
 					await handlerItem.onBeforeCall.call(this, ctx, socket, request, opts);
 				}
 				let res;
-				if (config.rpcCache.enable) {
+				if (config.rpcCache.enable && !config.rpcCache.excludeList.includes(request.method)) {
 					let ttl = expireMilliseconds;
 					let params = request.params;
 

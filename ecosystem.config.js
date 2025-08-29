@@ -48,6 +48,7 @@ module.exports = {
 				HTTP_RATE_LIMIT_NUM_KNOWN_PROXIES: 0,
 				// ENABLE_REQUEST_CACHING: true,
 				// REQUEST_CACHING_TTL: 'blockTime',
+				// REQUEST_CACHING_EXCLUDE_LIST: 'post.transactions,post.transactions.dryrun,post.transactions.estimate-fees,post.validator.validate-bls-key,post.invoke',
 				// GATEWAY_ROUTES_CALL_TIMEOUT: 30,
 				// ENABLE_REVERSE_PROXY_TIMEOUT_SETTINGS: true,
 				// HTTP_KEEP_ALIVE_TIMEOUT: 65000,

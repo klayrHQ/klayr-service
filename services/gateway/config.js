@@ -118,6 +118,15 @@ config.rpcCache = {
 		? Number(process.env.REQUEST_CACHING_TTL) // in seconds
 		: 'blockTime', // default to block time
 	enable: String(process.env.ENABLE_REQUEST_CACHING).toLowerCase() !== 'false', // default to true
+	excludeList: process.env.REQUEST_CACHING_EXCLUDE_LIST
+		? process.env.REQUEST_CACHING_EXCLUDE_LIST.split(',')
+		: [
+				'post.transactions',
+				'post.transactions.dryrun',
+				'post.transactions.estimate-fees',
+				'post.validator.validate-bls-key',
+				'post.invoke',
+		  ],
 };
 
 const DEFAULT_DEPENDENCIES = 'indexer,connector';

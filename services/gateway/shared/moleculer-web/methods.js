@@ -132,7 +132,8 @@ module.exports = {
 
 				// Cache handling
 				let ttl = expireMilliseconds;
-				if (config.rpcCache.enable) {
+				const requestMethod = `${req.method.toLowerCase()}.${req.$alias.path.replaceAll('/', '.')}`;
+				if (config.rpcCache.enable && !config.rpcCache.excludeList.includes(requestMethod)) {
 					let paramKey = params;
 					const meta = req.$alias?.callOptions?.meta;
 					if (meta && meta.$cache) {
@@ -146,10 +147,7 @@ module.exports = {
 						}, {});
 					}
 
-					cacheKey = `${req.method.toLowerCase()}.${req.$alias.path.replaceAll(
-						'/',
-						'.',
-					)}:${stringify(paramKey)}`;
+					cacheKey = `${requestMethod}:${stringify(paramKey)}`;
 
 					const cached = await getGatewayCache(cacheKey);
 					if (cached != null) {
