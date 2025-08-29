@@ -11,7 +11,12 @@ const _ = require('lodash');
 const kleur = require('kleur');
 const {
 	Exceptions: { ValidationException, NotFoundException },
+	CacheRedis,
 } = require('klayr-service-framework');
+const config = require('../../config');
+const stringify = require('json-stable-stringify');
+
+const webCache = CacheRedis('rpcCache', config.cacher.redis);
 
 module.exports = {
 	methods: {
@@ -120,12 +125,40 @@ module.exports = {
 				}
 				if (req.baseUrl) req.$endpoint.baseUrl = req.baseUrl;
 
-				// Call the action
-				let data = await ctx.call(req.$endpoint, params, route.callOptions);
+				let cacheKey;
+				let data;
 
-				// Post-process the response
+				// Cache handling
+				let ttl = config.cacher.globalTTL;
+				const meta = req.$alias?.callOptions?.meta;
+				if (meta && meta.$cache) {
+					ttl = meta.$cacheTTL;
+					const keys = meta.$cacheKeys || Object.keys(params);
+					const paramKey = keys.reduce((acc, key) => {
+						if (params.hasOwnProperty(key)) acc[key] = params[key];
+						return acc;
+					}, {});
+					cacheKey = `http:${req.method}:${req.$alias.path}:${stringify(paramKey)}`;
 
-				// onAfterCall handling
+					const cached = await webCache.get(cacheKey);
+					if (cached != null) {
+						this.logger.debug(`Cache HIT for ${cacheKey}`);
+						data = cached;
+					}
+				}
+
+				if (!data) {
+					// Call the action
+					data = await ctx.call(req.$endpoint, params, route.callOptions);
+
+					// Save result to cache if enabled
+					if (cacheKey) {
+						await webCache.set(cacheKey, data, ttl);
+						this.logger.debug(`Cache SET for ${cacheKey}`);
+					}
+				}
+
+				// Post-process response
 				if (route.onAfterCall) {
 					data = await route.onAfterCall.call(this, ctx, route, req, res, data);
 				}
