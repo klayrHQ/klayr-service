@@ -78,7 +78,7 @@ const applyTransaction = async (blockHeader, tx, events, dbTrx) => {
 				aggregateCommitHeight,
 			)
 		) {
-			await pendingUnlocksTable.deleteByPrimaryKey(
+			await pendingUnlocksTable.delete(
 				{
 					stakerAddress: senderAddress,
 					validatorAddress: unlockObject.validatorAddress,
@@ -143,7 +143,7 @@ const revertTransaction = async (blockHeader, tx, events, dbTrx) => {
 				unstakeHeight: unlockObject.unstakeHeight,
 			});
 
-			await stakeUnlockedTable.deleteByPrimaryKey({
+			await stakeUnlockedTable.delete({
 				stakerAddress: tx.senderAddress,
 				validatorAddress: unlockObject.validatorAddress,
 				unlockHeight: height,

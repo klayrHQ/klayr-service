@@ -142,7 +142,7 @@ const commitSupportedTokens = async dbTrx => {
 			if (isSupported) {
 				await tokenSupportedTable.upsert({ tokenID, chainID }, dbTrx);
 			} else {
-				await tokenSupportedTable.deleteByPrimaryKey({ tokenID, chainID }, dbTrx);
+				await tokenSupportedTable.delete({ tokenID, chainID }, dbTrx);
 			}
 		},
 		{ concurrency: Math.min(supportedTokensMap.size, COMMIT_MAX_CONCURRENCY) },
