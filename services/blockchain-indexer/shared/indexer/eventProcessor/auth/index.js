@@ -1,6 +1,6 @@
 const BluebirdPromise = require('bluebird');
 const { commitAuthAccount } = require('../../../dataService/recorder/auth/account');
-const { multisignatureRegistrationController } = require('./MultisignatureRegistration');
+const { multisignatureRegistrationController } = require('./multisignatureRegistration');
 
 const doNothing = async (_event, _isBlockDeletion) => {};
 

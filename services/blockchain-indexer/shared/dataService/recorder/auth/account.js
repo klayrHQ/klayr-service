@@ -49,7 +49,7 @@ const getAuthAccount = async address => {
 };
 
 const updateAuthAccountDB = async (authAccountData, dbTrx) => {
-	const authTable = getAuthTable();
+	const authTable = await getAuthTable();
 	return await authTable.upsert(authAccountData, dbTrx);
 };
 
