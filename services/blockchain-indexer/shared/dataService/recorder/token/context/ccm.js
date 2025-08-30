@@ -144,12 +144,12 @@ const getCcmIDForTokenCrossChainTransfer = ccmData => {
 	const amount = decodedParams.amount.toString();
 
 	const identifier = `${senderAddress}:${recipientAddress}:${tokenID}:${amount}`;
-	return utils.hash(identifier).toString('hex');
+	return utils.hash(identifier, 'utf8').toString('hex');
 };
 
 const getCcmIDFromCcmTransferEvent = eventData => {
 	const identifier = `${eventData.senderAddress}:${eventData.recipientAddress}:${eventData.tokenID}:${eventData.amount}`;
-	return utils.hash(identifier).toString('hex');
+	return utils.hash(identifier, 'utf8').toString('hex');
 };
 
 const decodeTransferCrossChainCCMParams = params => {
