@@ -41,6 +41,8 @@ const getBlocksTable = () => getTableInstance(blocksTableSchema, MYSQL_ENDPOINT)
 const getEventsTable = () => getTableInstance(eventsTableSchema, MYSQL_ENDPOINT);
 const getTransactionsTable = () => getTableInstance(transactionsTableSchema, MYSQL_ENDPOINT);
 
+const MAX_GET_EVENTS_CONCURRENCY = 20;
+
 const eventCache = CacheLRU('events');
 const eventCacheByBlockID = CacheLRU('eventsByBlockID');
 
@@ -235,30 +237,19 @@ const getEvents = async params => {
 
 	const { topic, ...paramsWithoutTopic } = params;
 	params = paramsWithoutTopic;
-	const eventsInfo = await eventsTable.find(params, ['eventStr', 'height', 'index']);
+	const eventsInfo = await eventsTable.find(params, ['eventStr', 'height', 'blockID', 'timestamp']);
 
 	events.data = await BluebirdPromise.map(
 		eventsInfo,
-		async ({ eventStr, height, index }) => {
-			let event;
-			if (eventStr) event = JSON.parse(eventStr);
+		async ({ eventStr, height, blockID, timestamp }) => {
+			const event = JSON.parse(eventStr);
 
-			if (!event) {
-				const eventsFromCache = await getEventsByHeight(height);
-				event = eventsFromCache.find(entry => entry.index === index);
-			}
-
-			const [{ id, timestamp } = {}] = await blocksTable.find({ height, limit: 1 }, [
-				'id',
-				'timestamp',
-			]);
-
-			return parseToJSONCompatObj({
+			return {
 				...event,
-				block: { id, height, timestamp },
-			});
+				block: { id: blockID, height, timestamp },
+			};
 		},
-		{ concurrency: eventsInfo.length },
+		{ concurrency: Math.min(eventsInfo.length, MAX_GET_EVENTS_CONCURRENCY) },
 	);
 
 	const { order, sort, ...remParamsWithoutOrderAndSort } = params;
