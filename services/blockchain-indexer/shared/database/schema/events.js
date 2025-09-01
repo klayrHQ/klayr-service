@@ -27,6 +27,7 @@ module.exports = {
 		timestamp: { type: 'integer' },
 	},
 	indexes: {
+		id: { type: 'key' },
 		height: { type: 'range' },
 		blockID: { type: 'key' },
 		index: { type: 'range' },

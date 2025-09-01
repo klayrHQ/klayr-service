@@ -24,5 +24,12 @@ module.exports = {
 		eventID: { type: 'key' },
 		topic: { type: 'key' },
 	},
+	compositeIndexes: {
+		topic_eventID_index: [
+			{ key: 'topic', direction: 'ASC' },
+			{ key: 'eventID', direction: 'ASC' },
+		],
+	},
+
 	purge: {},
 };
