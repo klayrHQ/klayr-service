@@ -20,29 +20,31 @@ const {
 const KLAYR_ADDRESS_FORMAT = 'klayr32';
 
 const parseToJSONCompatObj = obj => {
-	if (typeof obj === 'boolean' || !obj) return obj;
+	if (obj === null || obj === undefined) return obj;
 
-	if (['string', 'number'].includes(typeof obj)) return obj;
-	if (obj instanceof Buffer) return Buffer.from(obj).toString('hex');
-	if (typeof obj === 'bigint') return String(obj);
-	if (typeof obj === 'object' && Array.isArray(obj))
-		return (() => {
-			for (let i = 0; i < obj.length; i++) obj[i] = parseToJSONCompatObj(obj[i]);
-			return obj;
-		})();
+	const t = typeof obj;
 
-	const entries = Object.entries(obj);
-	for (let i = 0; i < entries.length; i++) {
-		const k = entries[i][0];
-		const v = entries[i][1];
-		if (v instanceof Buffer) obj[k] = Buffer.from(v).toString('hex');
-		else if (typeof v === 'bigint') obj[k] = String(v);
-		else if (typeof v === 'object' && Array.isArray(v)) {
-			for (let j = 0; j < obj[k].length; j++) {
-				obj[k][j] = parseToJSONCompatObj(obj[k][j]);
-			}
-		} else if (typeof v === 'object' && v !== null) obj[k] = parseToJSONCompatObj(v);
-		else obj[k] = v;
+	if (t === 'boolean' || t === 'string' || t === 'number') return obj;
+	if (t === 'bigint') return String(obj);
+	if (Buffer.isBuffer(obj)) return obj.toString('hex');
+
+	if (Array.isArray(obj)) {
+		for (let i = 0; i < obj.length; i++) {
+			obj[i] = parseToJSONCompatObj(obj[i]);
+		}
+		return obj;
+	}
+
+	if (t === 'object') {
+		for (const k in obj) {
+			if (!Object.prototype.hasOwnProperty.call(obj, k)) continue;
+			const v = obj[k];
+			if (Buffer.isBuffer(v)) obj[k] = v.toString('hex');
+			else if (typeof v === 'bigint') obj[k] = String(v);
+			else if (v && typeof v === 'object') obj[k] = parseToJSONCompatObj(v);
+			else obj[k] = v;
+		}
+		return obj;
 	}
 
 	return obj;
