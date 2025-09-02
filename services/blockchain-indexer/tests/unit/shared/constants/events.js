@@ -67,6 +67,7 @@ const mockEventTopics = [
 	},
 ];
 
+// TODO: eventStr is now eventBlob using msgpack
 const mockEventsForEventTopics = [
 	{
 		eventStr:

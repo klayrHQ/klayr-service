@@ -86,6 +86,7 @@ describe('getEventsByBlockID', () => {
 								const dbResp = [];
 
 								for (let i = 0; i < mockedEvents.length; i++) {
+									// TODO: eventStr is now eventBlob using msgpack
 									const eventStr = JSON.stringify(mockedEvents[i]);
 									dbResp.push({ eventStr });
 								}

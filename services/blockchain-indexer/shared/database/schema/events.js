@@ -23,7 +23,7 @@ module.exports = {
 		blockID: { type: 'string' },
 		height: { type: 'integer' },
 		index: { type: 'integer' },
-		eventStr: { type: 'text' },
+		eventBlob: { type: 'binary' },
 		timestamp: { type: 'integer' },
 	},
 	indexes: {

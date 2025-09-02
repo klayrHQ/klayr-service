@@ -30,6 +30,5 @@ module.exports = {
 			{ key: 'eventID', direction: 'ASC' },
 		],
 	},
-
 	purge: {},
 };

@@ -14,6 +14,7 @@
  *
  */
 const { EVENT, EVENT_TOPIC_PREFIX, LENGTH_ID, MODULE } = require('../../constants');
+const msgpack = require('@msgpack/msgpack');
 
 const getEventsInfoToIndex = (block, events) => {
 	const eventsInfoToIndex = {
@@ -50,7 +51,7 @@ const getEventsInfoToIndex = (block, events) => {
 			index: event.index,
 			blockID: block.id,
 			timestamp: block.timestamp,
-			eventStr: JSON.stringify(event),
+			eventBlob: Buffer.from(msgpack.encode(event)),
 		};
 
 		if (!eventsInfoKeys.eventsInfo[`${event.id}`]) {

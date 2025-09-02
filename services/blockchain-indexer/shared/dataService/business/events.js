@@ -14,6 +14,7 @@
  *
  */
 const BluebirdPromise = require('bluebird');
+const msgpack = require('@msgpack/msgpack');
 
 const {
 	CacheLRU,
@@ -58,11 +59,11 @@ const getEventsByHeight = async height => {
 
 	// Get from DB first (this is the default behavior)
 	const eventsTable = await getEventsTable();
-	const dbEventStrings = await eventsTable.find({ height }, ['eventStr']);
+	const dbEventBlob = await eventsTable.find({ height }, ['eventBlob']);
 
-	if (dbEventStrings.length) {
-		const dbEvents = dbEventStrings.map(({ eventStr }) =>
-			eventStr ? JSON.parse(eventStr) : eventStr,
+	if (dbEventBlob.length) {
+		const dbEvents = dbEventBlob.map(({ eventBlob }) =>
+			eventBlob ? msgpack.decode(eventBlob) : eventBlob,
 		);
 		await eventCache.set(height, JSON.stringify(dbEvents));
 		return dbEvents;
@@ -81,11 +82,11 @@ const getEventsByBlockID = async blockID => {
 
 	// Get from DB incase of cache miss
 	const eventsTable = await getEventsTable();
-	const dbEventStrings = await eventsTable.find({ blockID }, ['eventStr']);
+	const dbEventsBlob = await eventsTable.find({ blockID }, ['eventBlob']);
 
-	if (dbEventStrings.length) {
-		const dbEvents = dbEventStrings.map(({ eventStr }) =>
-			eventStr ? JSON.parse(eventStr) : eventStr,
+	if (dbEventsBlob.length) {
+		const dbEvents = dbEventsBlob.map(({ eventBlob }) =>
+			eventBlob ? msgpack.decode(eventBlob) : eventBlob,
 		);
 		eventCacheByBlockID.set(blockID, JSON.stringify(dbEvents));
 		return dbEvents;
@@ -237,12 +238,17 @@ const getEvents = async params => {
 
 	const { topic, ...paramsWithoutTopic } = params;
 	params = paramsWithoutTopic;
-	const eventsInfo = await eventsTable.find(params, ['eventStr', 'height', 'blockID', 'timestamp']);
+	const eventsInfo = await eventsTable.find(params, [
+		'eventBlob',
+		'height',
+		'blockID',
+		'timestamp',
+	]);
 
 	events.data = await BluebirdPromise.map(
 		eventsInfo,
-		async ({ eventStr, height, blockID, timestamp }) => {
-			const event = JSON.parse(eventStr);
+		async ({ eventBlob, height, blockID, timestamp }) => {
+			const event = msgpack.decode(eventBlob);
 
 			return {
 				...event,
