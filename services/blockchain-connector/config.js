@@ -115,7 +115,7 @@ config.apiClient = {
 config.queue = {
 	invokeEndpoint: {
 		name: 'InvokeEndpoint',
-		concurrency: Number(process.env.INVOKE_ENDPOINT_QUEUE_CONCURRENCY) || 1,
+		concurrency: Number(process.env.INVOKE_ENDPOINT_QUEUE_CONCURRENCY) || 3,
 	},
 };
 
