@@ -1,7 +1,7 @@
 const {
 	Utils: { waitForIt },
 } = require('klayr-service-framework');
-const { getAppContext } = require('./request');
+const { getAppContext, requestIndexer } = require('./request');
 
 let indexerReady = false;
 let indexerStatusReady = false;
