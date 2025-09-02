@@ -13,15 +13,11 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const {
-	CacheRedis,
-	Signals,
-	Utils: { isObject },
-} = require('klayr-service-framework');
+const { CacheRedis, Signals } = require('klayr-service-framework');
 
 const config = require('../../config');
 const { requestIndexer, requestConnector } = require('./request');
-const { waitForIndexerReady } = require('./indexerReady');
+const { waitForIndexerReady, waitForIndexerStatusReady } = require('./indexerReady');
 
 let genesisHeight;
 let blockTime;
@@ -94,6 +90,7 @@ const getBlockByHeight = async height => {
 	if (blockStr) return JSON.parse(blockStr);
 
 	await waitForIndexerReady();
+	await waitForIndexerStatusReady();
 
 	const block = await requestIndexer('getBlockByHeight', { height });
 	await cacheBlockByHeight(block);
