@@ -32,6 +32,8 @@ module.exports = {
 		blockID: { type: 'key' },
 		index: { type: 'range' },
 		timestamp: { type: 'range' },
+		name: { type: 'key' },
+		module: { type: 'key' },
 	},
 	compositeIndexes: {
 		timestamp_desc_index_asc: [
