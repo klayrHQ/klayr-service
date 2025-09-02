@@ -32,7 +32,11 @@ const getMissingBlocks = async (from, to) => {
 	await waitForIndexerReady();
 	await waitForIndexerStatusReady();
 
-	return await requestIndexer('getMissingBlocks', { from, to }).catch(err => err);
+	return await requestIndexer(
+		'getMissingBlocks',
+		{ from, to },
+		{ timeout: config.brokerTimeout * 1000 * 3 },
+	).catch(err => err);
 };
 
 const getIndexVerifiedHeight = async () =>

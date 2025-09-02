@@ -13,6 +13,7 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
+const config = require('../../config');
 const {
 	waitForConnectorWorkloadReady,
 	waitForConnectorReady,
@@ -28,12 +29,20 @@ const waitForConnector = async () => {
 
 const getAllPosValidators = async () => {
 	await waitForConnector();
-	return await requestConnector('getAllPosValidators');
+	return await requestConnector(
+		'getAllPosValidators',
+		{},
+		{ timeout: config.brokerTimeout * 1000 * 3 },
+	);
 };
 
 const getBlocksByHeightBetween = async (from, to) => {
 	await waitForConnector();
-	return await requestConnector('getBlocksByHeightBetween', { from, to });
+	return await requestConnector(
+		'getBlocksByHeightBetween',
+		{ from, to },
+		{ timeout: config.brokerTimeout * 1000 * 3 },
+	);
 };
 
 module.exports = {
