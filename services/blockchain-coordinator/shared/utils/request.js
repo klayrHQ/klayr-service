@@ -35,6 +35,7 @@ const requestIndexer = async (method, params, options) =>
 	requestRpc('indexer', method, params, options);
 
 module.exports = {
+	getAppContext,
 	setAppContext,
 	requestConnector,
 	requestIndexer,
