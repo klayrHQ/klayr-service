@@ -66,7 +66,18 @@ async function getNodeClientActiveSize(node) {
 }
 
 async function getActiveNodeClientActive() {
-	return nodeClientPool.filter(async node => (await getNodeClientActiveSize(node)) > 0);
+	const checks = await Promise.all(
+		nodeClientPool.map(async node => {
+			try {
+				const activeCount = await getNodeClientActiveSize(node);
+				return { node, activeCount };
+			} catch (err) {
+				return { node, activeCount: 0 };
+			}
+		}),
+	);
+
+	return checks.filter(c => c.activeCount > 0).map(c => c.node);
 }
 
 function getEventSubscriberNodeURL() {
@@ -581,6 +592,8 @@ const invokeEndpointOnSpecificNode = async (
 module.exports = {
 	TIMEOUT_REGEX,
 
+	getActiveNodeClientActive,
+	getNodeQueueSize,
 	getApiClient,
 	invokeEndpoint,
 	getEventSubscriberNodeURL,
