@@ -13,10 +13,30 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
+const {
+	waitForConnectorWorkloadReady,
+	waitForConnectorReady,
+	waitForConnectorStatusReady,
+} = require('../connectorReady');
 const { requestConnector } = require('../utils/request');
 
-const getAllPosValidators = async () => requestConnector('getAllPosValidators');
+const waitForConnector = async () => {
+	await waitForConnectorReady();
+	await waitForConnectorStatusReady();
+	await waitForConnectorWorkloadReady();
+};
+
+const getAllPosValidators = async () => {
+	await waitForConnector();
+	return await requestConnector('getAllPosValidators');
+};
+
+const getBlocksByHeightBetween = async (from, to) => {
+	await waitForConnector();
+	return await requestConnector('getBlocksByHeightBetween', { from, to });
+};
 
 module.exports = {
 	getAllPosValidators,
+	getBlocksByHeightBetween,
 };

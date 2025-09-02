@@ -79,9 +79,9 @@ config.job = {
 		interval: Number(process.env.JOB_INTERVAL_INDEX_MISSING_BLOCKS) || 0,
 		schedule: process.env.JOB_SCHEDULE_INDEX_MISSING_BLOCKS || '*/5 * * * *',
 		skipThreshold: Number(process.env.INDEX_MISSING_BLOCKS_SKIP_THRESHOLD) || 1000,
-		maxBlocksToSchedule: Number(process.env.INDEX_MISSING_BLOCKS_MAX_SCHEDULE) || 25000,
+		maxBlocksToSchedule: Number(process.env.INDEX_MISSING_BLOCKS_MAX_SCHEDULE) || 20000,
 		scheduleBlockIndexingMaxBatchSize:
-			Number(process.env.SCHEDULE_BLOCK_INDEXING_MAX_BATCH_SIZE) || 15000,
+			Number(process.env.SCHEDULE_BLOCK_INDEXING_MAX_BATCH_SIZE) || 5000,
 	},
 };
 

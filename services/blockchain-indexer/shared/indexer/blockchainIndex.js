@@ -1038,7 +1038,7 @@ const findMissingBlocksInRange = async (fromHeight, toHeight) => {
 	if (indexedBlockCount < 3) {
 		result.push({ from: fromHeight, to: toHeight });
 	} else if (indexedBlockCount !== totalNumOfBlocks) {
-		const BATCH_SIZE = 25000;
+		const BATCH_SIZE = 10000;
 		const NUM_BATCHES = Math.ceil((toHeight - fromHeight) / BATCH_SIZE);
 
 		for (let i = 0; i < NUM_BATCHES; i++) {
