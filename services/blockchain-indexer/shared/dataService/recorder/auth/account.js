@@ -19,6 +19,8 @@ const getAuthTable = () => getTableInstance(authTableSchema, MYSQL_ENDPOINT);
 // The key is 'address' and the value is the auth account object (for upsert) or false (for delete)
 const authUpdatesMap = new Map();
 
+const getAuthUpdatesMap = () => authUpdatesMap;
+
 const getAuthAccount = async address => {
 	const authTable = await getAuthTable();
 	const data = await authTable.find({ address, limit: 1 }, [
@@ -124,6 +126,7 @@ const commitAuthAccount = async dbTrx => {
 };
 
 module.exports = {
+	getAuthUpdatesMap,
 	recordNonceIncrease,
 	recordAuthAccount,
 	getAuthAccount,

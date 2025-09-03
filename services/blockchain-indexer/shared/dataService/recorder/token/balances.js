@@ -19,6 +19,8 @@ const getTokenBalancesTable = () => getTableInstance(tokenBalancesTableSchema, M
 // The key is a string 'address:tokenID' and the value is an object { available: BigInt, total: BigInt }
 const balancesUpdatesMap = new Map();
 
+const getBalancesUpdatesMap = () => balancesUpdatesMap;
+
 const getBalanceUpdate = key => {
 	const balanceUpdate = balancesUpdatesMap.get(key) || { available: 0n, total: 0n };
 	return balanceUpdate;
@@ -249,6 +251,7 @@ const commitTokenBalanceIndex = async dbTrx => {
 };
 
 module.exports = {
+	getBalancesUpdatesMap,
 	getAvailableBalance,
 	getTotalBalance,
 	recordTokenBalanceAddition,

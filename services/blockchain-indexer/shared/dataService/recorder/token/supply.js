@@ -18,6 +18,8 @@ const getTokenSupplyTable = () => getTableInstance(tokenSupplyTableSchema, MYSQL
 
 const supplyUpdatesMap = new Map();
 
+const getSupplyUpdatesMap = () => supplyUpdatesMap;
+
 const getTokenSupplyByTokenID = async tokenID => {
 	const tokenSupplyTable = await getTokenSupplyTable();
 	const [data = {}] = await tokenSupplyTable.find({ tokenID, limit: 1 }, ['tokenID', 'amount']);
@@ -130,6 +132,7 @@ const commitTokenSupplyIndex = async dbTrx => {
 };
 
 module.exports = {
+	getSupplyUpdatesMap,
 	recordTokenSupplyIncrease,
 	recordTokenSupplyDecrease,
 	commitTokenSupplyIndex,

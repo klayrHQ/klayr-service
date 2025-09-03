@@ -18,6 +18,8 @@ const getTokenLockedTable = () => getTableInstance(tokenLockedTableSchema, MYSQL
 
 const lockedUpdatesMap = new Map();
 
+const getLockedUpdatesMap = () => lockedUpdatesMap;
+
 const getLockedBalance = async (address, tokenID) => {
 	const tokenLockedTable = await getTokenLockedTable();
 	const params = tokenID ? { address, tokenID } : { address };
@@ -145,6 +147,7 @@ const commitTokenLockedIndex = async dbTrx => {
 };
 
 module.exports = {
+	getLockedUpdatesMap,
 	getLockedBalanceByModule,
 	getLockedBalance,
 	recordTokenLocked,

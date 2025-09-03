@@ -24,6 +24,8 @@ const SUPPORT_ALL_TOKENS_TABLE_KEY = 'supportAllTokens';
 
 const supportedTokensMap = new Map();
 
+const getSupportedTokensMap = () => supportedTokensMap;
+
 const getTokenSupportedTable = () => getTableInstance(tokenSupportedTableSchema, MYSQL_ENDPOINT);
 
 const initSupportedTokens = async dbTrx => {
@@ -188,6 +190,7 @@ const isTokenSupported = async (tokenID, chainID) => {
 };
 
 module.exports = {
+	getSupportedTokensMap,
 	recordSupportAllTokens,
 	recordUnsupportAllTokens,
 	recordSupportTokenID,

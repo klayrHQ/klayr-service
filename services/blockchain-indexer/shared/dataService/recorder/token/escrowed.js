@@ -18,6 +18,8 @@ const getTokenEscrowedTable = () => getTableInstance(tokenEscrowedTableSchema, M
 
 const escrowedUpdatesMap = new Map();
 
+const getEscrowedUpdatesMap = () => escrowedUpdatesMap;
+
 const tokenHasEscrowAccount = async (escrowChainID, tokenID) => {
 	const tokenEscrowedTable = await getTokenEscrowedTable();
 	const data = await tokenEscrowedTable.find({ escrowChainID, tokenID }, ['escrowChainID']);
@@ -142,6 +144,7 @@ const commitTokenEscrowedIndex = async dbTrx => {
 };
 
 module.exports = {
+	getEscrowedUpdatesMap,
 	getTokenEscrowed,
 	recordTokenEscrowed,
 	recordTokenUnescrowed,

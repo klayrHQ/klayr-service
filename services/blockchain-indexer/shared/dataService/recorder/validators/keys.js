@@ -19,6 +19,8 @@ const getValidatorsTable = () => getTableInstance(validatosrTableSchema, MYSQL_E
 // The key is 'address' and the value is the validator keys object
 const validatorsKeysUpdatesMap = new Map();
 
+const getValidatorsKeysUpdatesMap = () => validatorsKeysUpdatesMap;
+
 const updateValidatorsKeysDB = async (address, blsKey, proofOfPossession, generatorKey, dbTrx) => {
 	const validatorsTable = await getValidatorsTable();
 	await validatorsTable.upsert(
@@ -91,6 +93,7 @@ const commitValidatorsKeys = async dbTrx => {
 };
 
 module.exports = {
+	getValidatorsKeysUpdatesMap,
 	updateValidatorsKeysDB,
 	recordValidatorsBLSKey,
 	recordValidatorsGeneratorKey,
