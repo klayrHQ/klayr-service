@@ -30,6 +30,8 @@ const logger = Logger();
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
 const transactionsTableSchema = require('../../../database/schema/transactions');
+const { recordTokenBalanceRemoval } = require('../../../dataService/recorder/token/balances');
+const { recordTokenEscrowed } = require('../../../dataService/recorder/token/escrowed');
 
 const getTransactionsTable = () => getTableInstance(transactionsTableSchema, MYSQL_ENDPOINT);
 
@@ -72,6 +74,13 @@ const applyTransaction = async (blockHeader, tx, events, dbTrx) => {
 	logger.trace(`Indexing transaction ${tx.id} contained in block at height ${tx.height}.`);
 	await transactionsTable.upsert(tx, dbTrx);
 	logger.debug(`Indexed transaction ${tx.id} contained in block at height ${tx.height}.`);
+
+	recordTokenBalanceRemoval(tx.senderAddress, tx.params.messageFeeTokenID, tx.params.messageFee);
+	recordTokenEscrowed(
+		tx.params.receivingChainID,
+		tx.params.messageFeeTokenID,
+		tx.params.messageFee,
+	);
 };
 
 // eslint-disable-next-line no-unused-vars
@@ -80,6 +89,19 @@ const revertTransaction = async (blockHeader, tx, events, dbTrx) => {
 		`Updating index for the account with address ${tx.params.recipientAddress} asynchronously.`,
 	);
 	indexAccountAddress(tx.params.recipientAddress);
+
+	recordTokenBalanceRemoval(
+		tx.senderAddress,
+		tx.params.messageFeeTokenID,
+		tx.params.messageFee,
+		true,
+	);
+	recordTokenEscrowed(
+		tx.params.receivingChainID,
+		tx.params.messageFeeTokenID,
+		tx.params.messageFee,
+		true,
+	);
 };
 
 module.exports = {

@@ -9,6 +9,7 @@ const { beforeCCCExecutionController } = require('./beforeCCCExecution');
 const { beforeCCMForwardingController } = require('./beforeCCMForwarding');
 const { burnController } = require('./burn');
 const { ccmTransferController } = require('./ccmTransfer');
+const { initializeEscrowAccountController } = require('./initializeEscrowAccount');
 const { initializeTokenController } = require('./initializeToken');
 const { initializeUserAccountController } = require('./initializeUserAccount');
 const { lockController } = require('./lock');
@@ -49,7 +50,8 @@ const tokenIndexController = {
 	beforeCCCExecution: beforeCCCExecutionController,
 	beforeCCMForwarding: beforeCCMForwardingController,
 	burn: burnController,
-	ccmTransferEvent: ccmTransferController,
+	ccmTransfer: ccmTransferController,
+	initializeEscrowAccount: initializeEscrowAccountController,
 	initializeToken: initializeTokenController,
 	initializeUserAccount: initializeUserAccountController, // NOTE: payFee() balance change already handled by burn()
 	lock: lockController,
@@ -62,7 +64,6 @@ const tokenIndexController = {
 	unlock: unlockController,
 
 	// token events with no database record changes
-	initializeEscrowAccount: doNothing,
 	commandExecutionResult: doNothing,
 };
 
