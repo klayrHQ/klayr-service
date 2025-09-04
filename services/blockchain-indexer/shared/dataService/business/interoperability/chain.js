@@ -28,6 +28,8 @@ const getCurrentChainID = async () => {
 	return chainID;
 };
 
+const setCurrentChainID = id => (chainID = id);
+
 const isMainchain = async () => regex.MAINCHAIN_ID.test(await getCurrentChainID());
 
 module.exports = {
@@ -35,4 +37,5 @@ module.exports = {
 
 	// For unit testing
 	getCurrentChainID,
+	setCurrentChainID,
 };
