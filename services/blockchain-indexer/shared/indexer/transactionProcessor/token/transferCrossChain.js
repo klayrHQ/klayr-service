@@ -32,6 +32,8 @@ const MYSQL_ENDPOINT = config.endpoints.mysql;
 const transactionsTableSchema = require('../../../database/schema/transactions');
 const { recordTokenBalanceRemoval } = require('../../../dataService/recorder/token/balances');
 const { recordTokenEscrowed } = require('../../../dataService/recorder/token/escrowed');
+const { getCurrentChainID } = require('../../../dataService/business/interoperability/chain');
+const { splitTokenIDString } = require('../../../dataService/utils/token');
 
 const getTransactionsTable = () => getTableInstance(transactionsTableSchema, MYSQL_ENDPOINT);
 
@@ -76,11 +78,17 @@ const applyTransaction = async (blockHeader, tx, events, dbTrx) => {
 	logger.debug(`Indexed transaction ${tx.id} contained in block at height ${tx.height}.`);
 
 	recordTokenBalanceRemoval(tx.senderAddress, tx.params.messageFeeTokenID, tx.params.messageFee);
-	recordTokenEscrowed(
-		tx.params.receivingChainID,
-		tx.params.messageFeeTokenID,
-		tx.params.messageFee,
-	);
+
+	const [chainID] = splitTokenIDString(tx.params.messageFeeTokenID);
+	const sendingChainID = await getCurrentChainID();
+
+	if (chainID === sendingChainID) {
+		recordTokenEscrowed(
+			tx.params.receivingChainID,
+			tx.params.messageFeeTokenID,
+			tx.params.messageFee,
+		);
+	}
 };
 
 // eslint-disable-next-line no-unused-vars
@@ -96,12 +104,18 @@ const revertTransaction = async (blockHeader, tx, events, dbTrx) => {
 		tx.params.messageFee,
 		true,
 	);
-	recordTokenEscrowed(
-		tx.params.receivingChainID,
-		tx.params.messageFeeTokenID,
-		tx.params.messageFee,
-		true,
-	);
+
+	const [chainID] = splitTokenIDString(tx.params.messageFeeTokenID);
+	const sendingChainID = await getCurrentChainID();
+
+	if (chainID === sendingChainID) {
+		recordTokenEscrowed(
+			tx.params.receivingChainID,
+			tx.params.messageFeeTokenID,
+			tx.params.messageFee,
+			true,
+		);
+	}
 };
 
 module.exports = {
