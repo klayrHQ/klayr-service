@@ -14,7 +14,7 @@
  *
  */
 const config = require('../../config');
-const { waitForIndexerReady, waitForIndexerStatusReady } = require('../indexerReady');
+const { waitForIndexerReady } = require('../indexerReady');
 const { requestIndexer } = require('../utils/request');
 
 let isGenesisBlockIndexedFlag = false;
@@ -30,7 +30,6 @@ const getIndexStatus = async () => requestIndexer('index.status').catch(() => nu
 
 const getMissingBlocks = async (from, to) => {
 	await waitForIndexerReady();
-	await waitForIndexerStatusReady();
 
 	return await requestIndexer(
 		'getMissingBlocks',
