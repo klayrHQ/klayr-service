@@ -38,6 +38,21 @@ const CCMProcessedCode = {
 	INVALID_CCM_BEFORE_CCC_FORWARDING_EXCEPTION: 12,
 };
 
+const CCMStatusCode = {
+	// Value of status of a new CCM which is not a response due do an error
+	OK: 0,
+	// Value of status of returned CCM due to error: channel unavailable
+	CHANNEL_UNAVAILABLE: 1,
+	// Value of status of returned CCM due to error: module not supported
+	MODULE_NOT_SUPPORTED: 2,
+	// Value of status of returned CCM due to error: cross-chain command not supported
+	CROSS_CHAIN_COMMAND_NOT_SUPPORTED: 3,
+	// Value of status of returned CCM due to error: failed ccm execution
+	FAILED_CCM: 4,
+	// Value of status of CCM that have been recovered with a message recovery command
+	RECOVERED: 5,
+};
+
 const CHAIN_ID_LENGTH = 4;
 const LOCAL_ID_LENGTH = 4;
 const TOKEN_ID_LENGTH = CHAIN_ID_LENGTH + LOCAL_ID_LENGTH;
@@ -53,4 +68,4 @@ const CCMSchemaConstants = {
 	MAX_DATA_LENGTH: 64,
 };
 
-module.exports = { CCMProcessedResult, CCMProcessedCode, CCMSchemaConstants };
+module.exports = { CCMProcessedResult, CCMProcessedCode, CCMSchemaConstants, CCMStatusCode };
