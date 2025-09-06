@@ -14,7 +14,10 @@
  *
  */
 const {
-	address: { getKlayr32AddressFromPublicKey: getKlayr32AddressFromPublicKeyHelper },
+	address: {
+		getKlayr32AddressFromPublicKey: getKlayr32AddressFromPublicKeyHelper,
+		getKlayr32AddressFromAddress: getKlayr32AddressFromAddressHelper,
+	},
 } = require('@klayr/cryptography');
 
 const {
@@ -31,6 +34,9 @@ const MYSQL_ENDPOINT = config.endpoints.mysql;
 
 const getAccountsTable = () => getTableInstance(accountsTableSchema, MYSQL_ENDPOINT);
 const getValidatorsTable = () => getTableInstance(validatorsTableSchema, MYSQL_ENDPOINT);
+
+const getKlayr32AddressFromHexAddress = address =>
+	getKlayr32AddressFromAddressHelper(Buffer.from(address, 'hex'));
 
 const getKlayr32AddressFromPublicKey = publicKey =>
 	getKlayr32AddressFromPublicKeyHelper(Buffer.from(publicKey, 'hex'));
@@ -52,5 +58,6 @@ const updateAccountInfo = async params => {
 
 module.exports = {
 	getKlayr32AddressFromPublicKey,
+	getKlayr32AddressFromHexAddress,
 	updateAccountInfo,
 };

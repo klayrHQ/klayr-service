@@ -4,6 +4,7 @@ const { MODULE, MODULE_SUB_STORE } = require('../../constants');
 const requestAll = require('../../utils/requestAll');
 const { requestConnector } = require('../../utils/request');
 const { updateAuthAccountDB } = require('../../dataService/recorder/auth/account');
+const { getKlayr32AddressFromHexAddress } = require('../../utils/account');
 
 const logger = Logger();
 
@@ -30,8 +31,11 @@ const indexAuthModuleAssets = async dbTrx => {
 		for (let i = 0; i < authDataSubstoreInfos.length; i++) {
 			const { address, authAccount } = authDataSubstoreInfos[i];
 
+			const addressFormatted =
+				address.length !== 20 * 2 ? getKlayr32AddressFromHexAddress(address) : address;
+
 			authAccountData.push({
-				address,
+				address: addressFormatted,
 				nonce: BigInt(authAccount.nonce),
 				numberOfSignatures: authAccount.numberOfSignatures,
 				mandatoryKeys: authAccount.mandatoryKeys,
