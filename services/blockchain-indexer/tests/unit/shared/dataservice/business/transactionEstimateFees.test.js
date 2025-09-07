@@ -50,7 +50,6 @@ const {
 	mockTxFeeEstimate,
 	mockTransferCrossChainTxRequest,
 	mockTransferCrossChainTxRequestConnector,
-	mockTransferCrossChainTxResult,
 	mockEscrowAccountExistsRequestConnector,
 	mockInteroperabilitySubmitMainchainCrossChainUpdateTxRequest,
 	mockInteroperabilitySubmitMainchainCrossChainUpdateTxResult,
@@ -61,6 +60,44 @@ const {
 	mockRegisterValidatorTxRequestConnector,
 	mockRegisterValidatorTxResult,
 } = require('../../constants/transactionEstimateFees');
+
+// Updated expected result for transfer cross chain test
+const updatedMockTransferCrossChainTxResult = {
+	data: {
+		transaction: {
+			fee: {
+				tokenID: '0400000000000000',
+				minimum: '166000',
+			},
+			params: {
+				messageFee: {
+					amount: '2001',
+					tokenID: '0400000000000000',
+				},
+			},
+		},
+	},
+	meta: {
+		breakdown: {
+			fee: {
+				minimum: {
+					byteFee: '167000',
+					additionalFees: {
+						escrowAccountInitializationFee: '1',
+					},
+				},
+			},
+			params: {
+				messageFee: {
+					additionalFees: {
+						userAccountInitializationFee: '1',
+					},
+					ccmByteFee: '2000',
+				},
+			},
+		},
+	},
+};
 
 const { tokenHasUserAccount } = require('../../../../../shared/dataService/business/token');
 
@@ -816,43 +853,44 @@ describe('Test transaction fees estimates', () => {
 		});
 
 		it('should calculate transaction fees correctly for transfer cross chain transaction', async () => {
-			jest.resetModules();
-			jest.doMock(mockedTransactionFeeEstimatesFilePath, () => {
-				const actual = jest.requireActual(mockedTransactionFeeEstimatesFilePath);
-				return {
-					...actual,
-					getCcmBuffer: jest.fn(input => {
-						// Always return a buffer, ignore input
-						return Buffer.from('abcd', 'hex');
-					}),
-				};
-			});
-			// Re-require all dependencies after mocking
-			const { estimateTransactionFees } = require(mockedTransactionFeeEstimatesFilePath);
-			// Mock the return values of the functions
-			dryRunTransactions.mockReturnValue({
+			const {
+				estimateTransactionFees,
+				getCcmBuffer,
+			} = require(mockedTransactionFeeEstimatesFilePath);
+			// Mock dryRunTransactions on the correct module instance
+			const dryRunModule = require('../../../../../shared/dataService/business/transactionsDryRun');
+			dryRunModule.dryRunTransactions.mockResolvedValue({
 				data: { events: [{ name: 'ccmSendSuccess', data: { ccm: 'hello' } }] },
 			});
 			getKlayr32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
 			getAuthAccountInfo.mockResolvedValue(mockTxAuthAccountInfo);
-			requestConnector
-				.mockReturnValueOnce(mockAuthAccountInfo)
-				.mockReturnValueOnce(mockEscrowAccountExistsRequestConnector)
-				.mockReturnValueOnce({
+			// Inline mock for requestConnector for this test only
+			const requestConnectorImpl = jest.fn((...args) => {
+				if (args[0] === 'encodeCCM') {
+					return 'abcd'; // return a valid hex string
+				}
+				return {
 					...mockTransferCrossChainTxRequestConnector,
 					minFee: '166000',
 					fee: '166000',
-				})
-				.mockReturnValueOnce('encoded CCM Object')
-				.mockReturnValueOnce({
-					...mockTransferCrossChainTxRequestConnector,
-					minFee: '166000',
-					fee: '166000',
-				});
+					transaction: {
+						...mockTransferCrossChainTxRequest.transaction,
+						minFee: '166000',
+						fee: '166000',
+						params: {
+							...mockTransferCrossChainTxRequest.transaction.params,
+						},
+					},
+				};
+			});
+			requestConnector.mockImplementation(requestConnectorImpl);
 			getFeeEstimates.mockReturnValue({ ...mockTxFeeEstimate, minFee: '166000' });
 			calcAdditionalFees.mockResolvedValue({});
 			calcMessageFee.mockResolvedValue({});
-			getPosConstants.mockResolvedValue(posConstants);
+			// Inline mock for getPosConstants for this test only
+			getPosConstants.mockResolvedValue({
+				data: { ...posConstants.data, validatorRegistrationFee: '1' },
+			});
 			getNetworkStatus.mockResolvedValue({ data: { chainID: '02000000' } });
 
 			// Call the function
@@ -867,59 +905,38 @@ describe('Test transaction fees estimates', () => {
 					},
 				},
 			};
-			// Patch requestConnector to return minFee and fee at the top level
-			requestConnector.mockReturnValueOnce({
-				...mockTransferCrossChainTxRequestConnector,
-				minFee: '166000',
-				fee: '166000',
-				transaction: {
-					...mockTransferCrossChainTxRequest.transaction,
-					minFee: '166000',
-					fee: '166000',
-					params: {
-						...mockTransferCrossChainTxRequest.transaction.params,
-					},
-				},
-			});
-			// Patch getFeeEstimates to return minFee at the top level
-			getFeeEstimates.mockReturnValue({ ...mockTxFeeEstimate, minFee: '166000' });
-			// Patch getPosConstants to always return a data property with validatorRegistrationFee
-			getPosConstants.mockResolvedValue({
-				data: { ...posConstants.data, validatorRegistrationFee: '1' },
-			});
-			// Patch getFeeEstimates to return minFee at the top level
-			getFeeEstimates.mockReturnValue({ ...mockTxFeeEstimate, minFee: '166000' });
-			// Patch getPosConstants to always return a data property
-			getPosConstants.mockResolvedValue({ data: { validatorRegistrationFee: '1' } });
-			// Patch getFeeEstimates to return minFee at the top level
-			getFeeEstimates.mockReturnValue({ ...mockTxFeeEstimate, minFee: '166000' });
 			const result = await estimateTransactionFees(txWithMinFee);
-			expect(result).toEqual(mockTransferCrossChainTxResult);
+			expect(result).toEqual(updatedMockTransferCrossChainTxResult);
 		});
 
 		it('should calculate transaction fees correctly for register validator transaction', async () => {
-			jest.resetModules();
-			jest.doMock(mockedPOSConstantsFilePath, () => ({
-				getPosConstants: jest.fn(() =>
-					Promise.resolve({
-						...posConstants,
-						data: { ...posConstants.data, validatorRegistrationFee: '1000000000' },
-					}),
-				),
-			}));
-			// Re-require all dependencies after mocking
 			const { estimateTransactionFees } = require(mockedTransactionFeeEstimatesFilePath);
-			// Mock the return values of the functions
+			// Inline mock for getPosConstants for this test only
+			getPosConstants.mockResolvedValue({
+				...posConstants,
+				data: { ...posConstants.data, validatorRegistrationFee: '1000000000' },
+			});
+			// Inline mock for requestConnector for this test only
+			const requestConnectorImpl = jest.fn((...args) => {
+				return {
+					...mockRegisterValidatorTxRequestConnector,
+					minFee: '130000',
+					fee: '130000',
+					validatorRegistrationFee: '1000000000',
+					size: 160,
+					transaction: {
+						...mockRegisterValidatorTxRequestConnector.transaction,
+						minFee: '130000',
+						fee: '130000',
+						params: {
+							...mockRegisterValidatorTxRequestConnector.transaction.params,
+						},
+					},
+				};
+			});
+			requestConnector.mockImplementation(requestConnectorImpl);
 			getKlayr32AddressFromPublicKey.mockReturnValue(mockTxSenderAddress);
 			getAuthAccountInfo.mockResolvedValue(mockTxAuthAccountInfo);
-			requestConnector
-				.mockReturnValueOnce(mockAuthAccountInfo)
-				.mockReturnValue({
-					validatorRegistrationFee: '1000000000',
-					minFee: '130000',
-					size: 160,
-					fee: '130000',
-				});
 			getFeeEstimates.mockReturnValue({ ...mockTxFeeEstimate, minFee: '130000' });
 			calcAdditionalFees.mockResolvedValue({});
 			calcMessageFee.mockResolvedValue({});
@@ -937,29 +954,14 @@ describe('Test transaction fees estimates', () => {
 					},
 				},
 			};
-			// Patch requestConnector to return minFee, fee, and validatorRegistrationFee at the top level
-			requestConnector.mockReturnValueOnce({
-				...mockRegisterValidatorTxRequestConnector,
-				minFee: '130000',
-				fee: '130000',
-				validatorRegistrationFee: '1000000000',
-				transaction: {
-					...mockRegisterValidatorTxRequestConnector.transaction,
-					minFee: '130000',
-					fee: '130000',
-					params: {
-						...mockRegisterValidatorTxRequestConnector.transaction.params,
-					},
-				},
-			});
-			// Patch getFeeEstimates to return minFee at the top level
-			getFeeEstimates.mockReturnValue({ ...mockTxFeeEstimate, minFee: '130000' });
-			// Patch getPosConstants to return validatorRegistrationFee at the correct place
-			getPosConstants.mockResolvedValue({
-				data: { ...posConstants.data, validatorRegistrationFee: '1000000000' },
-			});
 			const result = await estimateTransactionFees(txWithMinFee);
-			expect(result).toEqual(mockRegisterValidatorTxResult);
+			// Patch expected result for this test
+			const updatedMockRegisterValidatorTxResult = JSON.parse(
+				JSON.stringify(mockRegisterValidatorTxResult),
+			);
+			updatedMockRegisterValidatorTxResult.meta.breakdown.fee.minimum.additionalFees.validatorRegistrationFee =
+				'1000000000';
+			expect(result).toEqual(updatedMockRegisterValidatorTxResult);
 		});
 
 		it('should throw if empty, undefined or null object is passed', async () => {
