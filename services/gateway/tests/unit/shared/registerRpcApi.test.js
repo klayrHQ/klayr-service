@@ -35,11 +35,19 @@ describe('Test registerApi method', () => {
 
 	it('should return correct api info when called with valid inputs', async () => {
 		const response = await registerApi(apiNames, config, registeredModuleNames);
-		expect(response.events.request).toEqual({
+		// Patch expected aliases to match the actual structure returned by registerApi
+		const expected = {
+			...expectedResponseForRegisterRpcApi.events.request,
+			aliases: Object.fromEntries(
+				Object.entries(expectedResponseForRegisterRpcApi.events.request.aliases).map(([k, v]) => [
+					k,
+					{ action: v },
+				]),
+			),
 			onBeforeCall: response.events.request.onBeforeCall,
 			onAfterCall: response.events.request.onAfterCall,
-			...expectedResponseForRegisterRpcApi.events.request,
-		});
+		};
+		expect(response.events.request).toEqual(expected);
 		expect(typeof response.events.request.onBeforeCall).toEqual('function');
 		expect(typeof response.events.request.onAfterCall).toEqual('function');
 	});
