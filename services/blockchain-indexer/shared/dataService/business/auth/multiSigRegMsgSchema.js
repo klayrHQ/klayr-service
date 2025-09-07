@@ -16,12 +16,21 @@
 const { getRegisteredModules, MODULE } = require('../../../constants');
 const { requestConnector } = require('../../../utils/request');
 
+let multiSigRegMsgSchema;
+
+const getAuthMultiSigRegMsgSchemaCached = async () => {
+	if (!multiSigRegMsgSchema) {
+		multiSigRegMsgSchema = await requestConnector('getAuthMultiSigRegMsgSchema');
+	}
+	return multiSigRegMsgSchema;
+};
+
 const getAuthMultiSigRegMsgSchema = async () => {
 	const registeredModules = await getRegisteredModules();
 	const isAuthModuleRegistered = registeredModules.includes(MODULE.AUTH);
 
 	if (isAuthModuleRegistered) {
-		const authMultiSigRegMsg = await requestConnector('getAuthMultiSigRegMsgSchema');
+		const authMultiSigRegMsg = await getAuthMultiSigRegMsgSchemaCached();
 		return {
 			moduleCommand: `${MODULE.AUTH}:registerMultisignature`,
 			param: 'signatures',

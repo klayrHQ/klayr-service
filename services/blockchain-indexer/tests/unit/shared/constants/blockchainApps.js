@@ -39,7 +39,6 @@ const mockedBlockchainAppsValidResponse = {
 			escrowedKLY: '0',
 			escrow: [
 				{
-					escrowChainID: '04000001',
 					amount: '0',
 					tokenID: '0400000000000000',
 				},

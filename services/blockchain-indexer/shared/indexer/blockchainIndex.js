@@ -50,12 +50,23 @@ const { getTransactionExecutionStatus } = require('../utils/transactions');
 const { getEventsInfoToIndex } = require('./utils/events');
 const { calcCommissionAmount, calcSelfStakeReward } = require('./utils/validator');
 const { indexAccountPublicKey } = require('./accountIndex');
-const { getGenesisAssetIntervalTimeout, indexGenesisBlockAssets } = require('./genesisBlock');
-const { updateTotalLockedAmounts } = require('./utils/blockchainIndex');
 const {
-	getAddressesFromTokenEvents,
-	scheduleAddressesBalanceUpdate,
-} = require('./accountBalanceIndex');
+	getGenesisAssetIntervalTimeout,
+	indexGenesisBlockAssets,
+	indexGenesisBlockEvents,
+	getGenesisEventsIntervalTimeout,
+} = require('./genesisBlock');
+const {
+	updateTotalLockedAmounts,
+	getReorderingStatus,
+	reorderIndexBlocksQueueJobs,
+	indexNewMissingBlock,
+	scheduleMissingBlocksIndexing,
+} = require('./utils/blockchainIndex');
+const {
+	startIndexSpeedRecord,
+	increaseBlockIndexedForSpeedRecord,
+} = require('../utils/indexSpeed');
 
 const {
 	getFinalizedHeight,
@@ -72,6 +83,15 @@ const eventsTableSchema = require('../database/schema/events');
 const eventTopicsTableSchema = require('../database/schema/eventTopics');
 const transactionsTableSchema = require('../database/schema/transactions');
 const validatorsTableSchema = require('../database/schema/validators');
+const { normalizeBlock } = require('../dataService/business/blocks');
+const { getLastIndexedBlock, setLastIndexedBlock } = require('./lastIndexedBlock');
+const { getIndexReadyStatus } = require('./readyIndex');
+const {
+	registerIndexerEventHook,
+	unregisterIndexerEventHook,
+} = require('./utils/indexerEventHook');
+const { recordEvents, commitEvent } = require('./eventProcessor');
+const { recordNonceIncrease } = require('../dataService/recorder/auth/account');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
@@ -88,6 +108,11 @@ const validateBlock = block => !!block && block.height >= 0;
 const DB_STATUS = Object.freeze({
 	COMMIT: 'commit',
 	ROLLBACK: 'rollback',
+});
+
+const RESCHEDULE_STATUS = Object.freeze({
+	IS_RETURN: 1,
+	NO_RETURN: 0,
 });
 
 // eslint-disable-next-line consistent-return
@@ -128,88 +153,167 @@ const checkBlockIDsDeleteStatusInDB = async (blockIDs, status) => {
 	);
 };
 
+const clearIndexBlocksQueue = async () => {
+	await pauseIndexBlocksQueue();
+
+	// remove all jobs from the queue
+	await indexBlocksQueue.queue.empty();
+	await indexBlocksQueue.queue.clean(0, 0);
+
+	await resumeIndexBlocksQueue();
+};
+
+const retryIndexingAndReorderIfFailed = async job => {
+	if (getReorderingStatus()) {
+		await reorderIndexBlocksQueueJobs(job, indexBlocksQueue);
+		return RESCHEDULE_STATUS.IS_RETURN;
+	}
+
+	const maxRetries = 5;
+	const currentRetry = job.data.retryCount || 0;
+	const originalJobId = job.data.originalJobId || job.id;
+
+	if (currentRetry < maxRetries) {
+		logger.warn(`Retrying job ${originalJobId} (attempt ${currentRetry + 1}/${maxRetries})`);
+
+		await indexBlocksQueue.queue.add(
+			job.name,
+			{
+				...job.data,
+				retryCount: currentRetry + 1,
+				originalJobId,
+			},
+			{
+				...job.opts,
+				lifo: true,
+				jobId: `${originalJobId}-r${currentRetry + 1}`,
+				attempts: 1,
+				removeOnComplete: true,
+				removeOnFail: true,
+			},
+		);
+
+		logger.warn(`Successfully rescheduled job ${originalJobId}-r${currentRetry + 1} for retry.`);
+
+		return RESCHEDULE_STATUS.NO_RETURN;
+	} else {
+		try {
+			logger.error(
+				`Job ${originalJobId} exceeded max retries, indexBlocksQueue will be re-ordered instead to schedule from scratch.`,
+			);
+			await reorderIndexBlocksQueueJobs(job, indexBlocksQueue);
+			return RESCHEDULE_STATUS.IS_RETURN;
+		} catch (err) {
+			await clearIndexBlocksQueue();
+			await scheduleMissingBlocksIndexing();
+			return RESCHEDULE_STATUS.IS_RETURN;
+		}
+	}
+};
+
 const indexBlock = async job => {
-	const { height: blockHeightFromJobData } = job.data;
-	let blockHeightToIndex = blockHeightFromJobData;
-	let addressesToUpdateBalance = [];
+	const { height: blockHeightFromJobData, block: blockFromJobData } = job.data;
+	if (blockHeightFromJobData === undefined && blockFromJobData === undefined)
+		throw new Error('invalid indexBlock job.data');
+
+	let blockHeightToIndex = blockHeightFromJobData || blockFromJobData.header.height;
 	let dbTrx;
 	let blockToIndexFromNode;
 
 	const genesisHeight = await getGenesisHeight();
+
+	if (config.isBenchmarkingIndexing && blockHeightToIndex > genesisHeight + 1)
+		startIndexSpeedRecord();
+
 	try {
 		const blocksTable = await getBlocksTable();
-
-		const [lastIndexedBlock = {}] = await blocksTable.find(
-			{
-				sort: 'height:desc',
-				limit: 1,
-			},
-			['height'],
-		);
-
-		const { height: lastIndexedHeight } = lastIndexedBlock;
+		const lastIndexedBlock = await getLastIndexedBlock();
 
 		// Always index the last indexed blockHeight + 1 (sequential indexing)
-		if (typeof lastIndexedHeight !== 'undefined') {
-			blockHeightToIndex = lastIndexedHeight + 1;
+		if (lastIndexedBlock !== undefined) {
+			blockHeightToIndex = lastIndexedBlock.height + 1;
 
 			// Skip job run if the height to be indexed does not exist
 			if ((await getCurrentHeight()) < blockHeightToIndex) return;
 		}
 
-		const [currentBlockInDB = {}] = await blocksTable.find(
-			{
-				where: { height: blockHeightToIndex },
-				limit: 1,
-			},
-			['id', 'height'],
-		);
-
-		let prevBlockInDB = {};
-		if (blockHeightToIndex > genesisHeight + 1) {
-			[prevBlockInDB] = await blocksTable.find(
-				{
-					where: { height: blockHeightToIndex - 1 },
-					limit: 1,
-				},
-				['id', 'height'],
-			);
+		// Get block from args if have same height, otherwise get from node
+		if (blockFromJobData) {
+			if (blockFromJobData.header.height === blockHeightToIndex) {
+				blockToIndexFromNode = await normalizeBlock(blockFromJobData, false, true);
+			} else if (blockFromJobData.header.height < blockHeightToIndex) {
+				// this section means this blockFromJobData is a rescheduled failed job from previous queue
+				// but the block should be already indexed
+				// hence, return
+				return;
+			} else {
+				throw new Error(
+					`Non-sequential blockFromJobData received in indexBlock: expected height ${blockHeightToIndex}, got ${blockFromJobData.header.height}`,
+				);
+			}
+		} else {
+			blockToIndexFromNode = await getBlockByHeight(blockHeightToIndex, true);
 		}
-
-		// Get block from node
-		blockToIndexFromNode = await getBlockByHeight(blockHeightToIndex);
 		if (!validateBlock(blockToIndexFromNode)) {
 			throw new Error(
 				`Invalid block ${blockToIndexFromNode.id} at height ${blockToIndexFromNode.height}.`,
 			);
 		}
 
-		// If current index block is incorrectly indexed then schedule for deletion
-		/* eslint-disable no-use-before-define */
-		if (Object.keys(currentBlockInDB).length && blockToIndexFromNode.id !== currentBlockInDB.id) {
-			await scheduleBlockDeletion(currentBlockInDB);
-			await addHeightToIndexBlocksQueue(currentBlockInDB.height);
-			return;
-		}
-
-		// Incase prev block is incorrect schedule that for deletion
 		if (
-			Object.keys(prevBlockInDB).length &&
-			prevBlockInDB.id !== blockToIndexFromNode.previousBlockID
+			lastIndexedBlock &&
+			lastIndexedBlock.height + 1 !==
+				(blockFromJobData ? blockFromJobData.header.height : blockHeightFromJobData)
 		) {
-			await scheduleBlockDeletion(prevBlockInDB);
-			await addHeightToIndexBlocksQueue(prevBlockInDB.height);
-			return;
+			const [currentBlockInDB = {}] = await blocksTable.find(
+				{
+					where: { height: blockHeightToIndex },
+					limit: 1,
+				},
+				['id', 'height'],
+			);
+
+			// If current index block is incorrectly indexed then schedule for deletion
+			/* eslint-disable no-use-before-define */
+			if (Object.keys(currentBlockInDB).length && blockToIndexFromNode.id !== currentBlockInDB.id) {
+				await scheduleBlockDeletion(currentBlockInDB);
+				await addHeightToIndexBlocksQueue(currentBlockInDB.height);
+				return;
+			}
+
+			// If current block is already indexed, then index the highest indexed block height + 1
+			// which is already implemented on line blockHeightToIndex = lastIndexedBlock.height + 1 above
+			if (Object.keys(currentBlockInDB).length) {
+				// Skip indexing if the blockchain is fully indexed.
+				const currentBlockchainHeight = await getCurrentHeight();
+				if (lastIndexedBlock.height >= currentBlockchainHeight) return;
+
+				// blockHeightToIndex = lastIndexedBlock.height + 1;
+			}
 		}
-		/* eslint-enable no-use-before-define */
 
-		// If current block is already indexed, then index the highest indexed block height + 1
-		if (Object.keys(currentBlockInDB).length) {
-			// Skip indexing if the blockchain is fully indexed.
-			const currentBlockchainHeight = await getCurrentHeight();
-			if (lastIndexedHeight >= currentBlockchainHeight) return;
+		// under normal condition, prevBlockInID should be lastIndexedBlock
+		if (lastIndexedBlock && lastIndexedBlock.id !== blockToIndexFromNode.previousBlockID) {
+			if (blockHeightToIndex > genesisHeight + 1) {
+				const [prevBlockInDB] = await blocksTable.find(
+					{
+						where: { height: blockHeightToIndex - 1 },
+						limit: 1,
+					},
+					['id', 'height'],
+				);
 
-			blockHeightToIndex = lastIndexedHeight + 1;
+				// Incase prev block is incorrect schedule that for deletion
+				if (
+					Object.keys(prevBlockInDB).length &&
+					prevBlockInDB.id !== blockToIndexFromNode.previousBlockID
+				) {
+					await scheduleBlockDeletion(prevBlockInDB);
+					await addHeightToIndexBlocksQueue(prevBlockInDB.height);
+					return;
+				}
+				/* eslint-enable no-use-before-define */
+			}
 		}
 
 		// Create DB transaction. Queries from here sees a snapshot of the database
@@ -247,6 +351,10 @@ const indexBlock = async job => {
 					// Store address -> publicKey mapping
 					indexAccountPublicKey(tx.senderPublicKey);
 
+					// Record increase nonce stored in database, which later will be committed through commitEvent()
+					await recordNonceIncrease(tx.senderAddress);
+
+					// store complete transaction data in database
 					await transactionsTable.upsert(tx, dbTrx);
 
 					// Invoke 'applyTransaction' to execute command specific processing logic
@@ -280,8 +388,11 @@ const indexBlock = async job => {
 			const eventTopicsTable = await getEventTopicsTable();
 
 			const { eventsInfo, eventTopicsInfo } = getEventsInfoToIndex(blockToIndexFromNode, events);
-			await eventsTable.upsert(eventsInfo, dbTrx);
-			await eventTopicsTable.upsert(eventTopicsInfo, dbTrx);
+
+			await Promise.all([
+				eventsTable.upsert(eventsInfo, dbTrx),
+				eventTopicsTable.upsert(eventTopicsInfo, dbTrx),
+			]);
 
 			// Update block generator's rewards
 			const blockRewardEvent = events.find(
@@ -307,25 +418,27 @@ const indexBlock = async job => {
 					logger.trace(
 						`Increasing commission for validator ${blockToIndexFromNode.generatorAddress} by ${commissionAmount}.`,
 					);
-					await validatorsTable.increment(
-						{
-							increment: { totalCommission: BigInt(commissionAmount) },
-							where: { address: blockToIndexFromNode.generatorAddress },
-						},
-						dbTrx,
-					);
-					logger.debug(
-						`Increased commission for validator ${blockToIndexFromNode.generatorAddress} by ${commissionAmount}.`,
-					);
 					logger.trace(
 						`Increasing self-stake rewards for validator ${blockToIndexFromNode.generatorAddress} by ${selfStakeReward}.`,
 					);
-					await validatorsTable.increment(
-						{
-							increment: { totalSelfStakeRewards: BigInt(selfStakeReward) },
-							where: { address: blockToIndexFromNode.generatorAddress },
-						},
-						dbTrx,
+					await Promise.all([
+						validatorsTable.increment(
+							{
+								increment: { totalCommission: BigInt(commissionAmount) },
+								where: { address: blockToIndexFromNode.generatorAddress },
+							},
+							dbTrx,
+						),
+						validatorsTable.increment(
+							{
+								increment: { totalSelfStakeRewards: BigInt(selfStakeReward) },
+								where: { address: blockToIndexFromNode.generatorAddress },
+							},
+							dbTrx,
+						),
+					]);
+					logger.debug(
+						`Increased commission for validator ${blockToIndexFromNode.generatorAddress} by ${commissionAmount}.`,
 					);
 					logger.debug(
 						`Increased self-stake rewards for validator ${blockToIndexFromNode.generatorAddress} by ${selfStakeReward}.`,
@@ -335,8 +448,9 @@ const indexBlock = async job => {
 
 			// Calculate locked amount change and update in key_value_store table for affected tokens
 			const tokenIDLockedAmountChangeMap = {};
-			events.forEach(event => {
-				const { data: eventData } = event;
+			for (let i = 0; i < events.length; i++) {
+				const event = events[i];
+				const eventData = event.data;
 				// Initialize map entry with BigInt
 				if (
 					[EVENT.LOCK, EVENT.UNLOCK].includes(event.name) &&
@@ -344,17 +458,23 @@ const indexBlock = async job => {
 				) {
 					tokenIDLockedAmountChangeMap[eventData.tokenID] = BigInt('0');
 				}
-
 				if (event.name === EVENT.LOCK) {
 					tokenIDLockedAmountChangeMap[eventData.tokenID] += BigInt(eventData.amount);
 				} else if (event.name === EVENT.UNLOCK) {
 					tokenIDLockedAmountChangeMap[eventData.tokenID] -= BigInt(eventData.amount);
 				}
-			});
+			}
 			await updateTotalLockedAmounts(tokenIDLockedAmountChangeMap, dbTrx);
 
-			// Get addresses to schedule account balance updates from token module events
-			addressesToUpdateBalance = await getAddressesFromTokenEvents(events);
+			if (blockToIndexFromNode.height > genesisHeight) {
+				// record token events for: balance, locked, escrowed, and supply data
+				await recordEvents(blockToIndexFromNode, events);
+			}
+
+			if (blockToIndexFromNode.height === genesisHeight) {
+				// index genesis events asynchronously in the background
+				await indexGenesisBlockEvents(events, dbTrx);
+			}
 		}
 
 		const blockToIndex = {
@@ -365,7 +485,11 @@ const indexBlock = async job => {
 		};
 
 		await blocksTable.upsert(blockToIndex, dbTrx);
+
+		await commitEvent(dbTrx);
 		await commitDBTransaction(dbTrx);
+		await setLastIndexedBlock(blockToIndex);
+
 		logger.debug(
 			`Committed MySQL transaction to index block ${blockToIndexFromNode.id} at height ${blockToIndexFromNode.height}.`,
 		);
@@ -376,14 +500,13 @@ const indexBlock = async job => {
 			config.db.durabilityVerifyFrequency,
 		);
 
-		// Only schedule address balance updates if the block is indexed successfully
-		await scheduleAddressesBalanceUpdate(addressesToUpdateBalance);
 		logger.info(
 			`Successfully indexed block ${blockToIndexFromNode.id} at height ${blockToIndexFromNode.height}.`,
 		);
 	} catch (error) {
-		// Stop genesisAsset index progress logging on errors
+		// Stop genesisAsset & genesisEvent index progress logging on errors
 		clearInterval(getGenesisAssetIntervalTimeout());
+		clearInterval(getGenesisEventsIntervalTimeout());
 
 		// Block may not have been initialized when error occurred
 		const failedBlockInfo = {
@@ -424,14 +547,36 @@ const indexBlock = async job => {
 			throw new Error(errMessage);
 		}
 
+		/**
+		 * This blocks means some expected error on "indexer initialization" phase (indexReady is false), like:
+		 *
+		 * - connector.getEventsByHeight: when klayr-service is shutting down, thus connector will not be available
+		 * - Non-sequential: when blockFromJobData is not sequential with the last indexed block
+		 *
+		 * In this case, we will retry indexing this block and clean all the queue if it fails again
+		 */
+
+		if (
+			!getIndexReadyStatus() &&
+			blockFromJobData !== undefined &&
+			['connector.getEventsByHeight', 'Non-sequential'].some(e => error.message.includes(e))
+		) {
+			if ((await retryIndexingAndReorderIfFailed(job)) === RESCHEDULE_STATUS.IS_RETURN) return;
+		}
+
 		logger.warn(
 			failedBlockInfo.id
 				? `Error occurred while indexing block ${failedBlockInfo.id} at height ${failedBlockInfo.height}. Will retry.`
 				: `Error occurred while indexing block at height ${failedBlockInfo.height}. Will retry.`,
 		);
 		logger.debug(error.stack);
+
+		// eslint-disable-next-line no-promise-executor-return
+		await new Promise(r => setTimeout(r, config.indexBlocksRetryDelay)); // reduce stress on core node
 		throw error;
 	}
+
+	if (config.isBenchmarkingIndexing) increaseBlockIndexedForSpeedRecord();
 };
 
 // Returns a list of all indexed blocks since the minimum block height from job
@@ -451,7 +596,7 @@ const getBlocksToDelete = async blocks => {
 					greaterThanEqualTo: minBlockHeight,
 				},
 			],
-			sort: 'height:desc',
+			sort: 'height:asc',
 		},
 		['id', 'height', 'generatorAddress', 'timestamp', 'isFinal'],
 	);
@@ -460,10 +605,10 @@ const getBlocksToDelete = async blocks => {
 };
 
 const deleteIndexedBlocks = async job => {
-	let addressesToUpdateBalance = [];
 	const { blocks: blocksFromJob } = job.data;
 	const blocksToDelete = await getBlocksToDelete(blocksFromJob);
 	const blockIDs = blocksToDelete.map(b => b.id);
+	if (blockIDs.length === 0) return;
 
 	const blocksTable = await getBlocksTable();
 	const connection = await getDBConnection(MYSQL_ENDPOINT);
@@ -497,7 +642,12 @@ const deleteIndexedBlocks = async job => {
 					// Invoke 'revertTransaction' to execute command specific reverting logic
 					await BluebirdPromise.map(
 						forkedTransactions,
-						async tx => revertTransaction(blockHeader, tx, events, dbTrx),
+						async tx => {
+							// Record decrease nonce stored in database, which later will be committed through commitEvent()
+							await recordNonceIncrease(tx.sender.address, true);
+
+							revertTransaction(blockHeader, tx, events, dbTrx);
+						},
 						{ concurrency: 1 },
 					);
 				}
@@ -604,36 +754,42 @@ const deleteIndexedBlocks = async job => {
 
 					// Calculate locked amount change and update in key_value_store table for affected tokens
 					const tokenIDLockedAmountChangeMap = {};
-					events.forEach(event => {
-						const { data: eventData } = event;
+					for (let i = 0; i < events.length; i++) {
+						const { data: eventData } = events[i];
 						// Initialize map entry with BigInt
 						if (
-							[EVENT.LOCK, EVENT.UNLOCK].includes(event.name) &&
+							[EVENT.LOCK, EVENT.UNLOCK].includes(events[i].name) &&
 							!(eventData.tokenID in tokenIDLockedAmountChangeMap)
 						) {
 							tokenIDLockedAmountChangeMap[eventData.tokenID] = BigInt(0);
 						}
 
 						// Negate amount to reverse the effect
-						if (event.name === EVENT.LOCK) {
+						if (events[i].name === EVENT.LOCK) {
 							tokenIDLockedAmountChangeMap[eventData.tokenID] -= BigInt(eventData.amount);
-						} else if (event.name === EVENT.UNLOCK) {
+						} else if (events[i].name === EVENT.UNLOCK) {
 							tokenIDLockedAmountChangeMap[eventData.tokenID] += BigInt(eventData.amount);
 						}
-					});
+					}
 					await updateTotalLockedAmounts(tokenIDLockedAmountChangeMap, dbTrx);
 
-					// Get addresses to schedule account balance updates from token module events
-					addressesToUpdateBalance = await getAddressesFromTokenEvents(events);
+					// record token data on isBlockDeletion set to true, reversing addition/removal on token database
+					await recordEvents({ ...blockFromJob, transactions: forkedTransactions }, events, true);
 				}
 
 				// Invalidate cached events for this block. Must be done after processing all event related calculations
 				await deleteEventsFromCacheByBlockID(blockFromJob.id);
+
+				logger.info(
+					`Recorded block deletion for ${blockFromJob.id} at height ${blockFromJob.height}.`,
+				);
 			},
 			{ concurrency: 1 },
 		);
 
 		await blocksTable.delete({ whereIn: { property: 'id', values: blockIDs } }, dbTrx);
+
+		await commitEvent(dbTrx);
 		await commitDBTransaction(dbTrx);
 
 		// Add safety check to ensure that the DB transaction is actually committed
@@ -642,9 +798,14 @@ const deleteIndexedBlocks = async job => {
 			config.db.durabilityVerifyFrequency,
 		);
 
-		// Only schedule address balance updates if the block is deleted successfully
-		await scheduleAddressesBalanceUpdate(addressesToUpdateBalance);
 		logger.debug(`Committed MySQL transaction to delete block(s) with ID(s): ${blockIDs}.`);
+
+		// Pass nothing as argument, means that it will set last indexed block from db
+		await setLastIndexedBlock();
+
+		logger.info(
+			`Successfully completed deletion of ${blockIDs.length} block(s) and committed changes to the database`,
+		);
 	} catch (error) {
 		logger.debug(`Rolled back MySQL transaction to delete block(s) with ID(s): ${blockIDs}.`);
 		await rollbackDBTransaction(dbTrx);
@@ -673,7 +834,7 @@ const deleteIndexedBlocksWrapper = async job => {
 	/* eslint-disable no-use-before-define */
 	try {
 		if (!(await indexBlocksQueue.queue.isPaused())) {
-			await indexBlocksQueue.queue.pause();
+			await pauseIndexBlocksQueue();
 		}
 		await deleteIndexedBlocks(job);
 	} catch (err) {
@@ -683,7 +844,7 @@ const deleteIndexedBlocksWrapper = async job => {
 	} finally {
 		// Resume indexing once all deletion jobs are processed
 		if ((await getPendingDeleteJobCount()) === 0) {
-			await indexBlocksQueue.queue.resume();
+			await resumeIndexBlocksQueue();
 		}
 	}
 	/* eslint-enable no-use-before-define */
@@ -707,6 +868,26 @@ const initBlockProcessingQueues = async () => {
 		deleteIndexedBlocksWrapper,
 		config.queue.deleteIndexedBlocks.concurrency,
 	);
+
+	await registerIndexerEventHook(indexBlocksQueue);
+};
+
+const unregisterIndexerEvent = () => {
+	if (indexBlocksQueue) unregisterIndexerEventHook(indexBlocksQueue);
+};
+
+const pauseIndexBlocksQueue = async () => {
+	if (indexBlocksQueue && indexBlocksQueue.queue) {
+		await indexBlocksQueue.queue.pause();
+		logger.info('Indexing blocks queue is paused.');
+	}
+};
+
+const resumeIndexBlocksQueue = async () => {
+	if (indexBlocksQueue && indexBlocksQueue.queue) {
+		await indexBlocksQueue.queue.resume();
+		logger.info('Indexing blocks queue is resumed.');
+	}
 };
 
 const getLiveIndexingJobCount = async () => {
@@ -737,30 +918,92 @@ const scheduleBlockDeletion = async block => {
 	await deleteIndexedBlocksQueue.add({ blocks });
 };
 
-const indexNewBlock = async block => {
-	const blocksTable = await getBlocksTable();
-	logger.info(`Scheduling indexing of new block: ${block.id} at height ${block.height}.`);
+const indexNewBlock = async (block, skipCheckingMissingBlock = false) => {
+	// To prevent indexBlocksQueue job failed because of Non-sequential block after block deletion process, we skip scheduling new block while deletion is in progress
+	if (await indexBlocksQueue.queue.isPaused()) {
+		logger.info(
+			`Block deletion currently in progress. Block ${block.header.id} at height ${block.header.height} will be indexed later.`,
+		);
+		return;
+	}
 
-	const [blockFromDB] = await blocksTable.find({ height: block.height, limit: 1 }, [
+	const blocksTable = await getBlocksTable();
+	const lastIndexedBlock = await getLastIndexedBlock();
+
+	// if new block height is not sequential, then schedule for indexing (if not skipped)
+	if (
+		!skipCheckingMissingBlock &&
+		lastIndexedBlock &&
+		block.header.height > lastIndexedBlock.height + 1
+	) {
+		logger.info(
+			`Detected missing block between last indexed block at height: ${lastIndexedBlock.height} until new block at height: ${block.header.height}`,
+		);
+		await indexNewMissingBlock(lastIndexedBlock, block, indexBlocksQueue);
+	}
+
+	logger.info(
+		`Scheduling indexing of new block: ${block.header.id} at height ${block.header.height}.`,
+	);
+
+	const [blockFromDB] = await blocksTable.find({ height: block.header.height, limit: 1 }, [
 		'id',
 		'height',
 		'generatorAddress',
 		'timestamp',
 		'isFinal',
+		'previousBlockID',
 	]);
 
 	// Schedule block deletion in case of an unprocessed fork detection
-	if (blockFromDB && blockFromDB.id !== block.id) {
+	if (
+		blockFromDB &&
+		blockFromDB.id !== block.header.id &&
+		!(await indexBlocksQueue.queue.isPaused())
+	) {
 		logger.info(
-			`Fork detected while scheduling indexing at height: ${block.height}. Actual blockID: ${block.id}, indexed blockID: ${blockFromDB.id}.`,
+			`Fork detected while scheduling indexing at height: ${block.header.height}. Actual blockID: ${block.header.id}, indexed blockID: ${blockFromDB.id}.`,
 		);
+		await pauseIndexBlocksQueue();
 
-		await scheduleBlockDeletion(blockFromDB);
+		let blockToCheck = blockFromDB;
+		while (true) {
+			if (blockToCheck.height === 1) {
+				logger.warn(
+					`Fork resolution reached the genesis block. All blocks up to the genesis block will be deleted.`,
+				);
+				await scheduleBlockDeletion(blockToCheck);
+				break;
+			}
+
+			const previousBlockFromNode = await getBlockByHeight(blockToCheck.height - 1, true);
+			if (previousBlockFromNode.id === blockToCheck.previousBlockID) {
+				logger.info(
+					`First divergent block found at height ${blockToCheck.height}. All blocks from this point onward will be scheduled for deletion.`,
+				);
+				await scheduleBlockDeletion(blockToCheck);
+				break;
+			}
+			const [previousBlockFromDB] = await blocksTable.find(
+				{ height: previousBlockFromNode.height, limit: 1 },
+				['id', 'height', 'generatorAddress', 'timestamp', 'isFinal', 'previousBlockID'],
+			);
+			if (!previousBlockFromDB) {
+				throw new Error(
+					`Expected a DB block at height ${previousBlockFromNode.height}, but none was found during fork resolution`,
+				);
+			}
+			blockToCheck = previousBlockFromDB;
+		}
+
+		return;
 	}
 
 	// Schedule indexing of the incoming block if not already indexed or a fork was detected
-	if (!blockFromDB || blockFromDB.id !== block.id) {
-		await indexBlocksQueue.add({ height: block.height });
+	if (!blockFromDB || blockFromDB.id !== block.header.id) {
+		await indexBlocksQueue.add({ height: block.header.height, block });
+	} else {
+		logger.info(`Block ${block.header.id} at height ${block.header.height} already indexed`);
 	}
 
 	// Update finality status of indexed blocks
@@ -795,7 +1038,7 @@ const findMissingBlocksInRange = async (fromHeight, toHeight) => {
 	if (indexedBlockCount < 3) {
 		result.push({ from: fromHeight, to: toHeight });
 	} else if (indexedBlockCount !== totalNumOfBlocks) {
-		const BATCH_SIZE = 25000;
+		const BATCH_SIZE = 10000;
 		const NUM_BATCHES = Math.ceil((toHeight - fromHeight) / BATCH_SIZE);
 
 		for (let i = 0; i < NUM_BATCHES; i++) {
@@ -824,9 +1067,13 @@ const findMissingBlocksInRange = async (fromHeight, toHeight) => {
 		}
 	}
 
-	result.forEach(({ from, to }) =>
-		logger.info(`Missing blocks in range: ${from}-${to} (${to - from + 1} blocks).`),
-	);
+	for (let i = 0; i < result.length; i++) {
+		logger.info(
+			`Missing blocks in range: ${result[i].from}-${result[i].to} (${
+				result[i].to - result[i].from + 1
+			} blocks).`,
+		);
+	}
 
 	return result;
 };
@@ -837,6 +1084,20 @@ const getMissingBlocks = async params => {
 	const nestedListOfRanges = missingBlockRanges.map(entry => range(entry.from, entry.to + 1));
 	const listOfMissingBlocks = nestedListOfRanges.flat();
 	return listOfMissingBlocks;
+};
+
+const addBlockToIndexBlocksQueue = async (block, priority) => {
+	const liveIndexingJobCount = await getLiveIndexingJobCount();
+	if (liveIndexingJobCount > config.queue.indexBlocks.scheduledJobsMaxCount) {
+		logger.trace(
+			`Skipping adding new job to the queue. Current liveIndexingJobCount: ${liveIndexingJobCount}.`,
+		);
+		return null;
+	}
+
+	return typeof priority === 'number'
+		? indexBlocksQueue.add({ block }, { priority })
+		: indexBlocksQueue.add({ block });
 };
 
 const addHeightToIndexBlocksQueue = async (height, priority) => {
@@ -879,10 +1140,14 @@ const isGenesisBlockIndexed = async () => {
 module.exports = {
 	indexNewBlock,
 	addHeightToIndexBlocksQueue,
+	addBlockToIndexBlocksQueue,
 	getMissingBlocks,
 	scheduleBlockDeletion,
 	getIndexVerifiedHeight,
 	getLiveIndexingJobCount,
 	isGenesisBlockIndexed,
 	initBlockProcessingQueues,
+	unregisterIndexerEvent,
+	pauseIndexBlocksQueue,
+	resumeIndexBlocksQueue,
 };

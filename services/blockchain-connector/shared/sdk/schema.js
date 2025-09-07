@@ -45,6 +45,8 @@ const setMetadata = _metadata => (metadata = _metadata);
 
 const getBlockAssetDataSchemaByModule = _module => {
 	const moduleMetadata = metadata.modules.find(m => m.name === _module);
+	if (moduleMetadata === undefined) return undefined;
+
 	const [{ data: schema } = {}] = moduleMetadata.assets;
 	return schema;
 };
@@ -54,11 +56,12 @@ const getDataSchemaByEvent = event => {
 
 	// Populate the eventSchemaLookup map with module events if not exists
 	if (Object.keys(eventSchemaLookup).length === 0) {
-		metadata.modules.forEach(module => {
-			module.events.forEach(moduleEvent => {
-				eventSchemaLookup[`${module.name}_${moduleEvent.name}`] = moduleEvent.data;
-			});
-		});
+		for (let i = 0; i < metadata.modules.length; i++) {
+			const module = metadata.modules[i];
+			for (let j = 0; j < module.events.length; j++) {
+				eventSchemaLookup[`${module.name}_${module.events[j].name}`] = module.events[j].data;
+			}
+		}
 	}
 
 	return eventSchemaLookup[`${event.module}_${event.name}`] || null;

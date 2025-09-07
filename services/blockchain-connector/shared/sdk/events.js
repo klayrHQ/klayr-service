@@ -19,15 +19,10 @@ const { Logger, Signals } = require('klayr-service-framework');
 
 const config = require('../../config');
 
-const { getApiClient } = require('./client');
+const { getApiClient, getEventSubscriberNodeURL } = require('./client');
 const { formatEvent } = require('./formatter');
-const {
-	getRegisteredEvents,
-	getEventsByHeight,
-	getNodeInfo,
-	getBlockByHeight,
-	getBFTParameters,
-} = require('./endpoints');
+const { getEventsByHeight, getBlockByHeight, getBFTParameters } = require('./endpoints');
+const { getNodeInfo, getRegisteredEvents } = require('./cached_endpoints');
 const { updateTokenInfo } = require('./token');
 const { getPosConstants } = require('./pos');
 
@@ -89,7 +84,8 @@ const emitEngineEvents = async () => {
 
 // eslint-disable-next-line consistent-return
 const subscribeToAllRegisteredEvents = async (newClientPoolIndex = null) => {
-	if (config.isUseHttpApi) return emitEngineEvents();
+	const url = getEventSubscriberNodeURL();
+	if (url.startsWith('http')) return emitEngineEvents();
 
 	// Active client subscription available, skip invocation
 	if (
@@ -102,13 +98,14 @@ const subscribeToAllRegisteredEvents = async (newClientPoolIndex = null) => {
 	// Reset eventsCounter first
 	eventsCounter = 0;
 
-	const apiClient = await getApiClient();
+	const apiClient = await getApiClient(url);
 	eventSubscribeClientPoolIndex = apiClient.poolIndex;
-	logger.info(`Subscribing events with apiClient ${eventSubscribeClientPoolIndex}.`);
+	logger.info(`Subscribing events with apiClient ${eventSubscribeClientPoolIndex} at ${url}.`);
 
 	const registeredEvents = await getRegisteredEvents();
 	const allEvents = registeredEvents.concat(events);
-	allEvents.forEach(event => {
+	for (let i = 0; i < allEvents.length; i++) {
+		const event = allEvents[i];
 		apiClient.subscribe(event, async payload => {
 			// Force update necessary caches on new chain events
 			if (event.startsWith('chain_')) {
@@ -122,7 +119,7 @@ const subscribeToAllRegisteredEvents = async (newClientPoolIndex = null) => {
 			Signals.get(event).dispatch(payload);
 		});
 		logger.info(`Subscribed to the API client event: ${event}.`);
-	});
+	}
 };
 
 const getEventsByHeightFormatted = async height => {
@@ -135,8 +132,9 @@ const getEventsByHeightFormatted = async height => {
 let isNodeSynced = false;
 let isGenesisBlockDownloaded = false;
 
-const ensureAPIClientLiveness = () => {
-	if (config.isUseHttpApi) return;
+const ensureEventSubscriberAPIClientLiveness = () => {
+	const url = getEventSubscriberNodeURL();
+	if (url.startsWith('http')) return;
 
 	if (isNodeSynced && isGenesisBlockDownloaded) {
 		setInterval(async () => {
@@ -156,13 +154,15 @@ const ensureAPIClientLiveness = () => {
 					}
 
 					if (typeof eventSubscribeClientPoolIndex === 'number') {
-						const apiClient = await getApiClient(eventSubscribeClientPoolIndex);
+						const apiClient = await getApiClient(url, eventSubscribeClientPoolIndex);
 						Signals.get('resetApiClient').dispatch(apiClient, true);
 						logger.debug(
-							`Dispatched 'resetApiClient' signal for the event subscription API client ${apiClient.poolIndex}.`,
+							`Dispatched 'resetApiClient' signal for the event subscription API client ${apiClient.poolIndex} at ${apiClient.url}.`,
 						);
 					} else {
-						logger.debug('Triggered subscribeToAllRegisteredEvents from ensureAPIClientLiveness.');
+						logger.debug(
+							`Triggered subscribeToAllRegisteredEvents from ensureEventSubscriberAPIClientLiveness for node ${url}.`,
+						);
 						await subscribeToAllRegisteredEvents();
 					}
 				}
@@ -172,7 +172,7 @@ const ensureAPIClientLiveness = () => {
 		}, config.clientConnVerifyInterval);
 	} else {
 		logger.info(
-			`Cannot start the events-based client liveness check yet. Either the node is not yet synced or the genesis block hasn't been downloaded yet.\nisNodeSynced: ${isNodeSynced}, isGenesisBlockDownloaded: ${isGenesisBlockDownloaded}`,
+			`Cannot start the events-based client liveness check for node ${url} yet. Either the node is not yet synced or the genesis block hasn't been downloaded yet.\nisNodeSynced: ${isNodeSynced}, isGenesisBlockDownloaded: ${isGenesisBlockDownloaded}`,
 		);
 	}
 };
@@ -180,13 +180,13 @@ const ensureAPIClientLiveness = () => {
 const nodeIsSyncedListener = () => {
 	logger.debug('Node is now synced with the network.');
 	isNodeSynced = true;
-	ensureAPIClientLiveness();
+	ensureEventSubscriberAPIClientLiveness();
 };
 
 const genesisBlockDownloadedListener = () => {
 	logger.debug('Genesis block is now downloaded.');
 	isGenesisBlockDownloaded = true;
-	ensureAPIClientLiveness();
+	ensureEventSubscriberAPIClientLiveness();
 };
 
 const eventSubscriptionClientResetListener = () => {

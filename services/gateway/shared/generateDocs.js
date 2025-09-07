@@ -40,9 +40,9 @@ const createApiDocs = async (apiName, apiJsonPaths, registeredModuleNames) => {
 	if (methods.postTransactions)
 		methods.transactions['/transactions'].post = methods.postTransactions['/transactions'].post;
 	const apiSchemas = Object.keys(methods);
-	apiSchemas.forEach(key => {
-		Object.assign(apiJsonPaths, methods[key]);
-	});
+	for (let i = 0; i < apiSchemas.length; i++) {
+		Object.assign(apiJsonPaths, methods[apiSchemas[i]]);
+	}
 	return apiJsonPaths;
 };
 
@@ -73,7 +73,10 @@ const genDocs = async (ctx, registeredModuleNames) => {
 			Object.assign(allResponses, responses);
 
 			const tags = finalDoc.tags || [];
-			apiJson.tags.forEach(tag => tags.push(tag));
+
+			for (let i = 0; i < apiJson.tags.length; i++) {
+				tags.push(apiJson.tags[i]);
+			}
 
 			const paths = finalDoc.paths || {};
 			const apiDocs = await createApiDocs(api, apiJson.paths, registeredModuleNames);

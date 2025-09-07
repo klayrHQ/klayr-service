@@ -23,14 +23,17 @@ module.exports = {
 		blockID: { type: 'string' },
 		height: { type: 'integer' },
 		index: { type: 'integer' },
-		eventStr: { type: 'text' },
+		eventBlob: { type: 'binary' },
 		timestamp: { type: 'integer' },
 	},
 	indexes: {
+		id: { type: 'key' },
 		height: { type: 'range' },
 		blockID: { type: 'key' },
 		index: { type: 'range' },
 		timestamp: { type: 'range' },
+		name: { type: 'key' },
+		module: { type: 'key' },
 	},
 	compositeIndexes: {
 		timestamp_desc_index_asc: [

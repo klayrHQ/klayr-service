@@ -22,7 +22,6 @@ const {
 const config = require('../../../../config');
 const validatorsTableSchema = require('../../../database/schema/validators');
 
-const { requestConnector } = require('../../../utils/request');
 const { getIndexedAccountInfo } = require('../../utils/account');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
@@ -38,14 +37,13 @@ const getValidator = async params => {
 	const { address } = params;
 
 	const validatorsTable = await getValidatorsTable();
-	const [{ proofOfPossession } = {}] = await validatorsTable.find({ address, limit: 1 }, [
+	const [data = {}] = await validatorsTable.find({ address, limit: 1 }, [
+		'generatorKey',
+		'blsKey',
 		'proofOfPossession',
 	]);
 
-	validator.data = {
-		...(await requestConnector('getValidator', { address })),
-		proofOfPossession,
-	};
+	validator.data = data;
 
 	const accountInfo = await getIndexedAccountInfo({ address, limit: 1 }, ['name', 'publicKey']);
 	validator.meta = {

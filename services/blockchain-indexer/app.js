@@ -40,6 +40,7 @@ const { initDatabase } = require('./shared/database/init');
 const { setAppContext } = require('./shared/utils/request');
 const { init } = require('./shared/init');
 const { setFeeEstimates } = require('./shared/dataService/business');
+const { onIndexerStopped } = require('./shared/indexer/utils/onIndexerStopped');
 
 const logger = Logger();
 
@@ -63,6 +64,9 @@ const defaultBrokerConfig = {
 		},
 	},
 	dependencies: ['connector'],
+	async stopped() {
+		await onIndexerStopped();
+	},
 };
 
 // Add routes, events & jobs
@@ -95,13 +99,16 @@ initDatabase()
 		setAppContext(app);
 
 		app.addMethods(path.join(__dirname, 'methods'));
+		app.addMethods(path.join(__dirname, 'methods', 'internal'));
 
 		if (config.operations.isDataRetrievalModeEnabled) {
 			app.addJobs(path.join(__dirname, 'jobs', 'dataService'));
 
 			// First register all the default methods followed by app specific module methods
 			app.addMethods(path.join(__dirname, 'methods', 'dataService'));
-			registeredModules.forEach(module => {
+			for (let i = 0; i < registeredModules.length; i++) {
+				let module = registeredModules[i];
+
 				// Map 'reward' module to the 'dynamicReward' module endpoints
 				if (module === MODULE.REWARD) module = MODULE.DYNAMIC_REWARD;
 
@@ -112,16 +119,17 @@ initDatabase()
 					'modules',
 					`${module}.js`,
 				);
+
 				try {
 					// eslint-disable-next-line import/no-dynamic-require
 					const methods = require(methodsFilePath);
-					methods.forEach(method => app.addMethod(method));
+					for (let j = 0; j < methods.length; j++) app.addMethod(methods[j]);
 				} catch (err) {
 					logger.warn(
 						`Moleculer method definitions missing for module: ${module}. Is this expected?\nWas expected at: ${methodsFilePath}.`,
 					);
 				}
-			});
+			}
 		}
 
 		if (config.operations.isIndexingModeEnabled) {

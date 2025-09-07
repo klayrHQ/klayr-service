@@ -20,14 +20,14 @@ const {
 } = require('klayr-service-framework');
 
 const config = require('../../../../config');
-const accountBalancesTableSchema = require('../../../database/schema/accountBalances');
 const accountTableSchema = require('../../../database/schema/accounts');
+const tokenBalancesTableSchema = require('../../../database/schema/tokenBalances');
 
 const { getAccountKnowledge } = require('../../knownAccounts');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
-const getAccountBalancesTable = () => getTableInstance(accountBalancesTableSchema, MYSQL_ENDPOINT);
+const getTokenBalancesTable = () => getTableInstance(tokenBalancesTableSchema, MYSQL_ENDPOINT);
 
 const getTokenTopBalances = async params => {
 	const response = {
@@ -35,16 +35,16 @@ const getTokenTopBalances = async params => {
 		meta: {},
 	};
 
-	const accountBalancesTable = await getAccountBalancesTable();
+	const tokenBalancesTable = await getTokenBalancesTable();
 
 	const { search, tokenID, ...remParams } = params;
 	params = remParams;
 
-	params[`${accountBalancesTableSchema.tableName}.tokenID`] = tokenID;
+	params[`${tokenBalancesTableSchema.tableName}.tokenID`] = tokenID;
 
 	params.leftOuterJoin = {
 		targetTable: accountTableSchema.tableName,
-		leftColumn: `${accountBalancesTableSchema.tableName}.address`,
+		leftColumn: `${tokenBalancesTableSchema.tableName}.address`,
 		rightColumn: `${accountTableSchema.tableName}.address`,
 	};
 
@@ -55,7 +55,7 @@ const getTokenTopBalances = async params => {
 				pattern: search,
 			},
 			{
-				property: `${accountTableSchema.tableName}.address`,
+				property: `${tokenBalancesTableSchema.tableName}.address`,
 				pattern: search,
 			},
 			{
@@ -65,9 +65,9 @@ const getTokenTopBalances = async params => {
 		];
 	}
 
-	const tokenInfos = await accountBalancesTable.find(params, [
-		`${accountBalancesTableSchema.tableName}.balance`,
-		`${accountBalancesTableSchema.tableName}.address`,
+	const tokenInfos = await tokenBalancesTable.find(params, [
+		`${tokenBalancesTableSchema.tableName}.balance`,
+		`${tokenBalancesTableSchema.tableName}.address`,
 		`${accountTableSchema.tableName}.publicKey`,
 		`${accountTableSchema.tableName}.name`,
 	]);
@@ -91,8 +91,8 @@ const getTokenTopBalances = async params => {
 	response.meta = {
 		count: response.data[tokenID].length,
 		offset: params.offset,
-		total: await accountBalancesTable.count(params, [
-			`${accountBalancesTableSchema.tableName}.address`,
+		total: await tokenBalancesTable.count(params, [
+			`${tokenBalancesTableSchema.tableName}.address`,
 		]),
 	};
 

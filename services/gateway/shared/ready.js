@@ -54,10 +54,15 @@ const updateSvcStatus = async () => {
 const getReady = () => {
 	try {
 		const includeSvcForReadiness = {};
-		Object.entries(currentSvcStatus).forEach(([service, isReady]) => {
+		const currentSvcStatusKeys = Object.keys(currentSvcStatus);
+		for (let i = 0; i < currentSvcStatusKeys.length; i++) {
+			const service = currentSvcStatusKeys[i];
+			const isReady = currentSvcStatus[service];
+
 			if (isReady) includeSvcForReadiness[service] = isReady;
 			else if (config.brokerDependencies.includes(service)) throw new MoleculerError();
-		});
+		}
+
 		return { services: includeSvcForReadiness };
 	} catch (_) {
 		logger.error(`Current service status:\n${JSON.stringify(currentSvcStatus, null, '\t')}`);

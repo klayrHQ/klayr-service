@@ -21,21 +21,30 @@ const setAppContext = h => (app = h);
 
 const getAppContext = () => app;
 
-const requestRpc = async (service, method, params = {}) => {
-	const data = await getAppContext().requestRpc(`${service}.${method}`, params);
+const requestRpc = async (service, method, params = {}, options = {}) => {
+	const broker = getAppContext().getBroker();
+	const data = await broker.call(`${service}.${method}`, params, options);
 	if (Utils.isObject(data) && data.error) throw new Error(data.error.message);
 	return data;
 };
 
-const requestConnector = async (method, params) => requestRpc('connector', method, params);
+const requestConnector = async (method, params, options) =>
+	requestRpc('connector', method, params, options);
 
-const requestAppRegistry = async (method, params) => requestRpc('app-registry', method, params);
+const requestCoordinator = async (method, params, options) =>
+	requestRpc('coordinator', method, params, options);
 
-const requestFeeEstimator = async (method, params) => requestRpc('fees', method, params);
+const requestAppRegistry = async (method, params, options) =>
+	requestRpc('app-registry', method, params, options);
+
+const requestFeeEstimator = async (method, params, options) =>
+	requestRpc('fees', method, params, options);
 
 module.exports = {
+	getAppContext,
 	setAppContext,
 	requestConnector,
 	requestAppRegistry,
 	requestFeeEstimator,
+	requestCoordinator,
 };

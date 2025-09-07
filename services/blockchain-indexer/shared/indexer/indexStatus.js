@@ -28,14 +28,24 @@ const logger = Logger();
 const blocksTableSchema = require('../database/schema/blocks');
 
 const config = require('../../config');
+const { stopIndexSpeedRecord } = require('../utils/indexSpeed');
+const {
+	getIndexerLastCurrentHeight,
+	startIndexingPendingNewBlock,
+	getNumBlocksIndexed,
+	registerPendingIndexReadySignal,
+} = require('./pendingBlockchainIndex');
+const {
+	getPendingIndexReady,
+	setPendingIndexIsReady,
+	getIndexReadyStatus,
+	setIndexReadyStatus,
+} = require('./readyIndex');
+const { unregisterIndexerEvent } = require('./blockchainIndex');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
 const getBlocksTable = () => getTableInstance(blocksTableSchema, MYSQL_ENDPOINT);
-
-let isIndexReady = false;
-const setIndexReadyStatus = isReady => (isIndexReady = isReady);
-const getIndexReadyStatus = () => isIndexReady;
 
 const getIndexStats = async () => {
 	try {
@@ -78,7 +88,37 @@ const checkIndexReadiness = async () => {
 		setIndexReadyStatus(true);
 		logger.info('The blockchain index is complete.');
 		logger.debug(`'blockIndexReady' signal: ${Signals.get('blockIndexReady')}`);
+
 		Signals.get('blockIndexReady').dispatch(true);
+		Signals.get('newBlock').remove(checkIndexReadiness);
+
+		unregisterIndexerEvent();
+
+		if (config.isBenchmarkingIndexing) stopIndexSpeedRecord();
+	}
+};
+
+const checkIndexReadinessWithoutPendingIndex = async () => {
+	const numBlocksIndexed = await getNumBlocksIndexed();
+	const indexReadyStatus = getIndexReadyStatus();
+	const lastCurrentHeight = getIndexerLastCurrentHeight();
+
+	if (
+		!indexReadyStatus &&
+		numBlocksIndexed > 1 &&
+		lastCurrentHeight !== -1 &&
+		numBlocksIndexed >= lastCurrentHeight
+	) {
+		Signals.get('newBlock').remove(checkIndexReadinessWithoutPendingIndex);
+		if (getPendingIndexReady()) return;
+
+		setPendingIndexIsReady();
+		await startIndexingPendingNewBlock(numBlocksIndexed);
+	}
+
+	// if this function still invoked after indexReadyStatus become true, then remove it
+	if (indexReadyStatus) {
+		Signals.get('newBlock').remove(checkIndexReadinessWithoutPendingIndex);
 	}
 };
 
@@ -107,12 +147,14 @@ const reportIndexStatus = async () => {
 };
 
 const init = async () => {
+	// Register event listeners
+	Signals.get('newBlock').add(checkIndexReadinessWithoutPendingIndex);
+	Signals.get('newBlock').add(checkIndexReadiness);
+	registerPendingIndexReadySignal();
+
 	// Initialize index status reporting and schedule regular updates
 	await reportIndexStatus();
 	setInterval(reportIndexStatus, 15 * 1000); // ms
-
-	// Register event listeners
-	Signals.get('newBlock').add(checkIndexReadiness);
 };
 
 module.exports = {

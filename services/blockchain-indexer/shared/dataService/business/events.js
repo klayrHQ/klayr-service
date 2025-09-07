@@ -14,6 +14,7 @@
  *
  */
 const BluebirdPromise = require('bluebird');
+const msgpack = require('@msgpack/msgpack');
 
 const {
 	CacheLRU,
@@ -41,6 +42,8 @@ const getBlocksTable = () => getTableInstance(blocksTableSchema, MYSQL_ENDPOINT)
 const getEventsTable = () => getTableInstance(eventsTableSchema, MYSQL_ENDPOINT);
 const getTransactionsTable = () => getTableInstance(transactionsTableSchema, MYSQL_ENDPOINT);
 
+const MAX_GET_EVENTS_CONCURRENCY = 20;
+
 const eventCache = CacheLRU('events');
 const eventCacheByBlockID = CacheLRU('eventsByBlockID');
 
@@ -54,18 +57,16 @@ const getEventsByHeight = async height => {
 	const cachedEvents = await eventCache.get(height);
 	if (cachedEvents) return JSON.parse(cachedEvents);
 
-	// Get from DB only when isPersistEvents is enabled
-	if (config.isPersistEvents) {
-		const eventsTable = await getEventsTable();
-		const dbEventStrings = await eventsTable.find({ height }, ['eventStr']);
+	// Get from DB first (this is the default behavior)
+	const eventsTable = await getEventsTable();
+	const dbEventBlob = await eventsTable.find({ height }, ['eventBlob']);
 
-		if (dbEventStrings.length) {
-			const dbEvents = dbEventStrings.map(({ eventStr }) =>
-				eventStr ? JSON.parse(eventStr) : eventStr,
-			);
-			await eventCache.set(height, JSON.stringify(dbEvents));
-			return dbEvents;
-		}
+	if (dbEventBlob.length) {
+		const dbEvents = dbEventBlob.map(({ eventBlob }) =>
+			eventBlob ? msgpack.decode(eventBlob) : eventBlob,
+		);
+		await eventCache.set(height, JSON.stringify(dbEvents));
+		return dbEvents;
 	}
 
 	// Get from node
@@ -81,11 +82,11 @@ const getEventsByBlockID = async blockID => {
 
 	// Get from DB incase of cache miss
 	const eventsTable = await getEventsTable();
-	const dbEventStrings = await eventsTable.find({ blockID }, ['eventStr']);
+	const dbEventsBlob = await eventsTable.find({ blockID }, ['eventBlob']);
 
-	if (dbEventStrings.length) {
-		const dbEvents = dbEventStrings.map(({ eventStr }) =>
-			eventStr ? JSON.parse(eventStr) : eventStr,
+	if (dbEventsBlob.length) {
+		const dbEvents = dbEventsBlob.map(({ eventBlob }) =>
+			eventBlob ? msgpack.decode(eventBlob) : eventBlob,
 		);
 		eventCacheByBlockID.set(blockID, JSON.stringify(dbEvents));
 		return dbEvents;
@@ -212,13 +213,16 @@ const getEvents = async params => {
 
 		const topics = topic.split(',');
 		const topicsToQuery = [];
-		topics.forEach(t => {
-			if (t.length === LENGTH_ID) {
-				topicsToQuery.push(EVENT_TOPIC_PREFIX.TX_ID.concat(t), EVENT_TOPIC_PREFIX.CCM_ID.concat(t));
+		for (let i = 0; i < topics.length; i++) {
+			if (topics[i].length === LENGTH_ID) {
+				topicsToQuery.push(
+					EVENT_TOPIC_PREFIX.TX_ID.concat(topics[i]),
+					EVENT_TOPIC_PREFIX.CCM_ID.concat(topics[i]),
+				);
 			} else {
-				topicsToQuery.push(t);
+				topicsToQuery.push(topics[i]);
 			}
-		});
+		}
 
 		params.leftOuterJoin.push({
 			targetTable: `${eventTopicsTableSchema.tableName} as eventTopicsForTopic`,
@@ -234,31 +238,24 @@ const getEvents = async params => {
 
 	const { topic, ...paramsWithoutTopic } = params;
 	params = paramsWithoutTopic;
-	const eventsInfo = await eventsTable.find(params, ['eventStr', 'height', 'index']);
+	const eventsInfo = await eventsTable.find(params, [
+		'eventBlob',
+		'height',
+		'blockID',
+		'timestamp',
+	]);
 
 	events.data = await BluebirdPromise.map(
 		eventsInfo,
-		async ({ eventStr, height, index }) => {
-			let event;
-			if (config.db.isPersistEvents) {
-				if (eventStr) event = JSON.parse(eventStr);
-			}
-			if (!event) {
-				const eventsFromCache = await getEventsByHeight(height);
-				event = eventsFromCache.find(entry => entry.index === index);
-			}
+		async ({ eventBlob, height, blockID, timestamp }) => {
+			const event = msgpack.decode(eventBlob);
 
-			const [{ id, timestamp } = {}] = await blocksTable.find({ height, limit: 1 }, [
-				'id',
-				'timestamp',
-			]);
-
-			return parseToJSONCompatObj({
+			return {
 				...event,
-				block: { id, height, timestamp },
-			});
+				block: { id: blockID, height, timestamp },
+			};
 		},
-		{ concurrency: eventsInfo.length },
+		{ concurrency: Math.min(eventsInfo.length, MAX_GET_EVENTS_CONCURRENCY) },
 	);
 
 	const { order, sort, ...remParamsWithoutOrderAndSort } = params;

@@ -20,7 +20,6 @@ const {
 	},
 } = require('klayr-service-framework');
 const { getNetworkStatus } = require('../network');
-const { requestConnector } = require('../../../utils/request');
 const { LENGTH_NETWORK_ID, LENGTH_TOKEN_ID } = require('../../../constants');
 
 const config = require('../../../../config');
@@ -29,6 +28,7 @@ const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
 const blockchainAppsTableSchema = require('../../../database/schema/blockchainApps');
 const { getMainchainID } = require('./mainchain');
+const { getTokenEscrowed } = require('../../recorder/token/escrowed');
 
 const getBlockchainAppsTable = () => getTableInstance(blockchainAppsTableSchema, MYSQL_ENDPOINT);
 
@@ -94,7 +94,7 @@ const getBlockchainApps = async params => {
 	const {
 		data: { chainID },
 	} = await getNetworkStatus();
-	const { escrowedAmounts } = await requestConnector('getEscrowedAmounts');
+	const escrowedAmounts = await getTokenEscrowed();
 
 	const tokenIdForKLY = await getKLYTokenID();
 	blockchainAppsInfo.data = await BluebirdPromise.map(

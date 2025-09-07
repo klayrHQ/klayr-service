@@ -34,19 +34,14 @@ config.brokerTimeout = Number(process.env.SERVICE_BROKER_TIMEOUT) || 10; // in s
 /**
  * External endpoints
  */
-config.endpoints.klayrWs = process.env.KLAYR_APP_WS || 'ws://127.0.0.1:7887';
-config.endpoints.klayrHttp =
-	process.env.KLAYR_APP_HTTP || config.endpoints.klayrWs.replace('ws', 'http');
+config.endpoints.klayrUrls = process.env.KLAYR_APP_URLS
+	? process.env.KLAYR_APP_URLS.split(',')
+	: ['ws://127.0.0.1:7887'];
+config.endpoints.klayrEventSubscriber =
+	process.env.KLAYR_EVENT_SUBSCRIBER_NODE || 'ws://127.0.0.1:7887';
 config.endpoints.geoip = process.env.GEOIP_JSON || 'https://geoip.klayr.xyz/json';
-
-/**
- * API Client related settings
- */
-config.isUseHttpApi = Boolean(String(process.env.USE_KLAYR_HTTP_API).toLowerCase() === 'true'); // Disabled by default
-config.isUseKlayrIPCClient = Boolean(
-	String(process.env.USE_KLAYR_IPC_CLIENT).toLowerCase() === 'true',
-);
-config.klayrAppDataPath = process.env.KLAYR_APP_DATA_PATH || '~/.klayr/klayr-core';
+config.endpoints.mysql =
+	process.env.SERVICE_CONNECTOR_MYSQL || 'mysql://klayr:password@127.0.0.1:3306/klayr';
 
 /**
  * Network-related settings
@@ -95,14 +90,6 @@ config.enableTestingMode = Boolean(
 	String(process.env.ENABLE_TESTING_MODE).toLowerCase() === 'true',
 );
 
-config.cache = {
-	isBlockCachingEnabled: Boolean(
-		String(process.env.ENABLE_BLOCK_CACHING).toLowerCase() !== 'false',
-	), // Enabled by default
-	expiryInHours: Number(process.env.EXPIRY_IN_HOURS) || 12,
-	dbDataDir: 'data/db_cache',
-};
-
 config.job = {
 	// Interval takes priority over schedule and must be greater than 0 to be valid
 	cacheCleanup: {
@@ -116,7 +103,7 @@ config.job = {
 };
 
 config.apiClient = {
-	poolSize: Number(process.env.CLIENT_POOL_SIZE) || 10,
+	poolSize: Number(process.env.CLIENT_POOL_SIZE) || 1,
 	wsServerPingInterval: Number(process.env.WS_SERVER_PING_INTERVAL) || 3 * 1000, // in millisecs
 	pingIntervalBuffer: Number(process.env.WS_SERVER_PING_INTERVAL_BUFFER) || 1000, // in millisecs
 	request: {
@@ -124,6 +111,15 @@ config.apiClient = {
 		retryDelay: Number(process.env.ENDPOINT_INVOKE_RETRY_DELAY) || 1000, // in millisecs
 	},
 };
+
+config.queue = {
+	invokeEndpoint: {
+		name: 'InvokeEndpoint',
+		concurrency: Number(process.env.INVOKE_ENDPOINT_QUEUE_CONCURRENCY) || 3,
+	},
+};
+
+config.coalescingTTL = Number(process.env.INVOKE_ENDPOINT_COALESCING_CACHE_TTL) || 1000; // in milisecs
 
 // Every n milliseconds, verify if client connection is alive
 config.clientConnVerifyInterval =

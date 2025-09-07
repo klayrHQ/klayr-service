@@ -38,6 +38,9 @@ jest.mock('klayr-service-framework', () => {
 			...actual.DB,
 			MySQL: {
 				...actual.DB.MySQL,
+				getTableInstance: jest.fn(() => ({
+					find: jest.fn(),
+				})),
 				KVStore: {
 					...actual.DB.MySQL.KVStore,
 					getKeyValueTable: jest.fn(),
@@ -62,6 +65,16 @@ describe('tokenHasUserAccount', () => {
 				requestConnector: jest.fn(() => ({ exists: true })),
 			}));
 
+			const { DB } = require('klayr-service-framework');
+			DB.MySQL.getTableInstance.mockReturnValue({
+				find: jest.fn(({ address }) => {
+					if (address === accAddressExists) {
+						return Promise.resolve([{ initialized: true }]);
+					}
+					return Promise.resolve([]);
+				}),
+			});
+
 			// Make a query to tokenHasUserAccount function
 			const { tokenHasUserAccount } = require(mockTokenaccountExistsFilePath);
 			const result = await tokenHasUserAccount({ address: accAddressExists, tokenID });
@@ -78,6 +91,19 @@ describe('tokenHasUserAccount', () => {
 			jest.mock(mockRequestFilePath, () => ({
 				requestConnector: jest.fn(() => ({ exists: true })),
 			}));
+
+			// The address derived from the publicKey used in this test
+			const publicKeyAddress = 'klyguo9kqnea2zsfo3a6qppozsxsg92nuuma3p7ad';
+
+			const { DB } = require('klayr-service-framework');
+			DB.MySQL.getTableInstance.mockReturnValue({
+				find: jest.fn(({ address }) => {
+					if (address === accAddressExists || address === publicKeyAddress) {
+						return Promise.resolve([{ initialized: true }]);
+					}
+					return Promise.resolve([]);
+				}),
+			});
 
 			// Make a query to tokenHasUserAccount function
 			const { tokenHasUserAccount } = require(mockTokenaccountExistsFilePath);
@@ -98,6 +124,16 @@ describe('tokenHasUserAccount', () => {
 			jest.mock(mockValidatorUtilsPath);
 			const { getAddressByName } = require(mockValidatorUtilsPath);
 			getAddressByName.mockReturnValueOnce(accAddressExists);
+
+			const { DB } = require('klayr-service-framework');
+			DB.MySQL.getTableInstance.mockReturnValue({
+				find: jest.fn(({ address }) => {
+					if (address === accAddressExists) {
+						return Promise.resolve([{ initialized: true }]);
+					}
+					return Promise.resolve([]);
+				}),
+			});
 
 			// Make a query to tokenHasUserAccount function
 			const { tokenHasUserAccount } = require(mockTokenaccountExistsFilePath);
@@ -122,6 +158,16 @@ describe('tokenHasUserAccount', () => {
 				meta: {},
 			});
 
+			const { DB } = require('klayr-service-framework');
+			DB.MySQL.getTableInstance.mockReturnValue({
+				find: jest.fn(({ address }) => {
+					if (address === accAddressExists) {
+						return Promise.resolve([{ initialized: true }]);
+					}
+					return Promise.resolve([]);
+				}),
+			});
+
 			// Make a query to tokenHasUserAccount function
 			const { tokenHasUserAccount } = require(mockTokenaccountExistsFilePath);
 			const result = await tokenHasUserAccount({ address: accAddressExists });
@@ -140,6 +186,16 @@ describe('tokenHasUserAccount', () => {
 			jest.mock(mockRequestFilePath, () => ({
 				requestConnector: jest.fn(() => ({ exists: false })),
 			}));
+
+			const { DB } = require('klayr-service-framework');
+			DB.MySQL.getTableInstance.mockReturnValue({
+				find: jest.fn(({ address }) => {
+					if (address === accAddressExists) {
+						return Promise.resolve([{ initialized: true }]);
+					}
+					return Promise.resolve([]);
+				}),
+			});
 
 			// Make a query to tokenHasUserAccount function
 			const { tokenHasUserAccount } = require(mockTokenaccountExistsFilePath);

@@ -82,7 +82,7 @@ const requestData = async requestedIp => {
 const autoCleanUp = () =>
 	setInterval(() => {
 		const tooMuch = refreshSchedule.splice(0, refreshSchedule.length - SCHEDULE_MAX_LENGTH);
-		tooMuch.forEach(item => clearInterval(item));
+		for (let i = 0; i < tooMuch.length; i++) clearInterval(tooMuch[i]);
 		logger.debug(
 			`Cache queue: Removed ${tooMuch.length} items, ${refreshSchedule.length} last elements left.`,
 		);

@@ -38,9 +38,11 @@ const EMAcalc = (feePerByte, prevFeeEstPerByte) => {
 		prevFeeEstPerByte = { low: 0, med: 0, high: 0 };
 	}
 
-	Object.keys(feePerByte).forEach(property => {
-		feeEst[property] = alpha * feePerByte[property] + (1 - alpha) * prevFeeEstPerByte[property];
-	});
+	const feePerByteKeys = Object.keys(feePerByte);
+	for (let i = 0; i < feePerByteKeys.length; i++) {
+		feeEst[feePerByteKeys[i]] =
+			alpha * feePerByte[feePerByteKeys[i]] + (1 - alpha) * prevFeeEstPerByte[feePerByteKeys[i]];
+	}
 
 	const EMAoutput = {
 		feeEstLow: feeEst.low,
@@ -52,7 +54,9 @@ const EMAcalc = (feePerByte, prevFeeEstPerByte) => {
 
 const calculateBlockSize = async block => {
 	let blockSize = 0;
-	block.transactions.forEach(txn => (blockSize += txn.size));
+	for (let i = 0; i < block.transactions.length; i++) {
+		blockSize += block.transactions[i].size;
+	}
 	return blockSize;
 };
 
@@ -73,7 +77,9 @@ const calculateAvgFeePerByte = (mode, transactionDetails) => {
 
 	let currentBytePos = 0;
 	let totalFeePriority = 0;
-	transactionDetails.forEach(transaction => {
+	for (let i = 0; i < transactionDetails.length; i++) {
+		const transaction = transactionDetails[i];
+
 		if (
 			currentBytePos <= lowerBytePos &&
 			lowerBytePos < currentBytePos + transaction.size &&
@@ -96,7 +102,7 @@ const calculateAvgFeePerByte = (mode, transactionDetails) => {
 		}
 
 		currentBytePos += transaction.size;
-	});
+	}
 
 	const avgFeePriority = totalFeePriority / (upperBytePos - lowerBytePos + 1);
 	return avgFeePriority;

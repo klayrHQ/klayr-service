@@ -13,26 +13,8 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const BluebirdPromise = require('bluebird');
-
-const {
-	getSchemas,
-	getRegisteredEndpoints,
-	getRegisteredEvents,
-	getRegisteredModules,
-	getNodeInfo,
-	getSystemMetadata,
-	getEngineEndpoints,
-} = require('./endpoints_1');
-const {
-	cacheBlocksIfEnabled,
-	getBlockByIDFromCache,
-	getTransactionByIDFromCache,
-} = require('./cache');
-const { invokeEndpoint } = require('./client');
+const { invokeEndpoint, invokeEndpointImmediate } = require('./client');
 const { getGenesisHeight, getGenesisBlockID, getGenesisBlock } = require('./genesisBlock');
-
-const config = require('../../config');
 
 const getNetworkConnectedPeers = async () => {
 	const connectedPeers = await invokeEndpoint('network_getConnectedPeers');
@@ -65,7 +47,6 @@ const getBlockByHeight = async (height, includeGenesisAssets = false) => {
 	}
 
 	const block = await invokeEndpoint('chain_getBlockByHeight', { height });
-	cacheBlocksIfEnabled(block);
 
 	return block;
 };
@@ -89,7 +70,6 @@ const getBlocksByHeightBetween = async ({ from, to }) => {
 	}
 
 	const blocks = blocksNestedList.flat();
-	cacheBlocksIfEnabled(blocks);
 	return blocks;
 };
 
@@ -99,11 +79,7 @@ const getBlockByID = async (id, includeGenesisAssets = false) => {
 		return getGenesisBlock(includeGenesisAssets);
 	}
 
-	const blockFromCache = await getBlockByIDFromCache(id).catch(() => null);
-	if (blockFromCache) return blockFromCache;
-
 	const block = await invokeEndpoint('chain_getBlockByID', { id });
-	cacheBlocksIfEnabled(block);
 	return block;
 };
 
@@ -121,9 +97,7 @@ const getBlocksByIDs = async ids => {
 		return remainingBlocks;
 	}
 
-	const blocks = config.cache.isBlockCachingEnabled
-		? await BluebirdPromise.map(ids, async id => getBlockByID(id), { concurrency: 1 })
-		: await invokeEndpoint('chain_getBlocksByIDs', { ids });
+	const blocks = await invokeEndpoint('chain_getBlocksByIDs', { ids });
 
 	return blocks;
 };
@@ -134,18 +108,12 @@ const getEventsByHeight = async height => {
 };
 
 const getTransactionByID = async id => {
-	const transactionFromCache = await getTransactionByIDFromCache(id).catch(() => null);
-	if (transactionFromCache) return transactionFromCache;
-
 	const transaction = await invokeEndpoint('chain_getTransactionByID', { id });
 	return transaction;
 };
 
 const getTransactionsByIDs = async ids => {
-	const transactions = config.cache.isBlockCachingEnabled
-		? await BluebirdPromise.map(ids, async id => getTransactionByID(id), { concurrency: 1 })
-		: await invokeEndpoint('chain_getTransactionsByIDs', { ids });
-
+	const transactions = await invokeEndpoint('chain_getTransactionsByIDs', { ids });
 	return transactions;
 };
 
@@ -155,12 +123,12 @@ const getTransactionsFromPool = async () => {
 };
 
 const postTransaction = async transaction => {
-	const response = await invokeEndpoint('txpool_postTransaction', { transaction });
+	const response = await invokeEndpointImmediate('txpool_postTransaction', { transaction });
 	return response;
 };
 
 const dryRunTransaction = async ({ transaction, skipVerify, strict }) => {
-	const response = await invokeEndpoint('txpool_dryRunTransaction', {
+	const response = await invokeEndpointImmediate('txpool_dryRunTransaction', {
 		transaction,
 		skipVerify,
 		strict,
@@ -180,13 +148,6 @@ const getBFTParameters = async height => {
 
 module.exports = {
 	invokeEndpoint,
-	getSchemas,
-	getRegisteredEndpoints,
-	getRegisteredEvents,
-	getRegisteredModules,
-	getNodeInfo,
-	getSystemMetadata,
-	getEngineEndpoints,
 	getNetworkConnectedPeers,
 	getNetworkDisconnectedPeers,
 	getGeneratorStatus,

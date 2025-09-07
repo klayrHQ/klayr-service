@@ -54,10 +54,12 @@ const mapParamWithType = (source, originalSetup, mappingKey) => {
 
 const transformParams = (params = {}, specs) => {
 	const output = {};
-	Object.keys(specs).forEach(specParam => {
-		const result = mapParamWithType(params, specs[specParam], specParam);
+	const specKeys = Object.keys(specs);
+	for (let i = 0; i < specKeys.length; i++) {
+		const result = mapParamWithType(params, specs[specKeys[i]], specKeys[i]);
 		if (result.key) output[result.key] = result.value;
-	});
+	}
+
 	return output;
 };
 

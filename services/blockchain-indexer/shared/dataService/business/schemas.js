@@ -38,33 +38,38 @@ const getAllSchemas = async () => {
 		const commandsParamsSchemas = [];
 		const assetsSchemas = [];
 		const eventsSchemas = [];
-		schemas.systemMetadata.modules.forEach(module => {
-			module.events.forEach(event => {
+
+		const modules = schemas.systemMetadata.modules;
+		for (let i = 0; i < modules.length; i++) {
+			const module = modules[i];
+
+			for (let j = 0; j < module.events.length; j++) {
 				const formattedEvents = {
 					module: module.name,
-					name: event.name,
-					schema: event.data,
+					name: module.events[j].name,
+					schema: module.events[j].data,
 				};
 				eventsSchemas.push(formattedEvents);
-			});
+			}
 
-			module.assets.forEach(asset => {
+			for (let j = 0; j < module.assets.length; j++) {
 				const formattedAssets = {
 					module: module.name,
-					version: asset.version,
-					schema: asset.data,
+					version: module.assets[j].version,
+					schema: module.assets[j].data,
 				};
 				assetsSchemas.push(formattedAssets);
-			});
+			}
 
-			module.commands.forEach(command => {
+			for (let j = 0; j < module.commands.length; j++) {
 				const formattedTxParams = {
-					moduleCommand: String(module.name).concat(':', command.name),
-					schema: command.params,
+					moduleCommand: String(module.name).concat(':', module.commands[j].name),
+					schema: module.commands[j].params,
 				};
 				commandsParamsSchemas.push(formattedTxParams);
-			});
-		});
+			}
+		}
+
 		Object.assign(allSchemas, {
 			assets: assetsSchemas,
 			commands: commandsParamsSchemas,
@@ -72,9 +77,12 @@ const getAllSchemas = async () => {
 		});
 
 		// Assign generic schemas
-		Object.entries(schemas.schemas).forEach(
-			([entity, schema]) => (allSchemas[entity] = { schema }),
-		);
+		const entries = Object.entries(schemas.schemas);
+		for (let i = 0; i < entries.length; i++) {
+			const entity = entries[i][0];
+			const schema = entries[i][1];
+			allSchemas[entity] = { schema };
+		}
 
 		// Assign messages schemas
 		Object.assign(allSchemas, { messages: schemas.messageSchemas });

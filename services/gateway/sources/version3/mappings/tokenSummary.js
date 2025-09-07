@@ -28,7 +28,7 @@ const supportedToken = {
 
 const totalSupplyByToken = {
 	tokenID: '=,string',
-	amount: 'totalSupply,string',
+	amount: '=,string',
 };
 
 module.exports = {

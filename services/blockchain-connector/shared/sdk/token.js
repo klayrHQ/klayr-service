@@ -33,21 +33,24 @@ const getTokenBalance = async ({ address, tokenID }) => {
 	return balance;
 };
 
-const getEscrowedAmounts = async (isForceUpdate = false) => {
+// NOTE: since now updateTokenInfo doesn't periodically update this info, any request to this info should be forceUpdated
+const getEscrowedAmounts = async (isForceUpdate = true) => {
 	if (isForceUpdate || !escrowedAmounts) {
 		escrowedAmounts = await invokeEndpoint('token_getEscrowedAmounts');
 	}
 	return escrowedAmounts;
 };
 
-const getSupportedTokens = async (isForceUpdate = false) => {
+// NOTE: since now updateTokenInfo doesn't periodically update this info, any request to this info should be forceUpdated
+const getSupportedTokens = async (isForceUpdate = true) => {
 	if (isForceUpdate || !supportedTokens) {
 		supportedTokens = await invokeEndpoint('token_getSupportedTokens');
 	}
 	return supportedTokens;
 };
 
-const getTotalSupply = async (isForceUpdate = false) => {
+// NOTE: since now updateTokenInfo doesn't periodically update this info, any request to this info should be forceUpdated
+const getTotalSupply = async (isForceUpdate = true) => {
 	if (isForceUpdate || !totalSupply) {
 		totalSupply = await invokeEndpoint('token_getTotalSupply');
 	}
@@ -69,10 +72,11 @@ const hasUserAccount = async ({ address, tokenID }) =>
 const hasEscrowAccount = async ({ tokenID, escrowChainID }) =>
 	invokeEndpoint('token_hasEscrowAccount', { tokenID, escrowChainID });
 
+// NOTE: escrowed amounts, supported tokens, and total supply, now already indexed dynamically on each block indexing
 const updateTokenInfo = async () => {
-	escrowedAmounts = await getEscrowedAmounts(true);
-	if (!(await isMainchain()) || !supportedTokens) supportedTokens = await getSupportedTokens(true);
-	totalSupply = await getTotalSupply(true);
+	// escrowedAmounts = await getEscrowedAmounts(true);
+	// if (!(await isMainchain()) || !supportedTokens) supportedTokens = await getSupportedTokens(true);
+	// totalSupply = await getTotalSupply(true);
 };
 
 const getTokenBalancesAtGenesis = async address => {

@@ -18,7 +18,7 @@ const {
 	Exceptions: { TimeoutException },
 } = require('klayr-service-framework');
 
-const { getNodeInfo } = require('./endpoints_1');
+const { getNodeInfo } = require('./cached_endpoints');
 const { getGenesisBlockFromFS } = require('./blocksUtils');
 
 const { TIMEOUT_REGEX, invokeEndpoint } = require('./client');
@@ -150,10 +150,11 @@ const getGenesisAssetsLength = async params => {
 
 	// eslint-disable-next-line no-restricted-syntax
 	for (const asset of genesisAssets) {
-		Object.keys(asset.data).forEach(subStoreKey => {
+		const subStoreKeys = Object.keys(asset.data);
+		for (let i = 0; i < subStoreKeys.length; i++) {
 			if (!assetLengthMap[asset.module]) assetLengthMap[asset.module] = {};
-			assetLengthMap[asset.module][subStoreKey] = asset.data[subStoreKey].length;
-		});
+			assetLengthMap[asset.module][subStoreKeys[i]] = asset.data[subStoreKeys[i]].length;
+		}
 	}
 
 	return assetLengthMap;

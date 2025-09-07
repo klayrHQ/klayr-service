@@ -13,8 +13,12 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
+const { Logger } = require('klayr-service-framework');
 const config = require('../../config');
+const { waitForIndexerReady } = require('../indexerReady');
+const delay = require('../utils/delay');
 const { requestIndexer } = require('../utils/request');
+const logger = Logger();
 
 let isGenesisBlockIndexedFlag = false;
 
@@ -27,8 +31,34 @@ const isGenesisBlockIndexed = async () => {
 
 const getIndexStatus = async () => requestIndexer('index.status').catch(() => null);
 
-const getMissingBlocks = async (from, to) =>
-	requestIndexer('getMissingBlocks', { from, to }).catch(err => err);
+const getMissingBlocks = async (from, to) => {
+	await waitForIndexerReady();
+
+	while (true) {
+		try {
+			return await requestIndexer(
+				'getMissingBlocks',
+				{ from, to },
+				{ timeout: config.brokerTimeout * 1000 * 3 },
+			);
+		} catch (err) {
+			if (err.message.includes('indexer.getMissingBlocks') && err.message.includes('timed out')) {
+				logger.warn(
+					`timeout detected while requesting indexer.getMissingBlocks from ${from} to ${to},, will retry after ${
+						config.requestTimeoutRetryDelay / 1000
+					} seconds!`,
+				);
+				await delay(config.requestTimeoutRetryDelay);
+				continue;
+			} else {
+				logger.error(
+					`Failed to request indexer.getMissingBlocks from ${from} to ${to} due to a non-timeout error: ${err.message}`,
+				);
+				throw err;
+			}
+		}
+	}
+};
 
 const getIndexVerifiedHeight = async () =>
 	requestIndexer('getIndexVerifiedHeight').catch(() => null);

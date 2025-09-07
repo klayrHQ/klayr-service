@@ -19,12 +19,12 @@ const mockTokenTopBalancesTokenInfos = [
 	},
 ];
 const mockTokenTopBalancesDbSearchResult = {
-	'account_balances.tokenID': 'token123',
+	'token_balances.tokenID': 'token123',
 	limit: 10,
 	offset: 0,
 	leftOuterJoin: {
 		targetTable: 'accounts',
-		leftColumn: 'account_balances.address',
+		leftColumn: 'token_balances.address',
 		rightColumn: 'accounts.address',
 	},
 	orSearch: [
@@ -33,7 +33,7 @@ const mockTokenTopBalancesDbSearchResult = {
 			pattern: 'search123',
 		},
 		{
-			property: 'accounts.address',
+			property: 'token_balances.address',
 			pattern: 'search123',
 		},
 		{

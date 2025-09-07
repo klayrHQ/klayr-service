@@ -26,7 +26,7 @@ const { initNodeConstants } = require('./constants');
 const {
 	addHeightToIndexBlocksQueue,
 	scheduleBlockDeletion,
-	indexNewBlock,
+	addBlockToIndexBlocksQueue,
 } = require('./indexer/blockchainIndex');
 
 const {
@@ -39,6 +39,7 @@ const {
 	formatPendingTransaction,
 } = require('./dataService');
 const { accountAddrUpdateQueue } = require('./indexer/accountIndex');
+const { indexPendingNewBlock } = require('./indexer/pendingBlockchainIndex');
 
 const STATS_INTERVAL = 1 * 60 * 1000; // ms
 
@@ -81,7 +82,7 @@ const newBlockProcessor = async block => {
 	const response = await formatBlock(block);
 	const [newBlock] = response.data;
 
-	await indexNewBlock(newBlock);
+	await indexPendingNewBlock(block);
 	await performLastBlockUpdate(newBlock);
 	Signals.get('newBlock').dispatch(response);
 	logger.info(
@@ -138,10 +139,17 @@ const initMessageProcessors = async () => {
 	logger.info(`Registering job processor for ${blockMessageQueue.name} message queue.`);
 	blockMessageQueue.process(async job => {
 		logger.debug('Subscribed to block index message queue.');
-		const { height } = job.data;
+		const { height, block } = job.data;
 
-		logger.debug(`Scheduling indexing for block at height: ${height}.`);
-		await addHeightToIndexBlocksQueue(height);
+		if (block !== undefined) {
+			logger.debug(
+				`Scheduling indexing using whole block with height: ${block.header.height}, and id: ${block.header.id}.`,
+			);
+			await addBlockToIndexBlocksQueue(block);
+		} else if (height !== undefined) {
+			logger.debug(`Scheduling indexing for block with height: ${height}.`);
+			await addHeightToIndexBlocksQueue(height);
+		}
 	});
 
 	logger.info(`Registering job processor for ${eventMessageQueue.name} message queue.`);

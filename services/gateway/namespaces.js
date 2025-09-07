@@ -25,9 +25,11 @@ const filterApis = (requiredApis, availableApis) => {
 	const filteredApis = {};
 
 	const requiredPaths = requiredApis.split(',').map(path => '/'.concat(path));
-	Object.keys(availableApis).forEach(key => {
-		if (requiredPaths.includes(key)) filteredApis[key] = availableApis[key]();
-	});
+	const availableApisKeys = Object.keys(availableApis);
+	for (let i = 0; i < availableApisKeys.length; i++) {
+		if (requiredPaths.includes(availableApisKeys[i]))
+			filteredApis[availableApisKeys[i]] = availableApis[availableApisKeys[i]]();
+	}
 
 	return filteredApis;
 };

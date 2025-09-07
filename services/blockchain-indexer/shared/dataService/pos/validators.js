@@ -109,24 +109,23 @@ const computeValidatorStatus = async () => {
 	};
 
 	logger.debug('Determine validator status.');
-	validatorList.forEach(validator => {
+	for (let i = 0; i < validatorList.length; i++) {
 		// Update validator status, if applicable
-		if (validator.isBanned) {
-			validator.status = VALIDATOR_STATUS.BANNED;
-		} else if (verifyIfPunished(validator)) {
-			validator.status = VALIDATOR_STATUS.PUNISHED;
-		} else if (activeGeneratorsList.includes(validator.address)) {
-			validator.status = VALIDATOR_STATUS.ACTIVE;
-		} else if (standByGeneratorsList.includes(validator.address)) {
-			validator.status = VALIDATOR_STATUS.STANDBY;
-		} else if (BigInt(validator.validatorWeight) >= BigInt(MIN_ELIGIBLE_VOTE_WEIGHT)) {
-			validator.status = VALIDATOR_STATUS.STANDBY;
+		if (validatorList[i].isBanned) {
+			validatorList[i].status = VALIDATOR_STATUS.BANNED;
+		} else if (verifyIfPunished(validatorList[i])) {
+			validatorList[i].status = VALIDATOR_STATUS.PUNISHED;
+		} else if (activeGeneratorsList.includes(validatorList[i].address)) {
+			validatorList[i].status = VALIDATOR_STATUS.ACTIVE;
+		} else if (standByGeneratorsList.includes(validatorList[i].address)) {
+			validatorList[i].status = VALIDATOR_STATUS.STANDBY;
+		} else if (BigInt(validatorList[i].validatorWeight) >= BigInt(MIN_ELIGIBLE_VOTE_WEIGHT)) {
+			validatorList[i].status = VALIDATOR_STATUS.STANDBY;
 		} else {
 			// Default validator status
-			validator.status = VALIDATOR_STATUS.INELIGIBLE;
+			validatorList[i].status = VALIDATOR_STATUS.INELIGIBLE;
 		}
-		return validator;
-	});
+	}
 
 	return validatorList;
 };
@@ -195,9 +194,26 @@ const getPosValidators = async params => {
 		indexAccountPublicKey(params.publicKey);
 	}
 
-	if (params.address) params.address.split(',').forEach(address => addressSet.add(address));
-	if (params.name) params.name.split(',').forEach(name => nameSet.add(name));
-	if (params.status) params.status.split(',').forEach(status => statusSet.add(status));
+	if (params.address) {
+		const addresses = params.address.split(',');
+		for (let i = 0; i < addresses.length; i++) {
+			addressSet.add(addresses[i]);
+		}
+	}
+
+	if (params.name) {
+		const names = params.name.split(',');
+		for (let i = 0; i < names.length; i++) {
+			nameSet.add(names[i]);
+		}
+	}
+
+	if (params.status) {
+		const statuses = params.status.split(',');
+		for (let i = 0; i < statuses.length; i++) {
+			statusSet.add(statuses[i]);
+		}
+	}
 
 	const validatorsTable = await getValidatorsTable();
 	const allValidators = await getAllValidators();
@@ -275,9 +291,10 @@ const updateValidatorListEveryBlock = () => {
 						if ([COMMAND.REGISTER_VALIDATOR, COMMAND.CHANGE_COMMISSION].includes(tx.command)) {
 							updatedValidatorAddresses.push(getKlayr32AddressFromPublicKey(tx.senderPublicKey));
 						} else if (tx.command === COMMAND.STAKE) {
-							tx.params.stakes.forEach(stake =>
-								updatedValidatorAddresses.push(stake.validatorAddress),
-							);
+							const stakes = tx.params.stakes;
+							for (let i = 0; i < stakes.length; i++) {
+								updatedValidatorAddresses.push(stakes[i].validatorAddress);
+							}
 						} else if (tx.command === COMMAND.REPORT_MISBEHAVIOR) {
 							includesMisbehaviorTx = true;
 							const { data: schemas } = await getSchemas();
@@ -296,7 +313,8 @@ const updateValidatorListEveryBlock = () => {
 						addresses: updatedValidatorAddresses,
 					});
 
-					updatedValidatorAccounts.forEach(validator => {
+					for (let i = 0; i < updatedValidatorAccounts.length; i++) {
+						const validator = updatedValidatorAccounts[i];
 						const validatorIndex = validatorList.findIndex(
 							acc => acc.address === validator.address,
 						);
@@ -314,7 +332,7 @@ const updateValidatorListEveryBlock = () => {
 							const { status } = validatorList[validatorIndex];
 							validatorList[validatorIndex] = { ...validator, status };
 						}
-					});
+					}
 
 					// Rank is impacted only when a validator gets (un-)voted
 					await computeValidatorRank();
@@ -364,9 +382,9 @@ const updateValidatorListEveryBlock = () => {
 
 // Updates the account details of the validators
 const updateValidatorListOnAccountsUpdate = () => {
-	const updateValidatorListOnAccountsUpdateListener = addresses => {
-		addresses.forEach(async address => {
-			const validatorIndex = validatorList.findIndex(acc => acc.address === address);
+	const updateValidatorListOnAccountsUpdateListener = async addresses => {
+		for (let i = 0; i < addresses.length; i++) {
+			const validatorIndex = validatorList.findIndex(acc => acc.address === addresses[i]);
 			const validator = validatorList[validatorIndex] || {};
 			if (Object.getOwnPropertyNames(validator).length) {
 				const {
@@ -376,7 +394,7 @@ const updateValidatorListOnAccountsUpdate = () => {
 				// Update the account details of the affected validator
 				Object.assign(validator, parseToJSONCompatObj(updatedValidator));
 			}
-		});
+		}
 	};
 
 	Signals.get('updateAccountState').add(updateValidatorListOnAccountsUpdateListener);

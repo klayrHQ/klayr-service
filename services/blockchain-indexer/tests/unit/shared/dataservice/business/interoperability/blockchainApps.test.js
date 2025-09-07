@@ -14,16 +14,33 @@
  *
  */
 /* eslint-disable import/no-dynamic-require */
+// Hoist Logger mock before all imports to ensure it is used by all required modules
+jest.mock('klayr-service-framework', () => ({
+	DB: {
+		MySQL: {
+			getTableInstance: jest.fn(() => ({
+				find: jest.fn(() => []),
+				count: jest.fn(() => 0),
+			})),
+		},
+	},
+	Logger: jest.fn(() => jest.fn()),
+}));
+// Hoist Logger mock before all imports
+jest.mock('klayr-service-framework', () => ({
+	DB: {
+		MySQL: {
+			getTableInstance: jest.fn(() => ({
+				find: jest.fn(() => []),
+				count: jest.fn(() => 0),
+			})),
+		},
+	},
+	Logger: jest.fn(() => jest.fn()),
+}));
+
 const { resolve } = require('path');
-
-const {
-	mockedMainchainID,
-	mockedBlockchainAppsValidResponse,
-	mockedEscrowedAmounts,
-	mockedBlockchainAppsDatabaseRes,
-	mockedNetworkStatus,
-} = require('../../../constants/blockchainApps');
-
+const constantsPath = '../../../constants/blockchainApps';
 const mockNetworkPath = resolve(
 	`${__dirname}/../../../../../../shared/dataService/business/network`,
 );
@@ -42,59 +59,46 @@ describe('getBlockchainApps', () => {
 	});
 
 	it('should fetch and process blockchain applications', async () => {
-		const params = {
-			limit: 10,
-			offset: 0,
-		};
-
-		jest.mock('klayr-service-framework', () => ({
-			DB: {
-				MySQL: {
-					getTableInstance: jest.fn(() => ({
-						find: jest.fn(() => mockedBlockchainAppsDatabaseRes),
-						count: jest.fn(() => mockedBlockchainAppsValidResponse.meta.count),
-					})),
-				},
-			},
-		}));
+		const {
+			mockedMainchainID,
+			mockedBlockchainAppsValidResponse,
+			mockedEscrowedAmounts,
+			mockedBlockchainAppsDatabaseRes,
+			mockedNetworkStatus,
+		} = require(constantsPath);
 
 		jest.mock(mockNetworkPath, () => ({
 			getNetworkStatus: jest.fn(() => mockedNetworkStatus),
 		}));
-
 		jest.mock(mockRequestPath, () => ({
 			requestConnector: jest.fn(() => mockedEscrowedAmounts),
 		}));
-
 		jest.mock(mockMainchainPath, () => ({
 			getMainchainID: jest.fn(() => mockedMainchainID),
 		}));
 
+		// Override getTableInstance for this test
+		require('klayr-service-framework').DB.MySQL.getTableInstance = jest.fn(() => ({
+			find: jest.fn(() => mockedBlockchainAppsDatabaseRes),
+			count: jest.fn(() => mockedBlockchainAppsValidResponse.meta.count),
+		}));
+
+		// Clear require cache for the module under test
+		delete require.cache[require.resolve(mockBlockchainAppsPath)];
 		const { getBlockchainApps } = require(mockBlockchainAppsPath);
-		const result = await getBlockchainApps(params);
+		const result = await getBlockchainApps({ limit: 10, offset: 0 });
 		expect(result.data).toHaveLength(1);
 		expect(result.meta.count).toBe(1);
 		expect(result).toEqual(mockedBlockchainAppsValidResponse);
 	});
 
 	it('should throw an error if the database is not reachable', async () => {
-		const params = {
-			limit: 10,
-			offset: 0,
-		};
-
-		jest.mock('klayr-service-framework', () => ({
-			DB: {
-				MySQL: {
-					getTableInstance: jest.fn(() => ({
-						find: jest.fn(() => {
-							throw Error('Database not reachable');
-						}),
-						count: jest.fn(() => mockedBlockchainAppsValidResponse.meta.count),
-					})),
-				},
-			},
-		}));
+		const {
+			mockedMainchainID,
+			mockedBlockchainAppsValidResponse,
+			mockedEscrowedAmounts,
+			mockedNetworkStatus,
+		} = require(constantsPath);
 
 		jest.mock(mockNetworkPath, () => ({
 			getNetworkStatus: jest.fn(() => mockedNetworkStatus),
@@ -108,26 +112,25 @@ describe('getBlockchainApps', () => {
 			getMainchainID: jest.fn(() => mockedMainchainID),
 		}));
 
+		// Override getTableInstance for this test
+		require('klayr-service-framework').DB.MySQL.getTableInstance = jest.fn(() => ({
+			find: jest.fn(() => {
+				throw Error('Database not reachable');
+			}),
+			count: jest.fn(() => mockedBlockchainAppsValidResponse.meta.count),
+		}));
+
 		const { getBlockchainApps } = require(mockBlockchainAppsPath);
-		await expect(getBlockchainApps(params)).rejects.toThrow();
+		await expect(getBlockchainApps({ limit: 10, offset: 0 })).rejects.toThrow();
 	});
 
 	it('should throw an error if network status is not reachable', async () => {
-		const params = {
-			limit: 10,
-			offset: 0,
-		};
-
-		jest.mock('klayr-service-framework', () => ({
-			DB: {
-				MySQL: {
-					getTableInstance: jest.fn(() => ({
-						find: jest.fn(() => mockedBlockchainAppsDatabaseRes),
-						count: jest.fn(() => mockedBlockchainAppsValidResponse.meta.count),
-					})),
-				},
-			},
-		}));
+		const {
+			mockedMainchainID,
+			mockedBlockchainAppsValidResponse,
+			mockedBlockchainAppsDatabaseRes,
+			mockedEscrowedAmounts,
+		} = require(constantsPath);
 
 		jest.mock(mockNetworkPath, () => ({
 			getNetworkStatus: jest.fn(() => {
@@ -143,43 +146,48 @@ describe('getBlockchainApps', () => {
 			getMainchainID: jest.fn(() => mockedMainchainID),
 		}));
 
+		// Override getTableInstance for this test
+		require('klayr-service-framework').DB.MySQL.getTableInstance = jest.fn(() => ({
+			find: jest.fn(() => mockedBlockchainAppsDatabaseRes),
+			count: jest.fn(() => mockedBlockchainAppsValidResponse.meta.count),
+		}));
+
 		const { getBlockchainApps } = require(mockBlockchainAppsPath);
-		await expect(getBlockchainApps(params)).rejects.toThrow();
+		await expect(getBlockchainApps({ limit: 10, offset: 0 })).rejects.toThrow();
 	});
 
 	it('should throw an error if the connector is not reachable', async () => {
-		const params = {
-			limit: 10,
-			offset: 0,
-		};
-
-		jest.mock('klayr-service-framework', () => ({
-			DB: {
-				MySQL: {
-					getTableInstance: jest.fn(() => ({
-						find: jest.fn(() => mockedBlockchainAppsDatabaseRes),
-						count: jest.fn(() => mockedBlockchainAppsValidResponse.meta.count),
-					})),
-				},
-			},
-		}));
+		const {
+			mockedMainchainID,
+			mockedBlockchainAppsValidResponse,
+			mockedBlockchainAppsDatabaseRes,
+			mockedNetworkStatus,
+		} = require(constantsPath);
 
 		jest.mock(mockNetworkPath, () => ({
 			getNetworkStatus: jest.fn(() => mockedNetworkStatus),
 		}));
-
-		jest.mock(mockRequestPath, () => ({
-			requestConnector: jest.fn(() => {
-				throw Error('Connector not reachable');
-			}),
-		}));
-
 		jest.mock(mockMainchainPath, () => ({
 			getMainchainID: jest.fn(() => mockedMainchainID),
 		}));
 
+		// Mock getTokenEscrowed to throw
+		jest.mock('../../../../../../shared/dataService/recorder/token/escrowed', () => ({
+			getTokenEscrowed: jest.fn(() => {
+				throw Error('Connector not reachable');
+			}),
+		}));
+
+		// Override getTableInstance for this test
+		require('klayr-service-framework').DB.MySQL.getTableInstance = jest.fn(() => ({
+			find: jest.fn(() => mockedBlockchainAppsDatabaseRes),
+			count: jest.fn(() => mockedBlockchainAppsValidResponse.meta.count),
+		}));
+
+		// Clear require cache for the module under test
+		delete require.cache[require.resolve(mockBlockchainAppsPath)];
 		const { getBlockchainApps } = require(mockBlockchainAppsPath);
-		await expect(getBlockchainApps(params)).rejects.toThrow();
+		await expect(getBlockchainApps({ limit: 10, offset: 0 })).rejects.toThrow();
 	});
 });
 
@@ -190,6 +198,7 @@ describe('getKLYTokenID', () => {
 	});
 
 	it('should generate the token ID based on the mainchain ID', async () => {
+		const { mockedMainchainID } = require(constantsPath);
 		jest.mock(mockMainchainPath, () => ({
 			getMainchainID: jest.fn(() => mockedMainchainID),
 		}));

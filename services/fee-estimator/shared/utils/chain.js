@@ -20,7 +20,8 @@ const {
 } = require('klayr-service-framework');
 
 const config = require('../../config');
-const { requestConnector } = require('./request');
+const { requestIndexer, requestConnector } = require('./request');
+const { waitForIndexerReady } = require('./indexerReady');
 
 let genesisHeight;
 let blockTime;
@@ -92,7 +93,9 @@ const getBlockByHeight = async height => {
 	const blockStr = await blockByHeightCache.get(height);
 	if (blockStr) return JSON.parse(blockStr);
 
-	const block = await requestConnector('getBlockByHeight', { height });
+	await waitForIndexerReady();
+
+	const block = await requestIndexer('getBlockByHeight', { height });
 	await cacheBlockByHeight(block);
 	return block;
 };

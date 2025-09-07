@@ -16,13 +16,14 @@
 const BluebirdPromise = require('bluebird');
 
 const {
+	CacheLRU,
 	Exceptions: { InvalidParamsException },
 	DB: {
 		MySQL: { getTableInstance },
 	},
 } = require('klayr-service-framework');
 
-const { getBlockByID } = require('./blocks');
+const { getBlockByID, formatTransactionResponseFromDB } = require('./blocks');
 const { getEventsByHeight } = require('./events');
 
 const { getCurrentChainID } = require('./interoperability/chain');
@@ -36,9 +37,39 @@ const transactionsTableSchema = require('../../database/schema/transactions');
 const config = require('../../../config');
 const { getKlayr32AddressFromPublicKey } = require('../../utils/account');
 
-const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
+const MYSQL_ENDPOINT = config.endpoints.mysql;
+
+const transactionCache = CacheLRU('transaction');
 
 const getTransactionsTable = () => getTableInstance(transactionsTableSchema, MYSQL_ENDPOINT);
+
+const getTransactionByIDFromDB = async id => {
+	const transactionsTable = await getTransactionsTable();
+
+	const [dbResponse] = await transactionsTable.find(
+		{ id, limit: 1 },
+		Object.getOwnPropertyNames(transactionsTableSchema.schema),
+	);
+
+	if (dbResponse) return formatTransactionResponseFromDB(dbResponse);
+
+	return undefined;
+};
+
+const getTransactionsByIDsFromDB = async ids => {
+	const transactionsTable = await getTransactionsTable();
+
+	const dbResponses = await transactionsTable.find(
+		{ whereIn: { property: 'id', values: ids } },
+		Object.getOwnPropertyNames(transactionsTableSchema.schema),
+	);
+
+	if (dbResponses.length) {
+		return dbResponses.map(formatTransactionResponseFromDB);
+	}
+
+	return undefined;
+};
 
 const getTransactionIDsByBlockID = async blockID => {
 	const transactionsTable = await getTransactionsTable();
@@ -64,8 +95,49 @@ const normalizeTransactions = async txs => {
 	return normalizedTransactions;
 };
 
-const getTransactionsByIDs = async ids => {
-	const response = await requestConnector('getTransactionsByIDs', { ids });
+const getTransactionByID = async (id, forceFromNode = false) => {
+	if (!forceFromNode) {
+		// Get from cache
+		const cachedTransaction = await transactionCache.get(id);
+		if (cachedTransaction) return JSON.parse(cachedTransaction);
+
+		// Get from DB first (this is the default behavior)
+		const transaction = await getTransactionByIDFromDB(id);
+		if (transaction) {
+			const normalizedTransaction = await normalizeTransaction(transaction);
+			await transactionCache.set(id, JSON.stringify(normalizedTransaction));
+			return normalizedTransaction;
+		}
+	}
+
+	// Get from node
+	const response = await requestConnector('getTransactionByID', { id });
+	const normalizedTransaction = await normalizeTransaction(response);
+	await transactionCache.set(id, JSON.stringify(normalizedTransaction));
+	return normalizedTransaction;
+};
+
+const getTransactionsByIDs = async (ids, forceFromNode = false) => {
+	if (!forceFromNode) {
+		// Get from cache
+		const cachedTransaction = (await Promise.all(ids.map(id => transactionCache.get(id)))).filter(
+			tx => tx,
+		);
+		if (cachedTransaction.length === ids.length) return cachedTransaction.map(tx => JSON.parse(tx));
+
+		// Get from DB first (this is the default behavior)
+		const transaction = await normalizeTransactions(await getTransactionsByIDsFromDB(ids));
+		if (transaction && transaction.length) {
+			for (const tx of transaction) await transactionCache.set(tx.id, JSON.stringify(tx));
+			return transaction;
+		}
+	}
+
+	// Get from node
+	const response = await normalizeTransactions(
+		await requestConnector('getTransactionsByIDs', { ids }),
+	);
+	for (const tx of response) await transactionCache.set(tx.id, JSON.stringify(tx));
 	return normalizeTransactions(response);
 };
 
@@ -124,25 +196,12 @@ const getTransactions = async params => {
 	params = await validateParams(params);
 
 	const total = await transactionsTable.count(params);
-	const resultSet = await transactionsTable.find({ ...params, limit: params.limit || total }, [
-		'id',
-		'timestamp',
-		'height',
-		'blockID',
-		'executionStatus',
-		'index',
-		'minFee',
-	]);
-	params.ids = resultSet.map(row => row.id);
+	const resultSet = await transactionsTable.find(
+		{ ...params, limit: params.limit || total },
+		Object.getOwnPropertyNames(transactionsTableSchema.schema),
+	);
 
-	if (params.ids.length) {
-		const BATCH_SIZE = 25;
-		for (let i = 0; i < Math.ceil(params.ids.length / BATCH_SIZE); i++) {
-			transactions.data = transactions.data.concat(
-				await getTransactionsByIDs(params.ids.slice(i * BATCH_SIZE, (i + 1) * BATCH_SIZE)),
-			);
-		}
-	}
+	if (resultSet.length) transactions.data = resultSet;
 
 	transactions.data = await BluebirdPromise.map(
 		transactions.data,
@@ -157,6 +216,9 @@ const getTransactions = async params => {
 				publicKey: transaction.senderPublicKey,
 				name: senderAccount ? senderAccount.name : null,
 			};
+
+			transaction.params = JSON.parse(transaction.params);
+			transaction.signatures = JSON.parse(transaction.signatures);
 
 			if (transaction.params.recipientAddress) {
 				const recipientAccount = await getIndexedAccountInfo(
@@ -173,17 +235,12 @@ const getTransactions = async params => {
 				};
 			}
 
-			const indexedTxInfo = resultSet.find(txInfo => txInfo.id === transaction.id) || {};
 			transaction.block = {
-				id: indexedTxInfo.blockID,
-				height: indexedTxInfo.height,
-				timestamp: indexedTxInfo.timestamp,
-				isFinal: indexedTxInfo.height <= (await getFinalizedHeight()),
+				id: transaction.blockID,
+				height: transaction.height,
+				timestamp: transaction.timestamp,
+				isFinal: transaction.height <= (await getFinalizedHeight()),
 			};
-
-			transaction.executionStatus = indexedTxInfo.executionStatus;
-			transaction.index = indexedTxInfo.index;
-			transaction.minFee = indexedTxInfo.minFee;
 
 			return transaction;
 		},
@@ -275,6 +332,10 @@ module.exports = {
 	getTransactionsByIDs,
 	normalizeTransaction,
 	formatTransactionsInBlock,
+
+	// for db indexnig use
+	formatTransactionResponseFromDB,
+	getTransactionByID,
 
 	// For unit test
 	validateParams,

@@ -94,19 +94,20 @@ const refreshStatistics = async () => {
 	basicStats.disconnectedPeers = disconnected.length;
 
 	const heightArr = connected.map(elem => elem.height);
-	heightArr.forEach(elem => {
-		if (elem) heightStats[elem] = (heightStats[elem] || 0) + 1;
-	});
+	for (let i = 0; i < heightArr.length; i++) {
+		if (heightArr[i]) heightStats[heightArr[i]] = (heightStats[heightArr[i]] || 0) + 1;
+	}
 
 	const coreVerArr = connected.map(elem => elem.version);
-	coreVerArr.forEach(elem => {
-		if (elem) coreVerStats[elem] = (coreVerStats[elem] || 0) + 1;
-	});
+	for (let i = 0; i < coreVerArr.length; i++) {
+		if (coreVerArr[i]) coreVerStats[coreVerArr[i]] = (coreVerStats[coreVerArr[i]] || 0) + 1;
+	}
 
 	const networkVerArr = connected.map(elem => elem.networkVersion);
-	networkVerArr.forEach(elem => {
-		if (elem) networkVerStats[elem] = (networkVerStats[elem] || 0) + 1;
-	});
+	for (let i = 0; i < networkVerArr.length; i++) {
+		if (networkVerArr[i])
+			networkVerStats[networkVerArr[i]] = (networkVerStats[networkVerArr[i]] || 0) + 1;
+	}
 
 	const osArr = connected.map(elem => elem.os);
 	const mappedOs = osArr.map(elem => {
@@ -116,9 +117,9 @@ const refreshStatistics = async () => {
 		}
 		return elem;
 	});
-	mappedOs.forEach(elem => {
-		if (elem) osStats[elem] = (osStats[elem] || 0) + 1;
-	});
+	for (let i = 0; i < mappedOs.length; i++) {
+		if (mappedOs[i]) osStats[mappedOs[i]] = (osStats[mappedOs[i]] || 0) + 1;
+	}
 
 	return {
 		basic: basicStats,

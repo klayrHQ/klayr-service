@@ -82,7 +82,10 @@ const requestAllCustom = async (fn, method, params, limit) => {
 					// When response is an object, we should traverse the properties and merge the values.
 					// We can safely assume that the properties would be of type array, so concatenation will
 					// result in the whole response. If property is not an array, the latest value is kept.
-					Object.entries(totalResponse).forEach(([dataKey, dataVal]) => {
+					const responseKeys = Object.keys(totalResponse);
+					for (let i = 0; i < responseKeys.length; i++) {
+						const dataKey = responseKeys[i];
+						const dataVal = totalResponse[dataKey];
 						if (Array.isArray(dataVal)) {
 							totalResponse[dataKey].push(...result[dataKey]);
 						} else if (Utils.isObject(dataVal)) {
@@ -90,7 +93,7 @@ const requestAllCustom = async (fn, method, params, limit) => {
 						} else {
 							totalResponse[dataKey] = result[dataKey];
 						}
-					});
+					}
 				}
 			}
 		}

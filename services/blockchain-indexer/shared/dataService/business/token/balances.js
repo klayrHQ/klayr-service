@@ -16,8 +16,8 @@
 const {
 	Exceptions: { InvalidParamsException },
 } = require('klayr-service-framework');
-
-const { requestConnector } = require('../../../utils/request');
+const { getAvailableBalance } = require('../../recorder/token/balances');
+const { getLockedBalance } = require('../../recorder/token/locked');
 
 const getTokenBalances = async params => {
 	const tokensInfo = [];
@@ -32,17 +32,18 @@ const getTokenBalances = async params => {
 		);
 	}
 
-	if (params.tokenID && params.address) {
-		const response = await requestConnector('getTokenBalance', {
-			address: params.address,
-			tokenID: params.tokenID,
-		});
+	const response = await getAvailableBalance(params.address, params.tokenID);
+	for (let i = 0; i < response.length; i++) {
+		const balanceInfo = response[i];
+		const lockedBalances = await getLockedBalance(balanceInfo.address, balanceInfo.tokenID);
 
-		tokensInfo.push({ ...response, tokenID: params.tokenID });
-	} else {
-		const response = await requestConnector('getTokenBalances', { address: params.address });
+		const data = {
+			tokenID: balanceInfo.tokenID,
+			availableBalance: balanceInfo.availableBalance,
+			lockedBalances: lockedBalances.filter(t => t.amount !== '0'),
+		};
 
-		if (response.balances) tokensInfo.push(...response.balances);
+		tokensInfo.push(data);
 	}
 
 	tokens.data =

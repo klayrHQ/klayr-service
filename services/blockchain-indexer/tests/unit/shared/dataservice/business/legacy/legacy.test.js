@@ -17,7 +17,9 @@
 const { resolve } = require('path');
 
 const mockRequestPath = resolve(`${__dirname}/../../../../../../shared/utils/request`);
-const dataServicePath = resolve(`${__dirname}/../../../../../../shared/dataService`);
+const dataServicePath = resolve(
+	`${__dirname}/../../../../../../shared/dataService/business/legacy/legacy`,
+);
 
 beforeEach(() => {
 	jest.resetModules();

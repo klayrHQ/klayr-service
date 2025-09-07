@@ -25,6 +25,11 @@ const config = {
 };
 
 /**
+ * Indexing Benchmark config
+ */
+config.isBenchmarkingIndexing = process.env.ENABLE_INDEXING_BENCHMARK === 'true'; // Disabled by default
+
+/**
  * Inter-service message broker
  */
 config.transporter = process.env.SERVICE_BROKER || 'redis://klayr:password@127.0.0.1:6379/0';
@@ -114,13 +119,6 @@ config.queue = {
 	},
 };
 
-config.set = {
-	accountBalanceUpdate: {
-		name: 'AccountBalanceUpdate',
-		batchSize: Number(process.env.ACCOUNT_BALANCE_UPDATE_BATCH_SIZE) || 1000,
-	},
-};
-
 config.operations = {
 	isDataRetrievalModeEnabled: Boolean(
 		String(process.env.ENABLE_DATA_RETRIEVAL_MODE).toLowerCase() !== 'false',
@@ -159,7 +157,6 @@ config.networks = Object.freeze({
 });
 
 config.db = {
-	isPersistEvents: String(process.env.ENABLE_PERSIST_EVENTS).toLowerCase() === 'true',
 	durabilityVerifyFrequency: Number(process.env.DURABILITY_VERIFY_FREQUENCY) || 1, // In millisecs
 };
 
@@ -204,10 +201,6 @@ config.job = {
 		interval: Number(process.env.JOB_INTERVAL_TRIGGER_ACCOUNT_UPDATES) || 0,
 		schedule: process.env.JOB_SCHEDULE_TRIGGER_ACCOUNT_UPDATES || '*/15 * * * *',
 	},
-	triggerAccountBalanceUpdates: {
-		interval: Number(process.env.JOB_INTERVAL_TRIGGER_ACCOUNT_BALANCE_UPDATES) || 10,
-		schedule: process.env.JOB_SCHEDULE_TRIGGER_ACCOUNT_BALANCE_UPDATES || '',
-	},
 };
 
 config.estimateFees = {
@@ -224,5 +217,9 @@ config.invokeAllowedMethods = process.env.INVOKE_ALLOWED_METHODS
 			'txpool_getTransactionsFromPool',
 			'pos_getExpectedSharedRewards',
 	  ];
+
+config.indexBlocksRetryDelay = Number(process.env.INDEX_BLOCKS_RETRY_DELAY) || 1000;
+
+config.getGeneratorsLimit = Number(process.env.GET_GENERATORS_LIMIT) || 53;
 
 module.exports = config;

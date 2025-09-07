@@ -14,7 +14,10 @@
  *
  */
 const {
-	address: { getKlayr32AddressFromPublicKey: getKlayr32AddressFromPublicKeyHelper },
+	address: {
+		getKlayr32AddressFromPublicKey: getKlayr32AddressFromPublicKeyHelper,
+		getKlayr32AddressFromAddress: getKlayr32AddressFromAddressHelper,
+	},
 } = require('@klayr/cryptography');
 
 const {
@@ -24,28 +27,37 @@ const {
 } = require('klayr-service-framework');
 
 const accountsTableSchema = require('../database/schema/accounts');
+const validatorsTableSchema = require('../database/schema/validators');
 const config = require('../../config');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
 const getAccountsTable = () => getTableInstance(accountsTableSchema, MYSQL_ENDPOINT);
+const getValidatorsTable = () => getTableInstance(validatorsTableSchema, MYSQL_ENDPOINT);
+
+const getKlayr32AddressFromHexAddress = address =>
+	getKlayr32AddressFromAddressHelper(Buffer.from(address, 'hex'));
 
 const getKlayr32AddressFromPublicKey = publicKey =>
 	getKlayr32AddressFromPublicKeyHelper(Buffer.from(publicKey, 'hex'));
 
 const updateAccountInfo = async params => {
 	const accountInfo = {};
-	Object.keys(accountsTableSchema.schema).forEach(columnName => {
-		if (columnName in params) {
-			accountInfo[columnName] = params[columnName];
-		}
-	});
+	for (let i = 0, keys = Object.keys(accountsTableSchema.schema); i < keys.length; i++) {
+		if (keys[i] in params) accountInfo[keys[i]] = params[keys[i]];
+	}
 
 	const accountsTable = await getAccountsTable();
 	await accountsTable.upsert(accountInfo);
+
+	if (accountInfo.isValidator && accountInfo.name) {
+		const validatorsTable = await getValidatorsTable();
+		await validatorsTable.upsert(accountInfo);
+	}
 };
 
 module.exports = {
 	getKlayr32AddressFromPublicKey,
+	getKlayr32AddressFromHexAddress,
 	updateAccountInfo,
 };

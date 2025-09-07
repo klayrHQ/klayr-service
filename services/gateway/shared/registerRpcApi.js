@@ -33,25 +33,25 @@ const apiMeta = [];
 const configureApi = (apiNames, apiPrefix, registeredModuleNames) => {
 	const allMethods = {};
 	if (typeof apiNames === 'string') apiNames = [apiNames];
-	apiNames.forEach(apiName => {
+	for (let i = 0; i < apiNames.length; i++) {
 		// Assign common endpoints
 		Object.assign(
 			allMethods,
-			Utils.requireAllJs(path.resolve(__dirname, `../apis/${apiName}/methods`)),
+			Utils.requireAllJs(path.resolve(__dirname, `../apis/${apiNames[i]}/methods`)),
 		);
 
 		// Assign registered application module specific endpoints
-		registeredModuleNames.forEach(moduleName => {
-			const dirPath = `../apis/${apiName}/methods/modules/${moduleName}`;
+		for (let j = 0; j < registeredModuleNames.length; j++) {
+			const dirPath = `../apis/${apiNames[i]}/methods/modules/${registeredModuleNames[j]}`;
 			try {
 				Object.assign(allMethods, Utils.requireAllJs(path.resolve(__dirname, dirPath)));
 			} catch (err) {
 				logger.warn(
-					`Moleculer method definitions (RPC endpoints) missing for module: ${module}. Is this expected?\nWas expected at: ${dirPath}.`,
+					`Moleculer method definitions (RPC endpoints) missing for module: ${registeredModuleNames[j]}. Is this expected?\nWas expected at: ${dirPath}.`,
 				);
 			}
-		});
-	});
+		}
+	}
 
 	const methods = Object.keys(allMethods).reduce((acc, key) => {
 		const method = allMethods[key];
@@ -67,13 +67,36 @@ const configureApi = (apiNames, apiPrefix, registeredModuleNames) => {
 		[],
 	);
 
-	const aliases = Object.keys(methods).reduce(
-		(acc, key) => ({
+	const aliases = Object.keys(methods).reduce((acc, key) => {
+		const methodConfig = methods[key];
+
+		let callOptions = {};
+
+		// mimic HTTP: only add caching meta if cache is enabled
+		if (
+			methodConfig.cache &&
+			(methodConfig.cache === true ||
+				(Object.keys(methodConfig.cache).length > 0 &&
+					(methodConfig.cache.ttl || methodConfig.cache.keys)))
+		) {
+			callOptions.meta = { $cache: true };
+
+			if (methodConfig.cache.ttl) {
+				callOptions.meta.$cacheTTL = methodConfig.cache.ttl;
+			}
+			if (methodConfig.cache.keys) {
+				callOptions.meta.$cacheKeys = methodConfig.cache.keys;
+			}
+		}
+
+		return {
 			...acc,
-			[`${transformPath(methods[key].rpcMethod)}`]: methods[key].source.method,
-		}),
-		{},
-	);
+			[`${transformPath(methodConfig.rpcMethod)}`]: {
+				action: methodConfig.source.method,
+				...(Object.keys(callOptions).length > 0 && { callOptions }),
+			},
+		};
+	}, {});
 
 	const methodPaths = Object.keys(methods).reduce(
 		(acc, key) => ({

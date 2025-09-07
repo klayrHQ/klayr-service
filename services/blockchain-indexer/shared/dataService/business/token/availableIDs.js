@@ -20,28 +20,26 @@ const {
 } = require('klayr-service-framework');
 
 const config = require('../../../../config');
-const accountBalancesTableSchema = require('../../../database/schema/accountBalances');
+const tokenBalancesTableSchema = require('../../../database/schema/tokenBalances');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
-const getAccountBalancesTable = () => getTableInstance(accountBalancesTableSchema, MYSQL_ENDPOINT);
+const getTokenBalancesTable = () => getTableInstance(tokenBalancesTableSchema, MYSQL_ENDPOINT);
 
 const getAvailableTokenIDs = async (params = {}) => {
 	const response = {
 		data: {},
 		meta: {},
 	};
-	const accountBalancesTable = await getAccountBalancesTable();
+	const tokenBalancesTable = await getTokenBalancesTable();
 
-	const tokenInfos = await accountBalancesTable.find({ ...params, distinct: 'tokenID' }, [
-		'tokenID',
-	]);
+	const tokenInfos = await tokenBalancesTable.find({ ...params, distinct: 'tokenID' }, ['tokenID']);
 
 	response.data.tokenIDs = tokenInfos.map(tokenInfo => tokenInfo.tokenID);
 	response.meta = {
 		count: response.data.tokenIDs.length,
 		offset: params.offset,
-		total: await accountBalancesTable.count({ distinct: 'tokenID' }),
+		total: await tokenBalancesTable.count({ distinct: 'tokenID' }),
 	};
 
 	return response;

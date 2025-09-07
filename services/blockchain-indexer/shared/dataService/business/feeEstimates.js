@@ -15,13 +15,22 @@
  */
 const logger = require('klayr-service-framework').Logger();
 
-const { requestFeeEstimator, requestConnector } = require('../../utils/request');
+const { requestFeeEstimator, requestConnector, getAppContext } = require('../../utils/request');
+
+let feeReady = false;
 
 let feeEstimates = {
 	low: 0,
 	med: 0,
 	high: 0,
 	minFeePerByte: 1000,
+};
+
+const waitForFeeReady = async () => {
+	if (feeReady) return;
+	await getAppContext().getBroker().waitForServices('fees');
+	feeReady = true;
+	return;
 };
 
 const setFeeEstimates = async payload => {
@@ -34,6 +43,7 @@ const getFeeEstimates = () => feeEstimates;
 
 const getFeeEstimatesFromFeeEstimator = async () => {
 	try {
+		await waitForFeeReady();
 		const response = await requestFeeEstimator('estimates');
 		setFeeEstimates(response);
 	} catch (err) {

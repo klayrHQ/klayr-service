@@ -13,13 +13,14 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { requestConnector } = require('../../../utils/request');
-
 const {
 	LENGTH_CHAIN_ID,
 	PATTERN_ANY_TOKEN_ID,
 	PATTERN_ANY_CHAIN_TOKEN_ID,
 } = require('../../../constants');
+const { getTokenEscrowed } = require('../../recorder/token/escrowed');
+const { getTokenSupply } = require('../../recorder/token/supply');
+const { getSupportedTokens } = require('../../recorder/token/supported');
 
 const getTokenSummary = async () => {
 	const summary = {
@@ -27,9 +28,10 @@ const getTokenSummary = async () => {
 		meta: {},
 	};
 
-	const { escrowedAmounts } = await requestConnector('getEscrowedAmounts');
-	const { totalSupply } = await requestConnector('getTotalSupply');
-	const { supportedTokens: supportedTokenIDs } = await requestConnector('getSupportedTokens');
+	const escrowedAmounts = await getTokenEscrowed();
+	const supportedTokenIDs = await getSupportedTokens();
+
+	const totalSupply = await getTokenSupply();
 
 	const supportedTokens = {
 		isSupportAllTokens: false,
@@ -37,7 +39,8 @@ const getTokenSummary = async () => {
 		patternTokenIDs: [],
 	};
 
-	supportedTokenIDs.forEach(tokenID => {
+	for (let i = 0; i < supportedTokenIDs.length; i++) {
+		const tokenID = supportedTokenIDs[i];
 		if (tokenID === PATTERN_ANY_TOKEN_ID) {
 			supportedTokens.isSupportAllTokens = true;
 		} else if (tokenID.substring(LENGTH_CHAIN_ID) === PATTERN_ANY_CHAIN_TOKEN_ID) {
@@ -45,7 +48,7 @@ const getTokenSummary = async () => {
 		} else {
 			supportedTokens.exactTokenIDs.push(tokenID);
 		}
-	});
+	}
 
 	summary.data = {
 		escrowedAmounts,

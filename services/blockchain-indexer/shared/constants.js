@@ -61,11 +61,12 @@ const getGenesisConfig = async () => {
 
 const resolveModuleCommands = systemMeta => {
 	const moduleCommandList = [];
-	systemMeta.forEach(module => {
-		module.commands.forEach(command => {
-			moduleCommandList.push(`${module.name}:${command.name}`);
-		});
-	});
+	for (let i = 0; i < systemMeta.length; i++) {
+		const module = systemMeta[i];
+		for (let j = 0; j < module.commands.length; j++) {
+			moduleCommandList.push(`${module.name}:${module.commands[j].name}`);
+		}
+	}
 	return moduleCommandList;
 };
 
@@ -129,10 +130,16 @@ const MODULE = Object.freeze({
 const MODULE_SUB_STORE = Object.freeze({
 	TOKEN: {
 		USER: 'userSubstore',
+		SUPPLY: 'supplySubstore',
+		ESCROW: 'escrowSubstore',
+		SUPPORTED: 'supportedTokensSubstore',
 	},
 	POS: {
 		STAKERS: 'stakers',
 		VALIDATORS: 'validators',
+	},
+	AUTH: {
+		DATA: 'authDataSubstore',
 	},
 });
 
@@ -176,6 +183,7 @@ const TRANSACTION_STATUS = Object.freeze({
 });
 
 const EVENT = Object.freeze({
+	BURN: 'burn',
 	LOCK: 'lock',
 	UNLOCK: 'unlock',
 	COMMAND_EXECUTION_RESULT: 'commandExecutionResult',

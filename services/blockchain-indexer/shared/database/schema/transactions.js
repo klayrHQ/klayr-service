@@ -36,6 +36,11 @@ module.exports = {
 		minFee: { type: 'bigInteger', null: false },
 		executionStatus: { type: 'string', null: false },
 		index: { type: 'integer', null: false },
+
+		// Retrieved Directly From Block Header:
+		senderPublicKey: { type: 'string', null: false },
+		signatures: { type: 'json', null: false },
+		params: { type: 'json', null: false },
 	},
 	indexes: {
 		height: { type: 'range' },

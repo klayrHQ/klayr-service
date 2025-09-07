@@ -36,6 +36,7 @@ config.transporter = process.env.SERVICE_BROKER || 'redis://klayr:password@127.0
 config.brokerTimeout = Number(process.env.SERVICE_BROKER_TIMEOUT) || 10; // in seconds
 config.volatileRedis =
 	process.env.SERVICE_GATEWAY_REDIS_VOLATILE || 'redis://klayr:password@127.0.0.1:6379/5';
+config.routesCallTimeout = Number(process.env.GATEWAY_ROUTES_CALL_TIMEOUT) || 30; // in seconds
 
 /**
  * Compatibility
@@ -111,8 +112,21 @@ config.websocket = {
 
 // Gateway RPC cache settings
 config.rpcCache = {
-	ttl: 5, // in seconds
-	enable: String(process.env.ENABLE_REQUEST_CACHING).toLowerCase() !== 'false',
+	ttl: ['blockTime', 'block'].includes(process.env.REQUEST_CACHING_TTL)
+		? process.env.REQUEST_CACHING_TTL
+		: !isNaN(Number(process.env.REQUEST_CACHING_TTL))
+		? Number(process.env.REQUEST_CACHING_TTL) // in seconds
+		: 'blockTime', // default to block time
+	enable: String(process.env.ENABLE_REQUEST_CACHING).toLowerCase() !== 'false', // default to true
+	excludeList: process.env.REQUEST_CACHING_EXCLUDE_LIST
+		? process.env.REQUEST_CACHING_EXCLUDE_LIST.split(',')
+		: [
+				'post.transactions',
+				'post.transactions.dryrun',
+				'post.transactions.estimate-fees',
+				'post.validator.validate-bls-key',
+				'post.invoke',
+		  ],
 };
 
 const DEFAULT_DEPENDENCIES = 'indexer,connector';

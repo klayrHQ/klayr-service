@@ -53,10 +53,17 @@ const buildModuleCommandProcessorMap = async () => {
 			if (!moduleProcessorMap.has(MODULE_NAME)) moduleProcessorMap.set(MODULE_NAME, new Map());
 
 			const moduleCommandProcessorMap = moduleProcessorMap.get(MODULE_NAME);
-			Object.values(availableCommandProcessors).forEach(e => {
-				moduleCommandProcessorMap.set(`apply_${e.COMMAND_NAME}`, e.applyTransaction);
-				moduleCommandProcessorMap.set(`revert_${e.COMMAND_NAME}`, e.revertTransaction);
-			});
+			const commandProcessors = Object.values(availableCommandProcessors);
+			for (let i = 0; i < commandProcessors.length; i++) {
+				moduleCommandProcessorMap.set(
+					`apply_${commandProcessors[i].COMMAND_NAME}`,
+					commandProcessors[i].applyTransaction,
+				);
+				moduleCommandProcessorMap.set(
+					`revert_${commandProcessors[i].COMMAND_NAME}`,
+					commandProcessors[i].revertTransaction,
+				);
+			}
 		}
 	});
 

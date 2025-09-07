@@ -94,17 +94,17 @@ const triggerAccountUpdates = async () => {
 		config.queue.indexAccountPublicKey.concurrency,
 	);
 
-	publicKeys.forEach(publicKey => {
-		if (typeof publicKey === 'string') accountPkUpdateQueue.add(publicKey);
-	});
+	for (let i = 0; i < publicKeys.length; i++) {
+		if (typeof publicKeys[i] === 'string') accountPkUpdateQueue.add(publicKeys[i]);
+	}
 
 	const addresses = await redis.spop(
 		config.queue.indexAccountAddress.name,
 		config.queue.indexAccountAddress.concurrency,
 	);
-	addresses.forEach(address => {
-		if (typeof address === 'string') accountAddrUpdateQueue.add(address);
-	});
+	for (let i = 0; i < addresses.length; i++) {
+		if (typeof addresses[i] === 'string') accountAddrUpdateQueue.add(addresses[i]);
+	}
 };
 
 module.exports = {

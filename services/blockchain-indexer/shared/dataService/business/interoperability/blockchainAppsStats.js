@@ -28,10 +28,11 @@ const config = require('../../../../config');
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
 const blockchainAppsTableSchema = require('../../../database/schema/blockchainApps');
-const { requestConnector } = require('../../../utils/request');
 const { getAnnualInflation } = require('../dynamicReward');
 const { getNetworkStatus } = require('../network');
 const { getTotalStaked } = require('../../../utils/pos');
+const { getKLYTokenID } = require('./blockchainApps');
+const { getTokenSupplyByTokenID } = require('../../recorder/token/supply');
 
 const getBlockchainAppsTable = () => getTableInstance(blockchainAppsTableSchema, MYSQL_ENDPOINT);
 
@@ -55,9 +56,8 @@ const reloadBlockchainAppsStats = async () => {
 		const numRegisteredChains = await blockchainAppsTable.count({ status: APP_STATUS.REGISTERED });
 		const numTerminatedChains = await blockchainAppsTable.count({ status: APP_STATUS.TERMINATED });
 
-		const {
-			totalSupply: [{ totalSupply }],
-		} = await requestConnector('getTotalSupply');
+		const klyTokenID = await getKLYTokenID();
+		const totalSupply = await getTokenSupplyByTokenID(klyTokenID);
 		const {
 			data: { height },
 		} = await getNetworkStatus();
@@ -72,7 +72,7 @@ const reloadBlockchainAppsStats = async () => {
 			registered: numRegisteredChains,
 			activated: numActivatedChains,
 			terminated: numTerminatedChains,
-			totalSupplyKLY: totalSupply,
+			totalSupplyKLY: totalSupply.toString(),
 			totalStakedKLY: totalStaked,
 			currentAnnualInflationRate: annualInflation,
 		};

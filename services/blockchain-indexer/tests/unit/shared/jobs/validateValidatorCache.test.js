@@ -20,8 +20,14 @@ const mockValidatorsPath = path.resolve(`${__dirname}/../../../../shared/dataSer
 
 const { posValidators: mockPosValidators } = require('../../../constants/validators');
 
+let Redis;
+
 beforeEach(() => {
 	jest.resetModules();
+
+	Redis = require('ioredis');
+	jest.mock('ioredis');
+	Redis.mockImplementation(() => ({ sadd: jest.fn() }));
 
 	jest.mock('klayr-service-framework', () => {
 		const actual = jest.requireActual('klayr-service-framework');
@@ -39,6 +45,7 @@ beforeEach(() => {
 			},
 			CacheRedis: jest.fn(),
 			CacheLRU: jest.fn(),
+			Queue: jest.fn(),
 		};
 	});
 	jest.mock(mockBusinessPath, () => {

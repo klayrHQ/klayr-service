@@ -21,8 +21,14 @@ const mockedFilePath = resolve(
 );
 const dataServicePath = resolve(`${__dirname}/../../../../../../shared/dataService`);
 
+let Redis;
+
 beforeEach(() => {
 	jest.resetModules();
+
+	Redis = require('ioredis');
+	jest.mock('ioredis');
+	Redis.mockImplementation(() => ({ sadd: jest.fn() }));
 
 	jest.mock('klayr-service-framework', () => {
 		const actualKlayrServiceFramework = jest.requireActual('klayr-service-framework');
@@ -40,6 +46,7 @@ beforeEach(() => {
 			},
 			CacheRedis: jest.fn(),
 			CacheLRU: jest.fn(),
+			Queue: jest.fn(),
 		};
 	});
 });

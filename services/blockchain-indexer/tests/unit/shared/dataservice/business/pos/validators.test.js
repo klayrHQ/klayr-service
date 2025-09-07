@@ -25,6 +25,10 @@ const validatorsPath = resolve(
 	`${__dirname}/../../../../../../shared/dataService/business/pos/validators`,
 );
 
+const Redis = require('ioredis');
+jest.mock('ioredis');
+Redis.mockImplementation(() => ({ sadd: jest.fn() }));
+
 // Mock dependencies
 jest.mock('../../../../../../shared/utils/request', () => ({
 	requestConnector: jest.fn(),
@@ -49,6 +53,7 @@ jest.mock('klayr-service-framework', () => ({
 			getTableInstance: jest.fn(),
 		},
 	},
+	Queue: jest.fn(),
 }));
 
 describe('getAllPosValidators', () => {

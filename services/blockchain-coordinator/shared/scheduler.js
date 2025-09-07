@@ -29,13 +29,15 @@ const {
 	getLiveIndexingJobCount: getLiveIndexingJobCountFromIndexer,
 } = require('./sources/indexer');
 
-const { getAllPosValidators } = require('./sources/connector');
+const { getAllPosValidators, getBlocksByHeightBetween } = require('./sources/connector');
 
 const { getCurrentHeight, getGenesisHeight, initNodeConstants } = require('./constants');
 
 const { range } = require('./utils/array');
 const delay = require('./utils/delay');
 const config = require('../config');
+const { requestIndexer } = require('./utils/request');
+const { getIsScheduling, setIsScheduling } = require('./status');
 
 const blockMessageQueue = new MessageQueue(config.queue.block.name, config.endpoints.messageQueue, {
 	defaultJobOptions: config.queue.defaultJobOptions,
@@ -112,12 +114,15 @@ const waitForGenesisBlockIndexing = (resolve, reject) =>
 	});
 
 const scheduleBlocksIndexing = async heights => {
+	const currentHeight = await getCurrentHeight();
+	await requestIndexer('setPendingIndexerLastCurrentHeight', { currentHeight });
+
 	const blockHeights = Array.isArray(heights) ? heights : [heights];
 
 	blockHeights.sort((h1, h2) => h1 - h2); // sort heights in ascending order
 
 	// Schedule indexing in batches when the list is too long to avoid OOM
-	const MAX_BATCH_SIZE = 15000;
+	const MAX_BATCH_SIZE = config.job.indexMissingBlocks.scheduleBlockIndexingMaxBatchSize;
 	const numBatches = Math.ceil(blockHeights.length / MAX_BATCH_SIZE);
 	if (numBatches > 1)
 		logger.info(
@@ -131,11 +136,18 @@ const scheduleBlocksIndexing = async heights => {
 		if (isMultiBatch) logger.debug(`Scheduling batch ${i + 1}/${numBatches}.`);
 		const blockHeightsBatch = blockHeights.slice(i * MAX_BATCH_SIZE, (i + 1) * MAX_BATCH_SIZE);
 
+		const blocksBetweenHeight = await getBlocksByHeightBetween(
+			blockHeightsBatch[0],
+			blockHeightsBatch[blockHeightsBatch.length - 1],
+		);
+
+		blocksBetweenHeight.sort((a, b) => a.header.height - b.header.height);
+
 		// eslint-disable-next-line no-restricted-syntax
-		for (const height of blockHeightsBatch) {
-			logger.trace(`Scheduling indexing for block at height: ${height}.`);
-			await blockMessageQueue.add({ height });
-			logger.debug(`Scheduled indexing for block at height: ${height}.`);
+		for (const block of blocksBetweenHeight) {
+			logger.trace(`Scheduling indexing for block at height: ${block.header.height}.`);
+			await blockMessageQueue.add({ block, height: block.header.height });
+			logger.debug(`Scheduled indexing for block at height: ${block.header.height}.`);
 		}
 
 		if (isMultiBatch)
@@ -196,6 +208,10 @@ const initIndexingScheduler = async () => {
 			`Skipping the check for missing blocks. ${jobCount} blocks already queued for indexing.`,
 		);
 	} else {
+		setIsScheduling(true);
+
+		await requestIndexer('setIsSchedulingThroughCoordinator');
+
 		// Check for missing blocks
 		logger.debug('Initializing block indexing scheduler.');
 		const genesisHeight = await getGenesisHeight();
@@ -205,7 +221,7 @@ const initIndexingScheduler = async () => {
 		logger.debug(
 			`Checking for missing blocks between heights: ${lastVerifiedHeight} - ${currentHeight}.`,
 		);
-		const missingBlockHeights = await getMissingBlocks(lastVerifiedHeight, currentHeight);
+		const missingBlockHeights = await getMissingBlocksList(lastVerifiedHeight, currentHeight);
 
 		// Schedule indexing for the missing blocks
 		if (Array.isArray(missingBlockHeights) && missingBlockHeights.length) {
@@ -221,11 +237,16 @@ const initIndexingScheduler = async () => {
 				`No missing blocks found between heights: ${lastVerifiedHeight} - ${currentHeight}. Nothing to schedule.`,
 			);
 		}
+
+		setIsScheduling(false);
 	}
 	logger.info('Block indexing initialization completed successfully.');
 };
 
 const scheduleMissingBlocksIndexing = async () => {
+	// if the coordinator is already scheduling missing blocks, skip the job
+	if (getIsScheduling()) return;
+
 	if (!(await isGenesisBlockIndexed())) {
 		logger.info('Genesis block is not yet indexed, skipping missing blocks job run.');
 		return;
@@ -239,6 +260,8 @@ const scheduleMissingBlocksIndexing = async () => {
 		);
 		return;
 	}
+
+	setIsScheduling(true);
 
 	const genesisHeight = await getGenesisHeight();
 	const currentHeight = await getCurrentHeight();
@@ -255,28 +278,10 @@ const scheduleMissingBlocksIndexing = async () => {
 	);
 
 	try {
-		const missingBlocksByHeight = [];
-		const MAX_QUERY_RANGE = 10000;
-		const NUM_BATCHES = Math.ceil((blockIndexHigherRange - blockIndexLowerRange) / MAX_QUERY_RANGE);
-
-		// Batch into smaller ranges to avoid microservice/DB query timeouts
-		for (let i = 0; i < NUM_BATCHES; i++) {
-			const batchStartHeight = blockIndexLowerRange + i * MAX_QUERY_RANGE;
-			const batchEndHeight = Math.min(batchStartHeight + MAX_QUERY_RANGE, blockIndexHigherRange);
-			const result = await getMissingBlocks(batchStartHeight, batchEndHeight);
-
-			if (Array.isArray(result)) {
-				missingBlocksByHeight.push(...result);
-			} else {
-				logger.warn(
-					`getMissingBlocks returned '${typeof result}' type instead of an Array.\nresult: ${JSON.stringify(
-						result,
-						null,
-						'\t',
-					)}`,
-				);
-			}
-		}
+		const missingBlocksByHeight = await getMissingBlocksList(
+			blockIndexLowerRange,
+			blockIndexHigherRange,
+		);
 
 		// Re-check for tiny gaps and schedule jobs accordingly
 		const indexStatus = await getIndexStatus();
@@ -303,7 +308,37 @@ const scheduleMissingBlocksIndexing = async () => {
 	} catch (err) {
 		logger.warn(`Scheduling to index missing blocks failed due to: ${err.message}`);
 		logger.trace(err.stack);
+	} finally {
+		setIsScheduling(false);
 	}
+};
+
+// Batch into smaller ranges to avoid microservice/DB query timeouts
+const getMissingBlocksList = async (fromHeight, toHeight) => {
+	const missingBlocksByHeight = [];
+	const MAX_QUERY_RANGE = 10000;
+	const NUM_BATCHES = Math.ceil((toHeight - fromHeight) / MAX_QUERY_RANGE);
+
+	// Batch into smaller ranges to avoid microservice/DB query timeouts
+	for (let i = 0; i < NUM_BATCHES; i++) {
+		const batchStartHeight = fromHeight + i * MAX_QUERY_RANGE;
+		const batchEndHeight = Math.min(batchStartHeight + MAX_QUERY_RANGE, toHeight);
+		const result = await getMissingBlocks(batchStartHeight, batchEndHeight);
+
+		if (Array.isArray(result)) {
+			missingBlocksByHeight.push(...result);
+		} else {
+			logger.warn(
+				`getMissingBlocks returned '${typeof result}' type instead of an Array.\nresult: ${JSON.stringify(
+					result,
+					null,
+					'\t',
+				)}`,
+			);
+		}
+	}
+
+	return missingBlocksByHeight;
 };
 
 const init = async () => {

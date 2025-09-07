@@ -71,9 +71,9 @@ const getNetworkPeers = async params => {
 	const filteredPeers = peers.filter(peer => {
 		let result = true;
 
-		activeFilters.forEach(property => {
-			if (params[property] !== peer[property]) result = false;
-		});
+		for (let i = 0; i < activeFilters.length; i++) {
+			if (params[activeFilters[i]] !== peer[activeFilters[i]]) result = false;
+		}
 
 		return result;
 	});

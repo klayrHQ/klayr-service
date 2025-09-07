@@ -12,6 +12,11 @@ const kleur = require('kleur');
 const {
 	Exceptions: { ValidationException, NotFoundException },
 } = require('klayr-service-framework');
+const config = require('../../config');
+const stringify = require('json-stable-stringify');
+const { getTTLBasedOnBlockTime } = require('../constant');
+const { getGatewayCache, setGatewayCache } = require('../cache');
+const { isValidNonEmptyResponse } = require('../utils');
 
 module.exports = {
 	methods: {
@@ -120,14 +125,45 @@ module.exports = {
 				}
 				if (req.baseUrl) req.$endpoint.baseUrl = req.baseUrl;
 
-				// Call the action
-				let data = await ctx.call(req.$endpoint, params, route.callOptions);
+				let cacheKey;
+				let data;
 
-				// Post-process the response
+				// Cache handling
+				let ttl = await getTTLBasedOnBlockTime(config.rpcCache.ttl);
+				const requestMethod = `${req.method.toLowerCase()}.${req.$alias.path.replaceAll('/', '.')}`;
+				if (config.rpcCache.enable && !config.rpcCache.excludeList.includes(requestMethod)) {
+					let paramKey = params;
+					const meta = req.$alias?.callOptions?.meta;
+					if (meta && meta.$cache) {
+						ttl = await getTTLBasedOnBlockTime(meta.$cacheTTL);
+						const keys = meta.$cacheKeys || Object.keys(params);
+						paramKey = keys.reduce((acc, key) => {
+							if (params.hasOwnProperty(key)) acc[key] = params[key];
+							return acc;
+						}, {});
+					}
 
-				// onAfterCall handling
-				if (route.onAfterCall) {
-					data = await route.onAfterCall.call(this, ctx, route, req, res, data);
+					cacheKey = `${requestMethod}:${stringify(paramKey)}`;
+
+					const cached = await getGatewayCache(cacheKey);
+					if (cached != null) {
+						data = JSON.parse(cached);
+					}
+				}
+
+				if (!data) {
+					// Call the action
+					data = await ctx.call(req.$endpoint, params, route.callOptions);
+
+					// Post-process response
+					if (route.onAfterCall) {
+						data = await route.onAfterCall.call(this, ctx, route, req, res, data);
+					}
+
+					// Save result to cache if enabled
+					if (cacheKey && isValidNonEmptyResponse(data)) {
+						await setGatewayCache(cacheKey, JSON.stringify(data), ttl);
+					}
 				}
 
 				// Send back the response

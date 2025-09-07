@@ -22,6 +22,8 @@ const {
 	formatTransactionsInBlock,
 } = require('../shared/dataService');
 
+const config = require('../config');
+
 const logger = Logger();
 
 let localPreviousBlockId;
@@ -136,7 +138,7 @@ module.exports = [
 			const generatorsChangeListener = async () => {
 				try {
 					await reloadGeneratorsCache();
-					const generators = await getGenerators({ limit: 103, offset: 0 });
+					const generators = await getGenerators({ limit: config.getGeneratorsLimit, offset: 0 });
 					callback(generators);
 				} catch (err) {
 					logger.error(`Error occurred when processing 'generators.change' event:\n${err.stack}`);

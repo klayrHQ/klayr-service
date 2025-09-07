@@ -40,14 +40,14 @@ const resolveMultisignatureMemberships = tx => {
 	const multisignatureInfoToIndex = [];
 	const allKeys = tx.params.mandatoryKeys.concat(tx.params.optionalKeys);
 
-	allKeys.forEach(key => {
+	for (let i = 0; i < allKeys.length; i++) {
 		const members = {
-			id: tx.senderAddress.concat('_', getKlayr32AddressFromPublicKey(key)),
-			memberAddress: getKlayr32AddressFromPublicKey(key),
+			id: tx.senderAddress.concat('_', getKlayr32AddressFromPublicKey(allKeys[i])),
+			memberAddress: getKlayr32AddressFromPublicKey(allKeys[i]),
 			groupAddress: tx.senderAddress,
 		};
 		multisignatureInfoToIndex.push(members);
-	});
+	}
 
 	return multisignatureInfoToIndex;
 };
@@ -55,8 +55,10 @@ const resolveMultisignatureMemberships = tx => {
 // eslint-disable-next-line no-unused-vars
 const applyTransaction = async (blockHeader, tx, events, dbTrx) => {
 	// Asynchronously index all the publicKeys
-	tx.params.mandatoryKeys.forEach(key => indexAccountPublicKey(key));
-	tx.params.optionalKeys.forEach(key => indexAccountPublicKey(key));
+	for (let i = 0; i < tx.params.mandatoryKeys.length; i++)
+		indexAccountPublicKey(tx.params.mandatoryKeys[i]);
+	for (let i = 0; i < tx.params.optionalKeys.length; i++)
+		indexAccountPublicKey(tx.params.optionalKeys[i]);
 
 	if (tx.executionStatus !== TRANSACTION_STATUS.SUCCESSFUL) return;
 
@@ -75,8 +77,10 @@ const applyTransaction = async (blockHeader, tx, events, dbTrx) => {
 // eslint-disable-next-line no-unused-vars
 const revertTransaction = async (blockHeader, tx, events, dbTrx) => {
 	// Asynchronously index all the publicKeys
-	tx.params.mandatoryKeys.forEach(key => indexAccountPublicKey(key));
-	tx.params.optionalKeys.forEach(key => indexAccountPublicKey(key));
+	for (let i = 0; i < tx.params.mandatoryKeys.length; i++)
+		indexAccountPublicKey(tx.params.mandatoryKeys[i]);
+	for (let i = 0; i < tx.params.optionalKeys.length; i++)
+		indexAccountPublicKey(tx.params.optionalKeys[i]);
 
 	if (tx.executionStatus !== TRANSACTION_STATUS.SUCCESSFUL) return;
 

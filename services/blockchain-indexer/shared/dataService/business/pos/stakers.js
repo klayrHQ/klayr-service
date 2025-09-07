@@ -106,9 +106,9 @@ const getStakers = async params => {
 			['name', 'address'],
 		);
 
-		stakerAccountsInfo.forEach(accountInfo => {
-			stakerAddressNameMap[accountInfo.address] = accountInfo.name;
-		});
+		for (let i = 0; i < stakerAccountsInfo.length; i++) {
+			stakerAddressNameMap[stakerAccountsInfo[i].address] = stakerAccountsInfo[i].name;
+		}
 		stakerAddressQueryFilter.whereIn = {
 			property: 'stakerAddress',
 			values: Object.keys(stakerAddressNameMap),

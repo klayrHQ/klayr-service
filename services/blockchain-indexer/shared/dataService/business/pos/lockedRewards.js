@@ -26,15 +26,39 @@ const {
 
 const config = require('../../../../config');
 
-const { requestConnector } = require('../../../utils/request');
-
 const validatorsTableSchema = require('../../../database/schema/validators');
+const stakesTableSchema = require('../../../database/schema/stakes');
+const pendingUnlocksTableSchema = require('../../../database/schema/pendingUnlocks');
 
 const { getRewardTokenID } = require('../dynamicReward');
+const { getLockedBalanceByModule } = require('../../recorder/token/locked');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
 const getValidatorsTable = () => getTableInstance(validatorsTableSchema, MYSQL_ENDPOINT);
+const getStakesTable = () => getTableInstance(stakesTableSchema, MYSQL_ENDPOINT);
+const getPendingUnlocksTable = () => getTableInstance(pendingUnlocksTableSchema, MYSQL_ENDPOINT);
+
+const getPosLockedRewardFromDB = async (address, tokenID) => {
+	const lockedBalance = await getLockedBalanceByModule(address, tokenID, 'pos');
+	const totalLockedBalance = lockedBalance.length
+		? lockedBalance.reduce((acc, cur) => acc + BigInt(cur.amount), 0n)
+		: 0n;
+
+	const stakesTable = await getStakesTable();
+	const stakesData = await stakesTable.find({ stakerAddress: address }, ['amount']);
+	const totalStaked = stakesData.length
+		? stakesData.reduce((acc, cur) => acc + BigInt(cur.amount), 0n)
+		: 0n;
+
+	const pendingUnlocksTable = await getPendingUnlocksTable();
+	const pendingUnlocksData = await pendingUnlocksTable.find({ stakerAddress: address }, ['amount']);
+	const totalPendingUnlocks = pendingUnlocksData.length
+		? pendingUnlocksData.reduce((acc, cur) => acc + BigInt(cur.amount), 0n)
+		: 0n;
+
+	return totalLockedBalance - (totalStaked + totalPendingUnlocks);
+};
 
 const getPosLockedRewards = async params => {
 	const response = {
@@ -73,9 +97,9 @@ const getPosLockedRewards = async params => {
 	if (!address || !tokenID) {
 		return response;
 	}
-	const { reward } = await requestConnector('getPosLockedReward', { tokenID, address });
+	const reward = await getPosLockedRewardFromDB(address, tokenID);
 	response.data.push({
-		reward,
+		reward: reward.toString(),
 		tokenID,
 	});
 

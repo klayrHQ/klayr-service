@@ -133,6 +133,12 @@ const formatBlock = block => {
 };
 
 const formatEvent = (event, skipDecode) => {
+	// Events data from blockchain doesn't have an id.
+	// If id exists, it means that the event is already formatted.
+	if (Object.hasOwn(event, 'id')) {
+		return parseToJSONCompatObj(event);
+	}
+
 	// Calculate event ID
 	const eventSchema = getEventSchema();
 	const schemaCompliantEvent = parseInputBySchema(event, eventSchema);
@@ -159,11 +165,12 @@ const formatEvent = (event, skipDecode) => {
 			);
 		} else {
 			// TODO: Remove after SDK fixes the address format (https://github.com/KlayrHQ/klayr-sdk/issues/7629)
-			Object.keys(eventDataSchema.properties).forEach(prop => {
-				if (prop.endsWith('Address')) {
-					eventData[prop] = getKlayr32Address(eventData[prop].toString('hex'));
+			const props = Object.keys(eventDataSchema.properties);
+			for (let i = 0; i < props.length; i++) {
+				if (props[i].endsWith('Address')) {
+					eventData[props[i]] = getKlayr32Address(eventData[props[i]].toString('hex'));
 				}
-			});
+			}
 		}
 	}
 

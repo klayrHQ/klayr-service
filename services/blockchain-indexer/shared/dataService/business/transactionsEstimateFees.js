@@ -53,6 +53,8 @@ const config = require('../../../config');
 const { getPosConstants } = require('./pos/constants');
 const { getInteroperabilityConstants } = require('./interoperability/constants');
 const { getFeeEstimates } = require('./feeEstimates');
+const { tokenHasEscrowAccount } = require('../recorder/token/escrowed');
+const { getAuthAccount } = require('../recorder/auth/account');
 
 const DEFAULT_MESSAGE_FEE = '10000000';
 const DEFAULT_MESSAGE_FEE_TOKEN_ID = '0000000000000000';
@@ -91,11 +93,13 @@ const OPTIONAL_TRANSACTION_PARAMS_PROPERTIES = Object.freeze({
 });
 
 const mockOptionalProperties = (inputObject, inputObjectOptionalProps, additionalParams) => {
-	Object.values(inputObjectOptionalProps).forEach(optionalPropInfo => {
+	const optionalProps = Object.values(inputObjectOptionalProps);
+	for (let i = 0; i < optionalProps.length; i++) {
+		const optionalPropInfo = optionalProps[i];
 		if (!(optionalPropInfo.propName in inputObject)) {
 			inputObject[optionalPropInfo.propName] = optionalPropInfo.defaultValue(additionalParams);
 		}
-	});
+	}
 
 	return inputObject;
 };
@@ -143,7 +147,7 @@ const mockTransaction = async (_transaction, numberOfSignatures) => {
 
 const getNumberOfSignatures = async address => {
 	try {
-		const authAccountInfo = await requestConnector('getAuthAccount', { address });
+		const authAccountInfo = await getAuthAccount(address);
 		const numberOfSignatures =
 			authAccountInfo.mandatoryKeys.length + authAccountInfo.optionalKeys.length ||
 			DEFAULT_NUM_OF_SIGNATURES;
@@ -254,10 +258,10 @@ const calcAdditionalFees = async transaction => {
 			// Check if escrow account exists only when tokenID specified in the params is a native token
 			const currentChainID = await getCurrentChainID();
 			if (tokenID.startsWith(currentChainID)) {
-				const { exists: escrowAccountExists } = await requestConnector('tokenHasEscrowAccount', {
+				const escrowAccountExists = await tokenHasEscrowAccount(
+					transaction.params.receivingChainID,
 					tokenID,
-					escrowChainID: transaction.params.receivingChainID,
-				});
+				);
 				if (!escrowAccountExists) {
 					additionalFees.fee = {
 						escrowAccountInitializationFee: extraCommandFees.escrowAccountInitializationFee,

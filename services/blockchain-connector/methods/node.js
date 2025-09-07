@@ -23,11 +23,20 @@ const {
 	getSystemMetadata,
 	getEngineEndpoints,
 } = require('../shared/sdk');
+const { invokeEndpointProxyImmediate } = require('../shared/sdk/invoke');
 
 module.exports = [
 	{
 		name: 'invokeEndpoint',
 		controller: async ({ endpoint, params }) => invokeEndpointProxy(endpoint, params),
+		params: {
+			endpoint: { optional: false, type: 'string' },
+			params: { optional: true, type: 'object' },
+		},
+	},
+	{
+		name: 'invokeEndpointImmediate',
+		controller: async ({ endpoint, params }) => invokeEndpointProxyImmediate(endpoint, params),
 		params: {
 			endpoint: { optional: false, type: 'string' },
 			params: { optional: true, type: 'object' },
