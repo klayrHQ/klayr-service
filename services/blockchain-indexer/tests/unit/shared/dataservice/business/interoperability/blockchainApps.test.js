@@ -167,13 +167,15 @@ describe('getBlockchainApps', () => {
 		jest.mock(mockNetworkPath, () => ({
 			getNetworkStatus: jest.fn(() => mockedNetworkStatus),
 		}));
-		jest.mock(mockRequestPath, () => ({
-			requestConnector: jest.fn(() => {
-				throw Error('Connector not reachable');
-			}),
-		}));
 		jest.mock(mockMainchainPath, () => ({
 			getMainchainID: jest.fn(() => mockedMainchainID),
+		}));
+
+		// Mock getTokenEscrowed to throw
+		jest.mock('../../../../../../shared/dataService/recorder/token/escrowed', () => ({
+			getTokenEscrowed: jest.fn(() => {
+				throw Error('Connector not reachable');
+			}),
 		}));
 
 		// Override getTableInstance for this test
