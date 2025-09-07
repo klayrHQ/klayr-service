@@ -115,6 +115,7 @@ jest.mock('klayr-service-framework', () => {
 			...actual.DB,
 			MySQL: {
 				...actual.DB.MySQL,
+				getTableInstance: jest.fn(() => {}),
 				KVStore: {
 					...actual.DB.MySQL.KVStore,
 					getKeyValueTable: jest.fn(),
@@ -533,6 +534,11 @@ describe('Test transaction fees estimates', () => {
 		};
 	});
 
+	// Mock tokenHasEscrowAccount to avoid undefined error in calcAdditionalFees
+	jest.mock('../../../../../shared/dataService/recorder/token/escrowed', () => ({
+		tokenHasEscrowAccount: jest.fn(() => Promise.resolve(true)),
+	}));
+
 	describe('Test calcDynamicFeeEstimates method', () => {
 		const feeEstimatePerByte = {
 			low: 3.3066625382716053,
@@ -853,6 +859,11 @@ describe('Test transaction fees estimates', () => {
 		});
 
 		it('should calculate transaction fees correctly for transfer cross chain transaction', async () => {
+			// Mock tokenHasEscrowAccount to return false for this test so escrowAccountInitializationFee is included
+			jest.doMock('../../../../../shared/dataService/recorder/token/escrowed', () => ({
+				tokenHasEscrowAccount: jest.fn(() => Promise.resolve(false)),
+			}));
+
 			const {
 				estimateTransactionFees,
 				getCcmBuffer,
