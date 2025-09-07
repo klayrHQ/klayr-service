@@ -36,7 +36,7 @@ const { getCurrentHeight, getGenesisHeight, initNodeConstants } = require('./con
 const { range } = require('./utils/array');
 const delay = require('./utils/delay');
 const config = require('../config');
-const { requestConnector, requestIndexer } = require('./utils/request');
+const { requestIndexer } = require('./utils/request');
 const { getIsScheduling, setIsScheduling } = require('./status');
 
 const blockMessageQueue = new MessageQueue(config.queue.block.name, config.endpoints.messageQueue, {

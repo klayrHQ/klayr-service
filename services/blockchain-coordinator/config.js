@@ -85,4 +85,6 @@ config.job = {
 	},
 };
 
+config.requestTimeoutRetryDelay = Number(process.env.REQUEST_TIMEOUT_RETRY_DELAY) || 1000; // in milliseconds
+
 module.exports = config;

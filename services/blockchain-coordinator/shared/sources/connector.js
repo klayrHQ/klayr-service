@@ -13,6 +13,7 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
+const { Logger } = require('klayr-service-framework');
 const config = require('../../config');
 const {
 	waitForConnectorWorkloadReady,
@@ -20,6 +21,8 @@ const {
 	waitForConnectorStatusReady,
 } = require('../connectorReady');
 const { requestConnector } = require('../utils/request');
+const delay = require('../utils/delay');
+const logger = Logger();
 
 const waitForConnector = async () => {
 	await waitForConnectorReady();
@@ -29,20 +32,66 @@ const waitForConnector = async () => {
 
 const getAllPosValidators = async () => {
 	await waitForConnector();
-	return await requestConnector(
-		'getAllPosValidators',
-		{},
-		{ timeout: config.brokerTimeout * 1000 * 3 },
-	);
+
+	while (true) {
+		try {
+			return await requestConnector(
+				'getAllPosValidators',
+				{},
+				{ timeout: config.brokerTimeout * 1000 * 3 },
+			);
+		} catch (err) {
+			if (
+				err.message.includes('connector.getAllPosValidators') &&
+				err.message.includes('timed out')
+			) {
+				logger.warn(
+					`timeout detected while requesting connector.getAllPosValidators, will retry after ${
+						config.requestTimeoutRetryDelay / 1000
+					} seconds!`,
+				);
+				await delay(config.requestTimeoutRetryDelay);
+				continue;
+			} else {
+				logger.error(
+					`Failed to request connector.getAllPosValidators due to a non-timeout error: ${err.message}`,
+				);
+				throw err;
+			}
+		}
+	}
 };
 
 const getBlocksByHeightBetween = async (from, to) => {
 	await waitForConnector();
-	return await requestConnector(
-		'getBlocksByHeightBetween',
-		{ from, to },
-		{ timeout: config.brokerTimeout * 1000 * 3 },
-	);
+
+	while (true) {
+		try {
+			return await requestConnector(
+				'getBlocksByHeightBetween',
+				{ from, to },
+				{ timeout: config.brokerTimeout * 1000 * 3 },
+			);
+		} catch (err) {
+			if (
+				err.message.includes('connector.getBlocksByHeightBetween') &&
+				err.message.includes('timed out')
+			) {
+				logger.warn(
+					`timeout detected while requesting connector.getBlocksByHeightBetween from ${from} to ${to}, will retry after ${
+						config.requestTimeoutRetryDelay / 1000
+					} seconds!`,
+				);
+				await delay(config.requestTimeoutRetryDelay);
+				continue;
+			} else {
+				logger.error(
+					`Failed to request connector.getBlocksByHeightBetween from ${from} to ${to} due to a non-timeout error: ${err.message}`,
+				);
+				throw err;
+			}
+		}
+	}
 };
 
 module.exports = {
