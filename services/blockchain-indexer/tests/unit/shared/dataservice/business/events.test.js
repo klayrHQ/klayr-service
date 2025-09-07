@@ -15,6 +15,7 @@
  */
 /* eslint-disable import/no-dynamic-require */
 const path = require('path');
+const msgpack = require('@msgpack/msgpack');
 const { eventsIncludingTokenModule } = require('../../../../constants/events');
 
 const mockedBlockID = '89a9f8dd0e9d15e54268f952b2e9430e799968169376273f715480d058a67dc4';
@@ -34,6 +35,8 @@ const {
 	mockGetEventsResult,
 	mockEventTopicsQueryParams,
 } = require('../../constants/events');
+
+const mockedEventsEncoded = mockedEvents.map(e => ({ eventBlob: msgpack.encode(e) }));
 
 describe('getEventsByBlockID', () => {
 	beforeEach(() => {
@@ -83,15 +86,7 @@ describe('getEventsByBlockID', () => {
 						getTableInstance: () => ({
 							find: params => {
 								expect(params).toEqual({ blockID: mockedBlockID });
-								const dbResp = [];
-
-								for (let i = 0; i < mockedEvents.length; i++) {
-									// TODO: eventStr is now eventBlob using msgpack
-									const eventStr = JSON.stringify(mockedEvents[i]);
-									dbResp.push({ eventStr });
-								}
-
-								return dbResp;
+								return mockedEventsEncoded;
 							},
 						}),
 					},
