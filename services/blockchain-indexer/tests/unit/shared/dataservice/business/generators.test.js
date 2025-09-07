@@ -28,6 +28,10 @@ beforeEach(() => {
 	jest.clearAllMocks();
 });
 
+const Redis = require('ioredis');
+jest.mock('ioredis');
+Redis.mockImplementation(() => ({ sadd: jest.fn() }));
+
 jest.mock('klayr-service-framework', () => {
 	const actual = jest.requireActual('klayr-service-framework');
 	return {
@@ -48,6 +52,7 @@ jest.mock('klayr-service-framework', () => {
 		},
 		CacheRedis: jest.fn(),
 		CacheLRU: jest.fn(),
+		Queue: jest.fn(),
 	};
 });
 

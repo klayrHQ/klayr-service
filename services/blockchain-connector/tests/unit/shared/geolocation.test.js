@@ -13,6 +13,7 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
+jest.useFakeTimers();
 
 const { getRandInt } = require('../../../shared/geolocation'); // Replace with the actual path to your file
 
