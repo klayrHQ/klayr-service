@@ -15,14 +15,20 @@
  */
 /* eslint-disable implicit-arrow-linebreak */
 const isObject = item => !!(item !== null && typeof item === 'object');
+const isProperObject = item => Object.prototype.toString.call(item) === '[object Object]';
 const isEmptyArray = array => !!(Array.isArray(array) && array.length === 0);
 const isEmptyObject = obj =>
-	!!(obj !== null && typeof obj === 'object' && Object.keys(obj).length === 0);
+	!!(
+		obj !== null &&
+		!Array.isArray(obj) &&
+		typeof obj === 'object' &&
+		Object.keys(obj).length === 0
+	);
 const isString = item => typeof item === 'string';
 
 module.exports = {
 	isObject,
-	isProperObject: isObject,
+	isProperObject,
 	isEmptyArray,
 	isEmptyObject,
 	isString,
