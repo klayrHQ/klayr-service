@@ -38,7 +38,14 @@ const loadSchema = async (knex, tableName, tableConfig) => {
 			if (charset) table.charset(charset);
 
 			Object.keys(schema).map(p => {
-				const kProp = table[schema[p].type](p);
+				let kProp;
+				if (schema[p].type === 'decimal') {
+					kProp = table[schema[p].type](p, schema[p].precision, schema[p].scale);
+				} else if (schema[p].increments === true) {
+					kProp = table.increments(p, { primaryKey: false });
+				} else {
+					kProp = table[schema[p].type](p);
+				}
 				if (schema[p].null === false) kProp.notNullable();
 				if ('defaultValue' in schema[p]) kProp.defaultTo(schema[p].defaultValue);
 				if (indexes[p]) kProp.index();
@@ -176,6 +183,35 @@ const getTableInstance = (tableConfig, knex) => {
 					throw err;
 				});
 		return Promise.all(queries);
+	};
+
+	const insert = async (inputRows, trx) => {
+		let isDefaultTrx = false;
+		if (!trx) {
+			trx = await createDefaultTransaction(knex);
+			isDefaultTrx = true;
+		}
+
+		let rawRows = inputRows;
+		if (!Array.isArray(rawRows)) rawRows = [inputRows];
+		const rows = await mapRowsBySchema(rawRows, schema);
+
+		// Perform a single bulk INSERT
+		const query = knex(tableName).transacting(trx).insert(rows);
+
+		if (isDefaultTrx) {
+			return query
+				.then(async result => {
+					await trx.commit();
+					return result;
+				})
+				.catch(async err => {
+					await trx.rollback();
+					logger.error(err.message);
+					throw err;
+				});
+		}
+		return query;
 	};
 
 	const queryBuilder = (params, columns, isCountQuery, trx) => {
@@ -634,6 +670,7 @@ const getTableInstance = (tableConfig, knex) => {
 
 	return {
 		upsert,
+		insert,
 		find,
 		delete: deleteByParams,
 		deleteByPrimaryKey,
