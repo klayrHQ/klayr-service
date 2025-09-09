@@ -19,7 +19,11 @@ const logger = Logger();
 
 const waitForIt = (fn, intervalMs = 1000, resolveUndefined = false) =>
 	// eslint-disable-next-line implicit-arrow-linebreak
-	new Promise(resolve => {
+	new Promise((resolve, reject) => {
+		if (typeof fn !== 'function') {
+			return reject(new Error('Input must be a function.'));
+		}
+
 		// eslint-disable-next-line consistent-return
 		const timeout = setInterval(async () => {
 			try {
