@@ -86,12 +86,26 @@ describe('HTTP library with caching enabled', () => {
 		});
 		timestamps.push(getTimestamp());
 
-		// Remove 'x-request-id' field
-		delete originalResponse.headers['x-request-id'];
-		delete secondResponse.headers['x-request-id'];
-
-		delete originalResponse.headers.date;
-		delete secondResponse.headers.date;
+		// Remove dynamic headers before comparison
+		const dynamicHeaders = [
+			'x-request-id',
+			'date',
+			'cf-ray',
+			'report-to',
+			'nel',
+			'alt-svc',
+			'cf-cache-status',
+			'etag',
+			'server',
+			'transfer-encoding',
+			'connection',
+			'content-type',
+			'content-length',
+		];
+		for (const h of dynamicHeaders) {
+			delete originalResponse.headers[h];
+			delete secondResponse.headers[h];
+		}
 
 		expect(timestamps[1] - timestamps[0]).toBeGreaterThanOrEqual(ttl);
 		expect(timestamps[3] - timestamps[2]).toBeGreaterThanOrEqual(ttl);

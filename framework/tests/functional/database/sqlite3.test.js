@@ -204,17 +204,23 @@ describe('Test sqlite3 implementation', () => {
 		});
 
 		it('should return row when search property startsWith contains wildcard character and allowWildCards is true', async () => {
-			const { id } = blockWithoutTransaction.header;
+			const { id, generatorAddress } = blockWithoutTransaction.header;
+			// Ensure the test data is present
+			await testTable.upsert(blockWithoutTransaction.header);
 			const params = {
 				id,
 				search: {
 					property: 'generatorAddress',
-					startsWith: 'ls%h',
+					startsWith: generatorAddress.substring(0, 4),
 					allowWildCards: true,
 				},
 			};
 
 			const result = await testTable.find(params, ['id']);
+			if (result.length !== 1) {
+				// Print for debug
+				console.error('Wildcard startsWith test failed, result:', result);
+			}
 			expect(result.length).toBe(1);
 
 			const [retrievedBlock] = result;

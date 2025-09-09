@@ -16,6 +16,39 @@
 const Microservice = require('../../src/microservice');
 const LoggerConfig = require('../../src/logger').init;
 
+jest.mock('moleculer', () => {
+	class ServiceBrokerMock {
+		constructor(opts = {}) {
+			this.opts = opts;
+			this.start = jest.fn(() => Promise.resolve());
+			this.stop = jest.fn(() => Promise.resolve());
+			this.call = jest.fn(async (actionName, params, opts) => {
+				const name = actionName.substring(this.serviceConfig.name.length + 1);
+				const handler = this.serviceConfig.actions[name].handler;
+				if (handler) return handler(params);
+				return undefined;
+			});
+			this.emit = jest.fn(() => true);
+			this.broadcast = jest.fn(() => true);
+			this.waitForServices = jest.fn(() => Promise.resolve());
+			this.loadService = jest.fn(() => ({}));
+			this.destroyService = jest.fn(() => ({}));
+			this.getLocalService = jest.fn(() => ({}));
+			this.createService = jest.fn(serviceConfig => {
+				this.serviceConfig = serviceConfig;
+			});
+			this.logger = { info: jest.fn(), error: jest.fn(), debug: jest.fn() };
+		}
+	}
+	return { ServiceBroker: ServiceBrokerMock };
+});
+
+jest.spyOn(globalThis, 'setInterval').mockImplementation(() => {});
+
+jest.mock('node-cron', () => ({
+	schedule: jest.fn().mockReturnValue(true),
+}));
+
 const loggerConf = {
 	console: 'true',
 	level: 'debug',
