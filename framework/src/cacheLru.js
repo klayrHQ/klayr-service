@@ -13,18 +13,27 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { KeyvLru } = require('keyv-lru');
+const { KeyvLru, KeyvLruManagedTtl } = require('keyv-lru');
 
 const memoryPool = {};
 
 const keyvMemoryCache = (bank = '$default', options = {}) => {
 	if (!memoryPool[bank]) {
-		memoryPool[bank] = new KeyvLru({
-			max: options.max || 1000,
-			ttl: options.ttl || 0,
-			notify: false,
-			expire: 0,
-		});
+		if (options.ttl) {
+			memoryPool[bank] = new KeyvLruManagedTtl({
+				max: options.max || 1000,
+				ttl: options.ttl || 0,
+				notify: false,
+				expire: 0,
+			});
+		} else {
+			memoryPool[bank] = new KeyvLru({
+				max: options.max || 1000,
+				ttl: options.ttl || 0,
+				notify: false,
+				expire: 0,
+			});
+		}
 	}
 
 	const cache = memoryPool[bank];
