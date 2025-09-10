@@ -355,7 +355,7 @@ const indexBlock = async job => {
 					await recordNonceIncrease(tx.senderAddress);
 
 					// store complete transaction data in database
-					await transactionsTable.upsert(tx, dbTrx);
+					await transactionsTable.insert(tx, dbTrx);
 
 					// Invoke 'applyTransaction' to execute command specific processing logic
 					await applyTransaction(blockHeader, tx, events, dbTrx);
@@ -374,7 +374,7 @@ const indexBlock = async job => {
 			dbTrx,
 		);
 		if (numRowsAffected === 0) {
-			await validatorsTable.upsert(
+			await validatorsTable.insert(
 				{
 					address: blockToIndexFromNode.generatorAddress,
 					generatedBlocks: 1,
@@ -390,8 +390,8 @@ const indexBlock = async job => {
 			const { eventsInfo, eventTopicsInfo } = getEventsInfoToIndex(blockToIndexFromNode, events);
 
 			await Promise.all([
-				eventsTable.upsert(eventsInfo, dbTrx),
-				eventTopicsTable.upsert(eventTopicsInfo, dbTrx),
+				eventsTable.insert(eventsInfo, dbTrx),
+				eventTopicsTable.insert(eventTopicsInfo, dbTrx),
 			]);
 
 			// Update block generator's rewards
@@ -484,7 +484,7 @@ const indexBlock = async job => {
 			reward: blockReward,
 		};
 
-		await blocksTable.upsert(blockToIndex, dbTrx);
+		await blocksTable.insert(blockToIndex, dbTrx);
 
 		await commitEvent(dbTrx);
 		await commitDBTransaction(dbTrx);
