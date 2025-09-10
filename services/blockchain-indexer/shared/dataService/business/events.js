@@ -14,7 +14,6 @@
  *
  */
 const BluebirdPromise = require('bluebird');
-const msgpack = require('@msgpack/msgpack');
 
 const {
 	CacheLRU,
@@ -40,12 +39,27 @@ const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
 const getBlocksTable = () => getTableInstance(blocksTableSchema, MYSQL_ENDPOINT);
 const getEventsTable = () => getTableInstance(eventsTableSchema, MYSQL_ENDPOINT);
+const getEventTopicsTable = () => getTableInstance(eventTopicsTableSchema, MYSQL_ENDPOINT);
 const getTransactionsTable = () => getTableInstance(transactionsTableSchema, MYSQL_ENDPOINT);
 
 const MAX_GET_EVENTS_CONCURRENCY = 20;
 
 const eventCache = CacheLRU('events');
 const eventCacheByBlockID = CacheLRU('eventsByBlockID');
+
+const EVENT_COLUMNS = ['data', 'index', 'module', 'name', 'topics', 'height', 'id'];
+
+const parseEventsData = events => {
+	return {
+		data: JSON.parse(events.data),
+		index: events.index,
+		module: events.module,
+		name: events.name,
+		topics: JSON.parse(events.topics),
+		height: events.height,
+		id: events.id,
+	};
+};
 
 const getEventsByHeightFromNode = async height => {
 	const events = await requestConnector('getEventsByHeight', { height });
@@ -59,12 +73,10 @@ const getEventsByHeight = async height => {
 
 	// Get from DB first (this is the default behavior)
 	const eventsTable = await getEventsTable();
-	const dbEventBlob = await eventsTable.find({ height }, ['eventBlob']);
+	const dbEventDatas = await eventsTable.find({ height }, EVENT_COLUMNS);
 
-	if (dbEventBlob.length) {
-		const dbEvents = dbEventBlob.map(({ eventBlob }) =>
-			eventBlob ? msgpack.decode(eventBlob) : eventBlob,
-		);
+	if (dbEventDatas.length) {
+		const dbEvents = dbEventDatas.map(events => parseEventsData(events));
 		await eventCache.set(height, JSON.stringify(dbEvents));
 		return dbEvents;
 	}
@@ -82,12 +94,10 @@ const getEventsByBlockID = async blockID => {
 
 	// Get from DB incase of cache miss
 	const eventsTable = await getEventsTable();
-	const dbEventsBlob = await eventsTable.find({ blockID }, ['eventBlob']);
+	const dbEventDatas = await eventsTable.find({ blockID }, EVENT_COLUMNS);
 
-	if (dbEventsBlob.length) {
-		const dbEvents = dbEventsBlob.map(({ eventBlob }) =>
-			eventBlob ? msgpack.decode(eventBlob) : eventBlob,
-		);
+	if (dbEventDatas.length) {
+		const dbEvents = dbEventDatas.map(events => parseEventsData(events));
 		eventCacheByBlockID.set(blockID, JSON.stringify(dbEvents));
 		return dbEvents;
 	}
@@ -106,164 +116,160 @@ const deleteEventsFromCacheByBlockID = async blockID => eventCacheByBlockID.dele
 const getEvents = async params => {
 	const blocksTable = await getBlocksTable();
 	const eventsTable = await getEventsTable();
+	const eventTopicsTable = await getEventTopicsTable();
 
-	const events = {
-		data: [],
-		meta: {},
-	};
+	const events = { data: [], meta: {} };
+	const topicsToQuery = new Set();
 
-	if (params.height && typeof params.height === 'string' && params.height.includes(':')) {
-		params = normalizeRangeParam(params, 'height');
+	let queryParams = { ...params };
+	let distincTopicParams = 0;
+
+	// Normalize ranges
+	if (
+		queryParams.height &&
+		typeof queryParams.height === 'string' &&
+		queryParams.height.includes(':')
+	) {
+		queryParams = normalizeRangeParam(queryParams, 'height');
 	}
 
-	if (params.timestamp && params.timestamp.includes(':')) {
-		params = normalizeRangeParam(params, 'timestamp');
+	if (queryParams.timestamp && queryParams.timestamp.includes(':')) {
+		queryParams = normalizeRangeParam(queryParams, 'timestamp');
 	}
 
-	params.leftOuterJoin = [];
-	params.whereIn = [];
+	// By transactionID
+	if (queryParams.transactionID) {
+		const { transactionID, ...rest } = queryParams;
+		queryParams = rest;
 
-	if (params.transactionID) {
-		const { transactionID, ...remParams } = params;
-		params = remParams;
+		const transactionTopic =
+			transactionID.length === LENGTH_ID ? EVENT_TOPIC_PREFIX.TX_ID + transactionID : transactionID;
 
-		const allTxIDs = [];
-		if (transactionID.length === LENGTH_ID) {
-			allTxIDs.push(EVENT_TOPIC_PREFIX.TX_ID.concat(transactionID));
-		} else {
-			allTxIDs.push(transactionID);
+		if (!topicsToQuery.has(transactionTopic)) {
+			distincTopicParams += 1;
+			topicsToQuery.add(transactionTopic);
 		}
-
-		params.leftOuterJoin.push({
-			targetTable: `${eventTopicsTableSchema.tableName} as eventTopicsForTxID`,
-			leftColumn: `${eventsTableSchema.tableName}.id`,
-			rightColumn: `eventTopicsForTxID.eventID`,
-		});
-
-		params.whereIn.push({
-			property: 'eventTopicsForTxID.topic',
-			values: allTxIDs,
-		});
 	}
 
-	if (params.senderAddress) {
-		const { senderAddress, ...remParams } = params;
-		params = remParams;
+	// By senderAddress
+	if (queryParams.senderAddress) {
+		const { senderAddress, ...rest } = queryParams;
+		queryParams = rest;
 
-		// Get all transactions IDs for sender Address
 		const transactionsTable = await getTransactionsTable();
-		const resultSet = await transactionsTable.find({ senderAddress }, ['id']);
-		const txIDs = resultSet.map(row => row.id);
+		const txRows = await transactionsTable.find({ senderAddress }, ['id']);
+		const txIDsToQuery = txRows.map(r =>
+			r.id.length === LENGTH_ID ? EVENT_TOPIC_PREFIX.TX_ID + r.id : r.id,
+		);
 
-		const txIDsToQuery = [];
-
-		// eslint-disable-next-line no-restricted-syntax
-		for (const txID of txIDs) {
-			if (txID.length === LENGTH_ID) {
-				txIDsToQuery.push(EVENT_TOPIC_PREFIX.TX_ID.concat(txID));
-			} else {
-				txIDsToQuery.push(txID);
-			}
+		if (txIDsToQuery.some(item => !topicsToQuery.has(item))) {
+			distincTopicParams += 1;
+			txIDsToQuery.forEach(item => topicsToQuery.add(item));
 		}
-
-		params.leftOuterJoin.push({
-			targetTable: `${eventTopicsTableSchema.tableName} as eventTopicsForSenderAddress`,
-			leftColumn: `${eventsTableSchema.tableName}.id`,
-			rightColumn: `eventTopicsForSenderAddress.eventID`,
-		});
-
-		params.whereIn.push({
-			property: 'eventTopicsForSenderAddress.topic',
-			values: txIDsToQuery,
-		});
 	}
 
-	if ('blockID' in params) {
-		const { blockID, ...remParams } = params;
-		params = remParams;
+	// By topic
+	if (queryParams.topic) {
+		const { topic, ...rest } = queryParams;
+		queryParams = rest;
+
+		const topics = topic.split(',');
+		const topicsLists = topics.flatMap(t =>
+			t.length === LENGTH_ID ? [EVENT_TOPIC_PREFIX.TX_ID + t, EVENT_TOPIC_PREFIX.CCM_ID + t] : [t],
+		);
+
+		if (topicsLists.some(item => !topicsToQuery.has(item))) {
+			distincTopicParams += 1;
+			topicsLists.forEach(item => topicsToQuery.add(item));
+		}
+	}
+
+	// By blockID
+	if ('blockID' in queryParams) {
+		const { blockID, ...rest } = queryParams;
+		queryParams = rest;
 
 		const [block] = await blocksTable.find({ id: blockID, limit: 1 }, ['height']);
-
 		if (!block || !block.height) {
 			throw new NotFoundException(`Invalid blockID: ${blockID}`);
 		}
 
-		if ('height' in params && Number(params.height) !== block.height) {
-			let heightLowerBound = Number(params.height);
-			let heightHigherBound = Number(params.height);
+		if ('height' in queryParams) {
+			let heightLowerBound = Number(queryParams.height);
+			let heightHigherBound = heightLowerBound;
 
-			if (typeof params.height === 'string' && params.height.includes(':')) {
-				const [fromStr, toStr] = params.height.split(':');
+			if (typeof queryParams.height === 'string' && queryParams.height.includes(':')) {
+				const [fromStr, toStr] = queryParams.height.split(':');
 				heightLowerBound = Number(fromStr);
 				heightHigherBound = Number(toStr);
 			}
 
 			if (block.height < heightLowerBound || block.height > heightHigherBound) {
 				throw new NotFoundException(
-					`Invalid combination of blockID: ${blockID} and height: ${params.height}`,
+					`Invalid combination of blockID: ${blockID} and height: ${queryParams.height}`,
 				);
 			}
 		}
-		params.height = block.height;
+
+		queryParams.height = block.height;
 	}
 
-	if (params.topic) {
-		const { topic, ...remParams } = params;
-		params = remParams;
+	const eventPKsToRetrieve = [];
+	let totalFromTopicTable = 0;
 
-		const topics = topic.split(',');
-		const topicsToQuery = [];
-		for (let i = 0; i < topics.length; i++) {
-			if (topics[i].length === LENGTH_ID) {
-				topicsToQuery.push(
-					EVENT_TOPIC_PREFIX.TX_ID.concat(topics[i]),
-					EVENT_TOPIC_PREFIX.CCM_ID.concat(topics[i]),
-				);
-			} else {
-				topicsToQuery.push(topics[i]);
-			}
+	if (topicsToQuery.size > 0) {
+		const topicQuery = {
+			...queryParams,
+			whereIn: { property: 'topic', values: [...topicsToQuery] },
+		};
+		if (distincTopicParams > 1) {
+			topicQuery.groupBy = 'eventPK';
+			topicQuery.havingRaw = `COUNT(DISTINCT topic) = ${distincTopicParams}`;
 		}
 
-		params.leftOuterJoin.push({
-			targetTable: `${eventTopicsTableSchema.tableName} as eventTopicsForTopic`,
-			leftColumn: `${eventsTableSchema.tableName}.id`,
-			rightColumn: `eventTopicsForTopic.eventID`,
-		});
+		totalFromTopicTable = await eventTopicsTable.count(topicQuery);
 
-		params.whereIn.push({
-			property: 'eventTopicsForTopic.topic',
-			values: topicsToQuery,
-		});
+		if (totalFromTopicTable > 0) {
+			const eventTopics = await eventTopicsTable.find(topicQuery, ['eventPK']);
+			eventPKsToRetrieve.push(...eventTopics.map(et => et.eventPK));
+		}
 	}
 
-	const { topic, ...paramsWithoutTopic } = params;
-	params = paramsWithoutTopic;
-	const eventsInfo = await eventsTable.find(params, [
-		'eventBlob',
-		'height',
+	// Final query
+	const { topic, order, sort, limit = 10, offset = 0, ...finalParams } = queryParams;
+	const eventQueryParams = { ...finalParams, order, sort, limit, offset };
+	if (eventPKsToRetrieve.length > 0) {
+		eventQueryParams.whereIn = { property: 'eventPK', values: eventPKsToRetrieve };
+	}
+
+	const eventsInfo = await eventsTable.find(eventQueryParams, [
+		...EVENT_COLUMNS,
 		'blockID',
 		'timestamp',
 	]);
 
+	// Decode
 	events.data = await BluebirdPromise.map(
 		eventsInfo,
-		async ({ eventBlob, height, blockID, timestamp }) => {
-			const event = msgpack.decode(eventBlob);
-
+		events => {
+			const event = parseEventsData(events);
 			return {
 				...event,
-				block: { id: blockID, height, timestamp },
+				block: { id: events.blockID, height: events.height, timestamp: events.timestamp },
 			};
 		},
 		{ concurrency: Math.min(eventsInfo.length, MAX_GET_EVENTS_CONCURRENCY) },
 	);
 
-	const { order, sort, ...remParamsWithoutOrderAndSort } = params;
-	const total = await eventsTable.count(remParamsWithoutOrderAndSort);
+	// Count
+	const total =
+		totalFromTopicTable > 0
+			? totalFromTopicTable // Count already obtained from eventTopicTable
+			: await eventsTable.count(finalParams);
 
 	events.meta = {
 		count: events.data.length,
-		offset: params.offset,
+		offset,
 		total,
 	};
 

@@ -694,13 +694,13 @@ const deleteIndexedBlocks = async job => {
 					const eventTopicsTable = await getEventTopicsTable();
 
 					const { eventsInfo } = getEventsInfoToIndex(blockFromJob, events);
-					const eventIDs = eventsInfo.map(e => e.id);
+					const eventPKs = eventsInfo.map(e => e.eventPK);
 
 					await eventTopicsTable.delete(
-						{ whereIn: { property: 'eventID', values: eventIDs } },
+						{ whereIn: { property: 'eventPK', values: eventPKs } },
 						dbTrx,
 					);
-					await eventsTable.deleteByPrimaryKey(eventIDs, dbTrx);
+					await eventsTable.deleteByPrimaryKey(eventPKs, dbTrx);
 
 					// Update block generator's rewards
 					const blockRewardEvent = events.find(

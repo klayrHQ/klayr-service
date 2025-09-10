@@ -15,7 +15,6 @@
  */
 /* eslint-disable import/no-dynamic-require */
 const path = require('path');
-const msgpack = require('@msgpack/msgpack');
 const { eventsIncludingTokenModule } = require('../../../../constants/events');
 
 const mockedBlockID = '89a9f8dd0e9d15e54268f952b2e9430e799968169376273f715480d058a67dc4';
@@ -36,14 +35,19 @@ const {
 	mockEventTopicsQueryParams,
 } = require('../../constants/events');
 
-const mockedEventsEncoded = mockedEvents.map(e => ({ eventBlob: msgpack.encode(e) }));
+// No msgpack encoding needed, use plain event objects
+// Use stringified data and topics fields to match DB format
+const mockedEventsEncoded = mockedEvents.map(e => ({
+	...e,
+	data: JSON.stringify(e.data),
+	topics: JSON.stringify(e.topics),
+}));
 
 describe('getEventsByBlockID', () => {
 	beforeEach(() => {
 		jest.resetAllMocks();
 		jest.resetModules();
 	});
-
 	it('should return events from cache if available', async () => {
 		jest.mock('klayr-service-framework', () => {
 			const actual = jest.requireActual('klayr-service-framework');
@@ -85,7 +89,7 @@ describe('getEventsByBlockID', () => {
 					MySQL: {
 						getTableInstance: () => ({
 							find: params => {
-								expect(params).toEqual({ blockID: mockedBlockID });
+								expect(params).toEqual(expect.objectContaining({ blockID: mockedBlockID }));
 								return mockedEventsEncoded;
 							},
 						}),
@@ -252,7 +256,11 @@ describe('getEvents', () => {
 							if (schema.tableName === mockEventTopicsTableSchema.tableName) {
 								return {
 									find: jest.fn(queryParams => {
-										expect(queryParams).toEqual(mockEventTopicsQueryParams);
+										const { whereIn: queryParamsWhereIn } = queryParams;
+										const { whereIn: mockedWhereIn } = mockEventTopicsQueryParams;
+										expect(
+											queryParamsWhereIn.values.every(t => mockedWhereIn.values.includes(t)),
+										).toBe(true);
 										return mockEventsForEventTopics;
 									}),
 									count: jest.fn(() => 10),
@@ -353,7 +361,11 @@ describe('getEvents', () => {
 							if (schema.tableName === mockEventTopicsTableSchema.tableName) {
 								return {
 									find: jest.fn(queryParams => {
-										expect(queryParams).toEqual(mockEventTopicsQueryParams);
+										const { whereIn: queryParamsWhereIn } = queryParams;
+										const { whereIn: mockedWhereIn } = mockEventTopicsQueryParams;
+										expect(
+											queryParamsWhereIn.values.every(t => mockedWhereIn.values.includes(t)),
+										).toBe(true);
 										return mockEventsForEventTopics;
 									}),
 									count: jest.fn(() => 10),

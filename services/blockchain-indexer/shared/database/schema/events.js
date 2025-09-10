@@ -15,25 +15,26 @@
  */
 module.exports = {
 	tableName: 'events',
-	primaryKey: 'id',
+	primaryKey: 'eventPK',
 	schema: {
-		id: { type: 'string' }, // Unique event identifier
-		name: { type: 'string' }, // Type of event
-		module: { type: 'string' },
-		blockID: { type: 'string' },
-		height: { type: 'integer' },
+		eventPK: { type: 'bigInteger' },
+		data: { type: 'json' },
 		index: { type: 'integer' },
-		eventBlob: { type: 'binary' },
+		module: { type: 'string' },
+		name: { type: 'string' }, // Type of event
+		topics: { type: 'json' }, // Type of event
+		height: { type: 'integer' },
+		id: { type: 'string' }, // Unique event identifier
+		blockID: { type: 'string' },
 		timestamp: { type: 'integer' },
 	},
 	indexes: {
-		id: { type: 'key' },
-		height: { type: 'range' },
-		blockID: { type: 'key' },
+		eventPK: { type: 'key' },
 		index: { type: 'range' },
-		timestamp: { type: 'range' },
-		name: { type: 'key' },
 		module: { type: 'key' },
+		name: { type: 'key' },
+		height: { type: 'range' },
+		timestamp: { type: 'range' },
 	},
 	compositeIndexes: {
 		timestamp_desc_index_asc: [
