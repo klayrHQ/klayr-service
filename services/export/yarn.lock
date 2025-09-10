@@ -3023,9 +3023,9 @@ keyv@^4.0.3:
   dependencies:
     json-buffer "3.0.1"
 
-"klayr-service-framework@https://github.com/klayrHQ/klayr-service/raw/development/framework/dist/klayr-service-framework-1.6.15.tgz":
-  version "1.6.15"
-  resolved "https://github.com/klayrHQ/klayr-service/raw/development/framework/dist/klayr-service-framework-1.6.15.tgz#5d57cac3ed044a3a9ae9fb636ab70011246d98bd"
+"klayr-service-framework@https://github.com/klayrHQ/klayr-service/raw/development/framework/dist/klayr-service-framework-1.6.16.tgz":
+  version "1.6.16"
+  resolved "https://github.com/klayrHQ/klayr-service/raw/development/framework/dist/klayr-service-framework-1.6.16.tgz#af6dd0017cd7f0a2a7e5d8831d19289f329ac0fd"
   dependencies:
     "@keyv/redis" "^2.1.2"
     "@log4js-node/gelf" "github:MichalTuleja/log4js-node-gelf#89d9933"
