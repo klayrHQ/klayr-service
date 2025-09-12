@@ -142,6 +142,20 @@ const getEvents = async params => {
 		const { transactionID, ...rest } = queryParams;
 		queryParams = rest;
 
+		const topicsToRemove = transactionID.length === LENGTH_ID ? [EVENT_TOPIC_PREFIX.TX_ID + transactionID, transactionID] : [transactionID, transactionID.slice(EVENT_TOPIC_PREFIX.TX_ID.length)];
+
+		if (queryParams.topic) {
+			const topicsArr = queryParams.topic.split(',');
+			const filteredTopics = topicsArr.filter(t => !topicsToRemove.includes(t));
+			if (filteredTopics.length === 0) {
+				// Remove topic entirely if it was the only one
+				const { topic, ...restWithoutTopic } = queryParams;
+				queryParams = restWithoutTopic;
+			} else if (filteredTopics.length !== topicsArr.length) {
+				queryParams.topic = filteredTopics.join(',');
+			}
+		}
+
 		const transactionTopic =
 			transactionID.length === LENGTH_ID ? EVENT_TOPIC_PREFIX.TX_ID + transactionID : transactionID;
 
