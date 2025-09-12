@@ -246,14 +246,23 @@ const getEvents = async params => {
 		if (totalFromTopicTable > 0) {
 			const eventTopics = await eventTopicsTable.find(topicQuery, ['eventPK']);
 			eventPKsToRetrieve.push(...eventTopics.map(et => et.eventPK));
+		} else {
+			// No events found for the given topics
+			events.meta = { count: 0, offset: queryParams.offset || 0, total: 0 };
+			return events;
 		}
 	}
 
 	// Final query
 	const { topic, order, sort, limit = 10, offset = 0, ...finalParams } = queryParams;
-	const eventQueryParams = { ...finalParams, order, sort, limit, offset };
+	const eventQueryParams = { ...finalParams };
 	if (eventPKsToRetrieve.length > 0) {
 		eventQueryParams.whereIn = { property: 'eventPK', values: eventPKsToRetrieve };
+	} else {
+		eventQueryParams.limit = limit;
+		eventQueryParams.offset = offset;
+		eventQueryParams.order = order;
+		eventQueryParams.sort = sort;
 	}
 
 	const eventsInfo = await eventsTable.find(eventQueryParams, [
