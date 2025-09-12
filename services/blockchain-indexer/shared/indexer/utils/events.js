@@ -48,11 +48,11 @@ const getEventsInfoToIndex = (block, events) => {
 		// Storing whole event is required to fetch events of a deleted block, and to make event retrieval faster
 		const eventInfo = {
 			eventPK: getEventPK(block.height, event.index),
-			data: JSON.stringify(event.data),
+			data: event.data,
 			index: event.index,
 			module: event.module,
 			name: event.name,
-			topics: JSON.stringify(event.topics),
+			topics: event.topics,
 			height: block.height,
 			id: event.id,
 			blockID: block.id,
