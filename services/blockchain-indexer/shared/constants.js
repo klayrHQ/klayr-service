@@ -27,6 +27,10 @@ let finalizedHeight;
 let engineEndpoints;
 let allRegisteredEndpoints;
 
+const refreshNodeInfo = async () => {
+	await requestConnector('getNodeInfoForceUpdate');
+};
+
 const updateFinalizedHeight = async () => {
 	const { finalizedHeight: latestFinalizedHeight } = await requestConnector('getNetworkStatus');
 	finalizedHeight = latestFinalizedHeight;
@@ -229,6 +233,7 @@ const initNodeConstants = async () => {
 module.exports = {
 	updateFinalizedHeight,
 	getFinalizedHeight,
+	refreshNodeInfo,
 	getCurrentHeight,
 	getGenesisConfig,
 	getGenesisHeight,

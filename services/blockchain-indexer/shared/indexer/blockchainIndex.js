@@ -74,6 +74,7 @@ const {
 	EVENT,
 	MODULE,
 	getCurrentHeight,
+	refreshNodeInfo,
 } = require('../constants');
 
 const config = require('../../config');
@@ -229,6 +230,7 @@ const indexBlock = async job => {
 	try {
 		const blocksTable = await getBlocksTable();
 		const lastIndexedBlock = await getLastIndexedBlock();
+		const currentHeight = await getCurrentHeight();
 
 		// Always index the last indexed blockHeight + 1 (sequential indexing)
 		if (lastIndexedBlock !== undefined) {
@@ -241,10 +243,23 @@ const indexBlock = async job => {
 				await setLargestMissingBlockHeight(blockHeightFromJobData);
 			}
 
-			blockHeightToIndex = lastIndexedBlock.height + 1;
+			if (blockHeightToIndex !== lastIndexedBlock.height + 1) {
+				logger.warn(
+					`overriding blockHeightToIndex from ${blockHeightToIndex} to ${
+						lastIndexedBlock.height + 1
+					}`,
+				);
+				blockHeightToIndex = lastIndexedBlock.height + 1;
+			}
 
-			// Skip job run if the height to be indexed does not exist
-			if ((await getCurrentHeight()) < blockHeightToIndex) return;
+			// if the height to be indexed does not exist yet, throw error so it would be retried later, while refreshing node info
+			// useful for fork recovery when node are lagging behind
+			if (currentHeight < blockHeightToIndex) {
+				await refreshNodeInfo();
+				throw new Error(
+					`Block at height ${blockHeightToIndex} is larger than current cached node height at ${currentHeight}.`,
+				);
+			}
 		}
 
 		// Get block from args if have same height, otherwise get from node
@@ -295,8 +310,7 @@ const indexBlock = async job => {
 			// which is already implemented on line blockHeightToIndex = lastIndexedBlock.height + 1 above
 			if (Object.keys(currentBlockInDB).length) {
 				// Skip indexing if the blockchain is fully indexed.
-				const currentBlockchainHeight = await getCurrentHeight();
-				if (lastIndexedBlock.height >= currentBlockchainHeight) return;
+				if (lastIndexedBlock.height >= currentHeight) return;
 
 				// blockHeightToIndex = lastIndexedBlock.height + 1;
 			}

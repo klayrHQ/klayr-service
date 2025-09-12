@@ -68,6 +68,11 @@ module.exports = [
 		params: {},
 	},
 	{
+		name: 'getNodeInfoForceUpdate',
+		controller: () => getNodeInfo(true),
+		params: {},
+	},
+	{
 		name: 'getSystemMetadata',
 		controller: getSystemMetadata,
 		params: {},
