@@ -122,13 +122,12 @@ const indexNewMissingBlock = async (lastIndexedBlock, newBlock, queue) => {
 
 	for (const missingBlockHeight of missingBlocks) {
 		if (missingBlockHeight > currentLargestMissingBlockHeight) {
-			logger.info(`Scheduling indexing of missing block at height ${missingBlockHeight}`);
-
 			const [blockFromDB] = await blocksTable.find({ height: missingBlockHeight, limit: 1 }, [
 				'id',
 			]);
 
 			if (!blockFromDB) {
+				logger.info(`Scheduling indexing of missing block at height ${missingBlockHeight}`);
 				currentLargestMissingBlockHeight = missingBlockHeight;
 				await queue.add({ height: missingBlockHeight });
 			} else {

@@ -62,6 +62,7 @@ const {
 	reorderIndexBlocksQueueJobs,
 	indexNewMissingBlock,
 	scheduleMissingBlocksIndexing,
+	setLargestMissingBlockHeight,
 } = require('./utils/blockchainIndex');
 const {
 	startIndexSpeedRecord,
@@ -231,6 +232,15 @@ const indexBlock = async job => {
 
 		// Always index the last indexed blockHeight + 1 (sequential indexing)
 		if (lastIndexedBlock !== undefined) {
+			// If blockHeightFromJobData is set, the job isn't from newBlock.
+			// If it's non-sequential, update largestMissingBlockHeight so indexNewMissingBlock could covers all missed blocks.
+			if (
+				blockHeightFromJobData !== undefined &&
+				blockHeightFromJobData !== lastIndexedBlock.height + 1
+			) {
+				await setLargestMissingBlockHeight(blockHeightFromJobData);
+			}
+
 			blockHeightToIndex = lastIndexedBlock.height + 1;
 
 			// Skip job run if the height to be indexed does not exist
