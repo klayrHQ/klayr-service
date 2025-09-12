@@ -29,29 +29,136 @@ const escapeUserInput = input => {
 };
 
 const loadSchema = async (knex, tableName, tableConfig) => {
-	const { primaryKey, charset, schema, indexes, compositeIndexes } = tableConfig;
+	const { primaryKey, charset, schema, indexes = {}, compositeIndexes = {} } = tableConfig;
 
 	if (await knex.schema.hasTable(tableName)) return knex;
 
+	// --- Supported type groups ---
+	const typesWithLength = ['string', 'binary'];
+	const typesWithPrecision = ['decimal', 'float', 'double'];
+	const typesWithTextType = ['text'];
+	const typesWithEnum = ['enum'];
+	const typesWithOptions = ['dateTime', 'timestamp'];
+	const typesFallback = ['integer', 'bigInteger', 'boolean', 'date', 'time', 'json', 'jsonb'];
+	const specialTypes = ['increments', 'timestamps', 'specificType'];
+
+	const allSupportedTypes = [
+		...typesWithLength,
+		...typesWithPrecision,
+		...typesWithTextType,
+		...typesWithEnum,
+		...typesWithOptions,
+		...typesFallback,
+		...specialTypes,
+	];
+
 	await knex.schema
 		.createTable(tableName, table => {
-			if (charset) table.charset(charset);
+			// ⚠️ Charset is MySQL/MariaDB-only
+			if (charset && typeof table.charset === 'function') {
+				table.charset(charset);
+			}
 
-			Object.keys(schema).map(p => {
+			Object.entries(schema).forEach(([colName, colDef]) => {
 				let kProp;
-				if (schema[p].type === 'decimal') {
-					kProp = table[schema[p].type](p, schema[p].precision, schema[p].scale);
-				} else if (schema[p].increments === true) {
-					kProp = table.increments(p, { primaryKey: false });
-				} else {
-					kProp = table[schema[p].type](p);
+				const { type, length, precision, scale, textType, values, options, dbType, increments } =
+					colDef;
+
+				// --- Validate type ---
+				if (!allSupportedTypes.includes(type)) {
+					throw new Error(
+						`Unsupported type "${type}" for column "${colName}" in table "${tableName}". ` +
+							`Allowed types: ${allSupportedTypes.join(', ')}`,
+					);
 				}
-				if (schema[p].null === false) kProp.notNullable();
-				if ('defaultValue' in schema[p]) kProp.defaultTo(schema[p].defaultValue);
-				if (indexes[p]) kProp.index();
-				return kProp;
+
+				// --- Validate optional parameters ---
+				if (typesWithLength.includes(type) && length !== undefined && typeof length !== 'number') {
+					throw new Error(
+						`Column "${colName}" of type "${type}" expects "length" to be a number, got: ${length}`,
+					);
+				}
+				if (typesWithPrecision.includes(type)) {
+					if (precision !== undefined && typeof precision !== 'number') {
+						throw new Error(
+							`Column "${colName}" of type "${type}" expects "precision" to be a number if provided, got: ${precision}`,
+						);
+					}
+					if (scale !== undefined && typeof scale !== 'number') {
+						throw new Error(
+							`Column "${colName}" of type "${type}" expects "scale" to be a number if provided, got: ${scale}`,
+						);
+					}
+				}
+				if (type === 'enum' && (!Array.isArray(values) || values.length === 0)) {
+					throw new Error(
+						`Column "${colName}" of type "enum" requires a non-empty "values" array, got: ${values}`,
+					);
+				}
+				if (type === 'specificType' && (typeof dbType !== 'string' || !dbType.trim())) {
+					throw new Error(
+						`Column "${colName}" of type "specificType" requires a non-empty "dbType" string, got: ${dbType}`,
+					);
+				}
+
+				// --- Column creation ---
+				switch (true) {
+					// Auto increment
+					case !!increments:
+						kProp = table.increments(colName, options || { primaryKey: false });
+						break;
+
+					// String / Binary with length
+					case typesWithLength.includes(type):
+						kProp = table[type](colName, length);
+						break;
+
+					// Decimal / Float / Double with precision & scale
+					case typesWithPrecision.includes(type):
+						kProp = table[type](colName, precision, scale);
+						break;
+
+					// Text with optional textType
+					case type === 'text':
+						kProp = table.text(colName, textType);
+						break;
+
+					// Enum
+					case type === 'enum':
+						kProp = table.enum(colName, values, options);
+						break;
+
+					// DateTime / Timestamp
+					case typesWithOptions.includes(type):
+						kProp = table[type](colName, options);
+						break;
+
+					// Timestamps helper
+					case type === 'timestamps':
+						kProp = table.timestamps(options?.useTz, options?.precision);
+						break;
+
+					// SpecificType
+					case type === 'specificType':
+						kProp = table.specificType(colName, dbType);
+						break;
+
+					// Default fallback (integer, bigInteger, boolean, date, time, json, jsonb)
+					default:
+						kProp = table[type](colName);
+				}
+
+				// --- Column modifiers ---
+				if (colDef.null === false) kProp.notNullable();
+				if (colDef.null === true) kProp.nullable();
+				if ('defaultValue' in colDef) kProp.defaultTo(colDef.defaultValue);
+				if (colDef.unique === true) kProp.unique();
+				if (colDef.unsigned === true && typeof kProp.unsigned === 'function') kProp.unsigned();
+				if (indexes[colName]) kProp.index();
 			});
-			table.primary(primaryKey);
+
+			// Table-level primary key
+			if (primaryKey) table.primary(primaryKey);
 		})
 		.then(() => logger.info(`Successfully created table: ${tableName}.`))
 		.catch(err => {
@@ -59,13 +166,50 @@ const loadSchema = async (knex, tableName, tableConfig) => {
 			throw err;
 		});
 
-	// eslint-disable-next-line no-restricted-syntax, guard-for-in
+	// Composite indexes
 	for (const key in compositeIndexes) {
-		const directions = compositeIndexes[key];
-		const indexName = `${tableName}_index_${key}`;
-		const indexColumns = directions.map(dir => `\`${dir.key}\` ${dir.direction}`).join(', ');
+		const indexDef = compositeIndexes[key];
 
-		const sqlStatement = `ALTER TABLE ${tableName} ADD INDEX ${indexName} (${indexColumns})`;
+		// --- Backward compatibility: allow array shorthand ---
+		const isArrayShorthand = Array.isArray(indexDef);
+		const columns = isArrayShorthand ? indexDef : indexDef.columns;
+
+		if (!Array.isArray(columns) || columns.length === 0) {
+			throw new Error(`Composite index "${key}" must define a non-empty "columns" array.`);
+		}
+
+		const { unique, type, where } = isArrayShorthand ? {} : indexDef;
+		const indexName = `${tableName}_index_${key}`;
+
+		// --- Build column definitions ---
+		const indexColumns = columns
+			.map(col => {
+				if (!col.key) {
+					throw new Error(
+						`Composite index "${key}" is missing required "key" property in one of its columns.`,
+					);
+				}
+				if (col.direction) {
+					const direction = col.direction.toUpperCase();
+					if (direction !== 'ASC' && direction !== 'DESC') {
+						throw new Error(
+							`Invalid direction "${col.direction}" for column "${col.key}" in composite index "${key}". Use "ASC" or "DESC".`,
+						);
+					}
+					return `\`${col.key}\` ${direction}`;
+				}
+				return `\`${col.key}\``; // default: no direction
+			})
+			.join(', ');
+
+		// --- Build SQL parts ---
+		const uniqueSql = unique ? 'UNIQUE' : '';
+		const typeSql = type ? `${type.toUpperCase()}` : '';
+		const whereSql = where ? `WHERE ${where}` : '';
+
+		const sqlStatement =
+			`ALTER TABLE ${tableName} ADD ${uniqueSql} ${typeSql} INDEX ${indexName} (${indexColumns}) ${whereSql}`.trim();
+
 		await knex.raw(sqlStatement);
 	}
 
