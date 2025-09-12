@@ -263,6 +263,8 @@ const scheduleMissingBlocksIndexing = async () => {
 
 	setIsScheduling(true);
 
+	await requestIndexer('setIsSchedulingThroughCoordinator');
+
 	const genesisHeight = await getGenesisHeight();
 	const currentHeight = await getCurrentHeight();
 

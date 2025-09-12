@@ -9,7 +9,13 @@ const { indexNewBlock } = require('./blockchainIndex');
 
 const blocksTableSchema = require('../database/schema/blocks');
 const config = require('../../config');
-const { getPendingIndexReady, setPendingIndexIsReady } = require('./readyIndex');
+const {
+	getPendingIndexReady,
+	setPendingIndexIsReady,
+	getIsSchedulingThroughCoordinator,
+} = require('./readyIndex');
+const { isWaitingDrained } = require('./utils/indexerEventHook');
+const { scheduleMissingBlocks } = require('./utils/scheduler');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
@@ -67,6 +73,14 @@ const indexPendingNewBlock = async block => {
 	if (getPendingIndexReady()) {
 		await indexNewBlock(block);
 	} else {
+		const isIndexingQueueDrained = isWaitingDrained();
+		const isScheduledThroughCoordinator = getIsSchedulingThroughCoordinator();
+
+		if (isIndexingQueueDrained && !isScheduledThroughCoordinator) {
+			await scheduleMissingBlocks(block);
+			return;
+		}
+
 		if (!pendingBlockToIndex.some(b => b.header.id === block.header.id)) {
 			logger.info(
 				`Block indexing is still in progress, block at height ${block.header.height} will be scheduled for indexing later...`,

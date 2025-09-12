@@ -61,7 +61,6 @@ const {
 	getReorderingStatus,
 	reorderIndexBlocksQueueJobs,
 	indexNewMissingBlock,
-	scheduleMissingBlocksIndexing,
 	setLargestMissingBlockHeight,
 } = require('./utils/blockchainIndex');
 const {
@@ -93,6 +92,7 @@ const {
 } = require('./utils/indexerEventHook');
 const { recordEvents, commitEvent } = require('./eventProcessor');
 const { recordNonceIncrease } = require('../dataService/recorder/auth/account');
+const { scheduleMissingBlocksOnCoordinator } = require('./utils/scheduler');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
@@ -206,7 +206,7 @@ const retryIndexingAndReorderIfFailed = async job => {
 			return RESCHEDULE_STATUS.IS_RETURN;
 		} catch (err) {
 			await clearIndexBlocksQueue();
-			await scheduleMissingBlocksIndexing();
+			await scheduleMissingBlocksOnCoordinator();
 			return RESCHEDULE_STATUS.IS_RETURN;
 		}
 	}
