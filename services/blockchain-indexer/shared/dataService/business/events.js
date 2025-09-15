@@ -142,7 +142,10 @@ const getEvents = async params => {
 		const { transactionID, ...rest } = queryParams;
 		queryParams = rest;
 
-		const topicsToRemove = transactionID.length === LENGTH_ID ? [EVENT_TOPIC_PREFIX.TX_ID + transactionID, transactionID] : [transactionID, transactionID.slice(EVENT_TOPIC_PREFIX.TX_ID.length)];
+		const topicsToRemove =
+			transactionID.length === LENGTH_ID
+				? [EVENT_TOPIC_PREFIX.TX_ID + transactionID, transactionID]
+				: [transactionID, transactionID.slice(EVENT_TOPIC_PREFIX.TX_ID.length)];
 
 		if (queryParams.topic) {
 			const topicsArr = queryParams.topic.split(',');

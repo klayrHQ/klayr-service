@@ -25,47 +25,22 @@ module.exports = {
 		name: { type: 'string' },
 		module: { type: 'string' },
 	},
-	indexes: {
-		eventPK: { type: 'key' },
-		topic: { type: 'key' },
-		height: { type: 'range' },
-		index: { type: 'range' },
-		timestamp: { type: 'range' },
-		name: { type: 'key' },
-		module: { type: 'key' },
-	},
+	indexes: {},
 	compositeIndexes: {
-		timestamp_desc_index_asc: [
+		topic_only_sort: [
+			{ key: 'topic' },
 			{ key: 'timestamp', direction: 'DESC' },
 			{ key: 'index', direction: 'ASC' },
+			{ key: 'eventPK' },
 		],
-		timestamp_asc_index_asc: [
-			{ key: 'timestamp', direction: 'ASC' },
-			{ key: 'index', direction: 'ASC' },
-		],
-		timestamp_desc_index_desc: [
+		topic_combination_sort: [
+			{ key: 'topic' },
+			{ key: 'module' },
+			{ key: 'name' },
+			{ key: 'height' },
 			{ key: 'timestamp', direction: 'DESC' },
-			{ key: 'index', direction: 'DESC' },
-		],
-		timestamp_asc_index_desc: [
-			{ key: 'timestamp', direction: 'ASC' },
-			{ key: 'index', direction: 'DESC' },
-		],
-		height_desc_index_asc: [
-			{ key: 'height', direction: 'DESC' },
 			{ key: 'index', direction: 'ASC' },
-		],
-		height_asc_index_asc: [
-			{ key: 'height', direction: 'ASC' },
-			{ key: 'index', direction: 'ASC' },
-		],
-		height_desc_index_desc: [
-			{ key: 'height', direction: 'DESC' },
-			{ key: 'index', direction: 'DESC' },
-		],
-		height_asc_index_desc: [
-			{ key: 'height', direction: 'ASC' },
-			{ key: 'index', direction: 'DESC' },
+			{ key: 'eventPK' },
 		],
 	},
 	purge: {},
