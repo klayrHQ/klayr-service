@@ -255,6 +255,7 @@ const resolveQueryParams = params => {
 		'groupBy',
 		'orderByRaw',
 		'havingRaw',
+		'forceIndex',
 	];
 	const queryParams = Object.keys(params)
 		.filter(key => !KNOWN_QUERY_PARAMS.includes(key))
@@ -359,7 +360,9 @@ const getTableInstance = (tableConfig, knex) => {
 	};
 
 	const queryBuilder = (params, columns, isCountQuery, trx) => {
-		const query = knex(tableName).transacting(trx);
+		const query = params.forceIndex
+			? knex.from(knex.raw(`${tableName} FORCE INDEX (${params.forceIndex})`)).transacting(trx)
+			: knex(tableName).transacting(trx);
 		const queryParams = resolveQueryParams(params);
 
 		if (isCountQuery) {
@@ -384,14 +387,12 @@ const getTableInstance = (tableConfig, knex) => {
 
 			if (params.sort) {
 				const [sortColumn, sortDirection] = params.sort.split(':');
-				query.whereNotNull(sortColumn);
-				query.select(sortColumn).orderBy(sortColumn, sortDirection);
+				query.orderBy(sortColumn, sortDirection);
 			}
 
 			if (params.order) {
 				const [orderColumn, orderDirection] = params.order.split(':');
-				query.whereNotNull(orderColumn);
-				query.select(orderColumn).orderBy(orderColumn, orderDirection);
+				query.orderBy(orderColumn, orderDirection);
 			}
 
 			if (params.orderByRaw) {
