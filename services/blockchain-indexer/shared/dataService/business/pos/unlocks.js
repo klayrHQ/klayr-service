@@ -81,6 +81,7 @@ const getPosPendingUnlocksDB = async address => {
 	return result;
 };
 
+// TODO: it still feels slow
 const getPosUnlocks = async params => {
 	const unlocks = {
 		data: {},

@@ -503,6 +503,7 @@ const isQueryFromIndex = params => {
 
 const formatBlock = async (block, isDeletedBlock = false) => normalizeBlock(block, isDeletedBlock);
 
+// TODO: this still feels slow
 const getBlocks = async params => {
 	const blocksTable = await getBlocksTable();
 	const blocks = {

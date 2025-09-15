@@ -181,6 +181,7 @@ const getDistributionByType = async params => {
 	return orderedFinalResult;
 };
 
+// TODO: report shows feels slow
 const getTransactionsStatistics = async params => {
 	const transactionStatisticsTable = await getTransactionStatisticsTable();
 

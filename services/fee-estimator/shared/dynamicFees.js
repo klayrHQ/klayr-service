@@ -70,6 +70,7 @@ const calculateEstimateFeePerByteQuick = async newBlock => {
 const getEstimateFeePerByteQuick = () => cacheRedisFees.get(config.cacheKeys.cacheKeyFeeEstFull);
 const getEstimateFeePerByteFull = () => cacheRedisFees.get(config.cacheKeys.cacheKeyFeeEstQuick);
 
+// TODO: report shows feels slow
 const getEstimateFeePerByte = async () => {
 	// aka getBestEstimateAvailable
 	if (!config.feeEstimates.quickAlgorithmEnabled && !config.feeEstimates.fullAlgorithmEnabled) {

@@ -186,6 +186,7 @@ const validateParams = async params => {
 	return params;
 };
 
+// TODO: this still feels slow
 const getTransactions = async params => {
 	const transactionsTable = await getTransactionsTable();
 	const transactions = {
