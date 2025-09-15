@@ -18,14 +18,14 @@ module.exports = {
 	primaryKey: 'eventPK',
 	schema: {
 		eventPK: { type: 'bigInteger' },
+		id: { type: 'string', length: 64 }, // Unique event identifier
+		module: { type: 'string', length: 32 },
+		name: { type: 'string', length: 64 }, // Type of event
+		blockID: { type: 'string', length: 64 },
 		data: { type: 'json' },
 		index: { type: 'integer' },
-		module: { type: 'string' },
-		name: { type: 'string' }, // Type of event
 		topics: { type: 'json' }, // Type of event
 		height: { type: 'integer' },
-		id: { type: 'string' }, // Unique event identifier
-		blockID: { type: 'string' },
 		timestamp: { type: 'integer' },
 	},
 	indexes: {},

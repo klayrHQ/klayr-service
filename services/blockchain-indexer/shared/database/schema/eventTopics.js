@@ -18,12 +18,12 @@ module.exports = {
 	primaryKey: ['eventPK', 'topic'],
 	schema: {
 		eventPK: { type: 'bigInteger' },
-		topic: { type: 'string' },
+		topic: { type: 'string', length: 100 },
+		module: { type: 'string', length: 32 },
+		name: { type: 'string', length: 64 },
 		height: { type: 'integer' },
-		index: { type: 'integer' },
 		timestamp: { type: 'integer' },
-		name: { type: 'string' },
-		module: { type: 'string' },
+		index: { type: 'integer' },
 	},
 	indexes: {},
 	compositeIndexes: {
