@@ -28,7 +28,9 @@ module.exports = {
 		height: { type: 'integer' },
 		timestamp: { type: 'integer' },
 	},
-	indexes: {},
+	indexes: {
+		blockID: { type: 'key' },
+	},
 	compositeIndexes: {
 		generic_sort: [
 			{ key: 'timestamp', direction: 'DESC' },
