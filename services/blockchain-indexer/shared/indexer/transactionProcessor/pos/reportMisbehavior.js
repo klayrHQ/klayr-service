@@ -57,7 +57,7 @@ const applyTransaction = async (blockHeader, tx, events, dbTrx) => {
 	await validatorsTable.upsert(
 		{
 			address: punishedAddress,
-			reportMisbehaviorHeights: JSON.stringify(reportMisbehaviorHeights),
+			reportMisbehaviorHeights,
 		},
 		dbTrx,
 	);
@@ -110,7 +110,7 @@ const revertTransaction = async (blockHeader, tx, events, dbTrx) => {
 	await validatorsTable.upsert(
 		{
 			address: punishedAddress,
-			reportMisbehaviorHeights: JSON.stringify(reportMisbehaviorHeights),
+			reportMisbehaviorHeights,
 		},
 		dbTrx,
 	);

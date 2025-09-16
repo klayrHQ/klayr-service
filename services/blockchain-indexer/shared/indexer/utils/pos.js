@@ -109,7 +109,7 @@ const getExpectedUnlockHeight = async (stakerAddress, validatorAddress, unstakeH
 	]);
 	if (validatorAccountData.length === 1) {
 		validatorAccount.reportMisbehaviorHeights = JSON.parse(
-			validatorAccountData[0].reportMisbehaviorHeights,
+			validatorAccountData[0].reportMisbehaviorHeights || '[]',
 		);
 	}
 
