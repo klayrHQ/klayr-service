@@ -43,19 +43,37 @@ module.exports = {
 		params: { type: 'json', null: false },
 	},
 	indexes: {
-		height: { type: 'range' },
-		moduleCommand: { type: 'key' },
-		nonce: { type: 'range' },
 		blockID: { type: 'key' },
-		timestamp: { type: 'range' },
+		nonce: { type: 'range' },
 		amount: { type: 'range' },
 		data: { type: 'key' },
-		senderAddress: { type: 'key' },
 		receivingChainID: { type: 'key' },
 		executionStatus: { type: 'key' },
 	},
 	compositeIndexes: {
-		// TODO: implement composite index
+		generic_sort: [
+			{ key: 'timestamp', direction: 'DESC' },
+			{ key: 'index', direction: 'ASC' },
+		],
+		height_sort: [
+			{ key: 'height', direction: 'DESC' },
+			{ key: 'index', direction: 'ASC' },
+		],
+		sender_sort: [
+			{ key: 'senderAddress' },
+			{ key: 'timestamp', direction: 'DESC' },
+			{ key: 'index', direction: 'ASC' },
+		],
+		recipient_sort: [
+			{ key: 'recipientAddress' },
+			{ key: 'timestamp', direction: 'DESC' },
+			{ key: 'index', direction: 'ASC' },
+		],
+		module_command_sort: [
+			{ key: 'moduleCommand' },
+			{ key: 'timestamp', direction: 'DESC' },
+			{ key: 'index', direction: 'ASC' },
+		],
 	},
 	purge: {},
 };
