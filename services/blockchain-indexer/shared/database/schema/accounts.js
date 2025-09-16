@@ -17,9 +17,9 @@ module.exports = {
 	tableName: 'accounts',
 	primaryKey: 'address',
 	schema: {
-		address: { type: 'string' },
-		publicKey: { type: 'string', null: true, defaultValue: null },
-		name: { type: 'string', null: true, defaultValue: null },
+		address: { type: 'string', length: 41 },
+		publicKey: { type: 'string', length: 64, null: true, defaultValue: null },
+		name: { type: 'string', length: 20, null: true, defaultValue: null },
 		isValidator: { type: 'boolean', null: false, defaultValue: false },
 	},
 	indexes: {},

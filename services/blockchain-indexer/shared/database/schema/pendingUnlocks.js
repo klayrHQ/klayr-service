@@ -17,14 +17,11 @@ module.exports = {
 	tableName: 'pending_unlocks',
 	primaryKey: ['validatorAddress', 'stakerAddress'],
 	schema: {
-		stakerAddress: { type: 'string' },
-		validatorAddress: { type: 'string' },
+		stakerAddress: { type: 'string', length: 41 },
+		validatorAddress: { type: 'string', length: 41 },
 		amount: { type: 'bigInteger' },
 		unstakeHeight: { type: 'integer' },
 	},
-	indexes: {
-		validatorAddress: { type: 'key' },
-		stakerAddress: { type: 'key' },
-	},
+	indexes: {},
 	purge: {},
 };
