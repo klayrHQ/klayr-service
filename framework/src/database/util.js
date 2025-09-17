@@ -256,6 +256,8 @@ const resolveQueryParams = params => {
 		'orderByRaw',
 		'havingRaw',
 		'forceIndex',
+		'union',
+		'unionAll',
 	];
 	const queryParams = Object.keys(params)
 		.filter(key => !KNOWN_QUERY_PARAMS.includes(key))
@@ -360,6 +362,36 @@ const getTableInstance = (tableConfig, knex) => {
 	};
 
 	const queryBuilder = (params, columns, isCountQuery, trx) => {
+		if (params.union || params.unionAll) {
+			const unionQueries = (params.union || params.unionAll).map(innerParams => {
+				return queryBuilder(innerParams, columns, false, trx);
+			});
+
+			// Outer query base
+			let outerParams = { ...params };
+			delete outerParams.union;
+			delete outerParams.unionAll;
+
+			// Start with a "blank" builder
+			let query = knex.queryBuilder();
+
+			// Apply union
+			if (params.union) {
+				query.union(unionQueries, true);
+			} else {
+				query.unionAll(unionQueries, true);
+			}
+
+			// Let queryBuilder apply the rest of the outer params
+			// (sort, order, limit, offset, where, groupBy, distinct, etc.)
+			const outerQuery = queryBuilder(outerParams, columns, isCountQuery, trx);
+
+			// Merge union into outer query
+			outerQuery.from(query.as('t')); // wrap as subquery alias
+
+			return outerQuery;
+		}
+
 		const query = params.forceIndex
 			? knex.from(knex.raw(`${tableName} FORCE INDEX (${params.forceIndex})`)).transacting(trx)
 			: knex(tableName).transacting(trx);
