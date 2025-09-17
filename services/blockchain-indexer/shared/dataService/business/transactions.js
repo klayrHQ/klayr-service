@@ -169,25 +169,49 @@ const validateParams = async params => {
 	if (params.executionStatus) {
 		const { executionStatus, ...remParams } = params;
 		params = remParams;
-		const executionStatuses = executionStatus
-			.split(',')
-			.map(e => e.trim())
-			.filter(e => e !== 'any');
-		params.whereIn = { property: 'executionStatus', values: executionStatuses };
+
+		const validStatuses = ['pending', 'successful', 'failed'];
+		const executionStatuses = new Set(
+			executionStatus
+				.split(',')
+				.map(e => e.trim())
+				.filter(e => e !== 'any' && validStatuses.includes(e)),
+		);
+
+		if (executionStatuses.size > 0 && executionStatuses.size < validStatuses.length) {
+			params.whereIn = { property: 'executionStatus', values: [...executionStatuses] };
+		}
 	}
 
 	if (params.address) {
 		const { address, ...remParams } = params;
 		params = remParams;
 
-		params.orWhere = { recipientAddress: address };
-		params.orWhereWith = { senderAddress: address };
+		const innerQueryLimit = params.limit ? params.limit + (params.offset || 0) : undefined;
+
+		params.union = [
+			{
+				forceIndex: 'transactions_index_sender_sort',
+				senderAddress: address,
+				whereIn: params.whereIn,
+				sort: params.sort,
+				order: params.order,
+				limit: innerQueryLimit,
+			},
+			{
+				forceIndex: 'transactions_index_recipient_sort',
+				recipientAddress: address,
+				whereIn: params.whereIn,
+				sort: params.sort,
+				order: params.order,
+				limit: innerQueryLimit,
+			},
+		];
 	}
 
 	return params;
 };
 
-// TODO: this still feels slow
 const getTransactions = async params => {
 	const transactionsTable = await getTransactionsTable();
 	const transactions = {
