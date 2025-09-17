@@ -52,6 +52,7 @@
 		"nats": "^1.4.12",
 		"node-cron": "^2.0.3",
 		"prettyjson": "^1.2.1",
+		"reqoal": "^1.0.2",
 		"require-all": "^3.0.0",
 		"signals": "^1.0.0",
 		"socket.io": "^4.4.1",
