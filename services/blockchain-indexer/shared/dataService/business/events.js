@@ -238,11 +238,17 @@ const getEvents = async params => {
 	if (topicsToQuery.size > 0) {
 		const topicQuery = {
 			...queryParams,
+			forceIndex: 'event_topics_index_topic_only_sort',
 			whereIn: { property: 'topic', values: [...topicsToQuery] },
 		};
 		if (distincTopicParams > 1) {
 			topicQuery.groupBy = 'eventPK';
 			topicQuery.havingRaw = `COUNT(DISTINCT topic) = ${distincTopicParams}`;
+		}
+
+		// NOTE: force index to topic_combination_sort (topic, module, name, height, timestamp DESC, index ASC)
+		if (Object.keys(topicQuery).some(key => ['module', 'name', 'height'].includes(key))) {
+			topicQuery.forceIndex = 'event_topics_index_topic_combination_sort';
 		}
 
 		totalFromTopicTable = await eventTopicsTable.count(topicQuery);
