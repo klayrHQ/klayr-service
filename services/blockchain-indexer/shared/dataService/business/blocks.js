@@ -39,6 +39,7 @@ const { normalizeTransaction } = require('../../utils/transactions');
 const { getNameByAddress } = require('../../utils/validator');
 
 const config = require('../../../config');
+const { JSONParseDB } = require('../utils/json');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
@@ -78,11 +79,11 @@ const formatTransactionResponseFromDB = transaction => {
 	const formattedTransaction = {
 		module: transaction.moduleCommand.split(':')[0],
 		command: transaction.moduleCommand.split(':')[1],
-		params: JSON.parse(transaction.params),
+		params: JSONParseDB(transaction.params),
 		nonce: transaction.nonce,
 		fee: transaction.fee.toString(),
 		senderPublicKey: transaction.senderPublicKey,
-		signatures: JSON.parse(transaction.signatures),
+		signatures: JSONParseDB(transaction.signatures),
 		id: transaction.id,
 	};
 	return formattedTransaction;
@@ -100,7 +101,7 @@ const formatBlockResponseFromDB = async (block, skipFetchTransaction = false) =>
 			eventRoot: block.eventRoot,
 			transactionRoot: block.transactionRoot,
 			validatorsHash: block.validatorsHash,
-			aggregateCommit: JSON.parse(block.aggregateCommit),
+			aggregateCommit: JSONParseDB(block.aggregateCommit),
 			generatorAddress: block.generatorAddress,
 			maxHeightPrevoted: block.maxHeightPrevoted,
 			maxHeightGenerated: block.maxHeightGenerated,
@@ -109,9 +110,9 @@ const formatBlockResponseFromDB = async (block, skipFetchTransaction = false) =>
 			id: block.id,
 		},
 		transactions: [],
-		assets: JSON.parse(block.assets),
+		assets: JSONParseDB(block.assets),
 		metadata: {
-			generator: JSON.parse(block.generator),
+			generator: JSONParseDB(block.generator),
 			networkFee: block.networkFee,
 			totalBurnt: block.totalBurnt,
 			totalForged: block.totalForged,

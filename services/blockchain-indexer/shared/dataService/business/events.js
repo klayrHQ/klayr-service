@@ -34,6 +34,7 @@ const { requestConnector } = require('../../utils/request');
 const { normalizeRangeParam } = require('../../utils/param');
 const { parseToJSONCompatObj } = require('../../utils/parser');
 const { LENGTH_ID, EVENT_TOPIC_PREFIX } = require('../../constants');
+const { JSONParseDB } = require('../utils/json');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
@@ -51,11 +52,11 @@ const EVENT_COLUMNS = ['data', 'index', 'module', 'name', 'topics', 'height', 'i
 
 const parseEventsData = events => {
 	return {
-		data: JSON.parse(events.data),
+		data: JSONParseDB(events.data),
 		index: events.index,
 		module: events.module,
 		name: events.name,
-		topics: JSON.parse(events.topics),
+		topics: JSONParseDB(events.topics),
 		height: events.height,
 		id: events.id,
 	};
