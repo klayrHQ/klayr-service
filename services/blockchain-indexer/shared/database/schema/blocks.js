@@ -52,13 +52,10 @@ module.exports = {
 	},
 	indexes: {
 		id: { type: 'key' },
-		timestamp: { type: 'range' },
-		generatorAddress: { type: 'key' },
-		size: { type: 'range' },
-		isFinal: { type: 'key' },
 	},
 	compositeIndexes: {
-		// TODO: implement composite index
+		generatorAddress_sort: [{ key: 'generatorAddress' }, { key: 'height', direction: 'DESC' }],
+		isFinal_sort: [{ key: 'isFinal' }, { key: 'height', direction: 'DESC' }],
 	},
 	purge: {},
 };
