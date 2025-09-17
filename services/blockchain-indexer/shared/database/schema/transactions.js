@@ -44,9 +44,6 @@ module.exports = {
 	},
 	indexes: {
 		blockID: { type: 'key' },
-		nonce: { type: 'range' },
-		amount: { type: 'range' },
-		data: { type: 'key' },
 		receivingChainID: { type: 'key' },
 		executionStatus: { type: 'key' },
 	},
