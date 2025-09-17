@@ -36,6 +36,7 @@ const { getFinalizedHeight } = require('../../constants');
 const transactionsTableSchema = require('../../database/schema/transactions');
 const config = require('../../../config');
 const { getKlayr32AddressFromPublicKey } = require('../../utils/account');
+const { JSONParseDB } = require('../utils/json');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
@@ -218,8 +219,8 @@ const getTransactions = async params => {
 				name: senderAccount ? senderAccount.name : null,
 			};
 
-			transaction.params = JSON.parse(transaction.params);
-			transaction.signatures = JSON.parse(transaction.signatures);
+			transaction.params = JSONParseDB(transaction.params);
+			transaction.signatures = JSONParseDB(transaction.signatures);
 
 			if (transaction.params.recipientAddress) {
 				const recipientAccount = await getIndexedAccountInfo(
