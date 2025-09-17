@@ -2687,7 +2687,7 @@ keyv@^4.0.3:
 
 "klayr-service-framework@https://github.com/klayrHQ/klayr-service/raw/development/framework/dist/klayr-service-framework-1.7.0.tgz":
   version "1.7.0"
-  resolved "https://github.com/klayrHQ/klayr-service/raw/development/framework/dist/klayr-service-framework-1.7.0.tgz#8fd90ad084421f2fd4264402810d581d55befcc0"
+  resolved "https://github.com/klayrHQ/klayr-service/raw/development/framework/dist/klayr-service-framework-1.7.0.tgz#5cf5d363c147d2efab805715fcac2b0e16ff8e10"
   dependencies:
     "@keyv/redis" "^2.1.2"
     "@log4js-node/gelf" "github:MichalTuleja/log4js-node-gelf#89d9933"
@@ -2710,6 +2710,7 @@ keyv@^4.0.3:
     nats "^1.4.12"
     node-cron "^2.0.3"
     prettyjson "^1.2.1"
+    reqoal "^1.0.2"
     require-all "^3.0.0"
     signals "^1.0.0"
     socket.io "^4.4.1"
@@ -3426,6 +3427,13 @@ regexp.prototype.flags@^1.5.2:
     define-properties "^1.2.1"
     es-errors "^1.3.0"
     set-function-name "^2.0.1"
+
+reqoal@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/reqoal/-/reqoal-1.0.2.tgz#ff463eb26043baa83107bd4c123098beab693b32"
+  integrity sha512-va/xSGIa3b2XgvFyNZfN9J02kyP8+G61lnrHt4RkeSTgf598C5xgzYuAhifBUC8Y3CK9HrTnQafT9FrCVE9+Mg==
+  dependencies:
+    json-stable-stringify "^1.3.0"
 
 require-all@^3.0.0:
   version "3.0.0"
