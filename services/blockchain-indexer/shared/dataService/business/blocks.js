@@ -524,6 +524,7 @@ const getBlocks = async params => {
 
 	// Checking for direct latest block fetch
 	const paramProps = Object.getOwnPropertyNames(params);
+	const sortOrder = params.sort ? params.sort.split(':')[1] : undefined;
 	const isDirectLatestBlockFetch =
 		(paramProps.length === 1 && params.limit === 1) ||
 		(paramProps.length === 2 &&
