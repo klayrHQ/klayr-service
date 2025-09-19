@@ -81,7 +81,6 @@ const getPosPendingUnlocksDB = async address => {
 	return result;
 };
 
-// TODO: it still feels slow
 const getPosUnlocks = async params => {
 	const unlocks = {
 		data: {},
@@ -99,16 +98,21 @@ const getPosUnlocks = async params => {
 		return unlocks;
 	}
 
-	const pendingUnlocks = await getPosPendingUnlocksDB(params.address);
+	const [pendingUnlocks, networkStatus, tokenID, indexedAccountInfo] = await Promise.all([
+		getPosPendingUnlocksDB(params.address),
+		getNetworkStatus(),
+		getPosTokenID(),
+		getIndexedAccountInfo({ address: params.address, limit: 1 }, ['name', 'publicKey']),
+	]);
+
 	const {
 		data: {
 			lastBlockID,
 			genesis: { blockTime },
 		},
-	} = await getNetworkStatus();
+	} = networkStatus;
 	const { height, timestamp } = await getBlockByID(lastBlockID);
 
-	const tokenID = await getPosTokenID();
 	const filteredPendingUnlocks = pendingUnlocks.reduce((accumulator, pendingUnlock) => {
 		const { unlockable, ...remPendingUnlock } = pendingUnlock;
 		const isLocked = !pendingUnlock.unlockable;
@@ -128,10 +132,7 @@ const getPosUnlocks = async params => {
 		return accumulator;
 	}, []);
 
-	const { publicKey, name } = await getIndexedAccountInfo({ address: params.address, limit: 1 }, [
-		'name',
-		'publicKey',
-	]);
+	const { publicKey, name } = indexedAccountInfo;
 
 	// Update index if public key is not indexed asynchronously
 	if (!publicKey && params.publicKey) indexAccountPublicKey(params.publicKey);
