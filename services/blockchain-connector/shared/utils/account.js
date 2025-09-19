@@ -32,7 +32,6 @@ const getKlayr32AddressFromPublicKey = publicKey =>
 const getKlayr32AddressFromHexAddress = address =>
 	getKlayr32AddressFromAddress(Buffer.from(address, 'hex'));
 
-// TODO: Remove once SDK returns address in Klayr32 format (https://github.com/KlayrHQ/klayr-sdk/issues/7629)
 const getKlayr32Address = address =>
 	address.startsWith('kly') ? address : getKlayr32AddressFromHexAddress(address);
 
