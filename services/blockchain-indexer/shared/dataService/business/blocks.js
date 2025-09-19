@@ -553,10 +553,10 @@ const getBlocks = async params => {
 	}
 
 	// Handle generic queries
-	const total = await blocksTable.count(requestParams);
+	const total = await blocksTable.count(params);
 	if (total > 0) {
 		const resultSet = await blocksTable.find(
-			requestParams,
+			params,
 			Object.getOwnPropertyNames(blocksTableSchema.schema),
 		);
 		blocks.data = await BluebirdPromise.map(
