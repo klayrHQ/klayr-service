@@ -5,6 +5,7 @@ const logger = Logger();
 let isIndexReady = false;
 let pendingIndexReady = false;
 let isScheduledThroughCoordinator = false;
+let isOnWaitingDrainedBeenExecuted = false;
 
 const getPendingIndexReady = () => pendingIndexReady;
 
@@ -30,6 +31,17 @@ const setIsSchedulingThroughCoordinator = () => {
 	}
 };
 
+const getIsOnWaitingDrainedBeenExecuted = () => isOnWaitingDrainedBeenExecuted;
+
+const setIsOnWaitingDrainedBeenExecuted = () => {
+	if (!isOnWaitingDrainedBeenExecuted) {
+		logger.trace(
+			'setIsOnWaitingDrainedBeenExecuted is setting isOnWaitingDrainedBeenExecuted as true on readyIndex.js',
+		);
+		isOnWaitingDrainedBeenExecuted = true;
+	}
+};
+
 module.exports = {
 	getPendingIndexReady,
 	setPendingIndexIsReady,
@@ -37,4 +49,6 @@ module.exports = {
 	setIndexReadyStatus,
 	getIsSchedulingThroughCoordinator,
 	setIsSchedulingThroughCoordinator,
+	getIsOnWaitingDrainedBeenExecuted,
+	setIsOnWaitingDrainedBeenExecuted,
 };

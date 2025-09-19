@@ -1,5 +1,9 @@
+const { Logger } = require('klayr-service-framework');
 const { debounce } = require('lodash');
-const { scheduleMissingBlocks } = require('./scheduler');
+const { shouldScheduleMissingBlocks, scheduleMissingBlocksOnCoordinator } = require('./scheduler');
+const { setIsOnWaitingDrainedBeenExecuted } = require('../readyIndex');
+
+const logger = Logger();
 
 let waitingCount = 0;
 let waitingEmptyFired = false;
@@ -7,7 +11,12 @@ let onWaitingDrainedInitialized = false;
 
 // This hook is called when the queue is drained and there are no more jobs waiting
 async function onWaitingDrained(currentBlock) {
-	await scheduleMissingBlocks(currentBlock);
+	setIsOnWaitingDrainedBeenExecuted();
+
+	if (await shouldScheduleMissingBlocks(currentBlock)) {
+		logger.info(`Scheduling missing blocks indexing, since waiting queue is drained`);
+		await scheduleMissingBlocksOnCoordinator();
+	}
 }
 
 function isWaitingDrained() {

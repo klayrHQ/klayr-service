@@ -12,10 +12,13 @@ const config = require('../../config');
 const {
 	getPendingIndexReady,
 	setPendingIndexIsReady,
-	getIsSchedulingThroughCoordinator,
+	getIsOnWaitingDrainedBeenExecuted,
 } = require('./readyIndex');
 const { isWaitingDrained } = require('./utils/indexerEventHook');
-const { scheduleMissingBlocks } = require('./utils/scheduler');
+const {
+	shouldScheduleMissingBlocks,
+	scheduleMissingBlocksOnCoordinator,
+} = require('./utils/scheduler');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
@@ -74,11 +77,16 @@ const indexPendingNewBlock = async block => {
 		await indexNewBlock(block);
 	} else {
 		const isIndexingQueueDrained = isWaitingDrained();
-		const isScheduledThroughCoordinator = getIsSchedulingThroughCoordinator();
+		const isOnWaitingDrainedBeenExecuted = getIsOnWaitingDrainedBeenExecuted();
 
-		if (isIndexingQueueDrained && !isScheduledThroughCoordinator) {
-			await scheduleMissingBlocks(block);
-			return;
+		if (isIndexingQueueDrained && !isOnWaitingDrainedBeenExecuted) {
+			if (await shouldScheduleMissingBlocks(block)) {
+				logger.info(
+					`Scheduling missing blocks indexing, since indexPendingNewBlock catching onWaitingDrained hasn't been executed`,
+				);
+				await scheduleMissingBlocksOnCoordinator();
+				return;
+			}
 		}
 
 		if (!pendingBlockToIndex.some(b => b.header.id === block.header.id)) {

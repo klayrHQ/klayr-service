@@ -206,6 +206,9 @@ const retryIndexingAndReorderIfFailed = async job => {
 			await reorderIndexBlocksQueueJobs(job, indexBlocksQueue);
 			return RESCHEDULE_STATUS.IS_RETURN;
 		} catch (err) {
+			logger.error(
+				`Re-ordering indexBlocksQueue failed, will schedule missing blocks through coordinator. Error: ${err.message}`,
+			);
 			await clearIndexBlocksQueue();
 			await scheduleMissingBlocksOnCoordinator();
 			return RESCHEDULE_STATUS.IS_RETURN;
