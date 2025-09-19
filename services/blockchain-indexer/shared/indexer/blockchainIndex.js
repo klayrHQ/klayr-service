@@ -244,11 +244,14 @@ const indexBlock = async job => {
 			}
 
 			if (blockHeightToIndex !== lastIndexedBlock.height + 1) {
-				logger.warn(
-					`overriding blockHeightToIndex from ${blockHeightToIndex} to ${
-						lastIndexedBlock.height + 1
-					}`,
-				);
+				// Only warn if not indexing from block job data (e.g. height mode), preventing verbose uneccessary logs on reordering
+				if (blockFromJobData === undefined) {
+					logger.warn(
+						`overriding blockHeightToIndex from ${blockHeightToIndex} to ${
+							lastIndexedBlock.height + 1
+						} on indexing by blocks`,
+					);
+				}
 				blockHeightToIndex = lastIndexedBlock.height + 1;
 			}
 
