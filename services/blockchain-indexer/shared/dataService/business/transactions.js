@@ -191,19 +191,15 @@ const validateParams = async params => {
 
 		params.union = [
 			{
+				...remParams,
 				forceIndex: 'transactions_index_sender_sort',
 				senderAddress: address,
-				whereIn: params.whereIn,
-				sort: params.sort,
-				order: params.order,
 				limit: innerQueryLimit,
 			},
 			{
+				...remParams,
 				forceIndex: 'transactions_index_recipient_sort',
 				recipientAddress: address,
-				whereIn: params.whereIn,
-				sort: params.sort,
-				order: params.order,
 				limit: innerQueryLimit,
 			},
 		];
@@ -219,9 +215,12 @@ const getTransactions = async params => {
 		meta: {},
 	};
 
+	const { order, sort, limit, offset, ...paramsWithoutOrderSortLimitOffset } = params;
+	const countParams = await validateParams(paramsWithoutOrderSortLimitOffset);
+	const total = await transactionsTable.count(countParams);
+
 	params = await validateParams(params);
 
-	const total = await transactionsTable.count(params);
 	const resultSet = await transactionsTable.find(
 		{ ...params, limit: params.limit || total },
 		Object.getOwnPropertyNames(transactionsTableSchema.schema),
