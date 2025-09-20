@@ -183,6 +183,7 @@ const validateParams = async params => {
 		}
 	}
 
+	// When `address` is provided, build a UNION of sender/recipient queries to improve performance using two composite index
 	if (params.address) {
 		const { address, ...remParams } = params;
 		params = remParams;
@@ -203,6 +204,14 @@ const validateParams = async params => {
 				limit: innerQueryLimit,
 			},
 		];
+
+		// Remove schema filters from outer query (already applied in union)
+		const tableColumns = Object.getOwnPropertyNames(transactionsTableSchema.schema);
+		Object.getOwnPropertyNames(params).forEach(t => {
+			if (tableColumns.includes(t)) {
+				delete params[t];
+			}
+		});
 	}
 
 	return params;
