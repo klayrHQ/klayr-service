@@ -29,7 +29,11 @@ const createDBConnection = async connEndpoint => {
 	const knex = require('knex')({
 		client: 'mysql2',
 		version: '8',
-		connection: connEndpoint,
+		connection: {
+			uri: connEndpoint,
+			supportBigNumbers: true,
+			bigNumberStrings: true,
+		},
 		useNullAsDefault: true,
 		pool: {
 			max: 100,
