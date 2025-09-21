@@ -20,6 +20,7 @@ const { getPosConstants } = require('./constants');
 const { getPosLockedRewards } = require('./lockedRewards');
 const { getPosClaimableRewards } = require('./claimableRewards');
 const { reloadValidatorCache, getPosValidators, getAllValidators } = require('./validators');
+const { getPosValidatorsStatusCount } = require('./statusCount');
 
 module.exports = {
 	// Stakes
@@ -44,4 +45,5 @@ module.exports = {
 	reloadValidatorCache,
 	getPosValidators,
 	getAllValidators,
+	getPosValidatorsStatusCount,
 };

@@ -23,6 +23,7 @@ const { getPosConstants } = require('./constants');
 const { getPosLockedRewards } = require('./lockedRewards');
 const { getPosClaimableRewards } = require('./claimableRewards');
 const { getPosValidators, getAllPosValidators, getPosValidatorsByStake } = require('./validators');
+const { getPosValidatorsStatusCount } = require('./statusCount');
 
 let isPosRegistered;
 const isPosModuleRegistered = async () => {
@@ -58,4 +59,5 @@ module.exports = {
 	getPosValidators,
 	getAllPosValidators,
 	getPosValidatorsByStake,
+	getPosValidatorsStatusCount,
 };

@@ -73,6 +73,7 @@ const {
 	getPosClaimableRewards,
 	getPosUnlocks,
 	getPosConstants,
+	getPosValidatorsStatusCount,
 } = require('./pos');
 
 const {
@@ -175,6 +176,7 @@ module.exports = {
 	getPosClaimableRewards,
 	getPosUnlocks,
 	getPosConstants,
+	getPosValidatorsStatusCount,
 
 	// Schemas
 	getSchemas,

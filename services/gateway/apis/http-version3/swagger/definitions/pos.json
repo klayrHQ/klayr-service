@@ -167,6 +167,46 @@
 			}
 		}
 	},
+	"validatorsStatusCountWithEnvelope": {
+		"type": "object",
+		"required": ["data", "meta"],
+		"properties": {
+			"data": {
+				"description": "Object with the count of validators status",
+				"type": "object",
+				"properties": {
+					"active": {
+						"type": "integer",
+						"example": 10,
+						"description": "Number of active validators"
+					},
+					"ineligible": {
+						"type": "integer",
+						"example": 10,
+						"description": "Number of ineligible validators"
+					},
+					"standby": {
+						"type": "integer",
+						"example": 10,
+						"description": "Number of standby validators"
+					},
+					"punished": {
+						"type": "integer",
+						"example": 10,
+						"description": "Number of punished validators"
+					},
+					"banned": {
+						"type": "integer",
+						"example": 10,
+						"description": "Number of banned validators"
+					}
+				}
+			},
+			"meta": {
+				"type": "object"
+			}
+		}
+	},
 	"unlock": {
 		"type": "object",
 		"required": ["address", "publicKey", "name"],

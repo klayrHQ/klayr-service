@@ -21,6 +21,7 @@ const {
 	getStakes,
 	getStakers,
 	getPosClaimableRewards,
+	getPosValidatorsStatusCount,
 } = require('../controllers/pos');
 
 const regex = require('../../../shared/utils/regex');
@@ -39,6 +40,11 @@ module.exports = [
 			offset: { optional: true, type: 'number' },
 			sort: { optional: true, type: 'string' },
 		},
+	},
+	{
+		name: 'pos.validators.count',
+		controller: getPosValidatorsStatusCount,
+		params: {},
 	},
 	{
 		name: 'pos.constants',

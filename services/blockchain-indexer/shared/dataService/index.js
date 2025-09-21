@@ -59,6 +59,7 @@ const {
 	getStakers,
 	getPosUnlocks,
 	getPosClaimableRewards,
+	getPosValidatorsStatusCount,
 } = require('./pos');
 
 const {
@@ -129,6 +130,7 @@ module.exports = {
 	getStakes,
 	getStakers,
 	getPosClaimableRewards,
+	getPosValidatorsStatusCount,
 
 	// Token
 	tokenHasUserAccount,
