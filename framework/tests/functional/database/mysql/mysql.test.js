@@ -229,7 +229,7 @@ describe('Test MySQL', () => {
 		it('should get row count', async () => {
 			await blocksTable.upsert([emptyBlock, nonEmptyBlock]);
 			const count = await blocksTable.count();
-			expect(count).toBe(2);
+			expect(count).toBe('2');
 		});
 
 		it('should get row count using whereIn', async () => {
@@ -247,7 +247,7 @@ describe('Test MySQL', () => {
 				],
 			};
 			const result = await blocksTable.count(params);
-			expect(result).toBe(1);
+			expect(result).toBe('1');
 		});
 
 		it('should get row count using whereNotNull', async () => {
@@ -256,7 +256,7 @@ describe('Test MySQL', () => {
 				whereNotNull: ['generatorPublicKey', 'timestamp'],
 			};
 			const result = await blocksTable.count(params);
-			expect(result).toBe(2);
+			expect(result).toBe('2');
 		});
 
 		it('should get row count using whereNull', async () => {
@@ -265,7 +265,7 @@ describe('Test MySQL', () => {
 				whereNull: ['isFinal'],
 			};
 			const result = await blocksTable.count(params);
-			expect(result).toBe(2);
+			expect(result).toBe('2');
 		});
 
 		it('should get row count using whereNot', async () => {
@@ -277,7 +277,7 @@ describe('Test MySQL', () => {
 				},
 			};
 			const result = await blocksTable.count(params);
-			expect(result).toBe(1);
+			expect(result).toBe('1');
 		});
 
 		it('should get row count using whereNotIn', async () => {
@@ -289,7 +289,7 @@ describe('Test MySQL', () => {
 				},
 			};
 			const result = await blocksTable.count(params);
-			expect(result).toBe(0);
+			expect(result).toBe('0');
 		});
 
 		it('should get row count using whereBetween', async () => {
@@ -304,7 +304,7 @@ describe('Test MySQL', () => {
 				},
 			};
 			const result = await blocksTable.count(params);
-			expect(result).toBe(2);
+			expect(result).toBe('2');
 		});
 
 		it('should get row count using whereIn and whereNull', async () => {
@@ -323,12 +323,12 @@ describe('Test MySQL', () => {
 				whereNull: ['isFinal'],
 			};
 			const result = await blocksTable.count(params);
-			expect(result).toBe(1);
+			expect(result).toBe('1');
 		});
 
 		it('should get row count with params', async () => {
 			const count = await blocksTable.count({ id: 'not_existing_id' });
-			expect(count).toEqual(0);
+			expect(count).toEqual('0');
 		});
 
 		it('should increment column value', async () => {
@@ -385,10 +385,10 @@ describe('Test MySQL', () => {
 			const numAffectedRows = await blocksTable.delete({
 				whereIn: { property: 'id', values: existingIds },
 			});
-			expect(numAffectedRows).toEqual(existingBlockCount);
+			expect(numAffectedRows.toString()).toEqual(existingBlockCount);
 
 			const count = await blocksTable.count({});
-			expect(count).toBe(0);
+			expect(count).toBe('0');
 		});
 
 		it('should delete row', async () => {
@@ -400,10 +400,10 @@ describe('Test MySQL', () => {
 			const numAffectedRows = await blocksTable.delete({
 				whereIn: { property: 'id', values: existingId },
 			});
-			expect(numAffectedRows).toEqual(existingBlockCount);
+			expect(numAffectedRows.toString()).toEqual(existingBlockCount);
 
 			const count = await blocksTable.count({});
-			expect(count).toBe(0);
+			expect(count).toBe('0');
 		});
 
 		it('should perform batch row insert', async () => {
@@ -986,7 +986,7 @@ describe('Test MySQL', () => {
 			await commitDBTransaction(trx);
 
 			const count = await blocksTable.count();
-			expect(count).toBe(2);
+			expect(count).toBe('2');
 		});
 
 		it('should get row count using whereIn', async () => {
@@ -1008,7 +1008,7 @@ describe('Test MySQL', () => {
 				],
 			};
 			const result = await blocksTable.count(params);
-			expect(result).toBe(1);
+			expect(result).toBe('1');
 		});
 
 		it('should get row count of column using whereIn', async () => {
@@ -1030,12 +1030,12 @@ describe('Test MySQL', () => {
 				],
 			};
 			const result = await blocksTable.count(params, 'height');
-			expect(result).toBe(1);
+			expect(result).toBe('1');
 		});
 
 		it('should get row count', async () => {
 			const count = await blocksTable.count({ id: 'not_existing_id' });
-			expect(count).toEqual(0);
+			expect(count).toEqual('0');
 		});
 
 		it('should increment column value', async () => {
@@ -1068,7 +1068,7 @@ describe('Test MySQL', () => {
 			const count = await blocksTable.count({
 				[blocksTableSchema.primaryKey]: existingBlock[blocksTableSchema.primaryKey],
 			});
-			expect(count).toBe(0);
+			expect(count).toBe('0');
 		});
 
 		it('should delete rows', async () => {
@@ -1086,10 +1086,10 @@ describe('Test MySQL', () => {
 			);
 			await commitDBTransaction(trx);
 
-			expect(numAffectedRows).toEqual(existingBlockCount);
+			expect(numAffectedRows.toString()).toEqual(existingBlockCount);
 
 			const count = await blocksTable.count({});
-			expect(count).toBe(0);
+			expect(count).toBe('0');
 		});
 
 		it('should delete a row using id', async () => {
@@ -1107,10 +1107,10 @@ describe('Test MySQL', () => {
 			);
 			await commitDBTransaction(trx);
 
-			expect(numAffectedRows).toEqual(existingBlockCount);
+			expect(numAffectedRows.toString()).toEqual(existingBlockCount);
 
 			const count = await blocksTable.count({});
-			expect(count).toBe(0);
+			expect(count).toBe('0');
 		});
 
 		it('should delete a row using raw query', async () => {
@@ -1119,13 +1119,13 @@ describe('Test MySQL', () => {
 
 			await blocksTable.upsert([emptyBlock]);
 			const existingBlockCount = await blocksTable.count();
-			expect(existingBlockCount).toBe(1);
+			expect(existingBlockCount).toBe('1');
 
 			await blocksTable.rawQuery(`DELETE FROM ${tableName} WHERE id=${emptyBlock.id}`, trx);
 			await commitDBTransaction(trx);
 
 			const count = await blocksTable.count({});
-			expect(count).toBe(0);
+			expect(count).toBe('0');
 		});
 
 		it('should get row count', async () => {
@@ -1134,11 +1134,11 @@ describe('Test MySQL', () => {
 
 			await blocksTable.upsert([emptyBlock]);
 			const existingBlockCount = await blocksTable.count();
-			expect(existingBlockCount).toBe(1);
+			expect(existingBlockCount).toBe('1');
 
 			const [result] = await blocksTable.count({}, null, trx);
 			await commitDBTransaction(trx);
-			expect(result.count).toBe(1);
+			expect(result.count).toBe('1');
 		});
 
 		it('should perform batch row insert', async () => {
