@@ -89,10 +89,12 @@ const getBlockchainAppsMetaList = async params => {
 	if (defaultApps.length < limit) {
 		// Update offset and limit
 		limit -= defaultApps.length;
-		const totalDefaultAppsCount = await applicationMetadataTable.count({
-			...params,
-			isDefault: true,
-		});
+		const totalDefaultAppsCount = Number(
+			await applicationMetadataTable.count({
+				...params,
+				isDefault: true,
+			}),
+		);
 
 		offset = Math.max(offset - totalDefaultAppsCount, 0);
 
@@ -106,7 +108,7 @@ const getBlockchainAppsMetaList = async params => {
 		blockchainAppsMetaList.data = defaultApps;
 	}
 
-	const total = await applicationMetadataTable.count(params);
+	const total = Number(await applicationMetadataTable.count(params));
 
 	blockchainAppsMetaList.meta = {
 		count: blockchainAppsMetaList.data.length,
@@ -201,11 +203,13 @@ const getBlockchainAppsMetadata = async params => {
 
 		// If params.isDefault is not passed in the request then adjust the offset
 		if (!('isDefault' in params)) {
-			const totalDefaultApps = await applicationMetadataTable.count({
-				...params,
-				limit,
-				isDefault: true,
-			});
+			const totalDefaultApps = Number(
+				await applicationMetadataTable.count({
+					...params,
+					limit,
+					isDefault: true,
+				}),
+			);
 			offset = params.offset - totalDefaultApps > 0 ? params.offset - totalDefaultApps : 0;
 		}
 
@@ -242,7 +246,7 @@ const getBlockchainAppsMetadata = async params => {
 		{ concurrency: blockchainAppsMetadata.data.length },
 	);
 
-	const total = await applicationMetadataTable.count(params);
+	const total = Number(await applicationMetadataTable.count(params));
 
 	blockchainAppsMetadata.meta = {
 		count: blockchainAppsMetadata.data.length,
@@ -358,7 +362,7 @@ const getBlockchainAppsTokenMetadata = async params => {
 		{ concurrency: uniqueChainList.length },
 	);
 
-	const total = await tokenMetadataTable.count(params);
+	const total = Number(await tokenMetadataTable.count(params));
 
 	blockchainAppsTokenMetadata.meta = {
 		count: blockchainAppsTokenMetadata.data.length,
@@ -439,7 +443,7 @@ const getAllTokensMetaInNetworkByChainID = async (chainID, limit, offset, sort) 
 		'tokenID',
 		'chainName',
 	]);
-	const total = await tokenMetadataTable.count(searchParams);
+	const total = Number(await tokenMetadataTable.count(searchParams));
 	const tokensMeta = await resolveTokenMetaInfo(tokensResultSet);
 	// Fetch the data
 	return { tokensMeta, total };
@@ -471,7 +475,7 @@ const getTokensMetaByTokenIDs = async (patternTokenIDs, exactTokenIDs, limit, of
 		'tokenID',
 		'chainName',
 	]);
-	const total = await tokenMetadataTable.count(searchParams);
+	const total = Number(await tokenMetadataTable.count(searchParams));
 
 	// Fetch the data
 	const tokensMeta = await resolveTokenMetaInfo(tokensResultSet);

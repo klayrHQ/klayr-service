@@ -43,7 +43,7 @@ const setPendingIndexerLastCurrentHeight = height => {
 
 const getNumBlocksIndexed = async () => {
 	const blocksTable = await getBlocksTable();
-	return await blocksTable.count();
+	return Number(await blocksTable.count());
 };
 
 const startIndexingPendingNewBlock = async numBlocksIndexed => {

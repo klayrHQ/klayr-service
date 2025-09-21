@@ -554,7 +554,7 @@ const getBlocks = async params => {
 	}
 
 	// Handle generic queries
-	const total = await blocksTable.count(params);
+	const total = Number(await blocksTable.count(params));
 	if (total > 0) {
 		const resultSet = await blocksTable.find(
 			params,
@@ -621,7 +621,7 @@ const getBlocksAssets = async params => {
 	}
 
 	logger.debug(`Querying index to retrieve block IDs with params: ${util.inspect(params)}`);
-	const total = await blocksTable.count(params);
+	const total = Number(await blocksTable.count(params));
 	const blocksFromDB = await blocksTable.find(
 		params,
 		Object.getOwnPropertyNames(blocksTableSchema.schema),

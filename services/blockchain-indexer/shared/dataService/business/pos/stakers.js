@@ -159,7 +159,7 @@ const getStakers = async params => {
 
 	stakersResponse.meta.count = stakersResponse.data.stakers.length;
 	stakersResponse.meta.offset = params.offset;
-	stakersResponse.meta.total = await stakesTable.count(stakesQueryParams);
+	stakersResponse.meta.total = Number(await stakesTable.count(stakesQueryParams));
 
 	return stakersResponse;
 };

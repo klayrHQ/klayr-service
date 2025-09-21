@@ -52,7 +52,7 @@ const getIndexStats = async () => {
 		const blocksTable = await getBlocksTable();
 		const currentChainHeight = await getCurrentHeight();
 		const genesisHeight = await getGenesisHeight();
-		const numBlocksIndexed = await blocksTable.count();
+		const numBlocksIndexed = Number(await blocksTable.count());
 		const [lastIndexedBlock = {}] = await blocksTable.find({ sort: 'height:desc', limit: 1 }, [
 			'height',
 		]);

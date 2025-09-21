@@ -39,7 +39,7 @@ const getAvailableTokenIDs = async (params = {}) => {
 	response.meta = {
 		count: response.data.tokenIDs.length,
 		offset: params.offset,
-		total: await tokenBalancesTable.count({ distinct: 'tokenID' }),
+		total: Number(await tokenBalancesTable.count({ distinct: 'tokenID' })),
 	};
 
 	return response;

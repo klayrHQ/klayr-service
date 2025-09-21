@@ -226,7 +226,7 @@ const getTransactions = async params => {
 
 	const { order, sort, limit, offset, ...paramsWithoutOrderSortLimitOffset } = params;
 	const countParams = await validateParams(paramsWithoutOrderSortLimitOffset);
-	const total = await transactionsTable.count(countParams);
+	const total = Number(await transactionsTable.count(countParams));
 
 	params = await validateParams(params);
 

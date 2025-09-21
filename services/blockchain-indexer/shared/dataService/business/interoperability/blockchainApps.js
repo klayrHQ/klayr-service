@@ -84,7 +84,7 @@ const getBlockchainApps = async params => {
 		});
 	}
 
-	const total = await blockchainAppsTable.count(params);
+	const total = Number(await blockchainAppsTable.count(params));
 
 	const dbBlockchainApps = await blockchainAppsTable.find(
 		{ ...params, limit: params.limit || total },

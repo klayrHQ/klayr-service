@@ -1062,7 +1062,7 @@ const findMissingBlocksInRange = async (fromHeight, toHeight) => {
 
 	const blocksTable = await getBlocksTable();
 	const propBetweens = [{ property: 'height', from: fromHeight, to: toHeight }];
-	const indexedBlockCount = await blocksTable.count({ propBetweens });
+	const indexedBlockCount = Number(await blocksTable.count({ propBetweens }));
 
 	// This block helps determine empty index
 	if (indexedBlockCount < 3) {

@@ -251,7 +251,7 @@ const getEvents = async params => {
 			topicQuery.forceIndex = 'event_topics_index_topic_combination_sort';
 		}
 
-		totalFromTopicTable = await eventTopicsTable.count(topicQuery);
+		totalFromTopicTable = Number(await eventTopicsTable.count(topicQuery));
 
 		if (totalFromTopicTable > 0) {
 			const eventTopics = await eventTopicsTable.find(topicQuery, ['eventPK']);
@@ -298,7 +298,7 @@ const getEvents = async params => {
 	const total =
 		totalFromTopicTable > 0
 			? totalFromTopicTable // Count already obtained from eventTopicTable
-			: await eventsTable.count(finalParams);
+			: Number(await eventsTable.count(finalParams));
 
 	events.meta = {
 		count: events.data.length,

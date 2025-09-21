@@ -52,9 +52,15 @@ const reloadBlockchainAppsStats = async () => {
 	try {
 		const blockchainAppsTable = await getBlockchainAppsTable();
 
-		const numActivatedChains = await blockchainAppsTable.count({ status: APP_STATUS.ACTIVATED });
-		const numRegisteredChains = await blockchainAppsTable.count({ status: APP_STATUS.REGISTERED });
-		const numTerminatedChains = await blockchainAppsTable.count({ status: APP_STATUS.TERMINATED });
+		const numActivatedChains = Number(
+			await blockchainAppsTable.count({ status: APP_STATUS.ACTIVATED }),
+		);
+		const numRegisteredChains = Number(
+			await blockchainAppsTable.count({ status: APP_STATUS.REGISTERED }),
+		);
+		const numTerminatedChains = Number(
+			await blockchainAppsTable.count({ status: APP_STATUS.TERMINATED }),
+		);
 
 		const klyTokenID = await getKLYTokenID();
 		const totalSupply = await getTokenSupplyByTokenID(klyTokenID);

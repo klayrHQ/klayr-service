@@ -91,9 +91,9 @@ const getTokenTopBalances = async params => {
 	response.meta = {
 		count: response.data[tokenID].length,
 		offset: params.offset,
-		total: await tokenBalancesTable.count(params, [
-			`${tokenBalancesTableSchema.tableName}.address`,
-		]),
+		total: Number(
+			await tokenBalancesTable.count(params, [`${tokenBalancesTableSchema.tableName}.address`]),
+		),
 	};
 
 	return response;
