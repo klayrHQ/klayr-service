@@ -56,10 +56,6 @@
 				"description": "Klayr (Dynamic) Reward module API calls."
 			},
 			{
-				"name": "Legacy",
-				"description": "Klayr Legacy module API calls."
-			},
-			{
 				"name": "Network",
 				"description": "Klayr Network utility API calls."
 			},
