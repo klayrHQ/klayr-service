@@ -4171,7 +4171,7 @@ keyv@^4.0.0, keyv@^4.0.3:
 
 "klayr-service-framework@https://github.com/klayrHQ/klayr-service/raw/development/framework/dist/klayr-service-framework-1.7.0.tgz":
   version "1.7.0"
-  resolved "https://github.com/klayrHQ/klayr-service/raw/development/framework/dist/klayr-service-framework-1.7.0.tgz#5cf5d363c147d2efab805715fcac2b0e16ff8e10"
+  resolved "https://github.com/klayrHQ/klayr-service/raw/development/framework/dist/klayr-service-framework-1.7.0.tgz#965bbafc617034809f3a9978d462cb481ff2c5d9"
   dependencies:
     "@keyv/redis" "^2.1.2"
     "@log4js-node/gelf" "github:MichalTuleja/log4js-node-gelf#89d9933"
