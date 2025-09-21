@@ -242,8 +242,8 @@ const getPosValidators = async params => {
 			);
 			const {
 				generatedBlocks = 0,
-				totalCommission = BigInt('0'),
-				totalSelfStakeRewards = BigInt('0'),
+				totalCommission = '0',
+				totalSelfStakeRewards = '0',
 			} = validatorInfo;
 
 			return {
@@ -251,7 +251,7 @@ const getPosValidators = async params => {
 				generatedBlocks,
 				totalCommission,
 				totalSelfStakeRewards,
-				earnedRewards: totalCommission + totalSelfStakeRewards,
+				earnedRewards: (BigInt(totalCommission) + BigInt(totalSelfStakeRewards)).toString(),
 			};
 		},
 		{ concurrency: validators.data.length },

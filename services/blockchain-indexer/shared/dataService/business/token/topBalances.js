@@ -81,7 +81,7 @@ const getTokenTopBalances = async params => {
 			address: tokenInfo.address,
 			publicKey: tokenInfo.publicKey,
 			name: tokenInfo.name,
-			balance: BigInt(tokenInfo.balance).toString(),
+			balance: tokenInfo.balance.toString(),
 			knowledge,
 		});
 	}
