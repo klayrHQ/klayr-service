@@ -22,8 +22,12 @@ const { getPosUnlocks } = require('./unlocks');
 const { getPosConstants } = require('./constants');
 const { getPosLockedRewards } = require('./lockedRewards');
 const { getPosClaimableRewards } = require('./claimableRewards');
-const { getPosValidators, getAllPosValidators, getPosValidatorsByStake } = require('./validators');
-const { getPosValidatorsStatusCount } = require('./statusCount');
+const {
+	getPosValidators,
+	getAllPosValidators,
+	getPosValidatorsByStake,
+	getPosValidatorsStatusCount,
+} = require('./validators');
 
 let isPosRegistered;
 const isPosModuleRegistered = async () => {

@@ -273,6 +273,12 @@ const getPosValidators = async params => {
 	return parseToJSONCompatObj(validators);
 };
 
+const getPosValidatorsStatusCount = async params => {
+	const allValidators = await getAllValidators();
+	const response = await business.getPosValidatorsStatusCount({ allValidators });
+	return response;
+};
+
 // Keep the validator cache up-to-date
 const updateValidatorListEveryBlock = () => {
 	const EVENT_NEW_BLOCK = 'newBlock';
@@ -404,6 +410,7 @@ updateValidatorListEveryBlock();
 updateValidatorListOnAccountsUpdate();
 
 module.exports = {
+	getPosValidatorsStatusCount,
 	reloadValidatorCache,
 	getPosValidators,
 	getAllValidators,

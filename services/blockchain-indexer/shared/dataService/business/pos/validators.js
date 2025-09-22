@@ -23,6 +23,8 @@ const { requestConnector } = require('../../../utils/request');
 
 const { getIndexedAccountInfo } = require('../../utils/account');
 
+const MAX_CONCURRENCY = 16;
+
 const LAST_BLOCK_KEY = 'lastBlock';
 const lastBlockCache = CacheRedis(LAST_BLOCK_KEY, config.endpoints.cache);
 
@@ -93,8 +95,30 @@ const getPosValidatorsByStake = async params => {
 	return validators;
 };
 
+const getPosValidatorsStatusCount = async params => {
+	const status = {
+		data: {
+			active: 0,
+			ineligible: 0,
+			standby: 0,
+			punished: 0,
+			banned: 0,
+		},
+		meta: {},
+	};
+
+	const allValidators = params.allValidators;
+
+	await BluebirdPromise.map(allValidators, validators => status.data[validators.status]++, {
+		concurrency: Math.min(MAX_CONCURRENCY, allValidators.length),
+	});
+
+	return status;
+};
+
 module.exports = {
 	getPosValidators,
 	getAllPosValidators,
 	getPosValidatorsByStake,
+	getPosValidatorsStatusCount,
 };
