@@ -40,6 +40,10 @@
 				"description": "Klayr Validators module API calls."
 			},
 			{
+				"name": "Account",
+				"description": "Klayr account data API calls."
+			},
+			{
 				"name": "Token",
 				"description": "Klayr Token module API calls."
 			},

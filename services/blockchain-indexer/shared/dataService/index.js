@@ -110,8 +110,12 @@ const { getLegacyAccountInfo } = require('./legacy');
 const { getValidator, validateBLSKey } = require('./validator');
 const { getGenerators } = require('./generators');
 const { invokeEndpoint } = require('./invoke');
+const { getAccount } = require('./account');
 
 module.exports = {
+	// Account
+	getAccount,
+
 	// Blocks
 	formatBlock,
 	getBlocks,

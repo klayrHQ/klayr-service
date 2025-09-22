@@ -107,8 +107,12 @@ const { estimateTransactionFees } = require('./transactionsEstimateFees');
 const { invokeEndpoint } = require('./invoke');
 
 const { setFeeEstimates, getFeeEstimates, initFeeEstimates } = require('./feeEstimates');
+const { getAccount } = require('./account');
 
 module.exports = {
+	// Account
+	getAccount,
+
 	// Generators
 	getGenerators,
 	getNumberOfGenerators,

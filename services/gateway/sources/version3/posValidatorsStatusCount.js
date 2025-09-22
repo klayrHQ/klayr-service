@@ -20,7 +20,7 @@ module.exports = {
 	method: 'indexer.pos.validators.count',
 	params: {},
 	definition: {
-		data: ['data', validatorStatusCount],
+		data: validatorStatusCount,
 		meta: {},
 	},
 };
