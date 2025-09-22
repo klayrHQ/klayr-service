@@ -74,7 +74,9 @@ const getAccount = async params => {
 
 	const accountsTable = await getAccountsTable();
 
-	params.whereIn = { property: 'address', values: Array.from(addressSet) };
+	if (addressSet.size > 0) {
+		params.whereIn = { property: 'address', values: Array.from(addressSet) };
+	}
 
 	const accountsData = await accountsTable.find(
 		params,

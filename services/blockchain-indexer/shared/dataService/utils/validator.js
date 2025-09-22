@@ -27,15 +27,6 @@ const getAddressByName = async name => {
 	return null;
 };
 
-const getNameByAddress = async address => {
-	if (address) {
-		const name = await validatorCache.get(address);
-		if (name) return name;
-	}
-	return null;
-};
-
 module.exports = {
 	getAddressByName,
-	getNameByAddress,
 };

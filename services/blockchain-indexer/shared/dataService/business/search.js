@@ -4,9 +4,9 @@ const {
 	},
 } = require('klayr-service-framework');
 
-const { getNameByAddress } = require('../utils/validator');
 const { getKlayr32AddressFromHexAddress } = require('../utils/account');
 const regex = require('../../utils/regex');
+const { getNameByAddress } = require('../../utils/validator');
 
 const config = require('../../../config');
 const accountsTableSchema = require('../../database/schema/accounts');
