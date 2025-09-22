@@ -108,9 +108,9 @@ const search = async params => {
 	};
 
 	const [accounts, blocks, transactions] = await Promise.all([
-		searchAccount(params.term),
-		searchBlock(params.term),
-		searchTransaction(params.term),
+		searchAccount(params.search),
+		searchBlock(params.search),
+		searchTransaction(params.search),
 	]);
 
 	result.data.accounts = accounts;

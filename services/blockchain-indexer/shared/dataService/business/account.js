@@ -38,7 +38,7 @@ const getAccount = async params => {
 		const { publicKey, ...restParams } = params;
 		params = restParams;
 
-		const address = getKlayr32AddressFromPublicKey(params.publicKey);
+		const address = getKlayr32AddressFromPublicKey(publicKey);
 
 		// Return empty response if user specified address and publicKey pair does not match
 		if (params.address && !params.address.split(',').includes(address)) {
@@ -48,14 +48,14 @@ const getAccount = async params => {
 		addressSet.add(address);
 
 		// Index publicKey asynchronously
-		indexAccountPublicKey(params.publicKey);
+		indexAccountPublicKey(publicKey);
 	}
 
 	if (params.address) {
 		const { address, ...restParams } = params;
 		params = restParams;
 
-		const addresses = params.address.split(',');
+		const addresses = address.split(',');
 		for (let i = 0; i < addresses.length; i++) {
 			addressSet.add(addresses[i]);
 		}
@@ -65,7 +65,7 @@ const getAccount = async params => {
 		const { name, ...restParams } = params;
 		params = restParams;
 
-		const names = params.name.split(',');
+		const names = name.split(',');
 		for (let i = 0; i < names.length; i++) {
 			const address = await getAddressByName(names[i]);
 			if (address) addressSet.add(address);
