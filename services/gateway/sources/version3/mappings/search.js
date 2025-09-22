@@ -14,7 +14,7 @@ const transactionsData = {
 };
 
 module.exports = {
-	accounts: ['accounts', accountsData],
-	blocks: ['blocks', blocksData],
-	transactions: ['transactions', transactionsData],
+	accounts: ['data.accounts', accountsData],
+	blocks: ['data.blocks', blocksData],
+	transactions: ['data.transactions', transactionsData],
 };

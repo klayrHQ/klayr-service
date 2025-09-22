@@ -30,7 +30,7 @@ const searchAccount = async term => {
 
 	if (!address && regex.NAME.test(term)) {
 		const accountsTable = await getAccountsTable();
-		const accounts = await accountsTable.find({ like: { property: 'name', startsWith: term } }, [
+		const accounts = await accountsTable.find({ search: { property: 'name', startsWith: term } }, [
 			'address',
 			'name',
 		]);

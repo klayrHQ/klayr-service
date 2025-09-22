@@ -119,7 +119,10 @@ const getAccount = async params => {
 				}
 
 				const knowledge = getAccountKnowledge(acc.address);
-				const description = knowledge ? `${knowledge.owner}'s ${knowledge.description}` : undefined;
+				const description =
+					knowledge && knowledge.owner && knowledge.description
+						? `${knowledge.owner}'s ${knowledge.description}`
+						: '';
 
 				const totalBalance = tokenBalancesInfo ? tokenBalancesInfo.balance : '0';
 				const availableBalance = tokenBalancesInfo ? tokenBalancesInfo.availableBalance : '0';
