@@ -37,6 +37,7 @@ const {
 	getCurrentChainID,
 	resolveChannelInfo,
 	initFeeEstimates,
+	search,
 } = require('./business');
 
 const {
@@ -113,6 +114,9 @@ const { invokeEndpoint } = require('./invoke');
 const { getAccount } = require('./account');
 
 module.exports = {
+	// Search
+	search,
+
 	// Account
 	getAccount,
 

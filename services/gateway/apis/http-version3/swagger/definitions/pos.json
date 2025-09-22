@@ -230,9 +230,9 @@
 			},
 			"unlocking": {
 				"type": "array",
-				"required": ["validatorAddress", "amount", "unvoteHeight"],
 				"items": {
 					"type": "object",
+					"required": ["validatorAddress", "amount", "unvoteHeight"],
 					"properties": {
 						"validatorAddress": {
 							"type": "string",

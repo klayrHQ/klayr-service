@@ -44,6 +44,10 @@
 				"description": "Klayr account data API calls."
 			},
 			{
+				"name": "Search",
+				"description": "Klayr search API calls."
+			},
+			{
 				"name": "Token",
 				"description": "Klayr Token module API calls."
 			},

@@ -1,0 +1,74 @@
+{
+	"searchWithEnvelope": {
+		"type": "object",
+		"required": ["data", "meta"],
+		"properties": {
+			"data": {
+				"description": "Object with the data of search results",
+				"type": "object",
+				"properties": {
+					"accounts": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"required": ["address", "name"],
+							"properties": {
+								"address": {
+									"type": "string",
+									"example": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+									"description": "Address of the matched account search."
+								},
+								"name": {
+									"type": "string",
+									"example": "genesis_3",
+									"description": "Name of the matched account search."
+								}
+							}
+						}
+					},
+					"blocks": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"required": ["id", "height"],
+							"properties": {
+								"id": {
+									"type": "string",
+									"example": "01967dba384998026fe028119bd099ecf073c05c045381500a93d1a7c7307e5b",
+									"description": "Block ID of the matched block search."
+								},
+								"height": {
+									"type": "integer",
+									"example": 8344448,
+									"description": "Height of the matched block search."
+								}
+							}
+						}
+					},
+					"transactions": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"required": ["id", "sender"],
+							"properties": {
+								"id": {
+									"type": "string",
+									"example": "01967dba384998026fe028119bd099ecf073c05c045381500a93d1a7c7307e5b",
+									"description": "Transaction ID of the matched transaction search."
+								},
+								"sender": {
+									"type": "string",
+									"example": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+									"description": "Transaction sender of the matched transaction search."
+								}
+							}
+						}
+					}
+				}
+			},
+			"meta": {
+				"type": "object"
+			}
+		}
+	}
+}

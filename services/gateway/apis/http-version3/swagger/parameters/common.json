@@ -87,5 +87,13 @@
 		"type": "string",
 		"minLength": 1,
 		"maxLength": 64
+	},
+	"searchByNameAddressID": {
+		"name": "search",
+		"in": "query",
+		"description": "Case-insensitive search by name, address block ID, or transaction ID.",
+		"type": "string",
+		"minLength": 1,
+		"maxLength": 64
 	}
 }

@@ -18,6 +18,9 @@ const TOKEN_ID = /[0-9A-Fa-f]{16}/;
 const MAINCHAIN_ID = /^\d{2}0{6}$/;
 const NAME = /^[a-z0-9!@$&_.]{1,20}$/;
 const PUBLIC_KEY = /^([A-Fa-f0-9]{2}){32}$/;
+const ID = /^([A-Fa-f0-9]{2}){32}$/;
+const ADDRESS_HEX = /^([A-Fa-f0-9]{2}){20}$/;
+const HEIGHT = /^[0-9]+$/;
 const PRIVATE_IP_REGEX = /^(10(\.\d{1,3}){3})|((172\.(1[6-9]|2\d|3[0-1])|192\.168)(\.\d{1,3}){2})$/;
 
 module.exports = {
@@ -27,4 +30,7 @@ module.exports = {
 	PUBLIC_KEY,
 	TOKEN_ID,
 	PRIVATE_IP_REGEX,
+	HEIGHT,
+	ADDRESS_HEX,
+	ID,
 };

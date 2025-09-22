@@ -108,6 +108,7 @@ const { invokeEndpoint } = require('./invoke');
 
 const { setFeeEstimates, getFeeEstimates, initFeeEstimates } = require('./feeEstimates');
 const { getAccount } = require('./account');
+const { search } = require('./search');
 
 module.exports = {
 	// Account
@@ -212,5 +213,9 @@ module.exports = {
 	getNetworkDisconnectedPeers,
 	getNetworkPeersStatistics,
 
+	// Invoke
 	invokeEndpoint,
+
+	// Search
+	search,
 };
