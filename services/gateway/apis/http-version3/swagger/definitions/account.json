@@ -25,7 +25,7 @@
 			},
 			"description": {
 				"type": "string",
-				"example": "1",
+				"example": "Growth Fund's Hot Wallet",
 				"description": "Description of the account (if known)."
 			},
 			"tokenBalances": {
