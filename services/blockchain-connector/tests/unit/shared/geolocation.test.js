@@ -13,7 +13,7 @@ describe('getLocation', () => {
 
 		// country should be US for 8.8.8.8
 		expect(result.countryCode).toBe('US');
-		expect(result.countryName).toBe('United States');
+		expect(result.countryName).toBe('United States of America');
 
 		// hostname may or may not exist, just check field is present
 		expect(result).toHaveProperty('hostname');
