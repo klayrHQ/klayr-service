@@ -56,25 +56,6 @@ const getBlocksFromServer = async params => {
 	return blocks;
 };
 
-const getBlocksTotal = async (params, blocksResponse) => {
-	let total;
-
-	if (params.generatorAddress) {
-		total = 'total' in blocksResponse.meta ? blocksResponse.meta.total : null;
-	} else if (params.blockID || !Number.isNaN(Number(params.height))) {
-		total = blocksResponse.data.length;
-	} else if (
-		(params.height && params.height.includes(':')) ||
-		(params.timestamp && params.timestamp.includes(':'))
-	) {
-		total = blocksResponse.meta.total;
-	} else {
-		total = (await getTotalNumberOfBlocks()) || blocksResponse.data.length;
-	}
-
-	return total;
-};
-
 const formatBlock = async (blockInfo, isDeletedBlock = false) => {
 	const blocksResponse = {
 		data: [],
@@ -96,7 +77,7 @@ const formatBlock = async (blockInfo, isDeletedBlock = false) => {
 		meta: {
 			count: blocksResponse.data.length,
 			offset: 0,
-			total: await getBlocksTotal({}, blocksResponse),
+			total: (await getTotalNumberOfBlocks()) || blocksResponse.data.length,
 		},
 	};
 };
@@ -111,14 +92,7 @@ const getBlocks = async (params = {}) => {
 	if (response.data) blocksResponse.data = response.data;
 	if (response.meta) blocksResponse.meta = response.meta;
 
-	return {
-		data: blocksResponse.data,
-		meta: {
-			count: blocksResponse.data.length,
-			offset: parseInt(params.offset, 10) || 0,
-			total: await getBlocksTotal(params, blocksResponse),
-		},
-	};
+	return response;
 };
 
 const getBlocksAssets = async params => {
