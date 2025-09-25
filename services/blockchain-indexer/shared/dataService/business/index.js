@@ -33,6 +33,7 @@ const {
 	getTransactionsByIDs,
 	normalizeTransaction,
 	formatTransactionsInBlock,
+	getTotalTransactions,
 } = require('./transactions');
 
 const {
@@ -107,12 +108,13 @@ const { estimateTransactionFees } = require('./transactionsEstimateFees');
 const { invokeEndpoint } = require('./invoke');
 
 const { setFeeEstimates, getFeeEstimates, initFeeEstimates } = require('./feeEstimates');
-const { getAccount } = require('./account');
+const { getAccount, getTotalAccounts } = require('./account');
 const { search } = require('./search');
 
 module.exports = {
 	// Account
 	getAccount,
+	getTotalAccounts,
 
 	// Generators
 	getGenerators,
@@ -142,6 +144,7 @@ module.exports = {
 	dryRunTransactions,
 	estimateTransactionFees,
 	formatTransactionsInBlock,
+	getTotalTransactions,
 
 	// Events
 	getEvents,

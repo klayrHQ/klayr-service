@@ -44,6 +44,12 @@ const transactionCache = CacheLRU('transaction');
 
 const getTransactionsTable = () => getTableInstance(transactionsTableSchema, MYSQL_ENDPOINT);
 
+const getTotalTransactions = async () => {
+	const transactionsTable = await getTransactionsTable();
+	const total = Number(await transactionsTable.count());
+	return total;
+};
+
 const getTransactionByIDFromDB = async id => {
 	const transactionsTable = await getTransactionsTable();
 
@@ -366,6 +372,7 @@ module.exports = {
 	getTransactionsByIDs,
 	normalizeTransaction,
 	formatTransactionsInBlock,
+	getTotalTransactions,
 
 	// for db indexnig use
 	formatTransactionResponseFromDB,

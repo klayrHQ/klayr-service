@@ -27,6 +27,8 @@ module.exports = {
 			escrowedAmounts: ['data.escrowedAmounts', escrowedAmount],
 			supportedTokens: supportedToken,
 			totalSupply: ['data.totalSupply', totalSupplyByToken],
+			totalAccounts: '=,number',
+			totalTransactions: '=,number',
 		},
 		meta: {},
 	},

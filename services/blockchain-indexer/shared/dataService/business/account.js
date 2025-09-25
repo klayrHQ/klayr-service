@@ -22,6 +22,12 @@ const getAuthTable = () => getTableInstance(authTableSchema, MYSQL_ENDPOINT);
 
 const MAX_CONCURRENCY = 16;
 
+const getTotalAccounts = async () => {
+	const accountsTable = await getAccountsTable();
+	const total = Number(await accountsTable.count());
+	return total;
+};
+
 const getAccount = async params => {
 	const account = {
 		data: [],
@@ -156,4 +162,4 @@ const getAccount = async params => {
 	return account;
 };
 
-module.exports = { getAccount };
+module.exports = { getAccount, getTotalAccounts };

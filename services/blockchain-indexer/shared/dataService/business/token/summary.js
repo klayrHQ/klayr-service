@@ -21,6 +21,8 @@ const {
 const { getTokenEscrowed } = require('../../recorder/token/escrowed');
 const { getTokenSupply } = require('../../recorder/token/supply');
 const { getSupportedTokens } = require('../../recorder/token/supported');
+const { getTotalAccounts } = require('../account');
+const { getTotalTransactions } = require('../transactions');
 
 const getTokenSummary = async () => {
 	const summary = {
@@ -30,8 +32,9 @@ const getTokenSummary = async () => {
 
 	const escrowedAmounts = await getTokenEscrowed();
 	const supportedTokenIDs = await getSupportedTokens();
-
 	const totalSupply = await getTokenSupply();
+	const totalAccounts = await getTotalAccounts();
+	const totalTranasctions = await getTotalTransactions();
 
 	const supportedTokens = {
 		isSupportAllTokens: false,
@@ -58,6 +61,8 @@ const getTokenSummary = async () => {
 			patternTokenIDs: [...new Set(supportedTokens.patternTokenIDs)],
 		},
 		totalSupply,
+		totalAccounts,
+		totalTranasctions,
 	};
 
 	return summary;
