@@ -24,6 +24,8 @@ const {
 	getPosValidators,
 	getAllValidators,
 	getPosValidatorsStatusCount,
+	reloadValidatorRewardCache,
+	getValidatorReward,
 } = require('./validators');
 
 module.exports = {
@@ -50,4 +52,6 @@ module.exports = {
 	getPosValidators,
 	getAllValidators,
 	getPosValidatorsStatusCount,
+	reloadValidatorRewardCache,
+	getValidatorReward,
 };

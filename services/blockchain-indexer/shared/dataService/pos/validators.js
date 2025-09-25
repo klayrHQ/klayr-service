@@ -37,9 +37,10 @@ const { MODULE, COMMAND } = require('../../constants');
 const { sortComparator } = require('../../utils/array');
 const { parseToJSONCompatObj } = require('../../utils/parser');
 const { updateAccountInfo, getKlayr32AddressFromPublicKey } = require('../../utils/account');
+const { indexAccountPublicKey } = require('../../indexer/accountIndex');
+const { requestConnector } = require('../../utils/request');
 
 const validatorsTableSchema = require('../../database/schema/validators');
-const { indexAccountPublicKey } = require('../../indexer/accountIndex');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
@@ -58,6 +59,45 @@ const VALIDATOR_STATUS = {
 };
 
 let validatorList = [];
+
+const validatorRewardCache = new Map();
+
+const reloadValidatorRewardCache = async () => {
+	try {
+		validatorRewardCache.clear();
+
+		const allActiveValidators = await getPosValidators({ status: 'active' });
+
+		for (let i = 0; i < allActiveValidators.data.length; i++) {
+			const validator = allActiveValidators.data[i];
+			const expectedReward = await requestConnector('getExpectedValidatorRewards', {
+				validatorAddress: validator.address,
+			});
+			validatorRewardCache.set(validator.address, expectedReward);
+		}
+		logger.info(
+			`Updated validator reward list cache with ${validatorRewardCache.size} active validators.`,
+		);
+	} catch (err) {
+		logger.warn(`Failed to update validator reward cache due to: ${err.message}`);
+		throw err;
+	}
+};
+
+const getValidatorReward = async validatorAddress => {
+	if (validatorRewardCache.size === 0) await reloadValidatorRewardCache();
+
+	if (!validatorRewardCache.has(validatorAddress)) {
+		return {
+			blockReward: '0',
+			dailyReward: '0',
+			monthlyReward: '0',
+			yearlyReward: '0',
+		};
+	}
+
+	return validatorRewardCache.get(validatorAddress);
+};
 
 const validatorComparator = (a, b) => {
 	const diff = BigInt(b.validatorWeight) - BigInt(a.validatorWeight);
@@ -248,7 +288,7 @@ const getPosValidators = async params => {
 				totalSelfStakeRewards = '0',
 			} = validatorInfo;
 
-			const validatorReward = await business.getValidatorReward(validator.address);
+			const validatorReward = await getValidatorReward(validator.address);
 			const generatorData = generators.find(generator => generator.address === validator.address);
 			const nextAllocatedTime = generatorData ? generatorData.nextAllocatedTime : 0;
 
@@ -422,6 +462,8 @@ module.exports = {
 	reloadValidatorCache,
 	getPosValidators,
 	getAllValidators,
+	reloadValidatorRewardCache,
+	getValidatorReward,
 
 	// For testing
 	validatorComparator,

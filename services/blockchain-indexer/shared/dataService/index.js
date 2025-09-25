@@ -61,6 +61,8 @@ const {
 	getPosUnlocks,
 	getPosClaimableRewards,
 	getPosValidatorsStatusCount,
+	reloadValidatorRewardCache,
+	getValidatorReward,
 } = require('./pos');
 
 const {
@@ -139,6 +141,8 @@ module.exports = {
 	getStakers,
 	getPosClaimableRewards,
 	getPosValidatorsStatusCount,
+	reloadValidatorRewardCache,
+	getValidatorReward,
 
 	// Token
 	tokenHasUserAccount,

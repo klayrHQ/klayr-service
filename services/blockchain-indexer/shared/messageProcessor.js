@@ -37,12 +37,10 @@ const {
 	getGenerators,
 	getNumberOfGenerators,
 	formatPendingTransaction,
+	reloadValidatorRewardCache,
 } = require('./dataService');
 const { accountAddrUpdateQueue } = require('./indexer/accountIndex');
 const { indexPendingNewBlock } = require('./indexer/pendingBlockchainIndex');
-const {
-	reloadValidatorRewardCache,
-} = require('./dataService/business/dynamicReward/validatorsReward');
 
 const STATS_INTERVAL = 1 * 60 * 1000; // ms
 

@@ -81,8 +81,6 @@ const {
 	getDefaultRewardAtHeight,
 	getAnnualInflation,
 	getRewardConstants,
-	reloadValidatorRewardCache,
-	getValidatorReward,
 } = require('./dynamicReward');
 
 const { getSchemas } = require('./schemas');
@@ -205,8 +203,6 @@ module.exports = {
 	getAnnualInflation,
 	getDefaultRewardAtHeight,
 	getRewardConstants,
-	reloadBlockchainAppsStats,
-	getValidatorReward,
 
 	// Fee estimates
 	initFeeEstimates,

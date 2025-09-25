@@ -16,13 +16,10 @@
 const { getDefaultRewardAtHeight } = require('./defaultReward');
 const { getAnnualInflation } = require('./annualInflation');
 const { getRewardTokenID, getRewardConstants } = require('./constants');
-const { reloadValidatorRewardCache, getValidatorReward } = require('./validatorsReward');
 
 module.exports = {
 	getDefaultRewardAtHeight,
 	getAnnualInflation,
 	getRewardTokenID,
 	getRewardConstants,
-	reloadValidatorRewardCache,
-	getValidatorReward,
 };
