@@ -65,7 +65,11 @@ describe('updateAccountInfoPk', () => {
 		});
 
 		// Mock the Redis instance
-		jest.mock('ioredis', () => jest.fn());
+		const Redis = require('ioredis');
+		jest.mock('ioredis');
+		Redis.mockImplementation(() => ({
+			sadd: jest.fn(),
+		}));
 
 		// Act
 		const { updateAccountInfoPk } = require(accountIndexFilePath);
@@ -196,11 +200,15 @@ describe('updateAccountInfoAddr', () => {
 		});
 
 		// Mock the Redis instance
-		jest.mock('ioredis', () => jest.fn());
+		const Redis = require('ioredis');
+		jest.mock('ioredis');
+		Redis.mockImplementation(() => ({
+			sadd: jest.fn(),
+		}));
 
 		// Act
 		const { updateAccountInfoAddr } = require(accountIndexFilePath);
-		const job = { data: mockAddress };
+		const job = { data: { address: mockAddress } };
 		await updateAccountInfoAddr(job);
 	});
 
@@ -244,7 +252,7 @@ describe('updateAccountInfoAddr', () => {
 		}));
 
 		const { updateAccountInfoAddr } = require(accountIndexFilePath);
-		const job = { data: mockAddress };
+		const job = { data: { address: mockAddress } };
 		await updateAccountInfoAddr(job);
 	});
 
@@ -286,7 +294,7 @@ describe('updateAccountInfoAddr', () => {
 		}));
 
 		const { updateAccountInfoAddr } = require(accountIndexFilePath);
-		const job = { data: mockAddress };
+		const job = { data: { address: mockAddress } };
 		await updateAccountInfoAddr(job);
 	});
 });

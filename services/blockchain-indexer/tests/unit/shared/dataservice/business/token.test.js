@@ -99,6 +99,8 @@ describe('getTokenTopBalances', () => {
 						publicKey: 'publicKey123',
 						name: 'name123',
 						balance: '100',
+						availableBalance: '100',
+						lockedBalance: '0',
 						knowledge: 'knowledge123',
 					},
 					{
@@ -106,6 +108,8 @@ describe('getTokenTopBalances', () => {
 						publicKey: 'publicKey456',
 						name: 'name456',
 						balance: '200',
+						availableBalance: '200',
+						lockedBalance: '0',
 						knowledge: 'knowledge234',
 					},
 				],

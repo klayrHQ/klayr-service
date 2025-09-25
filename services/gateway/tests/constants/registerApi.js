@@ -16,6 +16,7 @@
 const expectedResponseForRegisterHttpApi = [
 	{
 		whitelist: [
+			'indexer.account',
 			'indexer.blocks.assets',
 			'indexer.blockchain.apps',
 			'app-registry.blockchain.apps.meta.list',
@@ -35,6 +36,7 @@ const expectedResponseForRegisterHttpApi = [
 			'indexer.network.status',
 			'indexer.transactions.post',
 			'indexer.schemas',
+			'indexer.search',
 			'gateway.spec',
 			'indexer.transactions',
 			'indexer.transactions.dryrun',
@@ -48,6 +50,7 @@ const expectedResponseForRegisterHttpApi = [
 			'indexer.pos.stakes',
 			'indexer.pos.unlocks',
 			'indexer.pos.validators',
+			'indexer.pos.validators.count',
 			'indexer.token.account.exists',
 			'indexer.token.available-ids',
 			'indexer.token.constants',
@@ -59,6 +62,7 @@ const expectedResponseForRegisterHttpApi = [
 			'export.transactions.schedule',
 		],
 		aliases: {
+			'GET account': { action: 'indexer.account' },
 			'GET blocks/assets': { action: 'indexer.blocks.assets' },
 			'GET blockchain/apps': { action: 'indexer.blockchain.apps' },
 			'GET blockchain/apps/meta/list': { action: 'app-registry.blockchain.apps.meta.list' },
@@ -80,6 +84,7 @@ const expectedResponseForRegisterHttpApi = [
 			'GET network/status': { action: 'indexer.network.status' },
 			'POST transactions': { action: 'indexer.transactions.post' },
 			'GET schemas': { action: 'indexer.schemas' },
+			'GET search': { action: 'indexer.search' },
 			'GET spec': { action: 'gateway.spec' },
 			'GET transactions': { action: 'indexer.transactions' },
 			'POST transactions/dryrun': { action: 'indexer.transactions.dryrun' },
@@ -93,6 +98,7 @@ const expectedResponseForRegisterHttpApi = [
 			'GET pos/stakes': { action: 'indexer.pos.stakes' },
 			'GET pos/unlocks': { action: 'indexer.pos.unlocks' },
 			'GET pos/validators': { action: 'indexer.pos.validators' },
+			'GET pos/validators/status-count': { action: 'indexer.pos.validators.count' },
 			'GET token/account/exists': { action: 'indexer.token.account.exists' },
 			'GET token/available-ids': { action: 'indexer.token.available-ids' },
 			'GET token/constants': { action: 'indexer.token.constants' },
@@ -120,6 +126,7 @@ const expectedResponseForRegisterRpcApi = {
 	events: {
 		request: {
 			whitelist: [
+				'indexer.account',
 				'indexer.blocks.assets',
 				'indexer.blockchain.apps',
 				'app-registry.blockchain.apps.meta.list',
@@ -139,6 +146,7 @@ const expectedResponseForRegisterRpcApi = {
 				'indexer.network.status',
 				'indexer.transactions.post',
 				'indexer.schemas',
+				'indexer.search',
 				'indexer.transactions',
 				'indexer.transactions.dryrun',
 				'indexer.transactions.estimate-fees',
@@ -151,6 +159,7 @@ const expectedResponseForRegisterRpcApi = {
 				'indexer.pos.stakes',
 				'indexer.pos.unlocks',
 				'indexer.pos.validators',
+				'indexer.pos.validators.count',
 				'indexer.token.account.exists',
 				'indexer.token.available-ids',
 				'indexer.token.balances',
@@ -162,6 +171,7 @@ const expectedResponseForRegisterRpcApi = {
 				'export.transactions.schedule',
 			],
 			aliases: {
+				'get.account': 'indexer.account',
 				'get.blocks.assets': 'indexer.blocks.assets',
 				'get.blockchain.apps': 'indexer.blockchain.apps',
 				'get.blockchain.apps.meta.list': 'app-registry.blockchain.apps.meta.list',
@@ -182,6 +192,7 @@ const expectedResponseForRegisterRpcApi = {
 				'get.network.status': 'indexer.network.status',
 				'post.transactions': 'indexer.transactions.post',
 				'get.schemas': 'indexer.schemas',
+				'get.search': 'indexer.search',
 				'get.transactions': 'indexer.transactions',
 				'post.transactions.estimate-fees': 'indexer.transactions.estimate-fees',
 				'post.transactions.dryrun': 'indexer.transactions.dryrun',
@@ -194,6 +205,7 @@ const expectedResponseForRegisterRpcApi = {
 				'get.pos.stakes': 'indexer.pos.stakes',
 				'get.pos.unlocks': 'indexer.pos.unlocks',
 				'get.pos.validators': 'indexer.pos.validators',
+				'get.pos.validators.count': 'indexer.pos.validators.count',
 				'get.token.account.exists': 'indexer.token.account.exists',
 				'get.token.balances': 'indexer.token.balances',
 				'get.token.balances.top': 'indexer.token.balances.top',

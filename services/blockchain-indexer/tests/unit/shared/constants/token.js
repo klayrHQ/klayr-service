@@ -10,12 +10,16 @@ const mockTokenTopBalancesTokenInfos = [
 		publicKey: 'publicKey123',
 		name: 'name123',
 		balance: '100',
+		availableBalance: '100',
+		lockedBalance: '0',
 	},
 	{
 		address: 'address456',
 		publicKey: 'publicKey456',
 		name: 'name456',
 		balance: '200',
+		availableBalance: '200',
+		lockedBalance: '0',
 	},
 ];
 const mockTokenTopBalancesDbSearchResult = {
