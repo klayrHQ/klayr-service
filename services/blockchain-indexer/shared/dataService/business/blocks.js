@@ -508,6 +508,9 @@ const getBlocks = async params => {
 		meta: {},
 	};
 
+	const { inlcudeAssets, ...restParams } = params;
+	params = restParams;
+
 	if (params.blockID) {
 		const { blockID, ...remParams } = params;
 		params = remParams;
@@ -565,6 +568,7 @@ const getBlocks = async params => {
 			block => {
 				return {
 					...block,
+					assets: inlcudeAssets ? JSONParseDB(block.assets) : [],
 					aggregateCommit: JSONParseDB(block.aggregateCommit),
 					generator: JSONParseDB(block.generator),
 				};

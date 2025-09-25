@@ -16,7 +16,8 @@
 			"validatorsHash",
 			"aggregateCommit",
 			"signature",
-			"isFinal"
+			"isFinal",
+			"assets"
 		],
 		"properties": {
 			"id": {
@@ -166,6 +167,30 @@
 			"isFinal": {
 				"type": "boolean",
 				"example": "true"
+			},
+			"assets": {
+				"type": "array",
+				"required": ["module", "data"],
+				"items": {
+					"type": "object",
+					"properties": {
+						"module": {
+							"type": "string",
+							"example": "random",
+							"description": "Name of the blockchain module associated with the assets."
+						},
+						"data": {
+							"type": "object",
+							"properties": {
+								"seedReveal": {
+									"type": "string",
+									"example": "c555338417025a5b2b9278304f8a96be"
+								}
+							},
+							"description": "The data object schema varies by module. The exact schema can be found from the `/schemas` endpoint."
+						}
+					}
+				}
 			}
 		}
 	},

@@ -45,4 +45,11 @@ module.exports = {
 	signature: '=,string',
 	reward: '=,string',
 	isFinal: '=,boolean',
+	assets: [
+		'assets',
+		{
+			module: '=,string',
+			data: '=',
+		},
+	],
 };
