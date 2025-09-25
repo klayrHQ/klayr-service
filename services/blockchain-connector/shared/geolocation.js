@@ -13,86 +13,38 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const crypto = require('crypto');
-const { HTTP, CacheRedis, Logger } = require('klayr-service-framework');
+const geoip = require('geoip-lite');
+const countries = require('i18n-iso-countries');
+const dns = require('dns').promises;
 
-const requestLib = HTTP.request;
-const logger = Logger();
+// Load English names for country codes
+countries.registerLocale(require('i18n-iso-countries/langs/en.json'));
 
-const config = require('../config');
+async function getLocation(ip) {
+	const geo = geoip.lookup(ip);
 
-const GEOIP_TTL = 12 * 60 * 60 * 1000; // ms
-const REQUEST_LATENCY = 2000; // ms
-const SCHEDULE_INTERVAL = 60 * 1000; // ms
-const SCHEDULE_MAX_LENGTH = 1000; // items
-const SCHEDULE_CLEANUP_INTERVAL = 1 * 60 * 1000; // ms
-
-const freegeoAddress = config.endpoints.geoip;
-
-const cacheRedis = CacheRedis('geodata', config.endpoints.redis);
-
-const refreshSchedule = [];
-
-const getRandInt = max => crypto.randomInt(max);
-
-const httpTest = new RegExp('http:*');
-
-const getFromHttp = ip =>
-	new Promise((resolve, reject) => {
-		if (httpTest.test(freegeoAddress)) {
-			requestLib(`${freegeoAddress}/${ip}`)
-				.then(body => {
-					let jsonContent;
-					if (typeof body === 'string') jsonContent = JSON.parse(body);
-					else jsonContent = body;
-					return resolve(jsonContent);
-				})
-				.catch(err => {
-					reject(err);
-				});
-		}
-	});
-
-const requestData = async requestedIp => {
-	const key = `geoip:${requestedIp}`;
-
-	const refreshData = ip =>
-		getFromHttp(ip)
-			.then(data => {
-				if (data) cacheRedis.set(key, data.data, GEOIP_TTL);
-				logger.debug(`Fetched geolocation data from online service for IP ${ip}.`);
-				refreshSchedule.push(
-					setTimeout(
-						() => refreshData(ip),
-						GEOIP_TTL - (getRandInt(SCHEDULE_INTERVAL) + REQUEST_LATENCY),
-					),
-				);
-			})
-			.catch(err => {
-				logger.warn(`Could not retrieve geolocation data: ${err.message}`);
-			});
-
-	const geodata = await cacheRedis.get(key);
-	if (!geodata) {
-		refreshData(requestedIp);
+	if (!geo) {
+		return { error: 'IP not found in database' };
 	}
-	return geodata;
-};
 
-const autoCleanUp = () =>
-	setInterval(() => {
-		const tooMuch = refreshSchedule.splice(0, refreshSchedule.length - SCHEDULE_MAX_LENGTH);
-		for (let i = 0; i < tooMuch.length; i++) clearInterval(tooMuch[i]);
-		logger.debug(
-			`Cache queue: Removed ${tooMuch.length} items, ${refreshSchedule.length} last elements left.`,
-		);
-	}, SCHEDULE_CLEANUP_INTERVAL);
+	let hostname = null;
+	try {
+		const result = await dns.reverse(ip);
+		hostname = result[0];
+	} catch {
+		hostname = null;
+	}
 
-autoCleanUp();
+	return {
+		countryCode: geo.country,
+		countryName: countries.getName(geo.country, 'en'),
+		hostname,
+		ip,
+		latitude: geo.ll[0],
+		longitude: geo.ll[1],
+	};
+}
 
 module.exports = {
-	requestData,
-
-	// Testing
-	getRandInt,
+	getLocation,
 };

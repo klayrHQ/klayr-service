@@ -52,7 +52,7 @@ const refactorPeer = (orgPeer, state) => {
 
 const addLocation = async ipAddress => {
 	try {
-		const result = await GeoService.requestData(ipAddress);
+		const result = await GeoService.getLocation(ipAddress);
 		return result;
 	} catch (e) {
 		return {};

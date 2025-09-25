@@ -1,57 +1,26 @@
-/*
- * Klayrhq/klayrservice
- * Copyright © 2023 Lisk Foundation
- *
- * See the LICENSE file at the top-level directory of this distribution
- * for licensing information.
- *
- * Unless otherwise agreed in a custom licensing agreement with the Lisk Foundation,
- * no part of this software, including this file, may be copied, modified,
- * propagated, or distributed except according to the terms contained in the
- * LICENSE file.
- *
- * Removal or modification of this copyright notice is prohibited.
- *
- */
-jest.useFakeTimers();
+const { getLocation } = require('../../../shared/geolocation');
 
-const { getRandInt } = require('../../../shared/geolocation'); // Replace with the actual path to your file
+describe('getLocation', () => {
+	it('should return geolocation info for a known IP', async () => {
+		const ip = '8.8.8.8'; // Google DNS
+		const result = await getLocation(ip);
 
-describe('getRandInt', () => {
-	it('should return a value less than max', () => {
-		const max = 100;
-		const randomValue = getRandInt(max);
-		expect(randomValue).toBeLessThan(max);
+		expect(result).toHaveProperty('countryCode');
+		expect(result).toHaveProperty('countryName');
+		expect(result).toHaveProperty('ip', ip);
+		expect(result).toHaveProperty('latitude');
+		expect(result).toHaveProperty('longitude');
+
+		// country should be US for 8.8.8.8
+		expect(result.countryCode).toBe('US');
+		expect(result.countryName).toBe('United States');
+
+		// hostname may or may not exist, just check field is present
+		expect(result).toHaveProperty('hostname');
 	});
 
-	it('should return a non-negative value', () => {
-		const max = 100;
-		const randomValue = getRandInt(max);
-		expect(randomValue).toBeGreaterThanOrEqual(0);
-	});
-
-	it('should return an integer value', () => {
-		const max = 100;
-		const randomValue = getRandInt(max);
-		expect(Number.isInteger(randomValue)).toBe(true);
-	});
-
-	it('should handle max equal to 1', () => {
-		const max = 1;
-		const randomValue = getRandInt(max);
-		expect(randomValue).toBe(0);
-	});
-
-	it('should handle large max values', () => {
-		const max = 1000000;
-		const randomValue = getRandInt(max);
-		expect(randomValue).toBeLessThan(max);
-	});
-
-	it('should handle consecutive calls', () => {
-		const max = 100;
-		const randomValue1 = getRandInt(max);
-		const randomValue2 = getRandInt(max);
-		expect(randomValue1).not.toBe(randomValue2);
+	it('should return error for invalid IP', async () => {
+		const result = await getLocation('999.999.999.999');
+		expect(result).toHaveProperty('error');
 	});
 });

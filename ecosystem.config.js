@@ -118,7 +118,6 @@ module.exports = {
 				// KLAYR_APP_URLS: 'ws://127.0.0.1:7887',
 				// KLAYR_EVENT_SUBSCRIBER_NODE: 'ws://127.0.0.1:7887',
 				// SERVICE_CONNECTOR_MYSQL: 'mysql://klayr:password@127.0.0.1:3306/klayr',
-				// GEOIP_JSON: 'https://geoip.klayr.com/json',
 				// EXPIRY_IN_HOURS: 12,
 				// ENABLE_TESTING_MODE: false,
 				// SERVICE_BROKER_TIMEOUT: 10,
