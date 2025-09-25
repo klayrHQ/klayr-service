@@ -85,6 +85,7 @@ const {
 	getAnnualInflation,
 	getDefaultRewardAtHeight,
 	cacheRegisteredRewardModule,
+	getExpectedValidatorRewards,
 } = require('./dynamicReward');
 
 const { getFeeTokenID, getMinFeePerByte, cacheFeeConstants } = require('./fee');
@@ -204,6 +205,7 @@ module.exports = {
 	getRewardTokenID,
 	getAnnualInflation,
 	getDefaultRewardAtHeight,
+	getExpectedValidatorRewards,
 
 	// Fee
 	getFeeTokenID,
