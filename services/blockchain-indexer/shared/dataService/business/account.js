@@ -9,6 +9,7 @@ const { getAccountKnowledge } = require('../knownAccounts');
 
 const config = require('../../../config');
 const accountsTableSchema = require('../../database/schema/accounts');
+const tokenAccountTableSchema = require('../../database/schema/tokenAccount');
 const tokenBalancesTableSchema = require('../../database/schema/tokenBalances');
 const authTableSchema = require('../../database/schema/auth');
 const { getKlayr32AddressFromPublicKey } = require('../../utils/account');
@@ -17,14 +18,15 @@ const { getAddressByName } = require('../utils/validator');
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
 const getAccountsTable = () => getTableInstance(accountsTableSchema, MYSQL_ENDPOINT);
+const getTokenAccountTable = () => getTableInstance(tokenAccountTableSchema, MYSQL_ENDPOINT);
 const getTokenBalancesTable = () => getTableInstance(tokenBalancesTableSchema, MYSQL_ENDPOINT);
 const getAuthTable = () => getTableInstance(authTableSchema, MYSQL_ENDPOINT);
 
 const MAX_CONCURRENCY = 16;
 
 const getTotalAccounts = async () => {
-	const accountsTable = await getAccountsTable();
-	const total = Number(await accountsTable.count());
+	const tokenAccountTable = await getTokenAccountTable();
+	const total = Number(await tokenAccountTable.count());
 	return total;
 };
 
@@ -78,25 +80,26 @@ const getAccount = async params => {
 		}
 	}
 
-	const accountsTable = await getAccountsTable();
-
 	if (addressSet.size > 0) {
 		params.whereIn = { property: 'address', values: Array.from(addressSet) };
 	}
 
-	const accountsData = await accountsTable.find(
+	const tokenAccountTable = await getTokenAccountTable();
+
+	const tokenAccountData = await tokenAccountTable.find(
 		params,
-		Object.getOwnPropertyNames(accountsTableSchema.schema),
+		Object.getOwnPropertyNames(tokenAccountTableSchema.schema),
 	);
-	const total = Number(await accountsTable.count(params));
+	const total = Number(await tokenAccountTable.count(params));
 
 	if (total > 0) {
 		const tokenBalancesTable = await getTokenBalancesTable();
 		const authTable = await getAuthTable();
+		const accountsTable = await getAccountsTable();
 
-		const addressList = accountsData.map(t => t.address);
+		const addressList = tokenAccountData.map(t => t.address);
 
-		const [tokenBalancesData, authData] = await Promise.all([
+		const [tokenBalancesData, authData, accountsData] = await Promise.all([
 			tokenBalancesTable.find(
 				{ whereIn: { property: 'address', values: addressList } },
 				Object.getOwnPropertyNames(tokenBalancesTableSchema.schema),
@@ -105,10 +108,14 @@ const getAccount = async params => {
 				{ whereIn: { property: 'address', values: addressList } },
 				Object.getOwnPropertyNames(authTableSchema.schema),
 			),
+			accountsTable.find(
+				{ whereIn: { property: 'address', values: addressList } },
+				Object.getOwnPropertyNames(accountsTableSchema.schema),
+			),
 		]);
 
 		await BluebirdPromise.map(
-			accountsData,
+			tokenAccountData,
 			async acc => {
 				let tokenBalancesInfo;
 				for (let i = 0; i < tokenBalancesData.length; i++) {
@@ -126,6 +133,14 @@ const getAccount = async params => {
 					}
 				}
 
+				let accountInfo;
+				for (let i = 0; i < accountsData.length; i++) {
+					if (accountsData[i].address === acc.address) {
+						accountInfo = accountsData[i];
+						break;
+					}
+				}
+
 				const knowledge = getAccountKnowledge(acc.address);
 				const description =
 					knowledge && knowledge.owner && knowledge.description
@@ -138,8 +153,8 @@ const getAccount = async params => {
 
 				account.data.push({
 					address: acc.address,
-					publicKey: acc.publicKey,
-					name: acc.name,
+					publicKey: accountInfo ? accountInfo.publicKey : '',
+					name: accountInfo ? accountInfo.name : '',
 					nonce: authInfo ? authInfo.nonce : '0',
 					description,
 					tokenBalances: {
@@ -149,12 +164,12 @@ const getAccount = async params => {
 					},
 				});
 			},
-			{ concurrency: Math.min(accountsData.length, MAX_CONCURRENCY) },
+			{ concurrency: Math.min(tokenAccountData.length, MAX_CONCURRENCY) },
 		);
 	}
 
 	account.meta = {
-		count: accountsData.length,
+		count: tokenAccountData.length,
 		offset: params.offset,
 		total,
 	};
