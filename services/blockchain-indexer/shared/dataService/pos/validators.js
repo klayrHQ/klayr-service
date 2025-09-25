@@ -66,10 +66,13 @@ const reloadValidatorRewardCache = async () => {
 	try {
 		validatorRewardCache.clear();
 
-		const allActiveValidators = await getPosValidators({ status: 'active' });
+		const allValidators = await getAllValidators();
+		const allActiveValidators = allValidators.filter(
+			validator => validator.status === VALIDATOR_STATUS.ACTIVE,
+		);
 
-		for (let i = 0; i < allActiveValidators.data.length; i++) {
-			const validator = allActiveValidators.data[i];
+		for (let i = 0; i < allActiveValidators.length; i++) {
+			const validator = allActiveValidators[i];
 			const expectedReward = await requestConnector('getExpectedValidatorRewards', {
 				validatorAddress: validator.address,
 			});

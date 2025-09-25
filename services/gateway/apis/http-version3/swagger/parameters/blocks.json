@@ -24,10 +24,11 @@
 		"type": "string",
 		"minLength": 1
 	},
-	"inlcudeAssets": {
+	"includeAssets": {
 		"name": "includeAssets",
 		"in": "query",
 		"description": "Should include block assets in response",
-		"type": "boolean"
+		"type": "boolean",
+		"default": false
 	}
 }

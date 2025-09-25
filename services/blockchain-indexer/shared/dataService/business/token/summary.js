@@ -34,7 +34,7 @@ const getTokenSummary = async () => {
 	const supportedTokenIDs = await getSupportedTokens();
 	const totalSupply = await getTokenSupply();
 	const totalAccounts = await getTotalAccounts();
-	const totalTranasctions = await getTotalTransactions();
+	const totalTransactions = await getTotalTransactions();
 
 	const supportedTokens = {
 		isSupportAllTokens: false,
@@ -62,7 +62,7 @@ const getTokenSummary = async () => {
 		},
 		totalSupply,
 		totalAccounts,
-		totalTranasctions,
+		totalTransactions,
 	};
 
 	return summary;

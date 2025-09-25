@@ -508,7 +508,7 @@ const getBlocks = async params => {
 		meta: {},
 	};
 
-	const { inlcudeAssets, ...restParams } = params;
+	const { includeAssets, ...restParams } = params;
 	params = restParams;
 
 	if (params.blockID) {
@@ -550,6 +550,10 @@ const getBlocks = async params => {
 			if (!err.message.includes('does not exist')) throw err;
 		}
 
+		if (blocks.data.length === 1 && !includeAssets) {
+			blocks.data = [{ ...blocks.data[0], assets: [] }];
+		}
+
 		blocks.meta.count = blocks.data.length;
 		blocks.meta.offset = params.offset;
 		blocks.meta.total = blocks.data.length;
@@ -568,7 +572,7 @@ const getBlocks = async params => {
 			block => {
 				return {
 					...block,
-					assets: inlcudeAssets ? JSONParseDB(block.assets) : [],
+					assets: includeAssets ? JSONParseDB(block.assets) : [],
 					aggregateCommit: JSONParseDB(block.aggregateCommit),
 					generator: JSONParseDB(block.generator),
 				};

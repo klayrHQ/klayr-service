@@ -28,7 +28,7 @@ module.exports = [
 			limit: { optional: true, type: 'number' },
 			offset: { optional: true, type: 'number' },
 			sort: { optional: true, type: 'string' },
-			inlcudeAssets: { optional: true, type: 'boolean' },
+			includeAssets: { optional: true, type: 'boolean' },
 		},
 	},
 	{
