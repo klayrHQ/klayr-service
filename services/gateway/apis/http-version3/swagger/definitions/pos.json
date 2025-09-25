@@ -148,6 +148,16 @@
 				"type": "string",
 				"example": "100000000000",
 				"description": "Total rewards earned by the validator."
+			},
+			"nextAllocatedTime": {
+				"type": "integer",
+				"example": 1616058987,
+				"description": "UNIX Timestamp."
+			},
+			"blockReward": {
+				"type": "string",
+				"example": "100000000000",
+				"description": "Current block reward of validator."
 			}
 		}
 	},

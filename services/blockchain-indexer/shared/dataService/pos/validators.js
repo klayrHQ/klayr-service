@@ -218,6 +218,8 @@ const getPosValidators = async params => {
 	const validatorsTable = await getValidatorsTable();
 	const allValidators = await getAllValidators();
 
+	const generators = await business.getGenerators();
+
 	// Filter validators based on user passed params
 	const filteredValidators = allValidators.filter(validator => {
 		if (addressSet.size && !addressSet.has(validator.address)) return false;
@@ -246,11 +248,17 @@ const getPosValidators = async params => {
 				totalSelfStakeRewards = '0',
 			} = validatorInfo;
 
+			const validatorReward = await business.getValidatorReward(validator.address);
+			const generatorData = generators.find(generator => generator.address === validator.address);
+			const nextAllocatedTime = generatorData ? generatorData.nextAllocatedTime : 0;
+
 			return {
 				...validator,
 				generatedBlocks,
 				totalCommission,
 				totalSelfStakeRewards,
+				nextAllocatedTime,
+				blockReward: validatorReward.blockReward,
 				earnedRewards: (BigInt(totalCommission) + BigInt(totalSelfStakeRewards)).toString(),
 			};
 		},
