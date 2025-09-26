@@ -69,6 +69,7 @@ module.exports = {
 			],
 			default: 'commission:asc',
 		},
+		includeStatusValue: { optional: true, type: 'boolean', default: false },
 	},
 	get schema() {
 		const validatorsSchema = {};

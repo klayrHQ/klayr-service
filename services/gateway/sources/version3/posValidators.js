@@ -27,6 +27,7 @@ module.exports = {
 		offset: '=,number',
 		limit: '=,number',
 		sort: '=,string',
+		includeStatusValue: '=,boolean',
 	},
 	definition: {
 		data: ['data', validator],

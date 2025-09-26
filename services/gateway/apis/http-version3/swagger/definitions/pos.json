@@ -158,6 +158,23 @@
 				"type": "string",
 				"example": "100000000000",
 				"description": "Current block reward of validator."
+			},
+			"statusValue": {
+				"type": "object",
+				"properties": {
+					"height": {
+						"type": "integer",
+						"example": 559421
+					},
+					"maxHeightGenerated": {
+						"type": "integer",
+						"example": 559421
+					},
+					"maxHeightPrevoted": {
+						"type": "integer",
+						"example": 559434
+					}
+				}
 			}
 		}
 	},

@@ -48,4 +48,9 @@ module.exports = {
 	earnedRewards: '=,string',
 	nextAllocatedTime: '=,number',
 	blockReward: '=,string',
+	statusValue: {
+		height: '=,number',
+		maxHeightGenerated: '=,number',
+		maxHeightPrevoted: '=,number',
+	},
 };

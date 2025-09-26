@@ -41,10 +41,12 @@ const { indexAccountPublicKey } = require('../../indexer/accountIndex');
 const { requestConnector } = require('../../utils/request');
 
 const validatorsTableSchema = require('../../database/schema/validators');
+const blocksTableSchema = require('../../database/schema/blocks');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
 const getValidatorsTable = () => getTableInstance(validatorsTableSchema, MYSQL_ENDPOINT);
+const getBlocksTable = () => getTableInstance(blocksTableSchema, MYSQL_ENDPOINT);
 
 const validatorCache = CacheRedis('validator', config.endpoints.cache);
 
@@ -229,6 +231,9 @@ const getPosValidators = async params => {
 	const nameSet = new Set();
 	const statusSet = new Set();
 
+	const { includeStatusValue, ...restParams } = params;
+	params = restParams;
+
 	if (params.publicKey) {
 		const address = getKlayr32AddressFromPublicKey(params.publicKey);
 
@@ -263,9 +268,10 @@ const getPosValidators = async params => {
 		}
 	}
 
+	const blocksTable = await getBlocksTable();
 	const validatorsTable = await getValidatorsTable();
-	const allValidators = await getAllValidators();
 
+	const allValidators = await getAllValidators();
 	const generators = await business.getGenerators();
 
 	// Filter validators based on user passed params
@@ -286,10 +292,20 @@ const getPosValidators = async params => {
 	validators.data = await BluebirdPromise.map(
 		filteredValidators,
 		async validator => {
-			const [validatorInfo = {}] = await validatorsTable.find(
-				{ address: validator.address, limit: 1 },
-				['generatedBlocks', 'totalCommission', 'totalSelfStakeRewards'],
-			);
+			const [[validatorInfo = {}], [lastGeneratedBlock = {}]] = await Promise.all([
+				validatorsTable.find({ address: validator.address, limit: 1 }, [
+					'generatedBlocks',
+					'totalCommission',
+					'totalSelfStakeRewards',
+				]),
+				includeStatusValue
+					? blocksTable.find(
+							{ generatorAddress: validator.address, sort: 'height:desc', limit: 1 },
+							['height', 'maxHeightGenerated', 'maxHeightPrevoted'],
+					  )
+					: {},
+			]);
+
 			const {
 				generatedBlocks = 0,
 				totalCommission = '0',
@@ -308,6 +324,11 @@ const getPosValidators = async params => {
 				nextAllocatedTime,
 				blockReward: validatorReward.blockReward,
 				earnedRewards: (BigInt(totalCommission) + BigInt(totalSelfStakeRewards)).toString(),
+				statusValue: {
+					height: lastGeneratedBlock.height,
+					maxHeightGenerated: lastGeneratedBlock.maxHeightGenerated,
+					maxHeightPrevoted: lastGeneratedBlock.maxHeightPrevoted,
+				},
 			};
 		},
 		{ concurrency: validators.data.length },
