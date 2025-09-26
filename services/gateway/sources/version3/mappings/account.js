@@ -4,9 +4,13 @@ module.exports = {
 	name: '=,string',
 	nonce: '=,string',
 	description: '=,string',
-	tokenBalances: {
-		totalBalance: '=,string',
-		availableBalance: '=,string',
-		lockedBalance: '=,string',
-	},
+	tokenBalances: [
+		'tokenBalances',
+		{
+			tokenID: '=,string',
+			totalBalance: '=,string',
+			availableBalance: '=,string',
+			lockedBalance: '=,string',
+		},
+	],
 };

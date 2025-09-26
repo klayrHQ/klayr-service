@@ -29,23 +29,32 @@
 				"description": "Description of the account (if known)."
 			},
 			"tokenBalances": {
-				"type": "object",
-				"required": ["address", "name"],
-				"properties": {
-					"totalBalance": {
-						"type": "string",
-						"example": "1000000000000000000",
-						"description": "Total balance of the account."
-					},
-					"availableBalance": {
-						"type": "string",
-						"example": "1000000000000000000",
-						"description": "Available balance of the account."
-					},
-					"lockedBalance": {
-						"type": "string",
-						"example": "1000000000000000000",
-						"description": "Locked balance of the account."
+				"type": "array",
+				"items": {
+					"type": "object",
+					"description": "List of account token balances",
+					"required": ["tokenID", "totalBalance", "availableBalance", "lockedBalance"],
+					"properties": {
+						"tokenID": {
+							"type": "string",
+							"example": "0000000000000000",
+							"description": "Token ID of balances item."
+						},
+						"totalBalance": {
+							"type": "string",
+							"example": "1000000000000000000",
+							"description": "Total balance of the balance item."
+						},
+						"availableBalance": {
+							"type": "string",
+							"example": "1000000000000000000",
+							"description": "Available balance of the balance item."
+						},
+						"lockedBalance": {
+							"type": "string",
+							"example": "1000000000000000000",
+							"description": "Locked balance of the balance item."
+						}
 					}
 				}
 			}

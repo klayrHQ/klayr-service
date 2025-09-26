@@ -117,11 +117,17 @@ const getAccount = async params => {
 		await BluebirdPromise.map(
 			tokenAccountData,
 			async acc => {
-				let tokenBalancesInfo;
+				const tokenBalances = [];
 				for (let i = 0; i < tokenBalancesData.length; i++) {
 					if (tokenBalancesData[i].address === acc.address) {
-						tokenBalancesInfo = tokenBalancesData[i];
-						break;
+						tokenBalances.push({
+							tokenID: tokenBalancesData[i].tokenID,
+							totalBalance: tokenBalancesData[i].balance.toString(),
+							availableBalance: tokenBalancesData[i].availableBalance.toString(),
+							lockedBalance: (
+								BigInt(tokenBalancesData[i].balance) - BigInt(tokenBalancesData[i].availableBalance)
+							).toString(),
+						});
 					}
 				}
 
@@ -147,21 +153,13 @@ const getAccount = async params => {
 						? `${knowledge.owner}'s ${knowledge.description}`
 						: '';
 
-				const totalBalance = tokenBalancesInfo ? tokenBalancesInfo.balance : '0';
-				const availableBalance = tokenBalancesInfo ? tokenBalancesInfo.availableBalance : '0';
-				const lockedBalance = BigInt(totalBalance) - BigInt(availableBalance);
-
 				account.data.push({
 					address: acc.address,
 					publicKey: accountInfo ? accountInfo.publicKey : '',
 					name: accountInfo ? accountInfo.name : '',
 					nonce: authInfo ? authInfo.nonce : '0',
 					description,
-					tokenBalances: {
-						totalBalance,
-						availableBalance,
-						lockedBalance: lockedBalance.toString(),
-					},
+					tokenBalances,
 				});
 			},
 			{ concurrency: Math.min(tokenAccountData.length, MAX_CONCURRENCY) },
