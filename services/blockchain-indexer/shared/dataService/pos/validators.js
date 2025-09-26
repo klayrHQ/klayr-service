@@ -59,11 +59,13 @@ const VALIDATOR_STATUS = {
 };
 
 let validatorList = [];
+let isReloadingRewardsCache = false;
 
 const validatorRewardCache = new Map();
 
 const reloadValidatorRewardCache = async () => {
 	try {
+		isReloadingRewardsCache = true;
 		validatorRewardCache.clear();
 
 		const allValidators = await getAllValidators();
@@ -84,11 +86,14 @@ const reloadValidatorRewardCache = async () => {
 	} catch (err) {
 		logger.warn(`Failed to update validator reward cache due to: ${err.message}`);
 		throw err;
+	} finally {
+		isReloadingRewardsCache = false;
 	}
 };
 
 const getValidatorReward = async validatorAddress => {
-	if (validatorRewardCache.size === 0) await reloadValidatorRewardCache();
+	if (validatorRewardCache.size === 0 && !isReloadingRewardsCache)
+		await reloadValidatorRewardCache();
 
 	if (!validatorRewardCache.has(validatorAddress)) {
 		return {
