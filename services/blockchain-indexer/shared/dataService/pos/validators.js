@@ -303,7 +303,7 @@ const getPosValidators = async params => {
 							{ generatorAddress: validator.address, sort: 'height:desc', limit: 1 },
 							['height', 'maxHeightGenerated', 'maxHeightPrevoted'],
 					  )
-					: {},
+					: Promise.resolve([{}]),
 			]);
 
 			const {
