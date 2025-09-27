@@ -124,6 +124,7 @@ const getEvents = async params => {
 
 	let queryParams = { ...params };
 	let distincTopicParams = 0;
+	let isTopicQuery = false;
 
 	// Normalize ranges
 	if (
@@ -142,6 +143,7 @@ const getEvents = async params => {
 	if (queryParams.transactionID) {
 		const { transactionID, ...rest } = queryParams;
 		queryParams = rest;
+		isTopicQuery = true;
 
 		const topicsToRemove =
 			transactionID.length === LENGTH_ID
@@ -173,6 +175,7 @@ const getEvents = async params => {
 	if (queryParams.senderAddress) {
 		const { senderAddress, ...rest } = queryParams;
 		queryParams = rest;
+		isTopicQuery = true;
 
 		const transactionsTable = await getTransactionsTable();
 		const txRows = await transactionsTable.find({ senderAddress }, ['id']);
@@ -190,6 +193,7 @@ const getEvents = async params => {
 	if (queryParams.topic) {
 		const { topic, ...rest } = queryParams;
 		queryParams = rest;
+		isTopicQuery = true;
 
 		const topics = topic.split(',');
 		const topicsLists = topics.flatMap(t =>
@@ -235,7 +239,13 @@ const getEvents = async params => {
 	const eventPKsToRetrieve = [];
 	let totalFromTopicTable = 0;
 
-	if (topicsToQuery.size > 0) {
+	if (isTopicQuery) {
+		if (topicsToQuery.size === 0) {
+			// No events found for the given senderAddress / transactionID
+			events.meta = { count: 0, offset: queryParams.offset || 0, total: 0 };
+			return events;
+		}
+
 		const topicQuery = {
 			...queryParams,
 			forceIndex: 'event_topics_index_topic_only_sort',
