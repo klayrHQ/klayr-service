@@ -29,6 +29,11 @@ module.exports = {
 			totalSupply: ['data.totalSupply', totalSupplyByToken],
 			totalAccounts: '=,number',
 			totalTransactions: '=,number',
+			totalLocked: {
+				tokenID: '=,string',
+				module: '=,string',
+				total: '=,string',
+			},
 		},
 		meta: {},
 	},

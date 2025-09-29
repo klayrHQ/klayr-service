@@ -19,6 +19,7 @@ const {
 	PATTERN_ANY_CHAIN_TOKEN_ID,
 } = require('../../../constants');
 const { getTokenEscrowed } = require('../../recorder/token/escrowed');
+const { getTotalLocked } = require('../../recorder/token/locked');
 const { getTokenSupply } = require('../../recorder/token/supply');
 const { getSupportedTokens } = require('../../recorder/token/supported');
 const { getTotalAccounts } = require('../account');
@@ -35,6 +36,7 @@ const getTokenSummary = async () => {
 	const totalSupply = await getTokenSupply();
 	const totalAccounts = await getTotalAccounts();
 	const totalTransactions = await getTotalTransactions();
+	const totalLocked = await getTotalLocked();
 
 	const supportedTokens = {
 		isSupportAllTokens: false,
@@ -63,6 +65,7 @@ const getTokenSummary = async () => {
 		totalSupply,
 		totalAccounts,
 		totalTransactions,
+		totalLocked,
 	};
 
 	return summary;
