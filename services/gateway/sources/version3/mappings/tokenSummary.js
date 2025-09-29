@@ -31,8 +31,15 @@ const totalSupplyByToken = {
 	amount: '=,string',
 };
 
+const totalLockedByTokenAndModule = {
+	tokenID: '=,string',
+	module: '=,string',
+	total: '=,string',
+};
+
 module.exports = {
 	escrowedAmount,
 	supportedToken,
 	totalSupplyByToken,
+	totalLockedByTokenAndModule,
 };
