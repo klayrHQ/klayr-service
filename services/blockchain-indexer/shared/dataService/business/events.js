@@ -50,6 +50,31 @@ const eventCacheByBlockID = CacheLRU('eventsByBlockID');
 
 const EVENT_COLUMNS = ['data', 'index', 'module', 'name', 'topics', 'height', 'id'];
 
+function sortEvents(sort = 'timestamp:desc', order = 'index:asc') {
+	return (a, b) => {
+		const getValue = (obj, key) => (obj.block[key] != null ? obj.block[key] : 0);
+
+		// Primary sort
+		if (sort === 'timestamp:desc') {
+			const diff = getValue(b, 'timestamp') - getValue(a, 'timestamp');
+			if (diff !== 0) return diff;
+		} else if (sort === 'timestamp:asc') {
+			const diff = getValue(a, 'timestamp') - getValue(b, 'timestamp');
+			if (diff !== 0) return diff;
+		} else if (sort === 'height:desc') {
+			const diff = getValue(b, 'height') - getValue(a, 'height');
+			if (diff !== 0) return diff;
+		} else if (sort === 'height:asc') {
+			const diff = getValue(a, 'height') - getValue(b, 'height');
+			if (diff !== 0) return diff;
+		}
+
+		// Secondary sort
+		if (order === 'index:desc') return getValue(b, 'index') - getValue(a, 'index');
+		return getValue(a, 'index') - getValue(b, 'index');
+	};
+}
+
 const parseEventsData = events => {
 	return {
 		data: JSONParseDB(events.data),
@@ -238,6 +263,8 @@ const getEventsBySenderAddress = async params => {
 		},
 		{ concurrency: Math.min(eventsInfo.length, MAX_GET_EVENTS_CONCURRENCY) },
 	);
+
+	events.data.sort(sortEvents(sort, order));
 
 	// Count query (reuse same filters, no limit/offset)
 	const countQuery = knex
@@ -452,6 +479,8 @@ const getEvents = async params => {
 		},
 		{ concurrency: Math.min(eventsInfo.length, MAX_GET_EVENTS_CONCURRENCY) },
 	);
+
+	events.data.sort(sortEvents(sort, order));
 
 	// Count
 	const total =
