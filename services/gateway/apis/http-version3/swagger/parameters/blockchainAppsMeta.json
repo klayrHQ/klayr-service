@@ -5,5 +5,12 @@
 		"description": "Filter default blockchain application.",
 		"type": "boolean",
 		"minLength": 1
+	},
+	"includeBlockchainApp": {
+		"name": "includeBlockchainApp",
+		"in": "query",
+		"description": "Should include blockchain App data in response.",
+		"type": "boolean",
+		"minLength": 1
 	}
 }

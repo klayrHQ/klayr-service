@@ -53,4 +53,18 @@ module.exports = {
 		},
 	],
 	backgroundColor: '=,string',
+	blockchainApp: {
+		status: '=,string',
+		address: '=,string',
+		lastUpdated: '=,number',
+		lastCertificateHeight: '=,number',
+		escrowedKLY: '=,string',
+		escrow: [
+			'escrow',
+			{
+				tokenID: '=,string',
+				amount: '=,string',
+			},
+		],
+	},
 };

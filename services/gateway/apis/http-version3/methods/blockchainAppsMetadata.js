@@ -48,6 +48,7 @@ module.exports = {
 			enum: ['chainName:asc', 'chainName:desc', 'chainID:asc', 'chainID:desc'],
 			default: 'chainName:asc',
 		},
+		includeBlockchainApp: { optional: true, type: 'boolean', default: false },
 	},
 	get schema() {
 		const blockchainAppsMetadataSchema = {};

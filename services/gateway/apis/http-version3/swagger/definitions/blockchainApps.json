@@ -313,6 +313,57 @@
 						}
 					}
 				}
+			},
+			"blockchainApp": {
+				"type": "object",
+				"properties": {
+					"status": {
+						"type": "string",
+						"example": "activated",
+						"description": "Current status of the application."
+					},
+					"address": {
+						"type": "string",
+						"format": "address",
+						"example": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+						"description": "The Klayr Address is the human-readable representation of a blockchain account.\nIt is 41 character long identifier that begins with `kly`."
+					},
+					"lastCertificateHeight": {
+						"type": "integer",
+						"example": 160,
+						"minimum": 1,
+						"description": "Last certificate height"
+					},
+					"lastUpdated": {
+						"type": "integer",
+						"example": 1616008148,
+						"description": "timestamp"
+					},
+					"escrowedKLY": {
+						"type": "string",
+						"example": "50000000000",
+						"description": "Number of KLY tokens escrowed to the sidechain."
+					},
+					"escrow": {
+						"type": "array",
+						"required": ["tokenID", "amount"],
+						"items": {
+							"type": "object",
+							"properties": {
+								"tokenID": {
+									"type": "string",
+									"example": "0000000000000000",
+									"description": "The universal token identifier for the escrowed tokens within the Klayr ecosystem."
+								},
+								"amount": {
+									"type": "string",
+									"example": "50000000000",
+									"description": "The escrowed amount."
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	},

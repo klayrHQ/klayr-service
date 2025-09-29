@@ -35,6 +35,7 @@ module.exports = [
 			limit: { optional: true, type: 'number' },
 			offset: { optional: true, type: 'number' },
 			sort: { optional: true, type: 'string' },
+			includeBlockchainApp: { optional: true, type: 'boolean' },
 		},
 		controller: getBlockchainAppsMetadata,
 	},

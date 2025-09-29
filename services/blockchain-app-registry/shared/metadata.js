@@ -140,6 +140,9 @@ const getBlockchainAppsMetadata = async params => {
 		meta: {},
 	};
 
+	const { includeBlockchainApp, ...restParams } = params;
+	params = restParams;
+
 	// Initialize DB variables
 	params.whereIn = [];
 
@@ -194,6 +197,7 @@ const getBlockchainAppsMetadata = async params => {
 			'network',
 			'appDirName',
 			'isDefault',
+			'chainID',
 		]);
 		blockchainAppsMetadata.data = defaultApps;
 	}
@@ -215,11 +219,17 @@ const getBlockchainAppsMetadata = async params => {
 
 		const nonDefaultApps = await applicationMetadataTable.find(
 			{ ...params, offset, limit, isDefault: false },
-			['network', 'appDirName', 'isDefault'],
+			['network', 'appDirName', 'isDefault', 'chainID'],
 		);
 
 		blockchainAppsMetadata.data.push(...nonDefaultApps);
 	}
+
+	const blockchainApp = includeBlockchainApp
+		? await requestIndexer('blockchain.apps', {
+				chainID: blockchainAppsMetadata.data.map(t => t.chainID).join(','),
+		  })
+		: { data: [], meta: { count: 0, offset: 0, total: 0 } };
 
 	blockchainAppsMetadata.data = await BluebirdPromise.map(
 		// Slice necessary to adhere to limit passed
@@ -239,6 +249,10 @@ const getBlockchainAppsMetadata = async params => {
 					await requestIndexer('blockchain.apps', { chainID: appMeta.chainID })
 				).data;
 				appMeta.status = blockchainApp ? blockchainApp.status : APP_STATUS.DEFAULT;
+			}
+
+			if (includeBlockchainApp) {
+				appMeta.blockchainApp = blockchainApp.data.find(t => t.chainID === appMetadata.chainID);
 			}
 
 			return appMeta;
