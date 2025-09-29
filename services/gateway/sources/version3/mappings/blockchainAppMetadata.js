@@ -60,7 +60,7 @@ module.exports = {
 		lastCertificateHeight: '=,number',
 		escrowedKLY: '=,string',
 		escrow: [
-			'escrow',
+			'blockchainApp.escrow',
 			{
 				tokenID: '=,string',
 				amount: '=,string',
