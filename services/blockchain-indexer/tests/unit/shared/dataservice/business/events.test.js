@@ -43,6 +43,43 @@ const mockedEventsEncoded = mockedEvents.map(e => ({
 	topics: JSON.stringify(e.topics),
 }));
 
+const mockKnexQueryBuilder = () => {
+	const builder = jest.fn(() => builder); // callable like knex('table')
+
+	// attach chainable methods
+	const chainable = [
+		'select',
+		'from',
+		'innerJoin',
+		'where',
+		'andWhere',
+		'whereIn',
+		'andWhereIn',
+		'andWhereBetween',
+		'andWhereRaw',
+		'orderBy',
+		'orderByRaw',
+		'groupBy',
+		'havingRaw',
+		'limit',
+		'offset',
+	];
+	chainable.forEach(m => (builder[m] = jest.fn(() => builder)));
+
+	builder.select = jest.fn(); // mock count
+	builder.count = jest.fn(() => Promise.resolve([{ total: 10 }])); // mock count
+	builder.then = jest.fn(cb => Promise.resolve(cb([{ eventPK: 'evt1' }]))); // SELECT result
+	builder.catch = jest.fn(cb => Promise.resolve(cb([])));
+	builder.raw = jest.fn(() => 'RAW_SQL');
+	builder.clone = jest.fn(() => mockKnexQueryBuilder());
+
+	return {
+		select: jest.fn(() => builder),
+		from: jest.fn(() => builder),
+		count: jest.fn(() => builder),
+	};
+};
+
 describe('getEventsByBlockID', () => {
 	beforeEach(() => {
 		jest.resetAllMocks();
@@ -213,6 +250,7 @@ describe('getEvents', () => {
 				...actual,
 				DB: {
 					MySQL: {
+						getDBConnection: jest.fn(() => mockKnexQueryBuilder()),
 						getTableInstance: jest.fn(schema => {
 							if (schema.tableName === mockBlocksTableSchema.tableName) {
 								return {
@@ -318,6 +356,7 @@ describe('getEvents', () => {
 				...actual,
 				DB: {
 					MySQL: {
+						getDBConnection: jest.fn(() => mockKnexQueryBuilder()),
 						getTableInstance: jest.fn(schema => {
 							if (schema.tableName === mockBlocksTableSchema.tableName) {
 								return {

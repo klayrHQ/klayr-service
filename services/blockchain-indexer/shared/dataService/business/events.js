@@ -19,7 +19,7 @@ const {
 	CacheLRU,
 	Exceptions: { NotFoundException },
 	DB: {
-		MySQL: { getTableInstance },
+		MySQL: { getTableInstance, getDBConnection },
 	},
 } = require('klayr-service-framework');
 
@@ -114,7 +114,174 @@ const deleteEventsFromCache = async height => eventCache.delete(height);
 
 const deleteEventsFromCacheByBlockID = async blockID => eventCacheByBlockID.delete(blockID);
 
+const getEventsBySenderAddress = async params => {
+	const knex = await getDBConnection(MYSQL_ENDPOINT);
+	const blocksTable = await getBlocksTable();
+	const eventsTable = await getEventsTable();
+
+	const events = { data: [], meta: {} };
+
+	const {
+		senderAddress,
+		topic,
+		transactionID,
+		blockID,
+		limit = 10,
+		offset = 0,
+		sort,
+		order,
+		module,
+		name,
+		timestamp,
+		height,
+	} = params;
+
+	// Build topic set
+	const topicsSet = new Set();
+	if (topic) topic.split(',').forEach(t => topicsSet.add(t.trim()));
+	if (transactionID) {
+		const txTopic =
+			transactionID.length === LENGTH_ID ? EVENT_TOPIC_PREFIX.TX_ID + transactionID : transactionID;
+		topicsSet.add(txTopic);
+	}
+
+	// if blockID provided, resolve to height (unless height is also provided)
+	let effectiveHeight = height;
+	if (blockID && !height) {
+		const [block] = await blocksTable.find({ id: blockID, limit: 1 }, ['height']);
+		effectiveHeight = block?.height;
+	}
+
+	const et = eventTopicsTableSchema.tableName;
+	const tx = transactionsTableSchema.tableName;
+
+	// Base query
+	let query = knex
+		.select('et.eventPK')
+		.from(`${et} as et`)
+		.innerJoin(`${tx} as tx`, function () {
+			this.on('et.topic', knex.raw(`CONCAT(?, tx.id)`, [EVENT_TOPIC_PREFIX.TX_ID]));
+		})
+		.where('tx.senderAddress', senderAddress);
+
+	// Filters
+	if (topicsSet.size) query = query.whereIn('et.topic', [...topicsSet]);
+	if (module) query = query.andWhere('et.module', module);
+	if (name) query = query.andWhere('et.name', name);
+
+	if (effectiveHeight) {
+		if (String(effectiveHeight).includes(':')) {
+			const [fromStr, toStr] = effectiveHeight.split(':').map(Number);
+			query = query.andWhereBetween('et.height', [fromStr, toStr]);
+		} else {
+			query = query.andWhere('et.height', Number(effectiveHeight));
+		}
+	}
+
+	if (timestamp) {
+		if (String(timestamp).includes(':')) {
+			const [fromStr, toStr] = timestamp.split(':').map(Number);
+			query = query.andWhereBetween('et.timestamp', [fromStr, toStr]);
+		} else {
+			query = query.andWhere('et.timestamp', Number(timestamp));
+		}
+	}
+
+	// Order by
+	const allowedSortCols = new Set(['height', 'timestamp', 'index', 'module', 'name', 'topic']);
+	if (sort) {
+		const [col, dir] = sort.split(':');
+		if (allowedSortCols.has(col)) query = query.orderBy(`et.${col}`, dir?.toUpperCase() || 'DESC');
+	}
+	if (order) {
+		const [col, dir] = order.split(':');
+		if (allowedSortCols.has(col)) query = query.orderBy(`et.${col}`, dir?.toUpperCase() || 'DESC');
+	}
+	if (!sort && !order) {
+		query = query.orderBy([
+			{ column: 'tx.timestamp', order: 'desc' },
+			{ column: 'tx.index', order: 'asc' },
+		]);
+	}
+
+	// Pagination
+	query = query.limit(limit).offset(offset);
+
+	// Execute SELECT query
+	const eventTopicRows = await query;
+	if (!eventTopicRows.length) {
+		events.meta = { count: 0, offset, total: 0 };
+		return events;
+	}
+
+	// Collect eventPKs
+	const eventPKsToRetrieve = eventTopicRows.map(r => r.eventPK);
+
+	// Fetch full events
+	const eventsInfo = await eventsTable.find(
+		{ whereIn: { property: 'eventPK', values: eventPKsToRetrieve } },
+		[...EVENT_COLUMNS, 'blockID', 'timestamp'],
+	);
+
+	events.data = await BluebirdPromise.map(
+		eventsInfo,
+		row => {
+			const event = parseEventsData(row);
+			return {
+				...event,
+				block: {
+					id: row.blockID,
+					height: row.height,
+					timestamp: row.timestamp,
+				},
+			};
+		},
+		{ concurrency: Math.min(eventsInfo.length, MAX_GET_EVENTS_CONCURRENCY) },
+	);
+
+	// Count query (reuse same filters, no limit/offset)
+	const countQuery = knex
+		.count({ total: '*' })
+		.from(`${et} as et`)
+		.innerJoin(`${tx} as tx`, function () {
+			this.on('et.topic', knex.raw(`CONCAT(?, tx.id)`, [EVENT_TOPIC_PREFIX.TX_ID]));
+		})
+		.where('tx.senderAddress', senderAddress);
+
+	if (topicsSet.size) countQuery.andWhereIn('et.topic', [...topicsSet]);
+	if (module) countQuery.andWhere('et.module', module);
+	if (name) countQuery.andWhere('et.name', name);
+	if (effectiveHeight) {
+		if (String(effectiveHeight).includes(':')) {
+			const [fromStr, toStr] = effectiveHeight.split(':').map(Number);
+			countQuery.andWhereBetween('et.height', [fromStr, toStr]);
+		} else {
+			countQuery.andWhere('et.height', Number(effectiveHeight));
+		}
+	}
+	if (timestamp) {
+		if (String(timestamp).includes(':')) {
+			const [fromStr, toStr] = timestamp.split(':').map(Number);
+			countQuery.andWhereBetween('et.timestamp', [fromStr, toStr]);
+		} else {
+			countQuery.andWhere('et.timestamp', Number(timestamp));
+		}
+	}
+
+	const [{ total }] = await countQuery;
+
+	events.meta = {
+		count: events.data.length,
+		offset,
+		total: Number(total),
+	};
+
+	return events;
+};
+
 const getEvents = async params => {
+	if (params.senderAddress) return getEventsBySenderAddress(params);
+
 	const blocksTable = await getBlocksTable();
 	const eventsTable = await getEventsTable();
 	const eventTopicsTable = await getEventTopicsTable();
@@ -168,24 +335,6 @@ const getEvents = async params => {
 		if (!topicsToQuery.has(transactionTopic)) {
 			distincTopicParams += 1;
 			topicsToQuery.add(transactionTopic);
-		}
-	}
-
-	// By senderAddress
-	if (queryParams.senderAddress) {
-		const { senderAddress, ...rest } = queryParams;
-		queryParams = rest;
-		isTopicQuery = true;
-
-		const transactionsTable = await getTransactionsTable();
-		const txRows = await transactionsTable.find({ senderAddress }, ['id']);
-		const txIDsToQuery = txRows.map(r =>
-			r.id.length === LENGTH_ID ? EVENT_TOPIC_PREFIX.TX_ID + r.id : r.id,
-		);
-
-		if (txIDsToQuery.some(item => !topicsToQuery.has(item))) {
-			distincTopicParams += 1;
-			txIDsToQuery.forEach(item => topicsToQuery.add(item));
 		}
 	}
 

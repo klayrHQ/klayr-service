@@ -261,6 +261,8 @@ const mockGetEventsResult = {
 			id: '392eadd8f1703efd2b9d5fae72e272da1806fc3fb667c67e0ef71035f941710f',
 			block: {
 				height: 125247,
+				id: undefined,
+				timestamp: undefined,
 			},
 		},
 		{
@@ -280,6 +282,8 @@ const mockGetEventsResult = {
 			id: '180fccd1d16dd9806454e2a5f48da020aa5590df0100c72659e713ab502ca4b0',
 			block: {
 				height: 125247,
+				id: undefined,
+				timestamp: undefined,
 			},
 		},
 		{
@@ -301,6 +305,8 @@ const mockGetEventsResult = {
 			id: '51291dcc8010176f33f2a250d00869d5c423ad053204a204ebcb4a1b5dd19bc4',
 			block: {
 				height: 125246,
+				id: undefined,
+				timestamp: undefined,
 			},
 		},
 		{
@@ -320,6 +326,8 @@ const mockGetEventsResult = {
 			id: '75ae7452e1d304b846e1531c73f696d169b38926a603df4092cd4c2c924fbe75',
 			block: {
 				height: 125246,
+				id: undefined,
+				timestamp: undefined,
 			},
 		},
 		{
@@ -341,6 +349,8 @@ const mockGetEventsResult = {
 			id: 'af100a3fcfc221b0c62edb60bc88a78633e17f5bda449dc43216c2dedda3f20c',
 			block: {
 				height: 125245,
+				id: undefined,
+				timestamp: undefined,
 			},
 		},
 		{
@@ -360,6 +370,8 @@ const mockGetEventsResult = {
 			id: '5f31caae2e0a606a86b1425d49ab1d6543d06fe42b39b97397e9739d8ed87785',
 			block: {
 				height: 125245,
+				id: undefined,
+				timestamp: undefined,
 			},
 		},
 		{
@@ -381,6 +393,8 @@ const mockGetEventsResult = {
 			id: '6d15e5798dbc1e7b43fdd9d9c66d95f181dc4349ed8821e8209aa73c28939406',
 			block: {
 				height: 125244,
+				id: undefined,
+				timestamp: undefined,
 			},
 		},
 		{
@@ -400,6 +414,8 @@ const mockGetEventsResult = {
 			id: '0d39438acc199f647af69ecfb675775f31bf8b1dcbd3cf5f0d6fdecfb68a7910',
 			block: {
 				height: 125244,
+				id: undefined,
+				timestamp: undefined,
 			},
 		},
 		{
@@ -421,6 +437,8 @@ const mockGetEventsResult = {
 			id: '48131594ec7324a815f43d0e5e6122104a0c0573e97760abb53c5930ac1f481b',
 			block: {
 				height: 125243,
+				id: undefined,
+				timestamp: undefined,
 			},
 		},
 		{
@@ -440,13 +458,15 @@ const mockGetEventsResult = {
 			id: '8c50ade215fd89a9e351a338cd8389bec6d64babb03dbc8611d5bdd433cec181',
 			block: {
 				height: 125243,
+				id: undefined,
+				timestamp: undefined,
 			},
 		},
 	],
 	meta: {
 		count: 10,
 		offset: 0,
-		total: 10,
+		total: NaN,
 	},
 };
 
