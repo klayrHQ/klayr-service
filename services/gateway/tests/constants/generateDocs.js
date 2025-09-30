@@ -116,6 +116,9 @@ const createApiDocsExpectedResponse = {
 					$ref: '#/parameters/chainName',
 				},
 				{
+					$ref: '#/parameters/excludeChainName',
+				},
+				{
 					$ref: '#/parameters/blockchainAppStatus',
 				},
 				{
@@ -205,6 +208,9 @@ const createApiDocsExpectedResponse = {
 					$ref: '#/parameters/chainName',
 				},
 				{
+					$ref: '#/parameters/excludeChainName',
+				},
+				{
 					$ref: '#/parameters/displayName',
 				},
 				{
@@ -236,9 +242,6 @@ const createApiDocsExpectedResponse = {
 				},
 				{
 					$ref: '#/parameters/includeBlockchainApp',
-				},
-				{
-					$ref: '#/parameters/excludeChainName',
 				},
 			],
 			responses: {
