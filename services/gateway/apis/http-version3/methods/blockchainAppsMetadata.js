@@ -34,6 +34,12 @@ module.exports = {
 			altSwaggerKey: 'chainIDCSV',
 		},
 		isDefault: { optional: true, type: 'boolean' },
+		status: {
+			optional: true,
+			type: 'string',
+			pattern: regex.APPLICATION_STATUS,
+			altSwaggerKey: 'blockchainAppStatus',
+		},
 		network: { optional: true, type: 'string', min: 1, pattern: regex.NETWORK_CSV },
 		search: {
 			optional: true,

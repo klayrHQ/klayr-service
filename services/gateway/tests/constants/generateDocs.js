@@ -220,6 +220,9 @@ const createApiDocsExpectedResponse = {
 					$ref: '#/parameters/isDefault',
 				},
 				{
+					$ref: '#/parameters/blockchainAppStatus',
+				},
+				{
 					$ref: '#/parameters/network',
 				},
 				{

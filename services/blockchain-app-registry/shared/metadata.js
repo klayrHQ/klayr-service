@@ -140,7 +140,7 @@ const getBlockchainAppsMetadata = async params => {
 		meta: {},
 	};
 
-	const { includeBlockchainApp, excludeChainName, ...restParams } = params;
+	const { includeBlockchainApp, excludeChainName, status, ...restParams } = params;
 	params = restParams;
 
 	// Initialize DB variables
@@ -152,7 +152,7 @@ const getBlockchainAppsMetadata = async params => {
 		const chainIDs = chainID.split(',');
 
 		params.whereIn.push({
-			property: 'chainID',
+			property: `${appMetadataTableSchema.tableName}.chainID`,
 			values: chainIDs,
 		});
 
@@ -181,7 +181,7 @@ const getBlockchainAppsMetadata = async params => {
 
 		params.orSearch = [
 			{
-				property: 'chainName',
+				property: `${appMetadataTableSchema.tableName}.chainName`,
 				pattern: search,
 			},
 			{
@@ -193,9 +193,25 @@ const getBlockchainAppsMetadata = async params => {
 
 	if (excludeChainName) {
 		params.whereNotIn = {
-			column: 'chainName',
+			column: `${appMetadataTableSchema.tableName}.chainName`,
 			values: excludeChainName.split(','),
 		};
+	}
+
+	if (status) {
+		const blockchainAppsTableSchema = await requestIndexer('getDatabaseSchema', {
+			fileName: 'blockchainApps',
+		});
+		params.leftOuterJoin = {
+			targetTable: `${blockchainAppsTableSchema.tableName}`,
+			leftColumn: `${appMetadataTableSchema.tableName}.chainID`,
+			rightColumn: `${blockchainAppsTableSchema.tableName}.chainID`,
+		};
+		params.whereIn.push({
+			property: `${blockchainAppsTableSchema.tableName}.status`,
+			values: status.split(','),
+		});
+		if (params.sort) params.sort = `${appMetadataTableSchema.tableName}.${params.sort}`;
 	}
 
 	const limit = params.limit * config.supportedNetworks.length;
@@ -204,7 +220,7 @@ const getBlockchainAppsMetadata = async params => {
 			'network',
 			'appDirName',
 			'isDefault',
-			'chainID',
+			`${appMetadataTableSchema.tableName}.chainID`,
 		]);
 		blockchainAppsMetadata.data = defaultApps;
 	}
@@ -226,7 +242,7 @@ const getBlockchainAppsMetadata = async params => {
 
 		const nonDefaultApps = await applicationMetadataTable.find(
 			{ ...params, offset, limit, isDefault: false },
-			['network', 'appDirName', 'isDefault', 'chainID'],
+			['network', 'appDirName', 'isDefault', `${appMetadataTableSchema.tableName}.chainID`],
 		);
 
 		blockchainAppsMetadata.data.push(...nonDefaultApps);
@@ -252,10 +268,10 @@ const getBlockchainAppsMetadata = async params => {
 			if ((await isMainchain()) && knownMainchainIDs.includes(appMeta.chainID)) {
 				appMeta.status = APP_STATUS.ACTIVATED;
 			} else {
-				const [blockchainApp] = (
-					await requestIndexer('blockchain.apps', { chainID: appMeta.chainID })
-				).data;
-				appMeta.status = blockchainApp ? blockchainApp.status : APP_STATUS.DEFAULT;
+				const [blockchainAppData] = includeBlockchainApp
+					? [blockchainApp.data.find(t => t.chainID === appMeta.chainID)]
+					: (await requestIndexer('blockchain.apps', { chainID: appMeta.chainID })).data;
+				appMeta.status = blockchainAppData ? blockchainAppData.status : APP_STATUS.DEFAULT;
 			}
 
 			if (includeBlockchainApp) {

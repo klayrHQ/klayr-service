@@ -114,6 +114,7 @@ const { getValidator, validateBLSKey } = require('./validator');
 const { getGenerators } = require('./generators');
 const { invokeEndpoint } = require('./invoke');
 const { getAccount } = require('./account');
+const { getDatabaseSchema } = require('./database');
 
 module.exports = {
 	// Search
@@ -231,4 +232,7 @@ module.exports = {
 	resolveMainchainServiceURL,
 
 	invokeEndpoint,
+
+	// database
+	getDatabaseSchema,
 };
