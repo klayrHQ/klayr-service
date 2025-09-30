@@ -67,7 +67,8 @@ config.isRebuildIndexAtInit = Boolean(
 
 config.gitHub = {
 	accessToken: process.env.GITHUB_ACCESS_TOKEN,
-	appRegistryRepo: process.env.GITHUB_APP_REGISTRY_REPO || 'https://github.com/klayrhq/app-registry',
+	appRegistryRepo:
+		process.env.GITHUB_APP_REGISTRY_REPO || 'https://github.com/klayrhq/app-registry',
 	branch: process.env.GITHUB_APP_REGISTRY_REPO_BRANCH || 'main',
 	get appRegistryRepoName() {
 		return this.appRegistryRepo.split('/').pop();
@@ -80,6 +81,8 @@ config.supportedNetworks = ['mainnet', 'testnet', 'devnet'];
 
 const DEFAULT_KLAYR_APPS = ['klayr_mainchain'];
 const DEFAULT_USER_APPS = String(process.env.DEFAULT_APPS).split(',');
+
+config.DEFAULT_KLAYR_APPS = DEFAULT_KLAYR_APPS;
 
 config.defaultApps = DEFAULT_KLAYR_APPS.concat(DEFAULT_USER_APPS);
 

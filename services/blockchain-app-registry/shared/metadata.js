@@ -43,6 +43,8 @@ const APP_STATUS = {
 	ACTIVATED: 'activated',
 };
 
+const knownMainchainNames = config.DEFAULT_KLAYR_APPS;
+
 const knownMainchainIDs = Object.keys(config.CHAIN_ID_PREFIX_NETWORK_MAP).map(e =>
 	e.padEnd(LENGTH_CHAIN_ID, '0'),
 );
@@ -199,19 +201,42 @@ const getBlockchainAppsMetadata = async params => {
 	}
 
 	if (status) {
-		const blockchainAppsTableSchema = await requestIndexer('getDatabaseSchema', {
-			fileName: 'blockchainApps',
-		});
-		params.leftOuterJoin = {
-			targetTable: `${blockchainAppsTableSchema.tableName}`,
-			leftColumn: `${appMetadataTableSchema.tableName}.chainID`,
-			rightColumn: `${blockchainAppsTableSchema.tableName}.chainID`,
-		};
-		params.whereIn.push({
-			property: `${blockchainAppsTableSchema.tableName}.status`,
-			values: status.split(','),
-		});
-		if (params.sort) params.sort = `${appMetadataTableSchema.tableName}.${params.sort}`;
+		const statusValues = new Set(status.split(','));
+		if (statusValues.size > 0) {
+			const blockchainAppsTableSchema = await requestIndexer('getDatabaseSchema', {
+				fileName: 'blockchainApps',
+			});
+			params.leftOuterJoin = {
+				targetTable: `${blockchainAppsTableSchema.tableName}`,
+				leftColumn: `${appMetadataTableSchema.tableName}.chainID`,
+				rightColumn: `${blockchainAppsTableSchema.tableName}.chainID`,
+			};
+			if (params.sort) params.sort = `${appMetadataTableSchema.tableName}.${params.sort}`;
+
+			const statusValuesFiltered = Array.from(statusValues).filter(t => t !== 'unregistered');
+			if (statusValuesFiltered.length > 0) {
+				params.whereIn.push({
+					property: `${blockchainAppsTableSchema.tableName}.status`,
+					values: statusValuesFiltered,
+				});
+			}
+			if (statusValues.has('unregistered')) {
+				params.whereNull = `${blockchainAppsTableSchema.tableName}.status`;
+			}
+			if (statusValues.has('activated') && (await isMainchain())) {
+				params.whereIn.push({
+					property: `${appMetadataTableSchema.tableName}.chainID`,
+					values: knownMainchainIDs,
+				});
+			}
+			if (!statusValues.has('activated') && (await isMainchain())) {
+				params.whereNotIn = params.whereNotIn || {
+					column: `${appMetadataTableSchema.tableName}.chainName`,
+					values: [],
+				};
+				params.whereNotIn.values.push(...knownMainchainNames);
+			}
+		}
 	}
 
 	const limit = params.limit * config.supportedNetworks.length;
