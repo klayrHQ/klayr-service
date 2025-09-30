@@ -20,6 +20,7 @@ module.exports = {
 	method: 'app-registry.blockchain.apps.meta',
 	params: {
 		chainName: '=,string',
+		excludeChainName: '=,string',
 		displayName: '=,string',
 		chainID: '=,string',
 		isDefault: '=,boolean',

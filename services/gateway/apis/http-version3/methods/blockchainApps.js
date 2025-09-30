@@ -30,6 +30,7 @@ module.exports = {
 			pattern: regex.CHAIN_ID_CSV,
 			altSwaggerKey: 'chainIDCSV',
 		},
+		excludeChainName: { optional: true, type: 'string', pattern: regex.CHAIN_NAME_CSV },
 		chainName: { optional: true, type: 'string', pattern: regex.CHAIN_NAME },
 		status: {
 			optional: true,

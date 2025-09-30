@@ -140,7 +140,7 @@ const getBlockchainAppsMetadata = async params => {
 		meta: {},
 	};
 
-	const { includeBlockchainApp, ...restParams } = params;
+	const { includeBlockchainApp, excludeChainName, ...restParams } = params;
 	params = restParams;
 
 	// Initialize DB variables
@@ -189,6 +189,13 @@ const getBlockchainAppsMetadata = async params => {
 				pattern: search,
 			},
 		];
+	}
+
+	if (excludeChainName) {
+		params.whereNotIn = {
+			column: 'chainName',
+			values: excludeChainName.split(','),
+		};
 	}
 
 	const limit = params.limit * config.supportedNetworks.length;

@@ -237,6 +237,9 @@ const createApiDocsExpectedResponse = {
 				{
 					$ref: '#/parameters/includeBlockchainApp',
 				},
+				{
+					$ref: '#/parameters/excludeChainName',
+				},
 			],
 			responses: {
 				200: {

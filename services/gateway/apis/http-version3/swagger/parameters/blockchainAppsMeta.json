@@ -12,5 +12,12 @@
 		"description": "Should include blockchain App data in response.",
 		"type": "boolean",
 		"minLength": 1
+	},
+	"excludeChainName": {
+		"name": "excludeChainName",
+		"in": "query",
+		"description": "Exclude blockchain application by chain name.",
+		"type": "string",
+		"minLength": 3
 	}
 }

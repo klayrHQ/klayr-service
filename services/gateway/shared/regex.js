@@ -46,6 +46,7 @@ const MODULE_COMMAND = /^[0-9a-zA-Z]{0,32}:[0-9a-zA-Z]{0,32}$/;
 const CHAIN_ID = /^\b[a-fA-F0-9]{8}\b$/;
 const CHAIN_ID_CSV = /^\b(?:[a-fA-F0-9]{8}|,)+\b$/;
 const CHAIN_NAME = /^[A-Za-z0-9!@$&_.]{1,32}$/;
+const CHAIN_NAME_CSV = /^\b[A-Za-z0-9!@$&.,]{3,}\b$/;
 const TOKEN_ID = /^\b[a-fA-F0-9]{16}\b$/;
 const TOKEN_ID_CSV = /^\b(?:[a-fA-F0-9]{16}|,)+\b$/;
 const BLS_KEY = /^\b[a-fA-F0-9]{96}\b$/;
@@ -90,6 +91,7 @@ module.exports = {
 	CHAIN_ID,
 	CHAIN_ID_CSV,
 	CHAIN_NAME,
+	CHAIN_NAME_CSV,
 	TOKEN_ID,
 	TOKEN_ID_CSV,
 	BLS_KEY,

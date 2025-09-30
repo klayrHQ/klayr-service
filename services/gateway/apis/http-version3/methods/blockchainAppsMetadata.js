@@ -25,6 +25,7 @@ module.exports = {
 	tags: ['Application Off-Chain Metadata'],
 	params: {
 		chainName: { optional: true, type: 'string', pattern: regex.CHAIN_NAME },
+		excludeChainName: { optional: true, type: 'string', pattern: regex.CHAIN_NAME_CSV },
 		displayName: { optional: true, type: 'string', min: 3, max: 20, pattern: regex.NAME },
 		chainID: {
 			optional: true,

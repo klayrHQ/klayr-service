@@ -28,6 +28,7 @@ module.exports = [
 		params: {
 			chainID: { optional: true, type: 'string' },
 			chainName: { optional: true, type: 'string' },
+			excludeChainName: { optional: true, type: 'string' },
 			status: { optional: true, type: 'string' },
 			search: { optional: true, type: 'string' },
 			limit: { optional: true, type: 'number' },

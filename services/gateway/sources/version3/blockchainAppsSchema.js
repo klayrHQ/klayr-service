@@ -21,6 +21,7 @@ module.exports = {
 	params: {
 		chainID: '=,string',
 		chainName: '=,string',
+		excludeChainName: '=,string',
 		search: '=,string',
 		status: '=,string',
 		offset: '=,number',
