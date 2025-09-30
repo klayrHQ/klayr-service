@@ -203,6 +203,9 @@ const getBlockchainAppsMetadata = async params => {
 	if (status) {
 		const statusValues = new Set(status.split(','));
 		if (statusValues.size > 0) {
+			// NOTE: status filter only support non default apps
+			params.isDefault = false;
+
 			const blockchainAppsTableSchema = await requestIndexer('getDatabaseSchema', {
 				fileName: 'blockchainApps',
 			});
@@ -222,19 +225,6 @@ const getBlockchainAppsMetadata = async params => {
 			}
 			if (statusValues.has('unregistered')) {
 				params.whereNull = `${blockchainAppsTableSchema.tableName}.status`;
-			}
-			if (statusValues.has('activated') && (await isMainchain())) {
-				params.whereIn.push({
-					property: `${appMetadataTableSchema.tableName}.chainID`,
-					values: knownMainchainIDs,
-				});
-			}
-			if (!statusValues.has('activated') && (await isMainchain())) {
-				params.whereNotIn = params.whereNotIn || {
-					column: `${appMetadataTableSchema.tableName}.chainName`,
-					values: [],
-				};
-				params.whereNotIn.values.push(...knownMainchainNames);
 			}
 		}
 	}
