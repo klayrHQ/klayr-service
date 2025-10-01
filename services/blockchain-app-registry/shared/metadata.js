@@ -21,7 +21,7 @@ const {
 	},
 	HTTP,
 	DB: {
-		MySQL: { getTableInstance },
+		MySQL: { getTableInstance, getDBConnection, createTableIfNotExists },
 	},
 	Logger,
 } = require('klayr-service-framework');
@@ -51,6 +51,11 @@ const knownMainchainIDs = Object.keys(config.CHAIN_ID_PREFIX_NETWORK_MAP).map(e 
 
 const getApplicationMetadataTable = () => getTableInstance(appMetadataTableSchema, MYSQL_ENDPOINT);
 const getTokenMetadataTable = () => getTableInstance(tokenMetadataTableSchema, MYSQL_ENDPOINT);
+
+const escapeUserInput = input => {
+	const escapedInput = input.replace(new RegExp(/%|_/g), char => CHAR_ESCAPE_MAP[char]);
+	return escapedInput;
+};
 
 const getBlockchainAppsMetaList = async params => {
 	const applicationMetadataTable = await getApplicationMetadataTable();
@@ -122,41 +127,65 @@ const getBlockchainAppsMetaList = async params => {
 };
 
 const readMetadataFromClonedRepo = async (network, appDirName, filename) => {
-	const {
-		dataDir,
-		gitHub: { appRegistryRepoName },
-	} = config;
+	try {
+		const {
+			dataDir,
+			gitHub: { appRegistryRepoName },
+		} = config;
 
-	const filepath = `${dataDir}/${appRegistryRepoName}/${network}/${appDirName}/${filename}`;
-	const metadataStr = await read(filepath);
-	const parsedMetadata = JSON.parse(metadataStr);
+		const filepath = `${dataDir}/${appRegistryRepoName}/${network}/${appDirName}/${filename}`;
+		const metadataStr = await read(filepath);
+		const parsedMetadata = JSON.parse(metadataStr);
 
-	return parsedMetadata;
+		return parsedMetadata;
+	} catch (err) {
+		return {
+			title: '{Unknown}',
+			description: '',
+			chainName: '{Unknown}',
+			chainID: 'XXXXXXXX',
+			networkType: '',
+			genesisURL: '',
+			projectPage: '',
+			logo: {},
+			backgroundColor: '',
+			serviceURLs: [],
+			explorers: [],
+			appNodes: [],
+		};
+	}
 };
 
 const getBlockchainAppsMetadata = async params => {
-	const applicationMetadataTable = await getApplicationMetadataTable();
+	await createTableIfNotExists(appMetadataTableSchema, MYSQL_ENDPOINT);
+	const knex = await getDBConnection(MYSQL_ENDPOINT);
 
 	const blockchainAppsMetadata = {
 		data: [],
 		meta: {},
 	};
 
-	const { includeBlockchainApp, excludeChainName, status, ...restParams } = params;
+	const {
+		includeBlockchainApp,
+		excludeChainName,
+		status,
+		limit = 10,
+		offset = 0,
+		...restParams
+	} = params;
 	params = restParams;
 
-	// Initialize DB variables
-	params.whereIn = [];
+	const am = appMetadataTableSchema.tableName;
+	const query = knex.select('network', 'appDirName', 'isDefault', `am.chainID`).from(`${am} as am`);
+	const countQuery = knex.count({ total: '*' }).from(`${am} as am`);
 
 	if (params.chainID) {
 		const { chainID, ...remParams } = params;
 		params = remParams;
 		const chainIDs = chainID.split(',');
 
-		params.whereIn.push({
-			property: `${appMetadataTableSchema.tableName}.chainID`,
-			values: chainIDs,
-		});
+		query.whereIn(`am.chainID`, chainIDs);
+		countQuery.whereIn(`am.chainID`, chainIDs);
 
 		if (!('network' in params)) {
 			const networkSet = new Set();
@@ -171,33 +200,34 @@ const getBlockchainAppsMetadata = async params => {
 	if (params.network) {
 		const { network, ...remParams } = params;
 		params = remParams;
-		params.whereIn.push({
-			property: 'network',
-			values: network.split(','),
-		});
+		query.whereIn(`am.network`, network.split(','));
+		countQuery.whereIn(`am.network`, network.split(','));
 	}
 
 	if (params.search) {
 		const { search, ...remParams } = params;
 		params = remParams;
 
-		params.orSearch = [
-			{
-				property: `${appMetadataTableSchema.tableName}.chainName`,
-				pattern: search,
-			},
-			{
-				property: 'displayName',
-				pattern: search,
-			},
-		];
+		query.andWhere(function () {
+			this.where(`am.chainName`, 'like', `%${search}%`).orWhere(
+				'displayName',
+				'like',
+				`%${escapeUserInput(search)}%`,
+			);
+		});
+
+		countQuery.andWhere(function () {
+			this.where(`am.chainName`, 'like', `%${search}%`).orWhere(
+				'displayName',
+				'like',
+				`%${escapeUserInput(search)}%`,
+			);
+		});
 	}
 
 	if (excludeChainName) {
-		params.whereNotIn = {
-			column: `${appMetadataTableSchema.tableName}.chainName`,
-			values: excludeChainName.split(','),
-		};
+		query.whereNotIn(`am.chainName`, excludeChainName.split(','));
+		countQuery.whereNotIn(`am.chainName`, excludeChainName.split(','));
 	}
 
 	if (status) {
@@ -209,59 +239,65 @@ const getBlockchainAppsMetadata = async params => {
 			const blockchainAppsTableSchema = await requestIndexer('getDatabaseSchema', {
 				fileName: 'blockchainApps',
 			});
-			params.leftOuterJoin = {
-				targetTable: `${blockchainAppsTableSchema.tableName}`,
-				leftColumn: `${appMetadataTableSchema.tableName}.chainID`,
-				rightColumn: `${blockchainAppsTableSchema.tableName}.chainID`,
-			};
-			if (params.sort) params.sort = `${appMetadataTableSchema.tableName}.${params.sort}`;
+			const ba = blockchainAppsTableSchema.tableName;
 
-			const statusValuesFiltered = Array.from(statusValues).filter(t => t !== 'unregistered');
-			if (statusValuesFiltered.length > 0) {
-				params.whereIn.push({
-					property: `${blockchainAppsTableSchema.tableName}.status`,
-					values: statusValuesFiltered,
+			query.leftOuterJoin(`${ba} as ba`, `am.chainID`, `ba.chainID`);
+			countQuery.leftOuterJoin(`${ba} as ba`, `am.chainID`, `ba.chainID`);
+
+			if (statusValues.size > 0) {
+				const statuses = Array.from(statusValues).filter(s => s !== 'unregistered');
+				const includeUnregistered = statusValues.has('unregistered');
+
+				query.andWhere(function () {
+					if (includeUnregistered) this.whereNull('ba.status');
+					if (statuses.length > 0) {
+						if (includeUnregistered) {
+							this.orWhereIn('ba.status', statuses);
+						} else {
+							this.whereIn('ba.status', statuses);
+						}
+					}
+				});
+
+				countQuery.andWhere(function () {
+					if (includeUnregistered) this.whereNull('ba.status');
+					if (statuses.length > 0) {
+						if (includeUnregistered) {
+							this.orWhereIn('ba.status', statuses);
+						} else {
+							this.whereIn('ba.status', statuses);
+						}
+					}
 				});
 			}
-			if (statusValues.has('unregistered')) {
-				params.whereNull = `${blockchainAppsTableSchema.tableName}.status`;
-			}
 		}
 	}
 
-	const limit = params.limit * config.supportedNetworks.length;
-	if (params.isDefault !== false) {
-		const defaultApps = await applicationMetadataTable.find({ ...params, limit, isDefault: true }, [
-			'network',
-			'appDirName',
-			'isDefault',
-			`${appMetadataTableSchema.tableName}.chainID`,
-		]);
-		blockchainAppsMetadata.data = defaultApps;
+	if (params.displayName) {
+		query.where('displayName', params.displayName);
+		countQuery.where('displayName', params.displayName);
 	}
 
-	if (params.isDefault !== true && blockchainAppsMetadata.data.length < params.limit) {
-		let offset = { params };
-
-		// If params.isDefault is not passed in the request then adjust the offset
-		if (!('isDefault' in params)) {
-			const totalDefaultApps = Number(
-				await applicationMetadataTable.count({
-					...params,
-					limit,
-					isDefault: true,
-				}),
-			);
-			offset = params.offset - totalDefaultApps > 0 ? params.offset - totalDefaultApps : 0;
-		}
-
-		const nonDefaultApps = await applicationMetadataTable.find(
-			{ ...params, offset, limit, isDefault: false },
-			['network', 'appDirName', 'isDefault', `${appMetadataTableSchema.tableName}.chainID`],
-		);
-
-		blockchainAppsMetadata.data.push(...nonDefaultApps);
+	if (params.chainName) {
+		query.where('am.chainName', params.chainName);
+		countQuery.where('am.chainName', params.chainName);
 	}
+
+	if ('isDefault' in params) {
+		query.where('am.isDefault', params.isDefault);
+		countQuery.where('am.isDefault', params.isDefault);
+	}
+
+	if (params.sort) {
+		params.sort = `am.${params.sort}`;
+		const [sortBy, order] = params.sort.split(':');
+		query.orderBy(sortBy, order);
+	}
+
+	query.limit(limit).offset(offset);
+
+	blockchainAppsMetadata.data = await query;
+	const [{ total }] = await countQuery;
 
 	const blockchainApp = includeBlockchainApp
 		? await requestIndexer('blockchain.apps', {
@@ -270,8 +306,7 @@ const getBlockchainAppsMetadata = async params => {
 		: { data: [], meta: { count: 0, offset: 0, total: 0 } };
 
 	blockchainAppsMetadata.data = await BluebirdPromise.map(
-		// Slice necessary to adhere to limit passed
-		blockchainAppsMetadata.data.slice(0, params.limit),
+		blockchainAppsMetadata.data,
 		async appMetadata => {
 			const appMeta = await readMetadataFromClonedRepo(
 				appMetadata.network,
@@ -298,12 +333,10 @@ const getBlockchainAppsMetadata = async params => {
 		{ concurrency: blockchainAppsMetadata.data.length },
 	);
 
-	const total = Number(await applicationMetadataTable.count(params));
-
 	blockchainAppsMetadata.meta = {
 		count: blockchainAppsMetadata.data.length,
-		offset: params.offset,
-		total,
+		offset,
+		total: Number(total),
 	};
 
 	return blockchainAppsMetadata;
