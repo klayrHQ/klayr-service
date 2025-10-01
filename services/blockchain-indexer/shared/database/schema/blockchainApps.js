@@ -26,7 +26,7 @@ module.exports = {
 	},
 	indexes: {
 		status: { type: 'key' },
-		name: { type: 'key' },
+		chainName: { type: 'key' },
 	},
 	purge: {},
 };
