@@ -26,26 +26,27 @@ To configure the different microservices, there are several environment variable
 
 A list of the most commonly used environment variables is presented below:
 
-- `SERVICE_BROKER`: URL of the microservice message broker (NATS or Redis).
-- `KLAYR_APP_WS`: URL to connect with the Klayr SDK-based application node over WebSocket. By default, it is set to `ws://127.0.0.1:7887`.
-- `KLAYR_APP_HTTP`: URL to connect with the Klayr SDK-based application node over HTTP(s). By default, it is set to `http://127.0.0.1:7887`.
-- `USE_KLAYR_HTTP_API`: Boolean flag to enable HTTP-API based connection to the Klayr SDK-based application node.
-- `USE_KLAYR_IPC_CLIENT`: Boolean flag to enable IPC-based connection to the Klayr SDK-based application node. Not applicable to a docker-based setup.
-- `KLAYR_APP_DATA_PATH`: Data path to connect with the Klayr SDK-based application node over IPC. Not applicable to a docker-based setup.
-- `GENESIS_BLOCK_URL`: URL of the Klayr SDK-based application' genesis block. Only to be used when the genesis block is large enough to be transmitted over API calls within the timeout.
-- `GEOIP_JSON`: URL of GeoIP server.
-- `ENABLE_BLOCK_CACHING`: Boolean flag to enable the block caching. Enabled by default. To disable, set it to `false`.
-- `EXPIRY_IN_HOURS`: Expiry time (in hours) for block cache. By default, it is set to `12`.
-- `CLIENT_POOL_SIZE`: Number of active API clients to be maintained in the pool. Only applicable when using the IPC or WS clients to connect with the Klayr node. By default, it is set to `10`.
-- `WS_SERVER_PING_INTERVAL`: Interval (in milliseconds) at which the WS server checks for liveliness of all the connected clients. This should not be modified unless explicitly recommended by the development team. By default, it is set to `3000`.
-- `WS_SERVER_PING_INTERVAL_BUFFER`: A conservative assumption of the latency (in milliseconds) for WS server pings to arrive at the client. By default, it is set to `1000`.
-- `ENDPOINT_INVOKE_MAX_RETRIES`: Maximum number of endpoint invocation request retries to the node. By default, it is set to `3`.
-- `ENDPOINT_INVOKE_RETRY_DELAY`: Delay (in milliseconds) between each endpoint invocation request retry. By default, it is set to `1000`.
-- `CONNECTOR_EXIT_DELAY_IN_HOURS`: Delay (in hours) after which the blockchain-connector microservice exits. The service should restart automatically if deployed using Docker or PM2. To be removed eventually. To enable it, set it higher than `0`. By default, it is set to `0`.
-- `JOB_INTERVAL_CACHE_CLEANUP`: Job run interval to cleanup block cache. By default, it is set to `0`.
-- `JOB_SCHEDULE_CACHE_CLEANUP`: Job run cron schedule to cleanup block cache. By default, it is set to run every 12 hours (`0 */12 * * *`).
-- `JOB_INTERVAL_REFRESH_PEERS`: Job run interval to refresh the peers list. By default, it is set to run every `60` seconds.
-- `JOB_SCHEDULE_REFRESH_PEERS`: Job run cron schedule to refresh the peers list. By default, it is set to `''`.
+| Environment variable | Description |
+| -------------------- | ----------- |
+| `SERVICE_BROKER` | URL of the microservice message broker (NATS or Redis). |
+| `KLAYR_APP_URLS` | Comma-separated list of Klayr application node URLs to connect to. |
+| `KLAYR_EVENT_SUBSCRIBER_NODE` | The Klayr application node URL to subscribe to events from. |
+| `SERVICE_CONNECTOR_MYSQL` | Connection string for the MySQL instance that the microservice connects to. |
+| `GENESIS_BLOCK_URL` | URL of the Klayr SDK-based application's genesis block. |
+| `CLIENT_POOL_SIZE` | Number of active API clients to be maintained in the pool for each Klayr application node URL. |
+| `WS_SERVER_PING_INTERVAL` | Interval (in milliseconds) at which the WS server checks for liveliness of all the connected clients. |
+| `WS_SERVER_PING_INTERVAL_BUFFER` | A conservative assumption of the latency (in milliseconds) for WS server pings to arrive at the client. |
+| `ENDPOINT_INVOKE_MAX_RETRIES` | Maximum number of endpoint invocation request retries to the node. |
+| `ENDPOINT_INVOKE_RETRY_DELAY` | Delay (in milliseconds) between each endpoint invocation request retry. |
+| `INVOKE_ENDPOINT_QUEUE_CONCURRENCY` | The number of concurrent jobs to process from the invoke endpoint queue. |
+| `INVOKE_ENDPOINT_COALESCING_CACHE_TTL` | The time-to-live (in milliseconds) for the coalescing cache for invoke endpoints. |
+| `ENABLE_TESTING_MODE` | Boolean flag to enable testing mode. |
+| `CONNECTOR_EXIT_DELAY_IN_HOURS` | Delay (in hours) after which the blockchain-connector microservice exits. |
+| `CLIENT_CONNECTION_VERIFY_INTERVAL` | Every n milliseconds, verify if client connection is alive. |
+| `JOB_INTERVAL_CACHE_CLEANUP` | Job run interval to clean up block cache. |
+| `JOB_SCHEDULE_CACHE_CLEANUP` | Job run cron schedule to clean up block cache. |
+| `JOB_INTERVAL_REFRESH_PEERS` | Job run interval to refresh the peers' list. |
+| `JOB_SCHEDULE_REFRESH_PEERS` | Job run cron schedule to refresh the peers' list. |
 
 > **Note**: `interval` takes priority over `schedule` and must be greater than 0 to be valid for all the moleculer job configurations.
 

@@ -26,14 +26,19 @@ To configure the different microservices, there are several environment variable
 
 A list of the most commonly used environment variables is presented below:
 
-- `SERVICE_BROKER`: URL of the microservice message broker (NATS or Redis).
-- `SERVICE_APP_REGISTRY_MYSQL`: Connection string of the MySQL instance that the microservice connects to.
-- `ENABLE_REBUILD_INDEX_AT_INIT`: Boolean flag to truncate the index and rebuild at application init.
-- `DEFAULT_APPS`: Default blockchain applications. By default, it is set to `klayr_mainchain`.
-- `JOB_INTERVAL_DELETE_NON_METADATA_FILES`: Job run interval to delete non-metadata files. By default, it is set to `0`.
-- `JOB_SCHEDULE_DELETE_NON_METADATA_FILES`: Job run cron schedule to delete non-metadata files. By default, it is set to run every day at midnight (`0 0 * * *`).
-- `JOB_INTERVAL_UPDATE_METADATA`: Job run interval to update off-chain metadata. By default, it is set to `0`.
-- `JOB_SCHEDULE_UPDATE_METADATA`: Job run cron schedule to update off-chain metadata. By default, it is set to run every 10 minutes (`*/10 * * * *`).
+| Environment variable | Description |
+| -------------------- | ----------- |
+| `SERVICE_BROKER` | URL of the microservice message broker (NATS or Redis). |
+| `SERVICE_APP_REGISTRY_MYSQL` | Connection string of the MySQL instance that the microservice connects to. |
+| `ENABLE_REBUILD_INDEX_AT_INIT` | Boolean flag to truncate the index and rebuild at application init. |
+| `GITHUB_APP_REGISTRY_REPO` | URL of `app-registry` GitHub repository. |
+| `GITHUB_APP_REGISTRY_REPO_BRANCH` | Relevant branch for `app-registry` GitHub repository. |
+| `GITHUB_ACCESS_TOKEN` | GitHub access token. |
+| `DEFAULT_APPS` | Comma separated values of user default apps other than klayr_mainchain. |
+| `JOB_INTERVAL_DELETE_NON_METADATA_FILES` | Job run interval to delete non-metadata files. By default, it is set to `0`. |
+| `JOB_SCHEDULE_DELETE_NON_METADATA_FILES` | Job run cron schedule to delete non-metadata files. By default, it is set to run every day at `midnight`. |
+| `JOB_INTERVAL_UPDATE_METADATA` | Job run interval to update off-chain metadata. By default, it is set to `0`. |
+| `JOB_SCHEDULE_UPDATE_METADATA` | Job run cron schedule to update off-chain metadata. By default, it is set to run every `10` minutes. |
 
 > **Note**: `interval` takes priority over `schedule` and must be greater than 0 to be valid for all the moleculer job configurations.
 

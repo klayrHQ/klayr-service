@@ -26,9 +26,9 @@ config.brokerTimeout = Number(process.env.SERVICE_BROKER_TIMEOUT) || 10; // in s
  */
 config.endpoints = {};
 config.endpoints.redis =
-	process.env.SERVICE_EXPORT_REDIS || 'redis://klayr:password@127.0.0.1:6379/3';
+	process.env.SERVICE_EXPORT_REDIS || 'redis://klayr:password@127.0.0.1:6379/8';
 config.endpoints.volatileRedis =
-	process.env.SERVICE_EXPORT_REDIS_VOLATILE || 'redis://klayr:password@127.0.0.1:6379/4';
+	process.env.SERVICE_EXPORT_REDIS_VOLATILE || 'redis://klayr:password@127.0.0.1:6379/9';
 
 // Logging
 config.log = {

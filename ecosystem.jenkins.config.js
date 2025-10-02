@@ -31,7 +31,7 @@ module.exports = {
 			env: {
 				PORT: 9901,
 				SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
-				SERVICE_GATEWAY_REDIS_VOLATILE: 'redis://klayr:password@127.0.0.1:6379/3',
+				SERVICE_GATEWAY_REDIS_VOLATILE: 'redis://klayr:password@127.0.0.1:6379/5',
 				ENABLE_HTTP_API: 'http-status,http-version3,http-exports',
 				ENABLE_WS_API: 'blockchain,rpc-v3',
 				GATEWAY_DEPENDENCIES: 'indexer,connector',
@@ -81,10 +81,7 @@ module.exports = {
 			env: {
 				// --- Remember to set the properties below
 				SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
-				KLAYR_APP_WS: 'ws://127.0.0.1:7887',
-				GEOIP_JSON: 'https://geoip.klayr.com/json',
-				// USE_KLAYR_IPC_CLIENT: true,
-				// KLAYR_APP_DATA_PATH: '~/.klayr/klayr-core',
+				KLAYR_APP_URLS: 'ws://127.0.0.1:7887',
 				ENABLE_TESTING_MODE: true,
 			},
 		},
@@ -103,13 +100,12 @@ module.exports = {
 			env: {
 				// --- Remember to set the properties below
 				SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
-				SERVICE_INDEXER_CACHE_REDIS: 'redis://klayr:password@127.0.0.1:6379/1',
-				SERVICE_INDEXER_REDIS_VOLATILE: 'redis://klayr:password@127.0.0.1:6379/2',
-				SERVICE_MESSAGE_QUEUE_REDIS: 'redis://klayr:password@127.0.0.1:6379/3',
+				SERVICE_MESSAGE_QUEUE_REDIS: 'redis://klayr:password@127.0.0.1:6379/1',
+				SERVICE_INDEXER_CACHE_REDIS: 'redis://klayr:password@127.0.0.1:6379/2',
+				SERVICE_INDEXER_REDIS_VOLATILE: 'redis://klayr:password@127.0.0.1:6379/3',
 				SERVICE_INDEXER_MYSQL: 'mysql://klayr:password@127.0.0.1:3306/klayr',
 				ENABLE_DATA_RETRIEVAL_MODE: true,
 				ENABLE_INDEXING_MODE: true,
-				ENABLE_PERSIST_EVENTS: false,
 				// INVOKE_ALLOWED_METHODS: 'dynamicReward_getExpectedValidatorRewards,token_hasUserAccount,token_getInitializationFees,interoperability_getMinimumMessageFee,txpool_getTransactionsFromPool,pos_getExpectedSharedRewards',
 			},
 		},
@@ -128,7 +124,7 @@ module.exports = {
 			env: {
 				// --- Remember to set the properties below
 				SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
-				SERVICE_MESSAGE_QUEUE_REDIS: 'redis://klayr:password@127.0.0.1:6379/3',
+				SERVICE_MESSAGE_QUEUE_REDIS: 'redis://klayr:password@127.0.0.1:6379/1',
 			},
 		},
 		{
@@ -146,7 +142,7 @@ module.exports = {
 			env: {
 				// --- Remember to set the properties below
 				SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
-				SERVICE_FEE_ESTIMATOR_CACHE: 'redis://klayr:password@127.0.0.1:6379/1',
+				SERVICE_FEE_ESTIMATOR_CACHE: 'redis://klayr:password@127.0.0.1:6379/4',
 				ENABLE_FEE_ESTIMATOR_QUICK: true,
 				ENABLE_FEE_ESTIMATOR_FULL: false,
 			},
@@ -166,7 +162,7 @@ module.exports = {
 			env: {
 				// --- Remember to set the properties below
 				SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
-				SERVICE_STATISTICS_REDIS: 'redis://klayr:password@127.0.0.1:6379/1',
+				SERVICE_STATISTICS_REDIS: 'redis://klayr:password@127.0.0.1:6379/7',
 				SERVICE_STATISTICS_MYSQL: 'mysql://klayr:password@127.0.0.1:3306/klayr',
 				// TRANSACTION_STATS_HISTORY_LENGTH_DAYS: 366,
 			},
@@ -185,7 +181,7 @@ module.exports = {
 			autorestart: true,
 			env: {
 				SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
-				SERVICE_MARKET_REDIS: 'redis://klayr:password@127.0.0.1:6379/2',
+				SERVICE_MARKET_REDIS: 'redis://klayr:password@127.0.0.1:6379/6',
 				// SERVICE_MARKET_FIAT_CURRENCIES: 'EUR,USD,CHF,GBP,RUB',
 				// SERVICE_MARKET_TARGET_PAIRS: 'LSK_BTC,LSK_EUR,LSK_USD,LSK_CHF,BTC_EUR,BTC_USD,BTC_CHF',
 				// EXCHANGERATESAPI_IO_API_KEY: ''
@@ -205,8 +201,8 @@ module.exports = {
 			autorestart: true,
 			env: {
 				SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
-				SERVICE_EXPORT_REDIS: 'redis://klayr:password@127.0.0.1:6379/3',
-				SERVICE_EXPORT_REDIS_VOLATILE: 'redis://klayr:password@127.0.0.1:6379/4',
+				SERVICE_EXPORT_REDIS: 'redis://klayr:password@127.0.0.1:6379/8',
+				SERVICE_EXPORT_REDIS_VOLATILE: 'redis://klayr:password@127.0.0.1:6379/9',
 				// SERVICE_EXPORT_PARTIALS: './data/partials',
 				// EXPORT_S3_BUCKET_NAME_PARTIALS: 'partials',
 				// SERVICE_EXPORT_STATIC: './data/static',

@@ -33,7 +33,7 @@ sudo apt install -y build-essential git make
 sudo apt install -y redis-server
 ```
 
-> Note: During this step it is possible to change your port if you wish to have more Redis instances in the future. Remember to adjust the environment variables `SERVICE_BROKER` and `SERVICE_CORE_REDIS` accordingly.
+> Note: During this step it is possible to change your port if you wish to have more Redis instances in the future. Remember to adjust the environment variables `SERVICE_BROKER` accordingly.
 
 ### MySQL
 

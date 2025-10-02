@@ -5,7 +5,7 @@
 These options are applicable to all the Klayr Service microservices.
 When using the Docker setup, the default values specified in the [`docker/example.env`](../docker/example.env) file should suffice. To properly set the Docker environment variables, copy the [`docker/example.env`](../docker/example.env) file as `.env` and place it next to the [`docker-compose.yml`](../docker-compose.yml) file in the project's root directory. Please adjust the values for the environment variables, if necessary.
 
-> **Note:**  If the Docker environment is being used, the minimum necessary environment variable that needs to be set is `KLAYR_APP_WS`.
+> **Note:**  If the Docker environment is being used, the minimum necessary environment variable that needs to be set is `KLAYR_APP_URLS`.
 
 ### Service broker
 
