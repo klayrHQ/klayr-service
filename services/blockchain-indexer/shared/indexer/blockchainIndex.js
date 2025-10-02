@@ -231,9 +231,9 @@ const indexBlock = async job => {
 		startIndexSpeedRecord();
 
 	try {
+		let currentHeight = await getCurrentHeight();
 		const blocksTable = await getBlocksTable();
 		const lastIndexedBlock = await getLastIndexedBlock();
-		const currentHeight = await getCurrentHeight();
 
 		// Always index the last indexed blockHeight + 1 (sequential indexing)
 		if (lastIndexedBlock !== undefined) {
@@ -262,9 +262,17 @@ const indexBlock = async job => {
 			// useful for fork recovery when node are lagging behind
 			if (currentHeight < blockHeightToIndex) {
 				await refreshNodeInfo();
-				throw new Error(
-					`Block at height ${blockHeightToIndex} is larger than current cached node height at ${currentHeight}.`,
-				);
+
+				// wait to ensure node info is refreshed
+				await new Promise(r => setTimeout(r, 200));
+
+				// check once more after refresh, only then throw error if currentHeight is still behind
+				currentHeight = await getCurrentHeight();
+				if (currentHeight < blockHeightToIndex) {
+					throw new Error(
+						`Block at height ${blockHeightToIndex} is larger than current cached node height at ${currentHeight}.`,
+					);
+				}
 			}
 		}
 
