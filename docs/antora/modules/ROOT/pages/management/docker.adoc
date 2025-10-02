@@ -274,49 +274,49 @@ NOTE: In case the database needs to be flushed please execute the `make down` co
 . Checkout the version with *`git checkout <tag>`*
 +
 ----
-git checkout v0.7.8
+git checkout v0.8.0-alpha
 ----
 
 . Update `docker-compose.yml` to download the specific image versions from the DockerHub as shown below.
-Update specified images with the desired version, for example `0.7.8`.
+Update specified images with the desired version, for example `0.8.0-alpha`.
 +
 .docker-compose.yml
 [source,yaml]
 ----
 blockchain-app-registry:
-    image: klayr/service_blockchain_app_registry:0.7.8
+    image: klayr/service_blockchain_app_registry:0.8.0-alpha
     ...
 
   blockchain-connector:
-    image: klayr/service_blockchain_connector:0.7.8
+    image: klayr/service_blockchain_connector:0.8.0-alpha
     ...
 
   blockchain-indexer:
-    image: klayr/service_blockchain_indexer:0.7.8
+    image: klayr/service_blockchain_indexer:0.8.0-alpha
     ...
 
   blockchain-coordinator:
-    image: klayr/service_blockchain_coordinator:0.7.8
+    image: klayr/service_blockchain_coordinator:0.8.0-alpha
     ...
 
   transaction-statistics:
-    image: klayr/service_transaction_statistics:0.7.8
+    image: klayr/service_transaction_statistics:0.8.0-alpha
     ...
 
   fee-estimator:
-    image: klayr/service_fee_estimator:0.7.8
+    image: klayr/service_fee_estimator:0.8.0-alpha
     ...
 
   gateway:
-    image: klayr/service_gateway:0.7.8
+    image: klayr/service_gateway:0.8.0-alpha
     ...
 
   market:
-    image: klayr/service_market:0.7.8
+    image: klayr/service_market:0.8.0-alpha
     ...
 
   export:
-    image: klayr/service_export:0.7.8
+    image: klayr/service_export:0.8.0-alpha
 
 ----
 
@@ -342,7 +342,7 @@ NOTE: In case the database needs to be flushed please execute the `make down` co
 . Checkout the version with *`git checkout <tag>`*
 +
 ----
-git checkout v0.7.8
+git checkout v0.8.0-alpha
 ----
 
 . Build the required updated Docker images

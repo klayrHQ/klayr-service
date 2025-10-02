@@ -21,6 +21,7 @@ const {
 
 const { downloadAndExtractTarball, downloadFile } = require('../../../../shared/utils/download');
 
+// TODO: later change to v0.8.0-alpha
 const dirPath = `${__dirname}/test_data/`;
 const url = 'https://codeload.github.com/klayrhq/klayr-service/tar.gz/refs/tags/v0.7.8';
 
