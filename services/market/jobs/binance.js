@@ -25,11 +25,10 @@ const logger = Logger();
 
 const reloadMarketPrices = async () =>
 	reload().catch(err => {
-		if (err instanceof ServiceUnavailableException) {
-			logger.warn('Unable to fetch market prices from Binance right now. Will retry later.');
-			return;
-		}
-		throw err;
+		logger.warn(
+			`Unable to fetch market prices from Binance right now due to: (${err.message}). Will retry later.`,
+		);
+		return;
 	});
 
 module.exports = [
