@@ -21,7 +21,10 @@ module.exports = {
 	height: '=,number',
 	chainID: '=,string',
 	location: {
-		countryCode: 'location.country_code,string',
+		countryCode: 'location.countryCode,string',
+		countryName: 'location.countryName,string',
+		hostname: 'location.hostname,string',
+		ip: 'location.ip,string',
 		latitude: 'location.latitude,string',
 		longitude: 'location.longitude,string',
 	},

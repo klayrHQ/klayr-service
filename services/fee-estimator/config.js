@@ -33,7 +33,7 @@ config.brokerTimeout = Number(process.env.SERVICE_BROKER_TIMEOUT) || 10; // in s
  * External endpoints
  */
 config.endpoints.cache =
-	process.env.SERVICE_FEE_ESTIMATOR_CACHE || 'redis://klayr:password@127.0.0.1:6379/1';
+	process.env.SERVICE_FEE_ESTIMATOR_CACHE || 'redis://klayr:password@127.0.0.1:6379/4';
 
 config.feeEstimates = {
 	quickAlgorithmEnabled: String(process.env.ENABLE_FEE_ESTIMATOR_QUICK).toLowerCase() !== 'false',

@@ -61,7 +61,7 @@ const {
 	getReorderingStatus,
 	reorderIndexBlocksQueueJobs,
 	indexNewMissingBlock,
-	scheduleMissingBlocksIndexing,
+	setLargestMissingBlockHeight,
 } = require('./utils/blockchainIndex');
 const {
 	startIndexSpeedRecord,
@@ -74,6 +74,7 @@ const {
 	EVENT,
 	MODULE,
 	getCurrentHeight,
+	refreshNodeInfo,
 } = require('../constants');
 
 const config = require('../../config');
@@ -92,6 +93,7 @@ const {
 } = require('./utils/indexerEventHook');
 const { recordEvents, commitEvent } = require('./eventProcessor');
 const { recordNonceIncrease } = require('../dataService/recorder/auth/account');
+const { scheduleMissingBlocksOnCoordinator } = require('./utils/scheduler');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
@@ -204,8 +206,11 @@ const retryIndexingAndReorderIfFailed = async job => {
 			await reorderIndexBlocksQueueJobs(job, indexBlocksQueue);
 			return RESCHEDULE_STATUS.IS_RETURN;
 		} catch (err) {
+			logger.error(
+				`Re-ordering indexBlocksQueue failed, will schedule missing blocks through coordinator. Error: ${err.message}`,
+			);
 			await clearIndexBlocksQueue();
-			await scheduleMissingBlocksIndexing();
+			await scheduleMissingBlocksOnCoordinator();
 			return RESCHEDULE_STATUS.IS_RETURN;
 		}
 	}
@@ -226,15 +231,49 @@ const indexBlock = async job => {
 		startIndexSpeedRecord();
 
 	try {
+		let currentHeight = await getCurrentHeight();
 		const blocksTable = await getBlocksTable();
 		const lastIndexedBlock = await getLastIndexedBlock();
 
 		// Always index the last indexed blockHeight + 1 (sequential indexing)
 		if (lastIndexedBlock !== undefined) {
-			blockHeightToIndex = lastIndexedBlock.height + 1;
+			// If blockHeightFromJobData is set, the job isn't from newBlock.
+			// If it's non-sequential, update largestMissingBlockHeight so indexNewMissingBlock could covers all missed blocks.
+			if (
+				blockHeightFromJobData !== undefined &&
+				blockHeightFromJobData !== lastIndexedBlock.height + 1
+			) {
+				await setLargestMissingBlockHeight(blockHeightFromJobData);
+			}
 
-			// Skip job run if the height to be indexed does not exist
-			if ((await getCurrentHeight()) < blockHeightToIndex) return;
+			if (blockHeightToIndex !== lastIndexedBlock.height + 1) {
+				// Only warn if not indexing from block job data (e.g. height mode), preventing verbose uneccessary logs on reordering
+				if (blockFromJobData === undefined) {
+					logger.warn(
+						`overriding blockHeightToIndex from ${blockHeightToIndex} to ${
+							lastIndexedBlock.height + 1
+						} on indexing by blocks`,
+					);
+				}
+				blockHeightToIndex = lastIndexedBlock.height + 1;
+			}
+
+			// if the height to be indexed does not exist yet, throw error so it would be retried later, while refreshing node info
+			// useful for fork recovery when node are lagging behind
+			if (currentHeight < blockHeightToIndex) {
+				await refreshNodeInfo();
+
+				// wait to ensure node info is refreshed
+				await new Promise(r => setTimeout(r, 200));
+
+				// check once more after refresh, only then throw error if currentHeight is still behind
+				currentHeight = await getCurrentHeight();
+				if (currentHeight < blockHeightToIndex) {
+					throw new Error(
+						`Block at height ${blockHeightToIndex} is larger than current cached node height at ${currentHeight}.`,
+					);
+				}
+			}
 		}
 
 		// Get block from args if have same height, otherwise get from node
@@ -285,8 +324,7 @@ const indexBlock = async job => {
 			// which is already implemented on line blockHeightToIndex = lastIndexedBlock.height + 1 above
 			if (Object.keys(currentBlockInDB).length) {
 				// Skip indexing if the blockchain is fully indexed.
-				const currentBlockchainHeight = await getCurrentHeight();
-				if (lastIndexedBlock.height >= currentBlockchainHeight) return;
+				if (lastIndexedBlock.height >= currentHeight) return;
 
 				// blockHeightToIndex = lastIndexedBlock.height + 1;
 			}
@@ -355,7 +393,7 @@ const indexBlock = async job => {
 					await recordNonceIncrease(tx.senderAddress);
 
 					// store complete transaction data in database
-					await transactionsTable.upsert(tx, dbTrx);
+					await transactionsTable.insert(tx, dbTrx);
 
 					// Invoke 'applyTransaction' to execute command specific processing logic
 					await applyTransaction(blockHeader, tx, events, dbTrx);
@@ -374,7 +412,7 @@ const indexBlock = async job => {
 			dbTrx,
 		);
 		if (numRowsAffected === 0) {
-			await validatorsTable.upsert(
+			await validatorsTable.insert(
 				{
 					address: blockToIndexFromNode.generatorAddress,
 					generatedBlocks: 1,
@@ -390,8 +428,8 @@ const indexBlock = async job => {
 			const { eventsInfo, eventTopicsInfo } = getEventsInfoToIndex(blockToIndexFromNode, events);
 
 			await Promise.all([
-				eventsTable.upsert(eventsInfo, dbTrx),
-				eventTopicsTable.upsert(eventTopicsInfo, dbTrx),
+				eventsTable.insert(eventsInfo, dbTrx),
+				eventTopicsTable.insert(eventTopicsInfo, dbTrx),
 			]);
 
 			// Update block generator's rewards
@@ -484,7 +522,7 @@ const indexBlock = async job => {
 			reward: blockReward,
 		};
 
-		await blocksTable.upsert(blockToIndex, dbTrx);
+		await blocksTable.insert(blockToIndex, dbTrx);
 
 		await commitEvent(dbTrx);
 		await commitDBTransaction(dbTrx);
@@ -694,13 +732,13 @@ const deleteIndexedBlocks = async job => {
 					const eventTopicsTable = await getEventTopicsTable();
 
 					const { eventsInfo } = getEventsInfoToIndex(blockFromJob, events);
-					const eventIDs = eventsInfo.map(e => e.id);
+					const eventPKs = eventsInfo.map(e => e.eventPK);
 
 					await eventTopicsTable.delete(
-						{ whereIn: { property: 'eventID', values: eventIDs } },
+						{ whereIn: { property: 'eventPK', values: eventPKs } },
 						dbTrx,
 					);
-					await eventsTable.deleteByPrimaryKey(eventIDs, dbTrx);
+					await eventsTable.deleteByPrimaryKey(eventPKs, dbTrx);
 
 					// Update block generator's rewards
 					const blockRewardEvent = events.find(
@@ -1032,7 +1070,7 @@ const findMissingBlocksInRange = async (fromHeight, toHeight) => {
 
 	const blocksTable = await getBlocksTable();
 	const propBetweens = [{ property: 'height', from: fromHeight, to: toHeight }];
-	const indexedBlockCount = await blocksTable.count({ propBetweens });
+	const indexedBlockCount = Number(await blocksTable.count({ propBetweens }));
 
 	// This block helps determine empty index
 	if (indexedBlockCount < 3) {

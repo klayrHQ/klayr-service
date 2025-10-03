@@ -33,6 +33,7 @@ const {
 	getTransactionsByIDs,
 	normalizeTransaction,
 	formatTransactionsInBlock,
+	getTotalTransactions,
 } = require('./transactions');
 
 const {
@@ -73,6 +74,7 @@ const {
 	getPosClaimableRewards,
 	getPosUnlocks,
 	getPosConstants,
+	getPosValidatorsStatusCount,
 } = require('./pos');
 
 const {
@@ -106,8 +108,14 @@ const { estimateTransactionFees } = require('./transactionsEstimateFees');
 const { invokeEndpoint } = require('./invoke');
 
 const { setFeeEstimates, getFeeEstimates, initFeeEstimates } = require('./feeEstimates');
+const { getAccount, getTotalAccounts } = require('./account');
+const { search } = require('./search');
 
 module.exports = {
+	// Account
+	getAccount,
+	getTotalAccounts,
+
 	// Generators
 	getGenerators,
 	getNumberOfGenerators,
@@ -136,6 +144,7 @@ module.exports = {
 	dryRunTransactions,
 	estimateTransactionFees,
 	formatTransactionsInBlock,
+	getTotalTransactions,
 
 	// Events
 	getEvents,
@@ -175,6 +184,7 @@ module.exports = {
 	getPosClaimableRewards,
 	getPosUnlocks,
 	getPosConstants,
+	getPosValidatorsStatusCount,
 
 	// Schemas
 	getSchemas,
@@ -206,5 +216,9 @@ module.exports = {
 	getNetworkDisconnectedPeers,
 	getNetworkPeersStatistics,
 
+	// Invoke
 	invokeEndpoint,
+
+	// Search
+	search,
 };

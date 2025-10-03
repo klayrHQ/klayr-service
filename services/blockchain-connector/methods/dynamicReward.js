@@ -13,7 +13,12 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { getRewardTokenID, getAnnualInflation, getDefaultRewardAtHeight } = require('../shared/sdk');
+const {
+	getRewardTokenID,
+	getAnnualInflation,
+	getDefaultRewardAtHeight,
+	getExpectedValidatorRewards,
+} = require('../shared/sdk');
 
 module.exports = [
 	{
@@ -31,6 +36,13 @@ module.exports = [
 		controller: async ({ height }) => getDefaultRewardAtHeight(height),
 		params: {
 			height: { optional: false, type: 'number', min: 0 },
+		},
+	},
+	{
+		name: 'getExpectedValidatorRewards',
+		controller: async ({ validatorAddress }) => getExpectedValidatorRewards(validatorAddress),
+		params: {
+			validatorAddress: { optional: false, type: 'string' },
 		},
 	},
 ];

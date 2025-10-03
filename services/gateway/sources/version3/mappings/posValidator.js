@@ -46,4 +46,11 @@ module.exports = {
 	totalCommission: '=,string',
 	totalSelfStakeRewards: '=,string',
 	earnedRewards: '=,string',
+	nextAllocatedTime: '=,number',
+	blockReward: '=,string',
+	statusValue: {
+		height: '=,number',
+		maxHeightGenerated: '=,number',
+		maxHeightPrevoted: '=,number',
+	},
 };

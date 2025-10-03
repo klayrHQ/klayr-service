@@ -32,5 +32,12 @@
 		"in": "query",
 		"description": "Query pending unlocks filtered by lock status.",
 		"type": "boolean"
+	},
+	"includeStatusValue": {
+		"name": "includeStatusValue",
+		"in": "query",
+		"description": "Should include validator's status value in response",
+		"type": "boolean",
+		"default": false
 	}
 }

@@ -25,6 +25,7 @@ module.exports = {
 	tags: ['Application Off-Chain Metadata'],
 	params: {
 		chainName: { optional: true, type: 'string', pattern: regex.CHAIN_NAME },
+		excludeChainName: { optional: true, type: 'string', pattern: regex.CHAIN_NAME_CSV },
 		displayName: { optional: true, type: 'string', min: 3, max: 20, pattern: regex.NAME },
 		chainID: {
 			optional: true,
@@ -33,6 +34,12 @@ module.exports = {
 			altSwaggerKey: 'chainIDCSV',
 		},
 		isDefault: { optional: true, type: 'boolean' },
+		status: {
+			optional: true,
+			type: 'string',
+			pattern: regex.APPLICATION_STATUS,
+			altSwaggerKey: 'blockchainAppStatus',
+		},
 		network: { optional: true, type: 'string', min: 1, pattern: regex.NETWORK_CSV },
 		search: {
 			optional: true,
@@ -48,6 +55,7 @@ module.exports = {
 			enum: ['chainName:asc', 'chainName:desc', 'chainID:asc', 'chainID:desc'],
 			default: 'chainName:asc',
 		},
+		includeBlockchainApp: { optional: true, type: 'boolean', default: false },
 	},
 	get schema() {
 		const blockchainAppsMetadataSchema = {};

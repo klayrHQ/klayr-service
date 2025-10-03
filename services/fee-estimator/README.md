@@ -26,15 +26,17 @@ To configure the different microservices, there are several environment variable
 
 A list of the most commonly used environment variables is presented below:
 
-- `SERVICE_BROKER`: URL of the microservice message broker (NATS or Redis).
-- `SERVICE_FEE_ESTIMATOR_CACHE`: URL of the cache storage (Redis).
-- `ENABLE_FEE_ESTIMATOR_QUICK`: Boolean flag to enable quick algorithm.
-- `ENABLE_FEE_ESTIMATOR_FULL`: Boolean flag to enable full algorithm.
-- `FEE_EST_COLD_START_BATCH_SIZE`: Number of blocks analyzed during cold start.
-- `FEE_EST_DEFAULT_START_BLOCK_HEIGHT`: Block height at which fee estimation algorithm starts running. By default, it starts at the genesis height in full mode and the current block height at the moment of application initialization in the quick mode.
-- `FEE_EST_EMA_BATCH_SIZE`: Estimated moving average algorithm batch size.
-- `FEE_EST_EMA_DECAY_RATE`: Estimated moving average algorithm decay rate.
-- `FEE_EST_WAVG_DECAY_PERCENTAGE`: Estimated moving average algorithm weighted average decay percentage.
+| Environment variable | Description |
+| -------------------- | ----------- |
+| `SERVICE_BROKER` | URL of the microservice message broker (NATS or Redis). |
+| `SERVICE_FEE_ESTIMATOR_CACHE` | URL of the cache storage (Redis). |
+| `ENABLE_FEE_ESTIMATOR_QUICK` | Enable quick algorithm for fee estimation. |
+| `ENABLE_FEE_ESTIMATOR_FULL` | Enable full algorithm for fee estimation. |
+| `FEE_EST_COLD_START_BATCH_SIZE` | Defines the number of blocks that are analyzed during cold start. |
+| `FEE_EST_DEFAULT_START_BLOCK_HEIGHT` | Defines the block height at which the dynamic fee estimation algorithm starts. |
+| `FEE_EST_EMA_BATCH_SIZE` | Estimated moving average algorithm batch size. |
+| `FEE_EST_EMA_DECAY_RATE` | Estimated moving average algorithm decay rate. |
+| `FEE_EST_WAVG_DECAY_PERCENTAGE` | Estimated moving average algorithm weighted average decay percentage. |
 
 > **Note**: `interval` takes priority over `schedule` and must be greater than 0 to be valid for all the moleculer job configurations.
 

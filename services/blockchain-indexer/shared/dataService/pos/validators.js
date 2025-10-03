@@ -37,13 +37,16 @@ const { MODULE, COMMAND } = require('../../constants');
 const { sortComparator } = require('../../utils/array');
 const { parseToJSONCompatObj } = require('../../utils/parser');
 const { updateAccountInfo, getKlayr32AddressFromPublicKey } = require('../../utils/account');
+const { indexAccountPublicKey } = require('../../indexer/accountIndex');
+const { requestConnector } = require('../../utils/request');
 
 const validatorsTableSchema = require('../../database/schema/validators');
-const { indexAccountPublicKey } = require('../../indexer/accountIndex');
+const blocksTableSchema = require('../../database/schema/blocks');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
 const getValidatorsTable = () => getTableInstance(validatorsTableSchema, MYSQL_ENDPOINT);
+const getBlocksTable = () => getTableInstance(blocksTableSchema, MYSQL_ENDPOINT);
 
 const validatorCache = CacheRedis('validator', config.endpoints.cache);
 
@@ -58,6 +61,53 @@ const VALIDATOR_STATUS = {
 };
 
 let validatorList = [];
+let isReloadingRewardsCache = false;
+
+const validatorRewardCache = new Map();
+
+const reloadValidatorRewardCache = async () => {
+	try {
+		isReloadingRewardsCache = true;
+		validatorRewardCache.clear();
+
+		const allValidators = await getAllValidators();
+		const allActiveValidators = allValidators.filter(
+			validator => validator.status === VALIDATOR_STATUS.ACTIVE,
+		);
+
+		for (let i = 0; i < allActiveValidators.length; i++) {
+			const validator = allActiveValidators[i];
+			const expectedReward = await requestConnector('getExpectedValidatorRewards', {
+				validatorAddress: validator.address,
+			});
+			validatorRewardCache.set(validator.address, expectedReward);
+		}
+		logger.info(
+			`Updated validator reward list cache with ${validatorRewardCache.size} active validators.`,
+		);
+	} catch (err) {
+		logger.warn(`Failed to update validator reward cache due to: ${err.message}`);
+		throw err;
+	} finally {
+		isReloadingRewardsCache = false;
+	}
+};
+
+const getValidatorReward = async validatorAddress => {
+	if (validatorRewardCache.size === 0 && !isReloadingRewardsCache)
+		await reloadValidatorRewardCache();
+
+	if (!validatorRewardCache.has(validatorAddress)) {
+		return {
+			blockReward: '0',
+			dailyReward: '0',
+			monthlyReward: '0',
+			yearlyReward: '0',
+		};
+	}
+
+	return validatorRewardCache.get(validatorAddress);
+};
 
 const validatorComparator = (a, b) => {
 	const diff = BigInt(b.validatorWeight) - BigInt(a.validatorWeight);
@@ -181,6 +231,9 @@ const getPosValidators = async params => {
 	const nameSet = new Set();
 	const statusSet = new Set();
 
+	const { includeStatusValue, ...restParams } = params;
+	params = restParams;
+
 	if (params.publicKey) {
 		const address = getKlayr32AddressFromPublicKey(params.publicKey);
 
@@ -215,8 +268,11 @@ const getPosValidators = async params => {
 		}
 	}
 
+	const blocksTable = await getBlocksTable();
 	const validatorsTable = await getValidatorsTable();
+
 	const allValidators = await getAllValidators();
+	const generators = await business.getGenerators();
 
 	// Filter validators based on user passed params
 	const filteredValidators = allValidators.filter(validator => {
@@ -236,22 +292,43 @@ const getPosValidators = async params => {
 	validators.data = await BluebirdPromise.map(
 		filteredValidators,
 		async validator => {
-			const [validatorInfo = {}] = await validatorsTable.find(
-				{ address: validator.address, limit: 1 },
-				['generatedBlocks', 'totalCommission', 'totalSelfStakeRewards'],
-			);
+			const [[validatorInfo = {}], [lastGeneratedBlock = {}]] = await Promise.all([
+				validatorsTable.find({ address: validator.address, limit: 1 }, [
+					'generatedBlocks',
+					'totalCommission',
+					'totalSelfStakeRewards',
+				]),
+				includeStatusValue
+					? blocksTable.find(
+							{ generatorAddress: validator.address, sort: 'height:desc', limit: 1 },
+							['height', 'maxHeightGenerated', 'maxHeightPrevoted'],
+					  )
+					: Promise.resolve([{}]),
+			]);
+
 			const {
 				generatedBlocks = 0,
-				totalCommission = BigInt('0'),
-				totalSelfStakeRewards = BigInt('0'),
+				totalCommission = '0',
+				totalSelfStakeRewards = '0',
 			} = validatorInfo;
+
+			const validatorReward = await getValidatorReward(validator.address);
+			const generatorData = generators.find(generator => generator.address === validator.address);
+			const nextAllocatedTime = generatorData ? generatorData.nextAllocatedTime : 0;
 
 			return {
 				...validator,
 				generatedBlocks,
 				totalCommission,
 				totalSelfStakeRewards,
-				earnedRewards: totalCommission + totalSelfStakeRewards,
+				nextAllocatedTime,
+				blockReward: validatorReward.blockReward,
+				earnedRewards: (BigInt(totalCommission) + BigInt(totalSelfStakeRewards)).toString(),
+				statusValue: {
+					height: lastGeneratedBlock.height,
+					maxHeightGenerated: lastGeneratedBlock.maxHeightGenerated,
+					maxHeightPrevoted: lastGeneratedBlock.maxHeightPrevoted,
+				},
 			};
 		},
 		{ concurrency: validators.data.length },
@@ -271,6 +348,12 @@ const getPosValidators = async params => {
 	validators.meta.offset = params.offset;
 
 	return parseToJSONCompatObj(validators);
+};
+
+const getPosValidatorsStatusCount = async params => {
+	const allValidators = await getAllValidators();
+	const response = await business.getPosValidatorsStatusCount({ allValidators });
+	return response;
 };
 
 // Keep the validator cache up-to-date
@@ -404,9 +487,12 @@ updateValidatorListEveryBlock();
 updateValidatorListOnAccountsUpdate();
 
 module.exports = {
+	getPosValidatorsStatusCount,
 	reloadValidatorCache,
 	getPosValidators,
 	getAllValidators,
+	reloadValidatorRewardCache,
+	getValidatorReward,
 
 	// For testing
 	validatorComparator,

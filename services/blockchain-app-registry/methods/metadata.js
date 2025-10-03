@@ -28,6 +28,8 @@ module.exports = [
 		params: {
 			chainID: { optional: true, type: 'string' },
 			chainName: { optional: true, type: 'string' },
+			status: { optional: true, type: 'string' },
+			excludeChainName: { optional: true, type: 'string' },
 			displayName: { optional: true, type: 'string' },
 			isDefault: { optional: true, type: 'boolean' },
 			network: { optional: true, type: 'string', pattern: regex.NETWORK },
@@ -35,6 +37,7 @@ module.exports = [
 			limit: { optional: true, type: 'number' },
 			offset: { optional: true, type: 'number' },
 			sort: { optional: true, type: 'string' },
+			includeBlockchainApp: { optional: true, type: 'boolean' },
 		},
 		controller: getBlockchainAppsMetadata,
 	},

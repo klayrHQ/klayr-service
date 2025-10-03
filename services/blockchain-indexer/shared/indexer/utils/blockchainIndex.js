@@ -32,8 +32,6 @@ const { getLastIndexedBlock } = require('../lastIndexedBlock');
 const config = require('../../../config');
 
 const blocksTableSchema = require('../../database/schema/blocks');
-const { requestCoordinator } = require('../../utils/request');
-const { waitForCoordinatorReady } = require('./coordinator');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
@@ -122,13 +120,12 @@ const indexNewMissingBlock = async (lastIndexedBlock, newBlock, queue) => {
 
 	for (const missingBlockHeight of missingBlocks) {
 		if (missingBlockHeight > currentLargestMissingBlockHeight) {
-			logger.info(`Scheduling indexing of missing block at height ${missingBlockHeight}`);
-
 			const [blockFromDB] = await blocksTable.find({ height: missingBlockHeight, limit: 1 }, [
 				'id',
 			]);
 
 			if (!blockFromDB) {
+				logger.info(`Scheduling indexing of missing block at height ${missingBlockHeight}`);
 				currentLargestMissingBlockHeight = missingBlockHeight;
 				await queue.add({ height: missingBlockHeight });
 			} else {
@@ -214,11 +211,6 @@ const updateTotalLockedAmounts = async (tokenIDLockedAmountChangeMap, dbTrx) =>
 		{ concurrency: Object.entries(tokenIDLockedAmountChangeMap).length },
 	);
 
-const scheduleMissingBlocksIndexing = async () => {
-	await waitForCoordinatorReady();
-	await requestCoordinator('scheduleMissingBlocksIndexing');
-};
-
 module.exports = {
 	reorderIndexBlocksQueueJobs,
 	activateReorderingMode,
@@ -228,5 +220,4 @@ module.exports = {
 	setLargestMissingBlockHeight,
 	getLargestMissingBlockHeight,
 	indexNewMissingBlock,
-	scheduleMissingBlocksIndexing,
 };

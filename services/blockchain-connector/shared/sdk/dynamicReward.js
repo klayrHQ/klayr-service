@@ -14,7 +14,8 @@
  *
  */
 const { invokeEndpoint } = require('./client');
-const { getRegisteredModules } = require('./cached_endpoints');
+const { getRegisteredModules, getNodeInfo } = require('./cached_endpoints');
+const { getPosConstants } = require('./pos');
 
 let registeredRewardModule;
 let rewardTokenID;
@@ -53,9 +54,37 @@ const getDefaultRewardAtHeight = async height => {
 	return defaultRewardResponse;
 };
 
+const getExpectedValidatorRewards = async validatorAddress => {
+	if (registeredRewardModule === MODULE.DYNAMIC_REWARD) {
+		const expectedRewardResponse = await invokeEndpoint(
+			`dynamicReward_getExpectedValidatorRewards`,
+			{ validatorAddress },
+		);
+		return expectedRewardResponse;
+	} else {
+		const nodeInfo = await getNodeInfo();
+		const posConstants = await getPosConstants();
+
+		const currentReward = await invokeEndpoint(`reward_getDefaultRewardAtHeight`, {
+			height: nodeInfo.height,
+		});
+
+		const rewardPerSec =
+			BigInt(currentReward.reward) / BigInt(posConstants.roundLength * nodeInfo.genesis.blockTime);
+
+		return {
+			blockReward: currentReward.reward.toString(),
+			dailyReward: (BigInt(86400) * rewardPerSec).toString(),
+			monthlyReward: (BigInt(2592000) * rewardPerSec).toString(),
+			yearlyReward: (BigInt(31536000) * rewardPerSec).toString(),
+		};
+	}
+};
+
 module.exports = {
 	getRewardTokenID,
 	getAnnualInflation,
 	getDefaultRewardAtHeight,
 	cacheRegisteredRewardModule,
+	getExpectedValidatorRewards,
 };

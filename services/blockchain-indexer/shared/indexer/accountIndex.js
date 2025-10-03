@@ -54,7 +54,7 @@ const updateAccountInfoPk = async job => {
 };
 
 const updateAccountInfoAddr = async job => {
-	const address = job.data;
+	const { address } = job.data;
 
 	try {
 		const account = {
@@ -103,7 +103,7 @@ const triggerAccountUpdates = async () => {
 		config.queue.indexAccountAddress.concurrency,
 	);
 	for (let i = 0; i < addresses.length; i++) {
-		if (typeof addresses[i] === 'string') accountAddrUpdateQueue.add(addresses[i]);
+		if (typeof addresses[i] === 'string') accountAddrUpdateQueue.add({ address: addresses[i] });
 	}
 };
 

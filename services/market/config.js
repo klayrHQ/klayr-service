@@ -63,9 +63,7 @@ config.access_key.exchangeratesapi = process.env.EXCHANGERATESAPI_IO_API_KEY;
 config.ttl = {
 	exchangeratesapi: 24 * 60 * 60 * 1000, // milliseconds,
 	binance: 15 * 60 * 1000, // milliseconds
-	coinex: 15 * 60 * 1000, // milliseconds
 	bitrue: 15 * 60 * 1000, // milliseconds
-	coinex: 15 * 60 * 1000, // milliseconds
 	probit: 15 * 60 * 1000, // milliseconds
 };
 
@@ -88,9 +86,6 @@ config.market.sources = {
 	bitrue: {
 		allowRefreshAfter: 1 * 60 * 1000, // milliseconds
 	},
-	coinex: {
-		allowRefreshAfter: 1 * 60 * 1000, // milliseconds
-	},
 	probit: {
 		allowRefreshAfter: 1 * 60 * 1000, // milliseconds
 	},
@@ -109,10 +104,6 @@ config.job = {
 	refreshPricesBitrue: {
 		interval: Number(process.env.JOB_INTERVAL_REFRESH_PRICES_BITRUE) || 0,
 		schedule: process.env.JOB_SCHEDULE_REFRESH_PRICES_BITRUE || '* * * * *',
-	},
-	refreshPricesCoinex: {
-		interval: Number(process.env.JOB_INTERVAL_REFRESH_PRICES_COINEX) || 0,
-		schedule: process.env.JOB_SCHEDULE_REFRESH_PRICES_COINEX || '* * * * *',
 	},
 	refreshPricesProbit: {
 		interval: Number(process.env.JOB_INTERVAL_REFRESH_PRICES_PROBIT) || 0,

@@ -14,6 +14,44 @@
  *
  */
 const createApiDocsExpectedResponse = {
+	'/account': {
+		get: {
+			tags: ['Account'],
+			summary: 'Requests account data.',
+			description: 'Returns account data.\n RPC => get.account',
+			parameters: [
+				{
+					$ref: '#/parameters/addressCsv',
+				},
+				{
+					$ref: '#/parameters/publicKey',
+				},
+				{
+					$ref: '#/parameters/validatorNameCsv',
+				},
+				{
+					$ref: '#/parameters/limit',
+				},
+				{
+					$ref: '#/parameters/offset',
+				},
+			],
+			responses: {
+				200: {
+					description: 'Returns a list of account data.',
+					schema: {
+						$ref: '#/definitions/accountWithEnvelope',
+					},
+				},
+				400: {
+					description: 'Bad request',
+					schema: {
+						$ref: '#/definitions/badRequest',
+					},
+				},
+			},
+		},
+	},
 	'/blocks/assets': {
 		get: {
 			tags: ['Blocks'],
@@ -76,6 +114,9 @@ const createApiDocsExpectedResponse = {
 				},
 				{
 					$ref: '#/parameters/chainName',
+				},
+				{
+					$ref: '#/parameters/excludeChainName',
 				},
 				{
 					$ref: '#/parameters/blockchainAppStatus',
@@ -167,6 +208,9 @@ const createApiDocsExpectedResponse = {
 					$ref: '#/parameters/chainName',
 				},
 				{
+					$ref: '#/parameters/excludeChainName',
+				},
+				{
 					$ref: '#/parameters/displayName',
 				},
 				{
@@ -174,6 +218,9 @@ const createApiDocsExpectedResponse = {
 				},
 				{
 					$ref: '#/parameters/isDefault',
+				},
+				{
+					$ref: '#/parameters/blockchainAppStatus',
 				},
 				{
 					$ref: '#/parameters/network',
@@ -195,6 +242,9 @@ const createApiDocsExpectedResponse = {
 					type: 'string',
 					enum: ['chainName:asc', 'chainName:desc', 'chainID:asc', 'chainID:desc'],
 					default: 'chainName:asc',
+				},
+				{
+					$ref: '#/parameters/includeBlockchainApp',
 				},
 			],
 			responses: {
@@ -362,6 +412,9 @@ const createApiDocsExpectedResponse = {
 					type: 'string',
 					enum: ['height:asc', 'height:desc', 'timestamp:asc', 'timestamp:desc'],
 					default: 'height:desc',
+				},
+				{
+					$ref: '#/parameters/includeAssets',
 				},
 			],
 			responses: {
@@ -779,39 +832,6 @@ const createApiDocsExpectedResponse = {
 			},
 		},
 	},
-	'/transactions/estimate-fees': {
-		post: {
-			description:
-				'Returns estimated fees for the transaction.\n RPC => post.transactions.estimate-fees',
-			parameters: [
-				{
-					$ref: '#/parameters/transactionEstimateFees',
-				},
-			],
-			responses: {
-				200: {
-					description: 'Returns estimated fees for the given transaction.',
-					schema: {
-						$ref: '#/definitions/txEstimateFeesWithEnvelope',
-					},
-				},
-				400: {
-					description: 'Bad request',
-					schema: {
-						$ref: '#/definitions/badRequest',
-					},
-				},
-				500: {
-					description: 'Internal server error',
-					schema: {
-						$ref: '#/definitions/serverErrorEnvelope',
-					},
-				},
-			},
-			summary: 'Requests estimated fees for the transaction.',
-			tags: ['Transactions'],
-		},
-	},
 	'/schemas': {
 		get: {
 			tags: ['Schemas'],
@@ -822,6 +842,32 @@ const createApiDocsExpectedResponse = {
 					description: 'Returns a list of schemas.',
 					schema: {
 						$ref: '#/definitions/SchemaWithEnvelope',
+					},
+				},
+				400: {
+					description: 'Bad request',
+					schema: {
+						$ref: '#/definitions/badRequest',
+					},
+				},
+			},
+		},
+	},
+	'/search': {
+		get: {
+			tags: ['Search'],
+			summary: 'Requests search data.',
+			description: 'Returns search data.\n RPC => get.search',
+			parameters: [
+				{
+					$ref: '#/parameters/searchByNameAddressID',
+				},
+			],
+			responses: {
+				200: {
+					description: 'Returns a list of search data.',
+					schema: {
+						$ref: '#/definitions/searchWithEnvelope',
 					},
 				},
 				400: {
@@ -848,6 +894,39 @@ const createApiDocsExpectedResponse = {
 					description: "Dry run transactions. 'errorMessage' is available only when 'result: -1'.",
 					schema: {
 						$ref: '#/definitions/dryTransactionWithEnvelope',
+					},
+				},
+				400: {
+					description: 'Bad request',
+					schema: {
+						$ref: '#/definitions/badRequest',
+					},
+				},
+				500: {
+					description: 'Internal server error',
+					schema: {
+						$ref: '#/definitions/serverErrorEnvelope',
+					},
+				},
+			},
+		},
+	},
+	'/transactions/estimate-fees': {
+		post: {
+			tags: ['Transactions'],
+			summary: 'Requests estimated fees for the transaction.',
+			description:
+				'Returns estimated fees for the transaction.\n RPC => post.transactions.estimate-fees',
+			parameters: [
+				{
+					$ref: '#/parameters/transactionEstimateFees',
+				},
+			],
+			responses: {
+				200: {
+					description: 'Returns estimated fees for the given transaction.',
+					schema: {
+						$ref: '#/definitions/txEstimateFeesWithEnvelope',
 					},
 				},
 				400: {

@@ -46,7 +46,7 @@ pipeline {
 	environment {
 		ENABLE_HTTP_API='http-status,http-version3,http-exports'
 		ENABLE_WS_API='rpc-v3,rpc-test,blockchain'
-		KLAYR_APP_WS='ws://host.docker.internal:7887'
+		KLAYR_APP_URLS='ws://host.docker.internal:7887'
 		ENABLE_TESTING_MODE='true'
     }
 	stages {

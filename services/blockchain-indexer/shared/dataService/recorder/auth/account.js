@@ -8,6 +8,7 @@ const BluebirdPromise = require('bluebird');
 
 const config = require('../../../../config');
 const authTableSchema = require('../../../database/schema/auth'); // Path to auth.js schema
+const { JSONParseDB } = require('../../utils/json');
 
 const logger = Logger();
 
@@ -33,10 +34,10 @@ const getAuthAccount = async address => {
 		const account = data[0];
 		account.nonce = BigInt(account.nonce);
 		if (account.mandatoryKeys) {
-			account.mandatoryKeys = JSON.parse(account.mandatoryKeys);
+			account.mandatoryKeys = JSONParseDB(account.mandatoryKeys);
 		}
 		if (account.optionalKeys) {
-			account.optionalKeys = JSON.parse(account.optionalKeys);
+			account.optionalKeys = JSONParseDB(account.optionalKeys);
 		}
 		return account;
 	}

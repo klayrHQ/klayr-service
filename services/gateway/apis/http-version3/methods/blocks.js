@@ -42,6 +42,7 @@ module.exports = {
 			enum: ['height:asc', 'height:desc', 'timestamp:asc', 'timestamp:desc'],
 			default: 'height:desc',
 		},
+		includeAssets: { optional: true, type: 'boolean', default: false },
 	},
 	get schema() {
 		const blockSchema = {};

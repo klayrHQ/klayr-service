@@ -30,6 +30,7 @@ const {
 } = require('../../../dataService/business/pos/constants');
 
 const config = require('../../../../config');
+const { JSONParseDB } = require('../../../dataService/utils/json');
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 const getPendingUnlocksTable = () => getTableInstance(pendingUnlocksTableSchema, MYSQL_ENDPOINT);
 const getValidatorsTable = () => getTableInstance(validatorsTableSchema, MYSQL_ENDPOINT);
@@ -64,7 +65,7 @@ const applyTransaction = async (blockHeader, tx, events, dbTrx) => {
 		const [data = {}] = await validatorsTable.find({ address: unlockObject.validatorAddress }, [
 			'reportMisbehaviorHeights',
 		]);
-		const reportMisbehaviorHeights = JSON.parse(data.reportMisbehaviorHeights || '[]');
+		const reportMisbehaviorHeights = JSONParseDB(data.reportMisbehaviorHeights || '[]');
 
 		if (
 			isEligibleUnlock(
@@ -122,7 +123,7 @@ const revertTransaction = async (blockHeader, tx, events, dbTrx) => {
 		const [data = {}] = await validatorsTable.find({ address: unlockObject.validatorAddress }, [
 			'reportMisbehaviorHeights',
 		]);
-		const reportMisbehaviorHeights = JSON.parse(data.reportMisbehaviorHeights || '[]');
+		const reportMisbehaviorHeights = JSONParseDB(data.reportMisbehaviorHeights || '[]');
 
 		if (
 			isEligibleUnlock(

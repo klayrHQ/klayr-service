@@ -24,6 +24,7 @@ const stakesTableSchema = require('../../../database/schema/stakes');
 const logger = Logger();
 
 const config = require('../../../../config');
+const { JSONParseDB } = require('../../../dataService/utils/json');
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
 const getValidatorsTable = () => getTableInstance(validatorsTableSchema, MYSQL_ENDPOINT);
@@ -51,13 +52,13 @@ const applyTransaction = async (blockHeader, tx, events, dbTrx) => {
 	const [validatorInfo = {}] = await validatorsTable.find({ address: punishedAddress, limit: 1 }, [
 		'reportMisbehaviorHeights',
 	]);
-	const reportMisbehaviorHeights = JSON.parse(validatorInfo.reportMisbehaviorHeights || '[]');
+	const reportMisbehaviorHeights = JSONParseDB(validatorInfo.reportMisbehaviorHeights || '[]');
 	reportMisbehaviorHeights.push(tx.height);
 
 	await validatorsTable.upsert(
 		{
 			address: punishedAddress,
-			reportMisbehaviorHeights: JSON.stringify(reportMisbehaviorHeights),
+			reportMisbehaviorHeights,
 		},
 		dbTrx,
 	);
@@ -102,7 +103,7 @@ const revertTransaction = async (blockHeader, tx, events, dbTrx) => {
 	const [validatorInfo = {}] = await validatorsTable.find({ address: punishedAddress, limit: 1 }, [
 		'reportMisbehaviorHeights',
 	]);
-	const reportMisbehaviorHeights = JSON.parse(validatorInfo.reportMisbehaviorHeights || '[]');
+	const reportMisbehaviorHeights = JSONParseDB(validatorInfo.reportMisbehaviorHeights || '[]');
 
 	const index = reportMisbehaviorHeights.indexOf(tx.height);
 	if (index > -1) reportMisbehaviorHeights.splice(index, 1);
@@ -110,7 +111,7 @@ const revertTransaction = async (blockHeader, tx, events, dbTrx) => {
 	await validatorsTable.upsert(
 		{
 			address: punishedAddress,
-			reportMisbehaviorHeights: JSON.stringify(reportMisbehaviorHeights),
+			reportMisbehaviorHeights,
 		},
 		dbTrx,
 	);

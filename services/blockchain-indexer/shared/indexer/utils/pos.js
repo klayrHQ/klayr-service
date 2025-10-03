@@ -7,6 +7,7 @@ const {
 const config = require('../../../config');
 const validatorsTableSchema = require('../../database/schema/validators');
 const { getPosPunishmentLockingPeriods } = require('../../dataService/business/pos/constants');
+const { JSONParseDB } = require('../../dataService/utils/json');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
@@ -108,8 +109,8 @@ const getExpectedUnlockHeight = async (stakerAddress, validatorAddress, unstakeH
 		'reportMisbehaviorHeights',
 	]);
 	if (validatorAccountData.length === 1) {
-		validatorAccount.reportMisbehaviorHeights = JSON.parse(
-			validatorAccountData[0].reportMisbehaviorHeights,
+		validatorAccount.reportMisbehaviorHeights = JSONParseDB(
+			validatorAccountData[0].reportMisbehaviorHeights || '[]',
 		);
 	}
 

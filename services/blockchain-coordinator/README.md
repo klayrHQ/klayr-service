@@ -26,10 +26,16 @@ To configure the different microservices, there are several environment variable
 
 A list of the most commonly used environment variables is presented below:
 
-- `SERVICE_BROKER`: URL of the microservice message broker (NATS or Redis).
-- `SERVICE_MESSAGE_QUEUE_REDIS`: URL of the job queue to schedule the indexing jobs (Redis).
-- `JOB_INTERVAL_INDEX_MISSING_BLOCKS`: Job run interval to index missing blocks. By default, it is set to `0`.
-- `JOB_SCHEDULE_INDEX_MISSING_BLOCKS`: Job run cron schedule to index missing blocks. By default, it is set to run every 5 minutes (`*/5 * * * *`).
+| Environment variable | Description |
+| -------------------- | ----------- |
+| `SERVICE_BROKER` | URL of the microservice message broker (NATS or Redis). |
+| `SERVICE_MESSAGE_QUEUE_REDIS` | URL of the Redis instance hosting the job queue to schedule the block indexing jobs. |
+| `JOB_INTERVAL_INDEX_MISSING_BLOCKS` | Job run interval to index missing blocks. By default, it is set to `0`. |
+| `JOB_SCHEDULE_INDEX_MISSING_BLOCKS` | Job run cron schedule to index missing blocks. By default, it is set to run every `5` minutes. |
+| `INDEX_MISSING_BLOCKS_SKIP_THRESHOLD` | Skip threshold for indexing missing blocks. |
+| `INDEX_MISSING_BLOCKS_MAX_SCHEDULE` | Maximum number of blocks to schedule for indexing when missing blocks are detected. |
+| `SCHEDULE_BLOCK_INDEXING_MAX_BATCH_SIZE` | Maximum batch size for scheduling block indexing. |
+| `REQUEST_TIMEOUT_RETRY_DELAY` | Delay in milliseconds before retrying a request. |
 
 > **Note**: `interval` takes priority over `schedule` and must be greater than 0 to be valid for all the moleculer job configurations.
 

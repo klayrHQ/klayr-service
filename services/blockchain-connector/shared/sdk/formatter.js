@@ -164,7 +164,6 @@ const formatEvent = (event, skipDecode) => {
 				`Unable to decode event data. Event data schema missing for ${event.module}:${event.name}.`,
 			);
 		} else {
-			// TODO: Remove after SDK fixes the address format (https://github.com/KlayrHQ/klayr-sdk/issues/7629)
 			const props = Object.keys(eventDataSchema.properties);
 			for (let i = 0; i < props.length; i++) {
 				if (props[i].endsWith('Address')) {

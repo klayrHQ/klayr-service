@@ -52,7 +52,7 @@ module.exports = {
 			pattern: regex.PARTIAL_SEARCH,
 			altSwaggerKey: 'searchByNameAddressPubKey',
 		},
-		limit: { optional: true, type: 'number', min: 1, max: 103, default: 10 },
+		limit: { optional: true, type: 'number', min: 1, max: 1000, default: 10 },
 		offset: { optional: true, type: 'number', min: 0, default: 0 },
 		sort: {
 			optional: true,
@@ -69,6 +69,7 @@ module.exports = {
 			],
 			default: 'commission:asc',
 		},
+		includeStatusValue: { optional: true, type: 'boolean', default: false },
 	},
 	get schema() {
 		const validatorsSchema = {};

@@ -3,7 +3,7 @@
 		"swagger": "2.0",
 		"info": {
 			"title": "Klayr Service API",
-			"version": "0.7.8",
+			"version": "0.8.0-alpha",
 			"contact": {
 				"email": "admin@klayr.xyz"
 			},
@@ -40,6 +40,14 @@
 				"description": "Klayr Validators module API calls."
 			},
 			{
+				"name": "Account",
+				"description": "Klayr account data API calls."
+			},
+			{
+				"name": "Search",
+				"description": "Klayr search API calls."
+			},
+			{
 				"name": "Token",
 				"description": "Klayr Token module API calls."
 			},
@@ -54,10 +62,6 @@
 			{
 				"name": "(Dynamic) Reward",
 				"description": "Klayr (Dynamic) Reward module API calls."
-			},
-			{
-				"name": "Legacy",
-				"description": "Klayr Legacy module API calls."
 			},
 			{
 				"name": "Network",

@@ -17,9 +17,9 @@ module.exports = {
 	tableName: 'multisignature',
 	primaryKey: 'id',
 	schema: {
-		id: { type: 'string' },
-		groupAddress: { type: 'string' },
-		memberAddress: { type: 'string' },
+		id: { type: 'string', length: 83 },
+		groupAddress: { type: 'string', length: 41 },
+		memberAddress: { type: 'string', length: 41 },
 	},
 	indexes: {
 		groupAddress: { type: 'key' },

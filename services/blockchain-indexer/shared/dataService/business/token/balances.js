@@ -40,7 +40,7 @@ const getTokenBalances = async params => {
 		const data = {
 			tokenID: balanceInfo.tokenID,
 			availableBalance: balanceInfo.availableBalance,
-			lockedBalances: lockedBalances.filter(t => t.amount !== '0'),
+			lockedBalances: lockedBalances.filter(t => t.amount.toString() !== '0'),
 		};
 
 		tokensInfo.push(data);

@@ -15,19 +15,32 @@
  */
 module.exports = {
 	tableName: 'event_topics',
-	primaryKey: ['eventID', 'topic'],
+	primaryKey: ['eventPK', 'topic'],
 	schema: {
-		eventID: { type: 'string' },
-		topic: { type: 'string' },
+		eventPK: { type: 'bigInteger' },
+		topic: { type: 'string', length: 100 },
+		module: { type: 'string', length: 32 },
+		name: { type: 'string', length: 64 },
+		height: { type: 'integer' },
+		timestamp: { type: 'integer' },
+		index: { type: 'integer' },
 	},
-	indexes: {
-		eventID: { type: 'key' },
-		topic: { type: 'key' },
-	},
+	indexes: {},
 	compositeIndexes: {
-		topic_eventID_index: [
-			{ key: 'topic', direction: 'ASC' },
-			{ key: 'eventID', direction: 'ASC' },
+		topic_only_sort: [
+			{ key: 'topic' },
+			{ key: 'timestamp', direction: 'DESC' },
+			{ key: 'index', direction: 'ASC' },
+			{ key: 'eventPK' },
+		],
+		topic_combination_sort: [
+			{ key: 'topic' },
+			{ key: 'module' },
+			{ key: 'name' },
+			{ key: 'height' },
+			{ key: 'timestamp', direction: 'DESC' },
+			{ key: 'index', direction: 'ASC' },
+			{ key: 'eventPK' },
 		],
 	},
 	purge: {},

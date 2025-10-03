@@ -37,6 +37,7 @@ const {
 	getGenerators,
 	getNumberOfGenerators,
 	formatPendingTransaction,
+	reloadValidatorRewardCache,
 } = require('./dataService');
 const { accountAddrUpdateQueue } = require('./indexer/accountIndex');
 const { indexPendingNewBlock } = require('./indexer/pendingBlockchainIndex');
@@ -113,6 +114,7 @@ const newRoundProcessor = async () => {
 	logger.debug('Performing updates on new round.');
 	await reloadValidatorCache();
 	await reloadGeneratorsCache();
+	await reloadValidatorRewardCache();
 	const limit = await getNumberOfGenerators();
 	const generators = await getGenerators({ limit, offset: 0 });
 	Signals.get('newRound').dispatch(generators);

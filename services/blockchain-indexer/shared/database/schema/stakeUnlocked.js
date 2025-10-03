@@ -2,16 +2,12 @@ module.exports = {
 	tableName: 'stake_unlocked',
 	primaryKey: ['validatorAddress', 'stakerAddress', 'unlockHeight'],
 	schema: {
-		stakerAddress: { type: 'string' },
-		validatorAddress: { type: 'string' },
+		stakerAddress: { type: 'string', length: 41 },
+		validatorAddress: { type: 'string', length: 41 },
 		unlockHeight: { type: 'integer' },
 		amount: { type: 'bigInteger' },
 		unstakeHeight: { type: 'integer' },
 	},
-	indexes: {
-		validatorAddress: { type: 'key' },
-		stakerAddress: { type: 'key' },
-		unlockHeight: { type: 'key' },
-	},
+	indexes: {},
 	purge: {},
 };

@@ -46,6 +46,9 @@ const getKLYTokenID = async () => {
 const getBlockchainApps = async params => {
 	const blockchainAppsTable = await getBlockchainAppsTable();
 
+	const { excludeChainName, ...restParams } = params;
+	params = restParams;
+
 	const blockchainAppsInfo = {
 		data: [],
 		meta: {},
@@ -84,7 +87,14 @@ const getBlockchainApps = async params => {
 		});
 	}
 
-	const total = await blockchainAppsTable.count(params);
+	if (excludeChainName) {
+		params.whereNotIn = {
+			column: 'chainName',
+			values: excludeChainName.split(','),
+		};
+	}
+
+	const total = Number(await blockchainAppsTable.count(params));
 
 	const dbBlockchainApps = await blockchainAppsTable.find(
 		{ ...params, limit: params.limit || total },

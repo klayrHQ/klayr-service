@@ -14,7 +14,10 @@
  *
  */
 const { EVENT, EVENT_TOPIC_PREFIX, LENGTH_ID, MODULE } = require('../../constants');
-const msgpack = require('@msgpack/msgpack');
+
+const getEventPK = (height, index) => {
+	return (BigInt(height) << 32n) | BigInt(index);
+};
 
 const getEventsInfoToIndex = (block, events) => {
 	const eventsInfoToIndex = {
@@ -44,14 +47,16 @@ const getEventsInfoToIndex = (block, events) => {
 		// Store whole event is now the default behavior
 		// Storing whole event is required to fetch events of a deleted block, and to make event retrieval faster
 		const eventInfo = {
-			id: event.id,
-			name: event.name,
-			module: event.module,
-			height: block.height,
+			eventPK: getEventPK(block.height, event.index),
+			data: event.data,
 			index: event.index,
+			module: event.module,
+			name: event.name,
+			topics: event.topics,
+			height: block.height,
+			id: event.id,
 			blockID: block.id,
 			timestamp: block.timestamp,
-			eventBlob: Buffer.from(msgpack.encode(event)),
 		};
 
 		if (!eventsInfoKeys.eventsInfo[`${event.id}`]) {
@@ -65,8 +70,13 @@ const getEventsInfoToIndex = (block, events) => {
 			if (!eventsInfoKeys.eventTopicsInfo[`${event.id}-${topic}`]) {
 				eventsInfoKeys.eventTopicsInfo[`${event.id}-${topic}`] = true;
 				eventsInfoToIndex.eventTopicsInfo.push({
-					eventID: event.id,
+					eventPK: eventInfo.eventPK,
 					topic,
+					height: block.height,
+					index: event.index,
+					timestamp: block.timestamp,
+					name: event.name,
+					module: event.module,
 				});
 			}
 
@@ -90,8 +100,13 @@ const getEventsInfoToIndex = (block, events) => {
 					if (!eventsInfoKeys.eventTopicsInfo[`${event.id}-${transactionID}`]) {
 						eventsInfoKeys.eventTopicsInfo[`${event.id}-${transactionID}`] = true;
 						eventsInfoToIndex.eventTopicsInfo.push({
-							eventID: event.id,
+							eventPK: eventInfo.eventPK,
 							topic: transactionID,
+							height: block.height,
+							index: event.index,
+							timestamp: block.timestamp,
+							name: event.name,
+							module: event.module,
 						});
 					}
 				}
@@ -103,8 +118,13 @@ const getEventsInfoToIndex = (block, events) => {
 			if (!eventsInfoKeys.eventTopicsInfo[`${event.id}-${event.data.validatorAddress}`]) {
 				eventsInfoKeys.eventTopicsInfo[`${event.id}-${event.data.validatorAddress}`] = true;
 				eventsInfoToIndex.eventTopicsInfo.push({
-					eventID: event.id,
+					eventPK: eventInfo.eventPK,
 					topic: event.data.validatorAddress,
+					height: block.height,
+					index: event.index,
+					timestamp: block.timestamp,
+					name: event.name,
+					module: event.module,
 				});
 			}
 		}
@@ -115,4 +135,5 @@ const getEventsInfoToIndex = (block, events) => {
 
 module.exports = {
 	getEventsInfoToIndex,
+	getEventPK,
 };

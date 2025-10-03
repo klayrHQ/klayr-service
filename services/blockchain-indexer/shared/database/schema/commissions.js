@@ -17,14 +17,12 @@ module.exports = {
 	tableName: 'commissions',
 	primaryKey: ['address', 'height'],
 	schema: {
-		address: { type: 'string', null: false },
-		commission: { type: 'string', null: false },
-		height: { type: 'string', null: false },
+		address: { type: 'string', length: 41, null: false },
+		commission: { type: 'string', length: 12, null: false },
+		height: { type: 'string', length: 12, null: false },
 	},
 	indexes: {
-		address: { type: 'key' },
 		commission: { type: 'range' },
-		height: { type: 'range' },
 	},
 	purge: {},
 };

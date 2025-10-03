@@ -37,6 +37,7 @@ const {
 	getCurrentChainID,
 	resolveChannelInfo,
 	initFeeEstimates,
+	search,
 } = require('./business');
 
 const {
@@ -59,6 +60,9 @@ const {
 	getStakers,
 	getPosUnlocks,
 	getPosClaimableRewards,
+	getPosValidatorsStatusCount,
+	reloadValidatorRewardCache,
+	getValidatorReward,
 } = require('./pos');
 
 const {
@@ -109,8 +113,16 @@ const { getLegacyAccountInfo } = require('./legacy');
 const { getValidator, validateBLSKey } = require('./validator');
 const { getGenerators } = require('./generators');
 const { invokeEndpoint } = require('./invoke');
+const { getAccount } = require('./account');
+const { getDatabaseSchema } = require('./database');
 
 module.exports = {
+	// Search
+	search,
+
+	// Account
+	getAccount,
+
 	// Blocks
 	formatBlock,
 	getBlocks,
@@ -129,6 +141,9 @@ module.exports = {
 	getStakes,
 	getStakers,
 	getPosClaimableRewards,
+	getPosValidatorsStatusCount,
+	reloadValidatorRewardCache,
+	getValidatorReward,
 
 	// Token
 	tokenHasUserAccount,
@@ -217,4 +232,7 @@ module.exports = {
 	resolveMainchainServiceURL,
 
 	invokeEndpoint,
+
+	// database
+	getDatabaseSchema,
 };

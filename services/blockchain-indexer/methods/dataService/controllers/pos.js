@@ -128,6 +128,19 @@ const getPosLockedRewards = async params => {
 	}
 };
 
+const getPosValidatorsStatusCount = async params => {
+	const posValidatorsStatusCount = {
+		data: [],
+		meta: {},
+	};
+
+	const response = await dataService.getPosValidatorsStatusCount(params);
+	if (response.data) posValidatorsStatusCount.data = response.data;
+	if (response.meta) posValidatorsStatusCount.meta = response.meta;
+
+	return posValidatorsStatusCount;
+};
+
 module.exports = {
 	getPosValidators,
 	getPosConstants,
@@ -136,4 +149,5 @@ module.exports = {
 	getStakes,
 	getStakers,
 	getPosClaimableRewards,
+	getPosValidatorsStatusCount,
 };

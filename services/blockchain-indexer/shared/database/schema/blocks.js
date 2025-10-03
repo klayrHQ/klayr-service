@@ -17,10 +17,10 @@ module.exports = {
 	tableName: 'blocks',
 	primaryKey: 'height',
 	schema: {
-		id: { type: 'string' },
+		id: { type: 'string', length: 64 },
 		height: { type: 'integer' },
 		timestamp: { type: 'integer' },
-		generatorAddress: { type: 'string' },
+		generatorAddress: { type: 'string', length: 41 },
 		size: { type: 'integer' },
 		isFinal: { type: 'boolean', defaultValue: false },
 		assetsModules: { type: 'json' },
@@ -29,17 +29,17 @@ module.exports = {
 
 		// Retrieved Directly From Block Header:
 		version: { type: 'integer' },
-		previousBlockID: { type: 'string' },
-		stateRoot: { type: 'string' },
-		assetRoot: { type: 'string' },
-		eventRoot: { type: 'string' },
-		transactionRoot: { type: 'string' },
-		validatorsHash: { type: 'string' },
+		previousBlockID: { type: 'string', length: 64 },
+		stateRoot: { type: 'string', length: 64 },
+		assetRoot: { type: 'string', length: 64 },
+		eventRoot: { type: 'string', length: 64 },
+		transactionRoot: { type: 'string', length: 64 },
+		validatorsHash: { type: 'string', length: 64 },
 		aggregateCommit: { type: 'json' },
 		maxHeightPrevoted: { type: 'integer' },
 		maxHeightGenerated: { type: 'integer' },
 		impliesMaxPrevotes: { type: 'boolean' },
-		signature: { type: 'string' },
+		signature: { type: 'string', length: 128 },
 		assets: { type: 'json' },
 
 		// Additional Metadata:
@@ -52,11 +52,10 @@ module.exports = {
 	},
 	indexes: {
 		id: { type: 'key' },
-		height: { type: 'range' },
-		timestamp: { type: 'range' },
-		generatorAddress: { type: 'key' },
-		size: { type: 'range' },
-		isFinal: { type: 'key' },
+	},
+	compositeIndexes: {
+		generatorAddress_sort: [{ key: 'generatorAddress' }, { key: 'height', direction: 'DESC' }],
+		isFinal_sort: [{ key: 'isFinal' }, { key: 'height', direction: 'DESC' }],
 	},
 	purge: {},
 };

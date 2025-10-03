@@ -1,7 +1,7 @@
 const { Logger } = require('klayr-service-framework');
 
 const config = require('../../config');
-const { ReqoalInstance } = require('reqoal');
+const { Coalesce } = require('klayr-service-framework');
 
 const logger = Logger();
 
@@ -14,7 +14,7 @@ let coalescer;
 
 const getCoalescerInstance = () => {
 	if (!coalescer) {
-		coalescer = new ReqoalInstance(PRUNE_INTERVAL_MS, DEFAULT_TTL_MS, logger);
+		coalescer = new Coalesce.ReqoalInstance(PRUNE_INTERVAL_MS, DEFAULT_TTL_MS, logger);
 	}
 	return coalescer;
 };

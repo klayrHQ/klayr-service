@@ -39,22 +39,18 @@ const { normalizeTransaction } = require('../../utils/transactions');
 const { getNameByAddress } = require('../../utils/validator');
 
 const config = require('../../../config');
+const { JSONParseDB } = require('../utils/json');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
 const getBlocksTable = () => getTableInstance(blocksTableSchema, MYSQL_ENDPOINT);
 const getTransactionsTable = () => getTableInstance(transactionsTableSchema, MYSQL_ENDPOINT);
 
-// NOTE: latestBlockCache is not used anywhere in the codebase.
-// const latestBlockCache = CacheRedis('latestBlock', config.endpoints.cache);
-
 const blockCache = CacheLRU('block');
 const blockCacheByHeight = CacheLRU('blockByHeight');
 
-let latestBlock;
-
-const normalizeAndCacheBlock = async block => {
-	const normalizedBlock = await normalizeBlock(block);
+const normalizeAndCacheBlock = async (block, forceFromNode = false) => {
+	const normalizedBlock = await normalizeBlock(block, false, forceFromNode);
 	await blockCacheByHeight.set(block.header.height, JSON.stringify(normalizedBlock));
 	return normalizedBlock;
 };
@@ -78,11 +74,11 @@ const formatTransactionResponseFromDB = transaction => {
 	const formattedTransaction = {
 		module: transaction.moduleCommand.split(':')[0],
 		command: transaction.moduleCommand.split(':')[1],
-		params: JSON.parse(transaction.params),
+		params: JSONParseDB(transaction.params),
 		nonce: transaction.nonce,
 		fee: transaction.fee.toString(),
 		senderPublicKey: transaction.senderPublicKey,
-		signatures: JSON.parse(transaction.signatures),
+		signatures: JSONParseDB(transaction.signatures),
 		id: transaction.id,
 	};
 	return formattedTransaction;
@@ -100,7 +96,7 @@ const formatBlockResponseFromDB = async (block, skipFetchTransaction = false) =>
 			eventRoot: block.eventRoot,
 			transactionRoot: block.transactionRoot,
 			validatorsHash: block.validatorsHash,
-			aggregateCommit: JSON.parse(block.aggregateCommit),
+			aggregateCommit: JSONParseDB(block.aggregateCommit),
 			generatorAddress: block.generatorAddress,
 			maxHeightPrevoted: block.maxHeightPrevoted,
 			maxHeightGenerated: block.maxHeightGenerated,
@@ -109,9 +105,9 @@ const formatBlockResponseFromDB = async (block, skipFetchTransaction = false) =>
 			id: block.id,
 		},
 		transactions: [],
-		assets: JSON.parse(block.assets),
+		assets: JSONParseDB(block.assets),
 		metadata: {
-			generator: JSON.parse(block.generator),
+			generator: JSONParseDB(block.generator),
 			networkFee: block.networkFee,
 			totalBurnt: block.totalBurnt,
 			totalForged: block.totalForged,
@@ -195,6 +191,19 @@ const getBlocksByHeightsBetweenFromDB = async (
 			dbResponses.map(block => formatBlockResponseFromDB(block, skipFetchTransaction)),
 		);
 	}
+
+	return undefined;
+};
+
+const getLastBlockFromDB = async (skipFetchTransaction = false) => {
+	const blocksTable = await getBlocksTable();
+
+	const [dbResponse] = await blocksTable.find(
+		{ sort: 'height:desc', limit: 1 },
+		Object.getOwnPropertyNames(blocksTableSchema.schema),
+	);
+
+	if (dbResponse) return await formatBlockResponseFromDB(dbResponse, skipFetchTransaction);
 
 	return undefined;
 };
@@ -361,15 +370,17 @@ const normalizeBlock = async (originalBlock, isDeletedBlock = false, forceFromNo
 	}
 };
 
-const normalizeBlocks = async blocks => {
-	const normalizedBlocks = await BluebirdPromise.map(blocks, async block => normalizeBlock(block), {
-		concurrency: blocks.length,
-	});
+const normalizeBlocks = async (blocks, forceFromNode = false) => {
+	const normalizedBlocks = await BluebirdPromise.map(
+		blocks,
+		async block => normalizeBlock(block, false, forceFromNode),
+		{ concurrency: blocks.length },
+	);
 
 	return normalizedBlocks;
 };
 
-const getBlocksByHeightBetween = async ({ from, to, forceFromNode }) => {
+const getBlocksByHeightBetween = async ({ from, to, forceFromNode, skipFetchTransaction }) => {
 	let blocks = [];
 
 	if (from <= to) {
@@ -383,13 +394,13 @@ const getBlocksByHeightBetween = async ({ from, to, forceFromNode }) => {
 				return cachedBlocks.map(block => JSON.parse(block));
 
 			// Get from DB
-			blocks = await getBlocksByHeightsBetweenFromDB(from, to);
+			blocks = await getBlocksByHeightsBetweenFromDB(from, to, skipFetchTransaction);
 		}
 		if (blocks.length === 0) {
 			blocks = await requestConnector('getBlocksByHeightBetween', { from, to });
 		}
 		if (blocks.length > 0) {
-			blocks = await normalizeBlocks(blocks);
+			blocks = await normalizeBlocks(blocks, forceFromNode);
 			await BluebirdPromise.map(
 				blocks,
 				async block => await blockCacheByHeight.set(block.height, JSON.stringify(block)),
@@ -401,14 +412,14 @@ const getBlocksByHeightBetween = async ({ from, to, forceFromNode }) => {
 	return blocks;
 };
 
-const getBlockByHeight = async (height, forceFromNode = false) => {
+const getBlockByHeight = async (height, forceFromNode = false, skipFetchTransaction = false) => {
 	if (!forceFromNode) {
 		// Get from cache
 		const cachedBlocks = await blockCacheByHeight.get(height);
 		if (cachedBlocks) return JSON.parse(cachedBlocks);
 
 		// Get from DB first (this is the default behavior)
-		const block = await getBlockByHeightFromDB(height);
+		const block = await getBlockByHeightFromDB(height, skipFetchTransaction);
 		if (block) {
 			const normalizedBlock = await normalizeBlock(block, false, forceFromNode);
 			await blockCacheByHeight.set(height, JSON.stringify(normalizedBlock));
@@ -418,19 +429,19 @@ const getBlockByHeight = async (height, forceFromNode = false) => {
 
 	// Get from node
 	const response = await requestConnector('getBlockByHeight', { height });
-	const normalizedBlock = await normalizeBlock(response);
+	const normalizedBlock = await normalizeBlock(response, false, forceFromNode);
 	await blockCacheByHeight.set(height, JSON.stringify(normalizedBlock));
 	return normalizedBlock;
 };
 
-const getBlockByID = async (id, forceFromNode = false) => {
+const getBlockByID = async (id, forceFromNode = false, skipFetchTransaction = false) => {
 	if (!forceFromNode) {
 		// Get from cache
 		const cachedBlocks = await blockCache.get(id);
 		if (cachedBlocks) return JSON.parse(cachedBlocks);
 
 		// Get from DB first (this is the default behavior)
-		const block = await getBlockByIDFromDB(id);
+		const block = await getBlockByIDFromDB(id, skipFetchTransaction);
 		if (block) {
 			const normalizedBlock = await normalizeBlock(block, false, forceFromNode);
 			await blockCache.set(id, JSON.stringify(normalizedBlock));
@@ -440,12 +451,12 @@ const getBlockByID = async (id, forceFromNode = false) => {
 
 	// Get from node
 	const response = await requestConnector('getBlockByID', { id });
-	const normalizedBlock = await normalizeBlock(response);
+	const normalizedBlock = await normalizeBlock(response, false, forceFromNode);
 	await blockCache.set(id, JSON.stringify(normalizedBlock));
 	return normalizedBlock;
 };
 
-const getBlocksByIDs = async (ids, forceFromNode = false) => {
+const getBlocksByIDs = async (ids, forceFromNode = false, skipFetchTransaction = false) => {
 	if (!forceFromNode) {
 		// Get from cache
 		const cachedBlocks = (await Promise.all(ids.map(id => blockCache.get(id)))).filter(
@@ -454,7 +465,10 @@ const getBlocksByIDs = async (ids, forceFromNode = false) => {
 		if (cachedBlocks.length === ids.length) return cachedBlocks.map(block => JSON.parse(block));
 
 		// Get from DB first (this is the default behavior)
-		const blocks = await normalizeBlocks(await getBlocksByIDsFromDB(ids));
+		const blocks = await normalizeBlocks(
+			await getBlocksByIDsFromDB(ids, skipFetchTransaction),
+			forceFromNode,
+		);
 		if (blocks && blocks.length) {
 			for (const b of blocks) await blockCache.set(b.id, JSON.stringify(b));
 			return blocks;
@@ -462,43 +476,27 @@ const getBlocksByIDs = async (ids, forceFromNode = false) => {
 	}
 
 	// Get from node
-	const response = await normalizeBlocks(await requestConnector('getBlocksByIDs', { ids }));
+	const response = await normalizeBlocks(
+		await requestConnector('getBlocksByIDs', { ids }),
+		forceFromNode,
+	);
 	for (const b of response) await await blockCache.set(b.id, JSON.stringify(b));
 	return response;
 };
 
-const getLastBlockFromNode = async () => {
-	const response = await requestConnector('getLastBlock');
-	latestBlock = await normalizeBlock(response);
-	if (latestBlock && latestBlock.id) {
-		// NOTE: latestBlockCache is not used anywhere in the codebase.
-		// await latestBlockCache.set('latestBlock', JSON.stringify(latestBlock));
+const getLastBlock = async (forceFromNode = false, skipFetchTransaction = false) => {
+	if (!forceFromNode) {
+		const block = await getLastBlockFromDB(skipFetchTransaction);
+		if (block) return await normalizeBlock(block, false, forceFromNode);
 	}
-	return latestBlock;
+
+	const response = await requestConnector('getLastBlock');
+	return await normalizeBlock(response, false, forceFromNode);
 };
 
-const isQueryFromIndex = params => {
-	const paramProps = Object.getOwnPropertyNames(params);
-
-	const directQueryParams = ['id', 'height', 'heightBetween'];
-	const defaultQueryParams = ['limit', 'offset', 'sort'];
-
-	// For 'isDirectQuery' to be 'true', the request params should contain
-	// exactly one of 'directQueryParams' and all of them must be contained
-	// within 'directQueryParams' or 'defaultQueryParams'
-	const isDirectQuery =
-		paramProps.filter(prop => directQueryParams.includes(prop)).length === 1 &&
-		paramProps.every(prop => directQueryParams.concat(defaultQueryParams).includes(prop));
-
-	const sortOrder = params.sort ? params.sort.split(':')[1] : undefined;
-	const isLatestBlockFetch =
-		(paramProps.length === 1 && params.limit === 1) ||
-		(paramProps.length === 2 &&
-			((params.limit === 1 && params.offset === 0) ||
-				(sortOrder === 'desc' && (params.limit === 1 || params.offset === 0)))) ||
-		(paramProps.length === 3 && params.limit === 1 && params.offset === 0 && sortOrder === 'desc');
-
-	return !isDirectQuery && !isLatestBlockFetch;
+const getLastBlockFromNode = async () => {
+	const response = await requestConnector('getLastBlock');
+	return await normalizeBlock(response, false, true);
 };
 
 const formatBlock = async (block, isDeletedBlock = false) => normalizeBlock(block, isDeletedBlock);
@@ -509,6 +507,9 @@ const getBlocks = async params => {
 		data: [],
 		meta: {},
 	};
+
+	const { includeAssets, ...restParams } = params;
+	params = restParams;
 
 	if (params.blockID) {
 		const { blockID, ...remParams } = params;
@@ -524,45 +525,60 @@ const getBlocks = async params => {
 		params = normalizeRangeParam(params, 'timestamp');
 	}
 
-	let resultSet = [];
-	const total = await blocksTable.count(params);
+	// Checking for direct latest block fetch
+	const paramProps = Object.getOwnPropertyNames(params);
+	const sortOrder = params.sort ? params.sort.split(':')[1] : undefined;
+	const isDirectLatestBlockFetch =
+		(paramProps.length === 1 && params.limit === 1) ||
+		(paramProps.length === 2 &&
+			((params.limit === 1 && params.offset === 0) ||
+				(sortOrder === 'desc' && (params.limit === 1 || params.offset === 0)))) ||
+		(paramProps.length === 3 && params.limit === 1 && params.offset === 0 && sortOrder === 'desc');
 
-	if (isQueryFromIndex(params)) {
-		resultSet = await blocksTable.find(
+	// Handle direct one-block queries separately for performance
+	if (params.id || params.height || isDirectLatestBlockFetch) {
+		try {
+			if (params.id) {
+				blocks.data = [await getBlockByID(params.id, false, true)];
+			} else if (params.height) {
+				blocks.data = [await getBlockByHeight(Number(params.height), false, true)];
+			} else {
+				// direct latest block fetch
+				blocks.data = [await getLastBlock(true)];
+			}
+		} catch (err) {
+			if (!err.message.includes('does not exist')) throw err;
+		}
+
+		if (blocks.data.length === 1 && !includeAssets) {
+			blocks.data = [{ ...blocks.data[0], assets: [] }];
+		}
+
+		blocks.meta.count = blocks.data.length;
+		blocks.meta.offset = params.offset;
+		blocks.meta.total = blocks.data.length;
+		return blocks;
+	}
+
+	// Handle generic queries
+	const total = Number(await blocksTable.count(params));
+	if (total > 0) {
+		const resultSet = await blocksTable.find(
 			params,
 			Object.getOwnPropertyNames(blocksTableSchema.schema),
 		);
-		params.ids = resultSet.map(row => row.id);
-	}
-
-	try {
-		// Under normal circumstances params.ids will always populated,
-		// So we could directly use resultSet without any re-fetch
-		// In case params.ids is not available, we re-fetch blocks by id/height/lastBlock
-
-		if (params.ids) {
-			if (Array.isArray(params.ids) && params.ids.length) {
-				blocks.data = await BluebirdPromise.map(resultSet, block => {
-					return {
-						...block,
-						aggregateCommit: JSON.parse(block.aggregateCommit),
-						generator: JSON.parse(block.generator),
-					};
-				});
-			}
-		} else if (params.id) {
-			blocks.data.push(await getBlockByID(params.id));
-			if ('offset' in params && params.limit)
-				blocks.data = blocks.data.slice(params.offset, params.offset + params.limit);
-		} else if (params.height) {
-			blocks.data.push(await getBlockByHeight(Number(params.height)));
-			if ('offset' in params && params.limit)
-				blocks.data = blocks.data.slice(params.offset, params.offset + params.limit);
-		} else {
-			blocks.data.push(await getLastBlockFromNode());
-		}
-	} catch (err) {
-		if (!err.message.includes('does not exist')) throw err;
+		blocks.data = await BluebirdPromise.map(
+			resultSet,
+			block => {
+				return {
+					...block,
+					assets: includeAssets ? JSONParseDB(block.assets) : [],
+					aggregateCommit: JSONParseDB(block.aggregateCommit),
+					generator: JSONParseDB(block.generator),
+				};
+			},
+			{ concurrency: blocks.data.length },
+		);
 	}
 
 	blocks.meta = {
@@ -613,7 +629,7 @@ const getBlocksAssets = async params => {
 	}
 
 	logger.debug(`Querying index to retrieve block IDs with params: ${util.inspect(params)}`);
-	const total = await blocksTable.count(params);
+	const total = Number(await blocksTable.count(params));
 	const blocksFromDB = await blocksTable.find(
 		params,
 		Object.getOwnPropertyNames(blocksTableSchema.schema),
@@ -629,7 +645,7 @@ const getBlocksAssets = async params => {
 		async blockFromDB => {
 			const block = {
 				...blockFromDB,
-				assets: JSON.parse(blockFromDB.assets),
+				assets: JSONParseDB(blockFromDB.assets),
 			};
 			return {
 				block: {

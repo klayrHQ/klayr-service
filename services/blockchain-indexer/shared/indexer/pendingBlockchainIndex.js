@@ -9,7 +9,16 @@ const { indexNewBlock } = require('./blockchainIndex');
 
 const blocksTableSchema = require('../database/schema/blocks');
 const config = require('../../config');
-const { getPendingIndexReady, setPendingIndexIsReady } = require('./readyIndex');
+const {
+	getPendingIndexReady,
+	setPendingIndexIsReady,
+	getIsOnWaitingDrainedBeenExecuted,
+} = require('./readyIndex');
+const { isWaitingDrained } = require('./utils/indexerEventHook');
+const {
+	shouldScheduleMissingBlocks,
+	scheduleMissingBlocksOnCoordinator,
+} = require('./utils/scheduler');
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
@@ -34,7 +43,7 @@ const setPendingIndexerLastCurrentHeight = height => {
 
 const getNumBlocksIndexed = async () => {
 	const blocksTable = await getBlocksTable();
-	return await blocksTable.count();
+	return Number(await blocksTable.count());
 };
 
 const startIndexingPendingNewBlock = async numBlocksIndexed => {
@@ -67,6 +76,19 @@ const indexPendingNewBlock = async block => {
 	if (getPendingIndexReady()) {
 		await indexNewBlock(block);
 	} else {
+		const isIndexingQueueDrained = isWaitingDrained();
+		const isOnWaitingDrainedBeenExecuted = getIsOnWaitingDrainedBeenExecuted();
+
+		if (isIndexingQueueDrained && !isOnWaitingDrainedBeenExecuted) {
+			if (await shouldScheduleMissingBlocks(block)) {
+				logger.info(
+					`Scheduling missing blocks indexing, since indexPendingNewBlock catching onWaitingDrained hasn't been executed`,
+				);
+				await scheduleMissingBlocksOnCoordinator();
+				return;
+			}
+		}
+
 		if (!pendingBlockToIndex.some(b => b.header.id === block.header.id)) {
 			logger.info(
 				`Block indexing is still in progress, block at height ${block.header.height} will be scheduled for indexing later...`,

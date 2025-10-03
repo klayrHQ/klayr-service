@@ -272,10 +272,13 @@ const scheduleMissingBlocksIndexing = async () => {
 
 	// Lowest and highest block heights expected to be indexed
 	const blockIndexLowerRange = lastVerifiedHeight;
-	const blockIndexHigherRange = Math.min(
-		blockIndexLowerRange + config.job.indexMissingBlocks.maxBlocksToSchedule,
-		currentHeight,
-	);
+	const blockIndexHigherRange =
+		config.job.indexMissingBlocks.maxBlocksToSchedule > 0
+			? Math.min(
+					blockIndexLowerRange + config.job.indexMissingBlocks.maxBlocksToSchedule,
+					currentHeight,
+			  )
+			: currentHeight;
 
 	try {
 		const missingBlocksByHeight = await getMissingBlocksList(

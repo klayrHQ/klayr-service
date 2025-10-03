@@ -79,7 +79,13 @@ const getEstimateFeePerByte = async () => {
 		};
 	}
 
-	const { header: latestBlock } = await getLatestBlock();
+	const [{ header: latestBlock }, cachedFeeEstPerByteFull, cachedFeeEstPerByteQuick] =
+		await Promise.all([
+			getLatestBlock(),
+			getEstimateFeePerByteFull(),
+			getEstimateFeePerByteQuick(),
+		]);
+
 	const validate = (feeEstPerByte, allowedLag = 0) =>
 		feeEstPerByte &&
 		['low', 'med', 'high', 'updated', 'blockHeight', 'blockID'].every(key =>
@@ -87,21 +93,21 @@ const getEstimateFeePerByte = async () => {
 		) &&
 		Number(latestBlock.height) - Number(feeEstPerByte.blockHeight) <= allowedLag;
 
-	const cachedFeeEstPerByteFull = await getEstimateFeePerByteFull();
 	logger.debug(`Retrieved regular estimate: ${util.inspect(cachedFeeEstPerByteFull)}.`);
-	if (validate(cachedFeeEstPerByteFull, 15))
+	if (validate(cachedFeeEstPerByteFull, 15)) {
 		return {
 			...cachedFeeEstPerByteFull,
 			...(await getFeeConstants()),
 		};
+	}
 
-	const cachedFeeEstPerByteQuick = await getEstimateFeePerByteQuick();
 	logger.debug(`Retrieved quick estimate: ${util.inspect(cachedFeeEstPerByteQuick)}.`);
-	if (validate(cachedFeeEstPerByteQuick, 5))
+	if (validate(cachedFeeEstPerByteQuick, 5)) {
 		return {
 			...cachedFeeEstPerByteQuick,
 			...(await getFeeConstants()),
 		};
+	}
 
 	return {
 		data: { error: 'The estimates are currently under processing. Please retry in 30 seconds.' },

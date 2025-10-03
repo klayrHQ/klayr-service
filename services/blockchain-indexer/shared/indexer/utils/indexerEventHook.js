@@ -1,37 +1,32 @@
 const { Logger } = require('klayr-service-framework');
-const { getIndexReadyStatus, getIsSchedulingThroughCoordinator } = require('../readyIndex');
-const { scheduleMissingBlocksIndexing, getReorderingStatus } = require('./blockchainIndex');
 const { debounce } = require('lodash');
-const { getGenesisHeight } = require('../../constants');
+const { shouldScheduleMissingBlocks, scheduleMissingBlocksOnCoordinator } = require('./scheduler');
+const { setIsOnWaitingDrainedBeenExecuted } = require('../readyIndex');
 
 const logger = Logger();
 
 let waitingCount = 0;
 let waitingEmptyFired = false;
+let onWaitingDrainedInitialized = false;
 
 // This hook is called when the queue is drained and there are no more jobs waiting
 async function onWaitingDrained(currentBlock) {
-	const indexReady = getIndexReadyStatus();
-	const isScheduledThroughCoordinator = getIsSchedulingThroughCoordinator();
-	const isReordering = getReorderingStatus();
-	const genesisHeight = await getGenesisHeight();
+	setIsOnWaitingDrainedBeenExecuted();
 
-	// only schedule missing blocks indexing if the index is not ready, not scheduled through coordinator,
-	// is not reordering, and the current block height is greater than genesis height
-	if (
-		!indexReady &&
-		!isScheduledThroughCoordinator &&
-		!isReordering &&
-		currentBlock.header.height > genesisHeight
-	) {
-		logger.info('Scheduling missing blocks indexing, since waiting queue is drained');
-		await scheduleMissingBlocksIndexing();
+	if (await shouldScheduleMissingBlocks(currentBlock)) {
+		logger.info(`Scheduling missing blocks indexing, since waiting queue is drained`);
+		await scheduleMissingBlocksOnCoordinator();
 	}
+}
+
+function isWaitingDrained() {
+	if (!onWaitingDrainedInitialized) return false;
+	return waitingCount <= 0 && !waitingEmptyFired;
 }
 
 const checkWaitingDrained = async job => {
 	// double check condition to ensure that we invoke onWaitingDrained when waiting job truly drained
-	if (waitingCount <= 0 && !waitingEmptyFired) {
+	if (isWaitingDrained()) {
 		waitingCount = 0;
 		waitingEmptyFired = true;
 		await onWaitingDrained(job.data.block);
@@ -47,12 +42,13 @@ async function onJobWaiting(job) {
 
 async function onJobActive(job) {
 	waitingCount--;
-	if (waitingCount <= 0 && !waitingEmptyFired) await debouncedCheckWaitingDrained(job);
+	if (isWaitingDrained()) await debouncedCheckWaitingDrained(job);
 }
 
 async function registerIndexerEventHook(indexBlocksQueue) {
 	const jobCount = await indexBlocksQueue.queue.getJobCounts();
 	waitingCount = jobCount.waiting;
+	onWaitingDrainedInitialized = true;
 
 	indexBlocksQueue.queue.on('waiting', onJobWaiting);
 	indexBlocksQueue.queue.on('active', onJobActive);
@@ -66,4 +62,4 @@ function unregisterIndexerEventHook(indexBlocksQueue) {
 	indexBlocksQueue.queue.removeListener('active', onJobActive);
 }
 
-module.exports = { registerIndexerEventHook, unregisterIndexerEventHook };
+module.exports = { registerIndexerEventHook, unregisterIndexerEventHook, isWaitingDrained };

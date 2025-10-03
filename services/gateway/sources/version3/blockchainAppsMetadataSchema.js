@@ -20,14 +20,17 @@ module.exports = {
 	method: 'app-registry.blockchain.apps.meta',
 	params: {
 		chainName: '=,string',
+		excludeChainName: '=,string',
 		displayName: '=,string',
 		chainID: '=,string',
 		isDefault: '=,boolean',
+		status: '=,string',
 		network: '=,string',
 		search: '=,string',
 		offset: '=,number',
 		limit: '=,number',
 		sort: '=,string',
+		includeBlockchainApp: '=,boolean',
 	},
 	definition: {
 		data: ['data', blockchainAppMetadata],

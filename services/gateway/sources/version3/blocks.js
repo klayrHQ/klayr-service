@@ -26,6 +26,7 @@ module.exports = {
 		offset: '=,number',
 		limit: '=,number',
 		sort: '=,string',
+		includeAssets: '=,boolean',
 	},
 	definition: {
 		data: ['data', block],

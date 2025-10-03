@@ -207,16 +207,15 @@ const getTransactionsStatistics = async params => {
 		tokenIDs,
 	};
 
-	const timeline = await getStatsTimeline(statsParams);
-	const distributionByType = await getDistributionByType(statsParams);
-	const distributionByAmount = await getDistributionByAmount(statsParams);
+	const [timeline, distributionByType, distributionByAmount, [{ date: minDate } = {}]] =
+		await Promise.all([
+			getStatsTimeline(statsParams),
+			getDistributionByType(statsParams),
+			getDistributionByAmount(statsParams),
+			transactionStatisticsTable.find({ sort: 'date:asc', limit: 1 }, 'date'),
+		]);
 
 	transactionsStatistics.data = { timeline, distributionByType, distributionByAmount };
-
-	const [{ date: minDate } = {}] = await transactionStatisticsTable.find(
-		{ sort: 'date:asc', limit: 1 },
-		'date',
-	);
 	const total = minDate ? moment().diff(moment.unix(minDate), params.interval) : 0;
 
 	transactionsStatistics.meta = {

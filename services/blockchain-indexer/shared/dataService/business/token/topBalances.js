@@ -67,6 +67,7 @@ const getTokenTopBalances = async params => {
 
 	const tokenInfos = await tokenBalancesTable.find(params, [
 		`${tokenBalancesTableSchema.tableName}.balance`,
+		`${tokenBalancesTableSchema.tableName}.availableBalance`,
 		`${tokenBalancesTableSchema.tableName}.address`,
 		`${accountTableSchema.tableName}.publicKey`,
 		`${accountTableSchema.tableName}.name`,
@@ -81,7 +82,9 @@ const getTokenTopBalances = async params => {
 			address: tokenInfo.address,
 			publicKey: tokenInfo.publicKey,
 			name: tokenInfo.name,
-			balance: BigInt(tokenInfo.balance).toString(),
+			balance: tokenInfo.balance.toString(),
+			availableBalance: tokenInfo.availableBalance.toString(),
+			lockedBalance: (BigInt(tokenInfo.balance) - BigInt(tokenInfo.availableBalance)).toString(),
 			knowledge,
 		});
 	}
@@ -91,9 +94,9 @@ const getTokenTopBalances = async params => {
 	response.meta = {
 		count: response.data[tokenID].length,
 		offset: params.offset,
-		total: await tokenBalancesTable.count(params, [
-			`${tokenBalancesTableSchema.tableName}.address`,
-		]),
+		total: Number(
+			await tokenBalancesTable.count(params, [`${tokenBalancesTableSchema.tableName}.address`]),
+		),
 	};
 
 	return response;

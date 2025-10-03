@@ -36,12 +36,19 @@ const { getFinalizedHeight } = require('../../constants');
 const transactionsTableSchema = require('../../database/schema/transactions');
 const config = require('../../../config');
 const { getKlayr32AddressFromPublicKey } = require('../../utils/account');
+const { JSONParseDB } = require('../utils/json');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
 const transactionCache = CacheLRU('transaction');
 
 const getTransactionsTable = () => getTableInstance(transactionsTableSchema, MYSQL_ENDPOINT);
+
+const getTotalTransactions = async () => {
+	const transactionsTable = await getTransactionsTable();
+	const total = Number(await transactionsTable.count());
+	return total;
+};
 
 const getTransactionByIDFromDB = async id => {
 	const transactionsTable = await getTransactionsTable();
@@ -168,19 +175,49 @@ const validateParams = async params => {
 	if (params.executionStatus) {
 		const { executionStatus, ...remParams } = params;
 		params = remParams;
-		const executionStatuses = executionStatus
-			.split(',')
-			.map(e => e.trim())
-			.filter(e => e !== 'any');
-		params.whereIn = { property: 'executionStatus', values: executionStatuses };
+
+		const validStatuses = ['pending', 'successful', 'failed'];
+		const executionStatuses = new Set(
+			executionStatus
+				.split(',')
+				.map(e => e.trim())
+				.filter(e => e !== 'any' && validStatuses.includes(e)),
+		);
+
+		if (executionStatuses.size > 0 && executionStatuses.size < validStatuses.length) {
+			params.whereIn = { property: 'executionStatus', values: [...executionStatuses] };
+		}
 	}
 
+	// When `address` is provided, build a UNION of sender/recipient queries to improve performance using two composite index
 	if (params.address) {
 		const { address, ...remParams } = params;
 		params = remParams;
 
-		params.orWhere = { recipientAddress: address };
-		params.orWhereWith = { senderAddress: address };
+		const innerQueryLimit = params.limit ? params.limit + (params.offset || 0) : undefined;
+
+		params.union = [
+			{
+				...remParams,
+				forceIndex: 'transactions_index_sender_sort',
+				senderAddress: address,
+				limit: innerQueryLimit,
+			},
+			{
+				...remParams,
+				forceIndex: 'transactions_index_recipient_sort',
+				recipientAddress: address,
+				limit: innerQueryLimit,
+			},
+		];
+
+		// Remove schema filters from outer query (already applied in union)
+		const tableColumns = Object.getOwnPropertyNames(transactionsTableSchema.schema);
+		Object.getOwnPropertyNames(params).forEach(t => {
+			if (tableColumns.includes(t)) {
+				delete params[t];
+			}
+		});
 	}
 
 	return params;
@@ -193,9 +230,12 @@ const getTransactions = async params => {
 		meta: {},
 	};
 
+	const { order, sort, limit, offset, ...paramsWithoutOrderSortLimitOffset } = params;
+	const countParams = await validateParams(paramsWithoutOrderSortLimitOffset);
+	const total = Number(await transactionsTable.count(countParams));
+
 	params = await validateParams(params);
 
-	const total = await transactionsTable.count(params);
 	const resultSet = await transactionsTable.find(
 		{ ...params, limit: params.limit || total },
 		Object.getOwnPropertyNames(transactionsTableSchema.schema),
@@ -217,8 +257,8 @@ const getTransactions = async params => {
 				name: senderAccount ? senderAccount.name : null,
 			};
 
-			transaction.params = JSON.parse(transaction.params);
-			transaction.signatures = JSON.parse(transaction.signatures);
+			transaction.params = JSONParseDB(transaction.params);
+			transaction.signatures = JSONParseDB(transaction.signatures);
 
 			if (transaction.params.recipientAddress) {
 				const recipientAccount = await getIndexedAccountInfo(
@@ -332,6 +372,7 @@ module.exports = {
 	getTransactionsByIDs,
 	normalizeTransaction,
 	formatTransactionsInBlock,
+	getTotalTransactions,
 
 	// for db indexnig use
 	formatTransactionResponseFromDB,

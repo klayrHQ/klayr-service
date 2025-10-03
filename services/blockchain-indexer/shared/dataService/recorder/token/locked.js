@@ -8,6 +8,7 @@ const BluebirdPromise = require('bluebird');
 
 const config = require('../../../../config');
 const tokenLockedTableSchema = require('../../../database/schema/tokenLocked');
+const tokenTotalLockedTableSchema = require('../../../database/schema/tokenTotalLocked');
 
 const logger = Logger();
 
@@ -15,10 +16,18 @@ const MYSQL_ENDPOINT = config.endpoints.mysql;
 const COMMIT_MAX_CONCURRENCY = 16;
 
 const getTokenLockedTable = () => getTableInstance(tokenLockedTableSchema, MYSQL_ENDPOINT);
+const getTokenTotalLockedTable = () =>
+	getTableInstance(tokenTotalLockedTableSchema, MYSQL_ENDPOINT);
 
 const lockedUpdatesMap = new Map();
 
 const getLockedUpdatesMap = () => lockedUpdatesMap;
+
+const getTotalLocked = async () => {
+	const tokenTotalLockedTable = await getTokenTotalLockedTable();
+	const data = await tokenTotalLockedTable.find({}, ['tokenID', 'module', 'total']);
+	return data;
+};
 
 const getLockedBalance = async (address, tokenID) => {
 	const tokenLockedTable = await getTokenLockedTable();
@@ -43,6 +52,16 @@ const increaseTokenLockedDB = async (address, tokenID, module, amount, dbTrx) =>
 		},
 		dbTrx,
 	);
+
+	const tokenTotalLockedTable = await getTokenTotalLockedTable();
+	await tokenTotalLockedTable.increment(
+		{
+			increment: { total: amount },
+			where: { tokenID, module },
+		},
+		dbTrx,
+	);
+
 	if (numRowsAffected === 0) {
 		await tokenLockedTable.upsert(
 			{
@@ -50,6 +69,15 @@ const increaseTokenLockedDB = async (address, tokenID, module, amount, dbTrx) =>
 				tokenID,
 				module,
 				amount,
+			},
+			dbTrx,
+		);
+
+		await tokenTotalLockedTable.upsert(
+			{
+				tokenID,
+				module,
+				total: amount,
 			},
 			dbTrx,
 		);
@@ -88,6 +116,7 @@ const commitTokenLockedIndex = async dbTrx => {
 
 	logger.debug(`Committing ${lockedUpdatesMap.size} token locked balance updates.`);
 	const tokenLockedTable = await getTokenLockedTable();
+	const tokenTotalLockedTable = await getTokenTotalLockedTable();
 
 	await BluebirdPromise.map(
 		lockedUpdatesMap.entries(),
@@ -109,6 +138,13 @@ const commitTokenLockedIndex = async dbTrx => {
 					},
 					dbTrx,
 				);
+				await tokenTotalLockedTable.increment(
+					{
+						increment: { total: amount },
+						where: { tokenID, module },
+					},
+					dbTrx,
+				);
 			}
 			if (amount < 0n) {
 				logger.debug(
@@ -120,6 +156,13 @@ const commitTokenLockedIndex = async dbTrx => {
 					{
 						decrement: { amount: amount * -1n },
 						where: { address, tokenID, module },
+					},
+					dbTrx,
+				);
+				await tokenTotalLockedTable.decrement(
+					{
+						decrement: { total: amount * -1n },
+						where: { tokenID, module },
 					},
 					dbTrx,
 				);
@@ -137,6 +180,14 @@ const commitTokenLockedIndex = async dbTrx => {
 					},
 					dbTrx,
 				);
+				await tokenTotalLockedTable.upsert(
+					{
+						tokenID,
+						module,
+						total: amount,
+					},
+					dbTrx,
+				);
 			}
 		},
 		{ concurrency: Math.min(lockedUpdatesMap.size, COMMIT_MAX_CONCURRENCY) },
@@ -148,6 +199,7 @@ const commitTokenLockedIndex = async dbTrx => {
 
 module.exports = {
 	getLockedUpdatesMap,
+	getTotalLocked,
 	getLockedBalanceByModule,
 	getLockedBalance,
 	recordTokenLocked,

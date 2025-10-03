@@ -1,0 +1,79 @@
+{
+	"Account": {
+		"type": "object",
+		"required": ["address", "publicKey", "name", "nonce", "description", "tokenBalances"],
+		"properties": {
+			"address": {
+				"type": "string",
+				"example": "klydwsyfmcko6mcd357446yatromr9vzgu7eb8y99",
+				"description": "Address of the account."
+			},
+			"name": {
+				"type": "string",
+				"example": "genesis_3",
+				"description": "Name of the account."
+			},
+			"publicKey": {
+				"type": "string",
+				"example": "32ddb97e8d7e607a14fef8449c2a2180cd74a51f67b04a50a4b1917d3ca8a52e",
+				"description": "Public key of the account."
+			},
+			"nonce": {
+				"type": "string",
+				"example": "1",
+				"description": "Nonce of the account."
+			},
+			"description": {
+				"type": "string",
+				"example": "Growth Fund's Hot Wallet",
+				"description": "Description of the account (if known)."
+			},
+			"tokenBalances": {
+				"type": "array",
+				"items": {
+					"type": "object",
+					"description": "List of account token balances",
+					"required": ["tokenID", "totalBalance", "availableBalance", "lockedBalance"],
+					"properties": {
+						"tokenID": {
+							"type": "string",
+							"example": "0000000000000000",
+							"description": "Token ID of balances item."
+						},
+						"totalBalance": {
+							"type": "string",
+							"example": "1000000000000000000",
+							"description": "Total balance of the balance item."
+						},
+						"availableBalance": {
+							"type": "string",
+							"example": "1000000000000000000",
+							"description": "Available balance of the balance item."
+						},
+						"lockedBalance": {
+							"type": "string",
+							"example": "1000000000000000000",
+							"description": "Locked balance of the balance item."
+						}
+					}
+				}
+			}
+		}
+	},
+	"accountWithEnvelope": {
+		"type": "object",
+		"required": ["data", "meta"],
+		"properties": {
+			"data": {
+				"description": "List of account data",
+				"type": "array",
+				"items": {
+					"$ref": "#/definitions/Account"
+				}
+			},
+			"meta": {
+				"$ref": "#/definitions/pagination"
+			}
+		}
+	}
+}
