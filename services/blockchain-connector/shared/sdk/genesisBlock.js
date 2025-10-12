@@ -160,7 +160,7 @@ const getGenesisAssets = async (params = {}) => {
 	}
 
 	// This will only be executed when params.module is present. Return the module info if found
-	return assetByModule;
+	return assetByModule ? [assetByModule] : [];
 };
 
 /* Returns following structure of genesis asset data filtered by module and subStore
