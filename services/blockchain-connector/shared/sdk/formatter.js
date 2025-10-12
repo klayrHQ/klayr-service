@@ -95,33 +95,33 @@ const formatTransaction = (transaction, additionalFee = 0) => {
 	return parseToJSONCompatObj(formattedTransaction);
 };
 
+const formatAsset = asset => {
+	// Decode asset data in case of binary payload
+	if (typeof asset.data === 'string') {
+		const assetModule = asset.module;
+		const blockAssetDataSchema = getBlockAssetDataSchemaByModule(assetModule);
+		const formattedAssetData = blockAssetDataSchema
+			? codec.decodeJSON(blockAssetDataSchema, Buffer.from(asset.data, 'hex'))
+			: asset.data;
+
+		if (!blockAssetDataSchema) {
+			logger.error(
+				`Unable to decode asset data. Block asset schema missing for module ${assetModule}.`,
+			);
+		}
+
+		const formattedBlockAsset = {
+			module: assetModule,
+			data: formattedAssetData,
+		};
+		return formattedBlockAsset;
+	}
+	return asset;
+};
+
 const formatBlock = block => {
 	const blockHeader = block.header;
-
-	const blockAssets = block.assets.map(asset => {
-		// Decode asset data in case of binary payload
-		if (typeof asset.data === 'string') {
-			const assetModule = asset.module;
-			const blockAssetDataSchema = getBlockAssetDataSchemaByModule(assetModule);
-			const formattedAssetData = blockAssetDataSchema
-				? codec.decodeJSON(blockAssetDataSchema, Buffer.from(asset.data, 'hex'))
-				: asset.data;
-
-			if (!blockAssetDataSchema) {
-				logger.error(
-					`Unable to decode asset data. Block asset schema missing for module ${assetModule}.`,
-				);
-			}
-
-			const formattedBlockAsset = {
-				module: assetModule,
-				data: formattedAssetData,
-			};
-			return formattedBlockAsset;
-		}
-		return asset;
-	});
-
+	const blockAssets = block.assets.map(asset => formatAsset(asset));
 	const blockTransactions = block.transactions.map(t => formatTransaction(t));
 
 	const formattedBlock = {
@@ -129,6 +129,7 @@ const formatBlock = block => {
 		assets: blockAssets,
 		transactions: blockTransactions,
 	};
+
 	return parseToJSONCompatObj(formattedBlock);
 };
 
@@ -257,6 +258,7 @@ const formatAPIClientEventPayload = (eventName, payload) => {
 
 module.exports = {
 	formatBlock,
+	formatAsset,
 	formatTransaction,
 	formatEvent,
 	formatResponse,
