@@ -101,7 +101,7 @@ const {
 
 const { getLegacyAccount } = require('./legacy');
 const { getEventsByHeight } = require('./events');
-const { invokeEndpointProxy } = require('./invoke');
+const { invokeEndpointProxy, invokeEndpointProxyImmediate } = require('./invoke');
 const { setSchemas, setMetadata } = require('./schema');
 const { getValidator, validateBLSKey } = require('./validators');
 const {
@@ -111,6 +111,7 @@ const {
 	getNetworkDisconnectedPeers,
 	getNetworkPeersStatistics,
 } = require('./network');
+const { getActiveNodeClientPoolCount } = require('./client');
 
 const { formatTransaction } = require('./formatter');
 const { encodeCCM } = require('./encoder');
@@ -142,6 +143,9 @@ const init = async () => {
 
 module.exports = {
 	init,
+
+	// client
+	getActiveNodeClientPoolCount,
 
 	// Genesis block
 	getGenesisHeight,
@@ -230,6 +234,7 @@ module.exports = {
 
 	// Invoke
 	invokeEndpointProxy,
+	invokeEndpointProxyImmediate,
 
 	// Schema
 	setSchemas,

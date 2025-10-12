@@ -15,6 +15,7 @@
  */
 const {
 	invokeEndpointProxy,
+	invokeEndpointProxyImmediate,
 	getSchemas,
 	getRegisteredEndpoints,
 	getRegisteredEvents,
@@ -22,8 +23,8 @@ const {
 	getNodeInfo,
 	getSystemMetadata,
 	getEngineEndpoints,
+	getActiveNodeClientPoolCount,
 } = require('../shared/sdk');
-const { invokeEndpointProxyImmediate } = require('../shared/sdk/invoke');
 
 module.exports = [
 	{
@@ -41,6 +42,11 @@ module.exports = [
 			endpoint: { optional: false, type: 'string' },
 			params: { optional: true, type: 'object' },
 		},
+	},
+	{
+		name: 'getActiveNodeClientPoolCount',
+		controller: getActiveNodeClientPoolCount,
+		params: {},
 	},
 	{
 		name: 'getSchema',
