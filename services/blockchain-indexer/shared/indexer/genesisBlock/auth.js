@@ -24,7 +24,7 @@ const indexAuthModuleAssets = async dbTrx => {
 				const authModuleData = await requestConnector('getGenesisAssetByModule', {
 					module: MODULE.AUTH,
 					subStore: MODULE_SUB_STORE.AUTH.DATA,
-					limit: 10000,
+					limit: BATCH_SIZE,
 					offset,
 				});
 
