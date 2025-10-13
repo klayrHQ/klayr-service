@@ -1,5 +1,9 @@
 const { Logger } = require('klayr-service-framework');
-const { pauseIndexBlocksQueue, resumeIndexBlocksQueue } = require('../blockchainIndex');
+const {
+	pauseIndexBlocksQueue,
+	resumeIndexBlocksQueue,
+	isIndexBlocksQueuePaused,
+} = require('../blockchainIndex');
 
 const logger = Logger();
 
@@ -11,12 +15,13 @@ const onIndexerStoppedHook = async () => {
 const onIndexerStopped = async () => {
 	logger.debug("indexer's broker stopped() will be executed...");
 	const start = Date.now();
+	const isPaused = await isIndexBlocksQueuePaused();
 
-	await pauseIndexBlocksQueue();
+	if (!isPaused) await pauseIndexBlocksQueue();
 
 	await onIndexerStoppedHook();
 
-	await resumeIndexBlocksQueue();
+	if (!isPaused) await resumeIndexBlocksQueue();
 
 	logger.debug(`onIndexerStopped executed successfully! Elapsed time: ${Date.now() - start}ms`);
 };

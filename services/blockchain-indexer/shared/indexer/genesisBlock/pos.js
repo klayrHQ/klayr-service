@@ -40,7 +40,7 @@ const indexPosValidatorsInfo = async (numValidators, dbTrx) => {
 		const posModuleData = await requestAll(
 			requestConnector,
 			'getGenesisAssetByModule',
-			{ module: MODULE.POS, subStore: MODULE_SUB_STORE.POS.VALIDATORS, limit: 1000 },
+			{ module: MODULE.POS, subStore: MODULE_SUB_STORE.POS.VALIDATORS, limit: 10000 },
 			numValidators,
 		);
 
@@ -87,7 +87,7 @@ const indexPosStakesInfo = async (numStakers, dbTrx) => {
 		const posModuleData = await requestAll(
 			requestConnector,
 			'getGenesisAssetByModule',
-			{ module: MODULE.POS, subStore: MODULE_SUB_STORE.POS.STAKERS, limit: 1000 },
+			{ module: MODULE.POS, subStore: MODULE_SUB_STORE.POS.STAKERS, limit: 10000 },
 			numStakers,
 		);
 		const stakers = posModuleData[MODULE_SUB_STORE.POS.STAKERS];

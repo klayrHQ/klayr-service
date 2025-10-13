@@ -20,6 +20,11 @@ const { indexTokenModuleAssets } = require('./token');
 const { indexPosModuleAssets } = require('./pos');
 const { indexAuthModuleAssets } = require('./auth');
 const { indexValidatorModuleGenesisEvents } = require('./validator');
+const {
+	cleanGenesisBlockQueue,
+	pauseGenesisBlocksQueue,
+	resumeGenesisBlocksQueue,
+} = require('./queue');
 
 const logger = Logger();
 
@@ -29,26 +34,35 @@ let genesisEventsIntervalTimeout;
 const getGenesisAssetIntervalTimeout = () => genesisAssetIntervalTimeout;
 const getGenesisEventsIntervalTimeout = () => genesisEventsIntervalTimeout;
 
-const indexGenesisBlockAssets = async dbTrx => {
-	clearTimeout(genesisAssetIntervalTimeout);
-	logger.info('Starting to index the genesis assets.');
-
-	genesisAssetIntervalTimeout = setInterval(
-		() => logger.info('Genesis assets indexing still in progress...'),
-		5000,
-	);
-
-	await indexTokenModuleAssets(dbTrx);
-	await indexPosModuleAssets(dbTrx);
-	await indexAuthModuleAssets(dbTrx);
-
-	await triggerAccountUpdates();
+const indexGenesisBlockAssets = async (dbTrx, job) => {
+	await cleanGenesisBlockQueue();
+	await pauseGenesisBlocksQueue();
 	clearInterval(genesisAssetIntervalTimeout);
-	logger.info('Finished indexing all the genesis assets.');
+
+	try {
+		logger.info('Starting to index the genesis assets.');
+		genesisAssetIntervalTimeout = setInterval(() => {
+			logger.info('Genesis assets indexing still in progress...');
+			if (job && job.progress) job.progress('Genesis assets indexing still in progress...');
+		}, 5000);
+
+		await indexTokenModuleAssets(dbTrx);
+		await indexPosModuleAssets(dbTrx);
+		await indexAuthModuleAssets(dbTrx);
+		await triggerAccountUpdates();
+
+		logger.info('Finished indexing all the genesis assets.');
+	} catch (err) {
+		logger.error('Error while indexing genesis assets:', err.message);
+		throw err;
+	} finally {
+		await resumeGenesisBlocksQueue();
+		clearInterval(genesisAssetIntervalTimeout);
+	}
 };
 
 const indexGenesisBlockEvents = async (events, _dbTrx) => {
-	clearTimeout(genesisEventsIntervalTimeout);
+	clearInterval(genesisEventsIntervalTimeout);
 	logger.info('Starting to index the genesis events.');
 
 	genesisEventsIntervalTimeout = setInterval(

@@ -94,6 +94,7 @@ const {
 const { recordEvents, commitEvent } = require('./eventProcessor');
 const { recordNonceIncrease } = require('../dataService/recorder/auth/account');
 const { scheduleMissingBlocksOnCoordinator } = require('./utils/scheduler');
+const { initGenesisBlockQueues } = require('./genesisBlock/queue');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
@@ -364,7 +365,9 @@ const indexBlock = async job => {
 		let blockReward = BigInt('0');
 
 		if (blockToIndexFromNode.height === genesisHeight) {
-			await indexGenesisBlockAssets(dbTrx);
+			// pause indexing job until genesis block is successfully indexed
+			await pauseIndexBlocksQueue();
+			await indexGenesisBlockAssets(dbTrx, job);
 		}
 
 		const events = await getEventsByHeight(blockToIndexFromNode.height);
@@ -907,6 +910,7 @@ const initBlockProcessingQueues = async () => {
 		config.queue.deleteIndexedBlocks.concurrency,
 	);
 
+	await initGenesisBlockQueues(resumeIndexBlocksQueue);
 	await registerIndexerEventHook(indexBlocksQueue);
 };
 
@@ -926,6 +930,10 @@ const resumeIndexBlocksQueue = async () => {
 		await indexBlocksQueue.queue.resume();
 		logger.info('Indexing blocks queue is resumed.');
 	}
+};
+
+const isIndexBlocksQueuePaused = async () => {
+	return indexBlocksQueue && indexBlocksQueue.queue && indexBlocksQueue.queue.isPaused();
 };
 
 const getLiveIndexingJobCount = async () => {
@@ -1188,4 +1196,5 @@ module.exports = {
 	unregisterIndexerEvent,
 	pauseIndexBlocksQueue,
 	resumeIndexBlocksQueue,
+	isIndexBlocksQueuePaused,
 };
