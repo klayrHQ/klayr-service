@@ -23,7 +23,7 @@ const { INVALID_ED25519_KEY } = require('../../constants');
 const logger = Logger();
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
-const BATCH_SIZE = 10000;
+const BATCH_SIZE = 2000;
 const BATCH_RETRY_DELAY = 1000;
 
 const getStakesTable = () => getTableInstance(stakesTableSchema, MYSQL_ENDPOINT);

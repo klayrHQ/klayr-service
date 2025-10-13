@@ -14,7 +14,7 @@ const config = require('../../../config');
 const { addGenesisBlockJob } = require('./queue');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
-const BATCH_SIZE = 10000;
+const BATCH_SIZE = 2000;
 const BATCH_RETRY_DELAY = 1000;
 
 const logger = Logger();

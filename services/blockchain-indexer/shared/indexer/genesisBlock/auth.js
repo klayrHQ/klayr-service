@@ -6,7 +6,7 @@ const { getKlayr32AddressFromHexAddress } = require('../../utils/account');
 const { addGenesisBlockJob } = require('./queue');
 
 const logger = Logger();
-const BATCH_SIZE = 10000;
+const BATCH_SIZE = 2000;
 const BATCH_RETRY_DELAY = 1000;
 
 const indexAuthModuleAssets = async dbTrx => {
