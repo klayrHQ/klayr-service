@@ -28,13 +28,14 @@ const {
 
 const logger = Logger();
 
+let genesisResumeTriggerTimeout;
 let genesisAssetIntervalTimeout;
 let genesisEventsIntervalTimeout;
 
 const getGenesisAssetIntervalTimeout = () => genesisAssetIntervalTimeout;
 const getGenesisEventsIntervalTimeout = () => genesisEventsIntervalTimeout;
 
-const indexGenesisBlockAssets = async (dbTrx, job) => {
+const indexGenesisBlockAssets = async (dbTrx, job, resumeTrigger) => {
 	await cleanGenesisBlockQueue();
 	await pauseGenesisBlocksQueue();
 	clearInterval(genesisAssetIntervalTimeout);
@@ -56,8 +57,20 @@ const indexGenesisBlockAssets = async (dbTrx, job) => {
 		logger.error('Error while indexing genesis assets:', err.message);
 		throw err;
 	} finally {
-		await resumeGenesisBlocksQueue();
 		clearInterval(genesisAssetIntervalTimeout);
+
+		if (typeof resumeTrigger === 'function') {
+			clearInterval(genesisResumeTriggerTimeout);
+
+			genesisResumeTriggerTimeout = setInterval(async () => {
+				if (await resumeTrigger()) {
+					clearInterval(genesisResumeTriggerTimeout);
+					await resumeGenesisBlocksQueue();
+				}
+			}, 5000);
+		} else {
+			await resumeGenesisBlocksQueue();
+		}
 	}
 };
 

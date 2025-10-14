@@ -367,7 +367,7 @@ const indexBlock = async job => {
 		if (blockToIndexFromNode.height === genesisHeight) {
 			// pause indexing job until genesis block is successfully indexed
 			await pauseIndexBlocksQueue();
-			await indexGenesisBlockAssets(dbTrx, job);
+			await indexGenesisBlockAssets(dbTrx, job, isGenesisBlockIndexed);
 		}
 
 		const events = await getEventsByHeight(blockToIndexFromNode.height);
