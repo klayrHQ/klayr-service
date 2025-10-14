@@ -63,6 +63,12 @@ const getMissingBlocks = async (from, to) => {
 const getIndexVerifiedHeight = async () =>
 	requestIndexer('getIndexVerifiedHeight').catch(() => null);
 
+const getIsIndexerReordering = async () =>
+	requestIndexer('getReorderingStatus').catch(
+		// So that waitForJobCountToFallBelowThreshold will not continue when indexer is failing to respond
+		() => false,
+	);
+
 const getLiveIndexingJobCount = async () =>
 	requestIndexer('getLiveIndexingJobCount').catch(
 		// So that no new jobs are scheduled when indexer is failing to respond
@@ -75,4 +81,5 @@ module.exports = {
 	getMissingBlocks,
 	getIndexVerifiedHeight,
 	getLiveIndexingJobCount,
+	getIsIndexerReordering,
 };

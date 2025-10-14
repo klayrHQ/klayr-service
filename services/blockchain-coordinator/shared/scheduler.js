@@ -27,6 +27,7 @@ const {
 	getIndexVerifiedHeight,
 	isGenesisBlockIndexed,
 	getLiveIndexingJobCount: getLiveIndexingJobCountFromIndexer,
+	getIsIndexerReordering,
 } = require('./sources/indexer');
 
 const { getAllPosValidators, getBlocksByHeightBetween } = require('./sources/connector');
@@ -69,13 +70,21 @@ const waitForJobCountToFallBelowThreshold = async () => {
 	/* eslint-disable no-constant-condition */
 	while (true) {
 		const count = await getLiveIndexingJobCount();
-		if (count < skipThreshold) return;
-		logger.info(
-			`In progress job count (${String(count).padStart(
-				5,
-				' ',
-			)}) not yet below the threshold (${skipThreshold}). Waiting for ${REFRESH_INTERVAL}ms to re-check the job count before scheduling the next batch.`,
-		);
+		const isReordering = await getIsIndexerReordering();
+		if (!isReordering && count < skipThreshold) return;
+
+		if (isReordering) {
+			logger.info(
+				`Indexer is currently in reordering process. Waiting for ${REFRESH_INTERVAL}ms to re-check the job count before scheduling the next batch.`,
+			);
+		} else {
+			logger.info(
+				`In progress job count (${String(count).padStart(
+					5,
+					' ',
+				)}) not yet below the threshold (${skipThreshold}). Waiting for ${REFRESH_INTERVAL}ms to re-check the job count before scheduling the next batch.`,
+			);
+		}
 		await delay(REFRESH_INTERVAL);
 	}
 	/* eslint-enable no-constant-condition */
