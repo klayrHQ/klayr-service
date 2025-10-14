@@ -24,6 +24,7 @@ const {
 	cleanGenesisBlockQueue,
 	pauseGenesisBlocksQueue,
 	resumeGenesisBlocksQueue,
+	initializeTotalGenesisJob,
 } = require('./queue');
 
 const logger = Logger();
@@ -65,10 +66,12 @@ const indexGenesisBlockAssets = async (dbTrx, job, resumeTrigger) => {
 			genesisResumeTriggerTimeout = setInterval(async () => {
 				if (await resumeTrigger()) {
 					clearInterval(genesisResumeTriggerTimeout);
+					await initializeTotalGenesisJob();
 					await resumeGenesisBlocksQueue();
 				}
 			}, 5000);
 		} else {
+			await initializeTotalGenesisJob();
 			await resumeGenesisBlocksQueue();
 		}
 	}

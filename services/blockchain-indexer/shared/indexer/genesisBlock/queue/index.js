@@ -17,6 +17,7 @@ const { indexGenesisAuthAccount } = require('./auth');
 let indexGenesisBlockQueue;
 let onWaitingDrained;
 
+let totalGenesisJob = 0;
 let waitingCount = 0;
 let waitingEmptyFired = false;
 let onWaitingDrainedInitialized = false;
@@ -117,7 +118,10 @@ const indexGenesisBlock = async job => {
 			throw new Error(`unknown genesis block job method: ${job.data.method}`);
 	}
 
-	logger.info(`Successfully executed "${job.data.method}" with id: ${job.id}`);
+	const percent = (Number(job.id) / totalGenesisJob) * 100;
+	logger.info(
+		`Successfully executed "${job.data.method}" with id: ${job.id} (${percent.toFixed(2)})`,
+	);
 };
 
 const addGenesisBlockJob = async (method, payload) => {
@@ -151,6 +155,11 @@ const resumeGenesisBlocksQueue = async () => {
 	}
 };
 
+const initializeTotalGenesisJob = async () => {
+	const count = await indexGenesisBlockQueue.queue.getJobCounts();
+	Object.keys(count).forEach(key => (totalGenesisJob += count[key]));
+};
+
 module.exports = {
 	initGenesisBlockQueues,
 	addGenesisBlockJob,
@@ -158,4 +167,5 @@ module.exports = {
 	cleanGenesisBlockQueue,
 	pauseGenesisBlocksQueue,
 	resumeGenesisBlocksQueue,
+	initializeTotalGenesisJob,
 };
