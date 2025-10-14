@@ -168,6 +168,15 @@ const scheduleBlocksIndexing = async heights => {
 	}
 };
 
+const scheduleGenesisBlocksIndexing = async genesisHeight => {
+	const currentHeight = await getCurrentHeight();
+	await requestIndexer('setPendingIndexerLastCurrentHeight', { currentHeight });
+
+	logger.trace(`Scheduling indexing for genesis block at height: ${genesisHeight}.`);
+	await blockMessageQueue.add({ height: genesisHeight });
+	logger.debug(`Scheduled indexing for genesis block at height: ${genesisHeight}.`);
+};
+
 const scheduleValidatorsIndexing = async validators => {
 	await BluebirdPromise.map(
 		validators,
@@ -192,7 +201,7 @@ const indexGenesisBlock = async () => {
 
 	const genesisHeight = await getGenesisHeight();
 	logger.debug('Scheduling genesis block indexing.');
-	await scheduleBlocksIndexing(genesisHeight);
+	await scheduleGenesisBlocksIndexing(genesisHeight);
 	logger.info('Finished scheduling genesis block indexing.');
 
 	await waitForGenesisBlockIndexing().catch(async () => {
