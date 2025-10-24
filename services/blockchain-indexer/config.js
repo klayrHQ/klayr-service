@@ -121,6 +121,10 @@ config.queue = {
 		name: 'PendingAddressUpdates',
 		concurrency: 512,
 	},
+	pendingBlocks: {
+		name: 'pendingBlocks',
+		concurrency: 1,
+	},
 };
 
 config.operations = {
