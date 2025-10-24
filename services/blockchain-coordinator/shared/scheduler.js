@@ -337,7 +337,7 @@ const scheduleMissingBlocksIndexing = async () => {
 // Batch into smaller ranges to avoid microservice/DB query timeouts
 const getMissingBlocksList = async (fromHeight, toHeight) => {
 	const missingBlocksByHeight = [];
-	const MAX_QUERY_RANGE = 10000;
+	const MAX_QUERY_RANGE = config.job.indexMissingBlocks.getMissingBlocksListQuerySize;
 	const NUM_BATCHES = Math.ceil((toHeight - fromHeight) / MAX_QUERY_RANGE);
 
 	// Batch into smaller ranges to avoid microservice/DB query timeouts

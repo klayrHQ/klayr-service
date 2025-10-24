@@ -591,6 +591,12 @@ By default, it is set to `20000`.
 By default, it is set to `5000`.
 | 5000
 
+| `GET_MISSING_BLOCKS_LIST_QUERY_SIZE`
+| number
+| Maximum query size for getting missing block per one batch.
+By default, it is set to `2000`.
+| 2000
+
 | `REQUEST_TIMEOUT_RETRY_DELAY`
 | number
 | Delay in milliseconds before retrying a request.
@@ -623,6 +629,7 @@ module.exports = {
 			// INDEX_MISSING_BLOCKS_SKIP_THRESHOLD: 1000,
 			// INDEX_MISSING_BLOCKS_MAX_SCHEDULE: 20000,
 			// SCHEDULE_BLOCK_INDEXING_MAX_BATCH_SIZE: 5000,
+			// GET_MISSING_BLOCKS_LIST_QUERY_SIZE: 2000,
 			// REQUEST_TIMEOUT_RETRY_DELAY: 1000,
 			// JOB_INTERVAL_INDEX_MISSING_BLOCKS: 0,
 			// JOB_SCHEDULE_INDEX_MISSING_BLOCKS: '*/5 * * * *',
