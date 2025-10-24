@@ -19,6 +19,7 @@ const json = require('big-json');
 
 const {
 	Logger,
+	CacheRedis,
 	Exceptions: { NotFoundException },
 } = require('klayr-service-framework');
 
@@ -31,20 +32,35 @@ const config = require('../../config');
 
 const logger = Logger();
 
+const GENESIS_BLOCK_CACHE_KEY = 'genesisBlock';
+const genesisBlockCache = CacheRedis(GENESIS_BLOCK_CACHE_KEY, config.endpoints.cache);
+
 let readStream;
 let genesisBlockUrl;
 let genesisBlockFilePath;
-let genesisBlock = { header: {} };
 
 let isGenesisBlockURLNotFound = false;
 
 const parseStream = json.createParseStream();
 
-const setGenesisBlock = block => (genesisBlock = block);
+const setGenesisBlockCache = async block => {
+	// set only once
+	if (!(await getGenesisBlockId())) {
+		await genesisBlockCache.set(GENESIS_BLOCK_CACHE_KEY, JSON.stringify(block));
+	}
+};
 
-const getGenesisBlock = () => genesisBlock;
+const getGenesisBlockFromCache = async () => {
+	const genesisBlock = await genesisBlockCache.get(GENESIS_BLOCK_CACHE_KEY);
+	if (!genesisBlock) return undefined;
+	return JSON.parse(genesisBlock);
+};
 
-const getGenesisBlockId = () => genesisBlock.header.id;
+const getGenesisBlockId = async () => {
+	const genesisBlock = await getGenesisBlockFromCache();
+	if (!genesisBlock) return undefined;
+	return genesisBlock.header.id;
+};
 
 const loadConfig = async () => {
 	const nodeInfo = await getNodeInfo();
@@ -133,7 +149,7 @@ const getGenesisBlockFromFS = async () => {
 	if (isGenesisBlockURLNotFound) throw new NotFoundException();
 
 	if (!genesisBlockUrl || !genesisBlockFilePath) await loadConfig();
-	if (!getGenesisBlockId()) {
+	if (!(await getGenesisBlockId())) {
 		if (!(await exists(genesisBlockFilePath))) {
 			await downloadAndValidateGenesisBlock();
 			readStream = fs.createReadStream(genesisBlockFilePath);
@@ -150,13 +166,15 @@ const getGenesisBlockFromFS = async () => {
 		});
 
 		const formattedBlock = await formatBlock(block);
-		if (!getGenesisBlockId()) setGenesisBlock(formattedBlock);
+		if (!(await getGenesisBlockId())) await setGenesisBlockCache(formattedBlock);
 	}
 
-	return getGenesisBlock();
+	return await getGenesisBlockFromCache();
 };
 
 module.exports = {
 	getGenesisBlockId,
 	getGenesisBlockFromFS,
+	getGenesisBlockFromCache,
+	setGenesisBlockCache,
 };

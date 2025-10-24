@@ -116,6 +116,7 @@ module.exports = {
 			env: {
 				// --- Remember to set the properties below
 				SERVICE_BROKER: 'redis://klayr:password@127.0.0.1:6379/0',
+				// SERVICE_CONNECTOR_CACHE_REDIS: 'redis://klayr:password@127.0.0.1:6379/10',
 				// KLAYR_APP_URLS: 'ws://127.0.0.1:7887',
 				// KLAYR_EVENT_SUBSCRIBER_NODE: 'ws://127.0.0.1:7887',
 				// SERVICE_CONNECTOR_MYSQL: 'mysql://klayr:password@127.0.0.1:3306/klayr',

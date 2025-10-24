@@ -34,6 +34,8 @@ config.brokerTimeout = Number(process.env.SERVICE_BROKER_TIMEOUT) || 10; // in s
 /**
  * External endpoints
  */
+config.endpoints.cache =
+	process.env.SERVICE_CONNECTOR_CACHE_REDIS || 'redis://klayr:password@127.0.0.1:6379/10';
 config.endpoints.klayrUrls = process.env.KLAYR_APP_URLS
 	? process.env.KLAYR_APP_URLS.split(',')
 	: ['ws://127.0.0.1:7887'];

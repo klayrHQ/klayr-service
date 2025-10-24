@@ -26,27 +26,28 @@ To configure the different microservices, there are several environment variable
 
 A list of the most commonly used environment variables is presented below:
 
-| Environment variable | Description |
-| -------------------- | ----------- |
-| `SERVICE_BROKER` | URL of the microservice message broker (NATS or Redis). |
-| `KLAYR_APP_URLS` | Comma-separated list of Klayr application node URLs to connect to. |
-| `KLAYR_EVENT_SUBSCRIBER_NODE` | The Klayr application node URL to subscribe to events from. |
-| `SERVICE_CONNECTOR_MYSQL` | Connection string for the MySQL instance that the microservice connects to. |
-| `GENESIS_BLOCK_URL` | URL of the Klayr SDK-based application's genesis block. |
-| `CLIENT_POOL_SIZE` | Number of active API clients to be maintained in the pool for each Klayr application node URL. |
-| `WS_SERVER_PING_INTERVAL` | Interval (in milliseconds) at which the WS server checks for liveliness of all the connected clients. |
-| `WS_SERVER_PING_INTERVAL_BUFFER` | A conservative assumption of the latency (in milliseconds) for WS server pings to arrive at the client. |
-| `ENDPOINT_INVOKE_MAX_RETRIES` | Maximum number of endpoint invocation request retries to the node. |
-| `ENDPOINT_INVOKE_RETRY_DELAY` | Delay (in milliseconds) between each endpoint invocation request retry. |
-| `INVOKE_ENDPOINT_QUEUE_CONCURRENCY` | The number of concurrent jobs to process from the invoke endpoint queue. |
-| `INVOKE_ENDPOINT_COALESCING_CACHE_TTL` | The time-to-live (in milliseconds) for the coalescing cache for invoke endpoints. |
-| `ENABLE_TESTING_MODE` | Boolean flag to enable testing mode. |
-| `CONNECTOR_EXIT_DELAY_IN_HOURS` | Delay (in hours) after which the blockchain-connector microservice exits. |
-| `CLIENT_CONNECTION_VERIFY_INTERVAL` | Every n milliseconds, verify if client connection is alive. |
-| `JOB_INTERVAL_CACHE_CLEANUP` | Job run interval to clean up block cache. |
-| `JOB_SCHEDULE_CACHE_CLEANUP` | Job run cron schedule to clean up block cache. |
-| `JOB_INTERVAL_REFRESH_PEERS` | Job run interval to refresh the peers' list. |
-| `JOB_SCHEDULE_REFRESH_PEERS` | Job run cron schedule to refresh the peers' list. |
+| Environment variable                   | Description                                                                                             |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `SERVICE_BROKER`                       | URL of the microservice message broker (NATS or Redis).                                                 |
+| `KLAYR_APP_URLS`                       | Comma-separated list of Klayr application node URLs to connect to.                                      |
+| `SERVICE_CONNECTOR_CACHE_REDIS`        | URL of the cache storage (Redis).                                                                       |
+| `KLAYR_EVENT_SUBSCRIBER_NODE`          | The Klayr application node URL to subscribe to events from.                                             |
+| `SERVICE_CONNECTOR_MYSQL`              | Connection string for the MySQL instance that the microservice connects to.                             |
+| `GENESIS_BLOCK_URL`                    | URL of the Klayr SDK-based application's genesis block.                                                 |
+| `CLIENT_POOL_SIZE`                     | Number of active API clients to be maintained in the pool for each Klayr application node URL.          |
+| `WS_SERVER_PING_INTERVAL`              | Interval (in milliseconds) at which the WS server checks for liveliness of all the connected clients.   |
+| `WS_SERVER_PING_INTERVAL_BUFFER`       | A conservative assumption of the latency (in milliseconds) for WS server pings to arrive at the client. |
+| `ENDPOINT_INVOKE_MAX_RETRIES`          | Maximum number of endpoint invocation request retries to the node.                                      |
+| `ENDPOINT_INVOKE_RETRY_DELAY`          | Delay (in milliseconds) between each endpoint invocation request retry.                                 |
+| `INVOKE_ENDPOINT_QUEUE_CONCURRENCY`    | The number of concurrent jobs to process from the invoke endpoint queue.                                |
+| `INVOKE_ENDPOINT_COALESCING_CACHE_TTL` | The time-to-live (in milliseconds) for the coalescing cache for invoke endpoints.                       |
+| `ENABLE_TESTING_MODE`                  | Boolean flag to enable testing mode.                                                                    |
+| `CONNECTOR_EXIT_DELAY_IN_HOURS`        | Delay (in hours) after which the blockchain-connector microservice exits.                               |
+| `CLIENT_CONNECTION_VERIFY_INTERVAL`    | Every n milliseconds, verify if client connection is alive.                                             |
+| `JOB_INTERVAL_CACHE_CLEANUP`           | Job run interval to clean up block cache.                                                               |
+| `JOB_SCHEDULE_CACHE_CLEANUP`           | Job run cron schedule to clean up block cache.                                                          |
+| `JOB_INTERVAL_REFRESH_PEERS`           | Job run interval to refresh the peers' list.                                                            |
+| `JOB_SCHEDULE_REFRESH_PEERS`           | Job run cron schedule to refresh the peers' list.                                                       |
 
 > **Note**: `interval` takes priority over `schedule` and must be greater than 0 to be valid for all the moleculer job configurations.
 

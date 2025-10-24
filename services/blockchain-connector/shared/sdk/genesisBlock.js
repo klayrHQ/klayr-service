@@ -19,7 +19,11 @@ const {
 } = require('klayr-service-framework');
 
 const { getNodeInfo } = require('./cached_endpoints');
-const { getGenesisBlockFromFS } = require('./blocksUtils');
+const {
+	getGenesisBlockFromFS,
+	getGenesisBlockFromCache,
+	setGenesisBlockCache,
+} = require('./blocksUtils');
 
 const { TIMEOUT_REGEX, invokeEndpoint } = require('./client');
 const { formatBlock, formatAsset } = require('./formatter');
@@ -39,8 +43,18 @@ const getGenesisHeight = async () => {
 };
 
 const getGenesisBlock = async (isIncludeAssets = false) => {
+	const blockCache = await getGenesisBlockFromCache();
+	if (blockCache) {
+		return {
+			...blockCache,
+			assets: isIncludeAssets ? blockCache.assets : [],
+		};
+	}
+
 	try {
+		// NOTE: getGenesisBlockFromFS already call setGenesisBlockCache
 		const block = await getGenesisBlockFromFS();
+
 		// Filter out assets from genesis block and assign empty array
 		return {
 			...block,
@@ -55,7 +69,12 @@ const getGenesisBlock = async (isIncludeAssets = false) => {
 	const height = await getGenesisHeight();
 	try {
 		const block = await invokeEndpoint('chain_getBlockByHeight', { height });
-		return block;
+		await setGenesisBlockCache(block);
+
+		return {
+			...block,
+			assets: isIncludeAssets ? block.assets : [],
+		};
 	} catch (err) {
 		if (TIMEOUT_REGEX.test(err.message)) {
 			throw new TimeoutException("Request timed out when calling 'getGenesisBlock'.");

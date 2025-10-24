@@ -137,6 +137,7 @@ services:
       replicas: 1
     environment:
       - SERVICE_BROKER=nats://nats:4222
+      - SERVICE_CONNECTOR_CACHE_REDIS=${SERVICE_CONNECTOR_CACHE_REDIS}
       - KLAYR_APP_URLS=${KLAYR_APP_URLS}
       - KLAYR_EVENT_SUBSCRIBER_NODE=${KLAYR_EVENT_SUBSCRIBER_NODE}
       - SERVICE_CONNECTOR_MYSQL=mysql://klayr:password@mysql-primary:3306/klayr
