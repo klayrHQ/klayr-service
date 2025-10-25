@@ -42,13 +42,6 @@ let numBlocksIndexedValue = 0;
 
 let firstPendingBlockJSON;
 
-const pendingBlocksQueue = Queue(
-	config.endpoints.cache,
-	config.queue.pendingBlocks.name,
-	indexPendingNewBlockWorker,
-	config.queue.pendingBlocks.concurrency,
-);
-
 const getFirstPendingBlock = async () => {
 	if (!firstPendingBlockJSON) {
 		const firstPendingBlock = await firstPendingBlockCache.get(FIRST_PENDING_BLOCK_KEY);
@@ -68,7 +61,7 @@ const indexPendingNewBlockWorker = async job => {
 
 	try {
 		const skipMissingCheck =
-			firstPendingBlock && block.id === firstPendingBlock.header.id
+			firstPendingBlock && block.header.id === firstPendingBlock.header.id
 				? !thereAreMissingBlocks
 				: thereAreMissingBlocks;
 		logger.trace(
@@ -80,6 +73,13 @@ const indexPendingNewBlockWorker = async job => {
 		logger.error(`Failed to index pending block ${block.header.id}: ${err.message}`);
 	}
 };
+
+const pendingBlocksQueue = Queue(
+	config.endpoints.cache,
+	config.queue.pendingBlocks.name,
+	indexPendingNewBlockWorker,
+	config.queue.pendingBlocks.concurrency,
+);
 
 const getIndexerLastCurrentHeight = () => indexerLastCurrentHeight;
 
@@ -96,7 +96,7 @@ const getNumBlocksIndexed = async () => {
 };
 
 const startIndexingPendingNewBlock = async numBlocksIndexed => {
-	if (!(await pendingBlocksQueue.queue.isPaused())) {
+	if (await pendingBlocksQueue.queue.isPaused()) {
 		logger.info('Start scheduling indexing pending blocks...');
 
 		numBlocksIndexedValue = numBlocksIndexed;
@@ -143,6 +143,8 @@ const addPendingNewBlock = async block => {
 		if (lastPendingBlockJSON.header.height < block.header.height) {
 			await lastPendingBlockCache.set(LAST_PENDING_BLOCK_KEY, JSON.stringify(block));
 		}
+	} else {
+		await lastPendingBlockCache.set(LAST_PENDING_BLOCK_KEY, JSON.stringify(block));
 	}
 
 	logger.info(
