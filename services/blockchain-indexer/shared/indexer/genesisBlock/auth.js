@@ -46,7 +46,9 @@ const indexAuthModuleAssets = async dbTrx => {
 				}
 
 				const percent =
-					totalAuthData > 0 ? (((offset + BATCH_SIZE) / totalAuthData) * 100).toFixed(1) : 0;
+					totalAuthData > 0
+						? Math.min((((offset + BATCH_SIZE) / totalAuthData) * 100).toFixed(1), 100)
+						: 0;
 				logger.info(
 					`Scheduled ${Math.min(
 						offset + BATCH_SIZE,

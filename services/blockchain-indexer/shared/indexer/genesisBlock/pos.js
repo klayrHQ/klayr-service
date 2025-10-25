@@ -77,7 +77,9 @@ const indexPosValidatorsInfo = async (numValidators, dbTrx) => {
 				await commissionsTable.upsert(commissionEntries, dbTrx);
 
 				const percent =
-					numValidators > 0 ? (((offset + BATCH_SIZE) / numValidators) * 100).toFixed(1) : 0;
+					numValidators > 0
+						? Math.min((((offset + BATCH_SIZE) / numValidators) * 100).toFixed(1), 100)
+						: 0;
 				logger.info(
 					`Scheduled ${Math.min(
 						offset + BATCH_SIZE,
@@ -140,7 +142,9 @@ const indexPosStakesInfo = async (numStakers, dbTrx) => {
 				await stakesTable.upsert(allStakes, dbTrx);
 
 				const percent =
-					numStakers > 0 ? (((offset + BATCH_SIZE) / numStakers) * 100).toFixed(1) : 0;
+					numStakers > 0
+						? Math.min((((offset + BATCH_SIZE) / numStakers) * 100).toFixed(1), 100)
+						: 0;
 				logger.info(
 					`Scheduled ${Math.min(
 						offset + BATCH_SIZE,

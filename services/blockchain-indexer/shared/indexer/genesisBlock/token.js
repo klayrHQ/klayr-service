@@ -82,7 +82,9 @@ const indexTokenModuleAssets = async dbTrx => {
 				numBalanceEntries += userSubStoreInfos.length;
 
 				const percent =
-					totalUsers > 0 ? (((offset + BATCH_SIZE) / totalUsers) * 100).toFixed(1) : 0;
+					totalUsers > 0
+						? Math.min((((offset + BATCH_SIZE) / totalUsers) * 100).toFixed(1), 100)
+						: 0;
 				logger.info(
 					`Scheduled ${Math.min(
 						offset + BATCH_SIZE,
@@ -123,7 +125,9 @@ const indexTokenModuleAssets = async dbTrx => {
 				numSupplyEntries += supplySubstoreInfos.length;
 
 				const percent =
-					totalSupplyItem > 0 ? (((offset + BATCH_SIZE) / totalSupplyItem) * 100).toFixed(1) : 0;
+					totalSupplyItem > 0
+						? Math.min((((offset + BATCH_SIZE) / totalSupplyItem) * 100).toFixed(1), 100)
+						: 0;
 				logger.info(
 					`Scheduled ${Math.min(
 						offset + BATCH_SIZE,
@@ -163,7 +167,9 @@ const indexTokenModuleAssets = async dbTrx => {
 				numEscrowedEntries += escrowSubstoreInfos.length;
 
 				const percent =
-					totalEscrowItem > 0 ? (((offset + BATCH_SIZE) / totalEscrowItem) * 100).toFixed(1) : 0;
+					totalEscrowItem > 0
+						? Math.min((((offset + BATCH_SIZE) / totalEscrowItem) * 100).toFixed(1), 100)
+						: 0;
 				logger.info(
 					`Scheduled ${Math.min(
 						offset + BATCH_SIZE,
@@ -212,7 +218,7 @@ const indexTokenModuleAssets = async dbTrx => {
 
 				const percent =
 					totalSupportedItem > 0
-						? (((offset + BATCH_SIZE) / totalSupportedItem) * 100).toFixed(1)
+						? Math.min((((offset + BATCH_SIZE) / totalSupportedItem) * 100).toFixed(1), 100)
 						: 0;
 				logger.info(
 					`Scheduled ${Math.min(
