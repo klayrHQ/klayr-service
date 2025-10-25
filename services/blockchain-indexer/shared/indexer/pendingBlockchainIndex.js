@@ -24,10 +24,6 @@ const {
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
-const LAST_PENDING_BLOCK_CACHE = 'lastPendingBlock';
-const LAST_PENDING_BLOCK_KEY = 'lastPendingBlock';
-const lastPendingBlockCache = CacheRedis(LAST_PENDING_BLOCK_CACHE, config.endpoints.cache);
-
 const FIRST_PENDING_BLOCK_CACHE = 'firstPendingBlock';
 const FIRST_PENDING_BLOCK_KEY = 'firstPendingBlock';
 const firstPendingBlockCache = CacheRedis(FIRST_PENDING_BLOCK_CACHE, config.endpoints.cache);
@@ -135,16 +131,6 @@ const addPendingNewBlock = async block => {
 	const firstPendingBlock = await getFirstPendingBlock();
 	if (!firstPendingBlock) {
 		await firstPendingBlockCache.set(FIRST_PENDING_BLOCK_KEY, JSON.stringify(block));
-	}
-
-	const lastPendingBlock = await lastPendingBlockCache.get(LAST_PENDING_BLOCK_KEY);
-	if (lastPendingBlock) {
-		const lastPendingBlockJSON = JSON.parse(lastPendingBlock);
-		if (lastPendingBlockJSON.header.height < block.header.height) {
-			await lastPendingBlockCache.set(LAST_PENDING_BLOCK_KEY, JSON.stringify(block));
-		}
-	} else {
-		await lastPendingBlockCache.set(LAST_PENDING_BLOCK_KEY, JSON.stringify(block));
 	}
 
 	logger.info(
