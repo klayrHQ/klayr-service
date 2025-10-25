@@ -222,7 +222,7 @@ const indexBlock = async job => {
 	if (blockHeightFromJobData === undefined && blockFromJobData === undefined)
 		throw new Error('invalid indexBlock job.data');
 
-	let blockHeightToIndex = blockHeightFromJobData || blockFromJobData.header.height;
+	let blockHeightToIndex = blockHeightFromJobData ?? blockFromJobData.header.height;
 	let dbTrx;
 	let blockToIndexFromNode;
 
