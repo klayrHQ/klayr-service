@@ -75,7 +75,7 @@ const applyTransaction = async (blockHeader, tx, events, dbTrx) => {
 		{ stakerAddress: punishedAddress, validatorAddress: punishedAddress },
 		['amount'],
 	);
-	const selfStake = BigInt(punishedAddressData.amount) || BigInt(0);
+	const selfStake = punishedAddressData.amount ? BigInt(punishedAddressData.amount) : BigInt(0);
 
 	const reward =
 		BigInt(posConstants.reportMisbehaviorReward) > selfStake
@@ -128,7 +128,7 @@ const revertTransaction = async (blockHeader, tx, events, dbTrx) => {
 		{ stakerAddress: punishedAddress, validatorAddress: punishedAddress },
 		['amount'],
 	);
-	const selfStake = BigInt(punishedAddressData.amount) || BigInt(0);
+	const selfStake = punishedAddressData.amount ? BigInt(punishedAddressData.amount) : BigInt(0);
 
 	const reward =
 		BigInt(posConstants.reportMisbehaviorReward) > selfStake
