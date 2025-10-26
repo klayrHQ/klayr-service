@@ -13,7 +13,12 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { Logger } = require('klayr-service-framework');
+const {
+	Logger,
+	DB: {
+		MySQL: { getTableInstance },
+	},
+} = require('klayr-service-framework');
 const { codec } = require('@klayr/codec');
 const { reloadValidatorCache, getSchemas, getPosConstants } = require('../../../dataService');
 
