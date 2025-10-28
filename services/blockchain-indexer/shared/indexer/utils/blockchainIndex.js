@@ -78,6 +78,16 @@ const createMissingBlockArray = (lastIndexedBlockHeight, newBlockHeight) => {
 	return result;
 };
 
+const isBlockHeightExistsOnNode = async height => {
+	try {
+		const blockFromNode = await requestConnector('getBlockByHeight', { height });
+		if (blockFromNode) return true;
+		return false;
+	} catch (err) {
+		return false;
+	}
+};
+
 const fillMissingHeights = async blocks => {
 	const completeBlockDataResult = [];
 
@@ -213,6 +223,7 @@ const updateTotalLockedAmounts = async (tokenIDLockedAmountChangeMap, dbTrx) =>
 	);
 
 module.exports = {
+	isBlockHeightExistsOnNode,
 	reorderIndexBlocksQueueJobs,
 	activateReorderingMode,
 	updateTotalLockedAmounts,

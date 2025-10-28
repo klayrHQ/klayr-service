@@ -62,6 +62,7 @@ const {
 	reorderIndexBlocksQueueJobs,
 	indexNewMissingBlock,
 	setLargestMissingBlockHeight,
+	isBlockHeightExistsOnNode,
 } = require('./utils/blockchainIndex');
 const {
 	startIndexSpeedRecord,
@@ -259,20 +260,12 @@ const indexBlock = async job => {
 				blockHeightToIndex = lastIndexedBlock.height + 1;
 			}
 
-			// if the height to be indexed does not exist yet, throw error so it would be retried later, while refreshing node info
-			// useful for fork recovery when node are lagging behind
+			// if the height to be indexed is larger than current height, we need to check if block to be indexed is indeed exists
+			// if not exist, skip indexing that block
 			if (currentHeight < blockHeightToIndex) {
-				await refreshNodeInfo();
-
-				// wait to ensure node info is refreshed
-				await new Promise(r => setTimeout(r, 200));
-
-				// check once more after refresh, only then throw error if currentHeight is still behind
-				currentHeight = await getCurrentHeight();
-				if (currentHeight < blockHeightToIndex) {
-					throw new Error(
-						`Block at height ${blockHeightToIndex} is larger than current cached node height at ${currentHeight}.`,
-					);
+				if (!(await isBlockHeightExistsOnNode(blockHeightToIndex))) {
+					logger.warn(`Block at height ${blockHeightToIndex} doesn't exist on node, skipping...`);
+					return;
 				}
 			}
 		}
