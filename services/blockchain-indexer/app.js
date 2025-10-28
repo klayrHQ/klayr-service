@@ -126,7 +126,7 @@ initDatabase()
 					for (let j = 0; j < methods.length; j++) app.addMethod(methods[j]);
 				} catch (err) {
 					logger.warn(
-						`Moleculer method definitions missing for module: ${module}. Is this expected?\nWas expected at: ${methodsFilePath}.`,
+						`Moleculer method definitions missing for module: ${module}. Is this expected? Was expected at: ${methodsFilePath}.`,
 					);
 				}
 			}
