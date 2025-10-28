@@ -254,7 +254,7 @@ const indexBlock = async job => {
 					logger.warn(
 						`overriding blockHeightToIndex from ${blockHeightToIndex} to ${
 							lastIndexedBlock.height + 1
-						} on indexing by blocks`,
+						} on indexing by height`,
 					);
 				}
 				blockHeightToIndex = lastIndexedBlock.height + 1;
