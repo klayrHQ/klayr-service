@@ -53,7 +53,7 @@ const indexAuthModuleAssets = async dbTrx => {
 					`Scheduled ${Math.min(
 						offset + BATCH_SIZE,
 						totalAuthData,
-					)} of ${totalAuthData} auth item (${percent}%)`,
+					)} of ${totalAuthData} genesis auth item (${percent}%)`,
 				);
 
 				offset += BATCH_SIZE;

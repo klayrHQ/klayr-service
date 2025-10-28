@@ -89,7 +89,7 @@ const indexTokenModuleAssets = async dbTrx => {
 					`Scheduled ${Math.min(
 						offset + BATCH_SIZE,
 						totalUsers,
-					)} of ${totalUsers} user item (${percent}%)`,
+					)} of ${totalUsers} genesis user item (${percent}%)`,
 				);
 
 				offset += BATCH_SIZE;
@@ -132,7 +132,7 @@ const indexTokenModuleAssets = async dbTrx => {
 					`Scheduled ${Math.min(
 						offset + BATCH_SIZE,
 						totalSupplyItem,
-					)} of ${totalSupplyItem} supply item (${percent}%)`,
+					)} of ${totalSupplyItem} genesis supply item (${percent}%)`,
 				);
 
 				offset += BATCH_SIZE;
@@ -174,7 +174,7 @@ const indexTokenModuleAssets = async dbTrx => {
 					`Scheduled ${Math.min(
 						offset + BATCH_SIZE,
 						totalEscrowItem,
-					)} of ${totalEscrowItem} escrow item (${percent}%)`,
+					)} of ${totalEscrowItem} genesis escrow item (${percent}%)`,
 				);
 
 				offset += BATCH_SIZE;
@@ -224,7 +224,7 @@ const indexTokenModuleAssets = async dbTrx => {
 					`Scheduled ${Math.min(
 						offset + BATCH_SIZE,
 						totalSupportedItem,
-					)} of ${totalSupportedItem} supported token item (${percent}%)`,
+					)} of ${totalSupportedItem} genesis supported token item (${percent}%)`,
 				);
 
 				offset += BATCH_SIZE;

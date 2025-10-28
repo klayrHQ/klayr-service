@@ -120,7 +120,9 @@ const indexGenesisBlock = async job => {
 
 	const percent =
 		totalGenesisJob > 0 ? Math.min(((Number(job.id) / totalGenesisJob) * 100).toFixed(1), 100) : 0;
-	logger.info(`Successfully executed "${job.data.method}" with id: ${job.id} (${percent}%)`);
+	logger.info(
+		`Successfully executed "${job.data.method}" — ${job.id}/${totalGenesisJob} (${percent}%)`,
+	);
 };
 
 const addGenesisBlockJob = async (method, payload) => {

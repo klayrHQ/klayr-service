@@ -84,7 +84,7 @@ const indexPosValidatorsInfo = async (numValidators, dbTrx) => {
 					`Scheduled ${Math.min(
 						offset + BATCH_SIZE,
 						numValidators,
-					)} of ${numValidators} validators item (${percent}%)`,
+					)} of ${numValidators} genesis validators item (${percent}%)`,
 				);
 
 				offset += BATCH_SIZE;
@@ -149,7 +149,7 @@ const indexPosStakesInfo = async (numStakers, dbTrx) => {
 					`Scheduled ${Math.min(
 						offset + BATCH_SIZE,
 						numStakers,
-					)} of ${numStakers} stakers item (${percent}%)`,
+					)} of ${numStakers} genesis stakers item (${percent}%)`,
 				);
 
 				offset += BATCH_SIZE;
