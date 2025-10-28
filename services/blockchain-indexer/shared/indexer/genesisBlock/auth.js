@@ -34,7 +34,7 @@ const indexAuthModuleAssets = async dbTrx => {
 					const { address, authAccount } = authDataSubstoreInfos[i];
 
 					const addressFormatted =
-						address.length !== 20 * 2 ? getKlayr32AddressFromHexAddress(address) : address;
+						address.length === 20 * 2 ? getKlayr32AddressFromHexAddress(address) : address;
 
 					await addGenesisBlockJob('indexGenesisAuthAccount', {
 						address: addressFormatted,
