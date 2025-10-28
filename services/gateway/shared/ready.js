@@ -34,17 +34,35 @@ const currentSvcStatus = {
 	statistics: false,
 };
 
+const currentSvcServiceReadyStatus = {
+	indexer: false,
+	connector: false,
+	fees: false,
+	market: false,
+	'app-registry': false,
+	statistics: false,
+};
+
 const updateSvcStatus = async () => {
 	await BluebirdPromise.map(Object.keys(currentSvcStatus), async microservice => {
 		const broker = (await getAppContext()).getBroker();
+
+		if (!currentSvcServiceReadyStatus[microservice]) {
+			await broker.waitForServices(microservice);
+			currentSvcServiceReadyStatus[microservice] = true;
+		}
+
 		currentSvcStatus[microservice] = await broker
 			.call(`${microservice}.status`)
 			.then(res => res.isReady)
 			.catch(err => {
-				if (err instanceof ServiceNotFoundError) {
-					logger.warn(err);
+				if (
+					err instanceof ServiceNotFoundError ||
+					(microservice === 'market' && err.message.includes('not ready'))
+				) {
+					logger.warn(`Service '${microservice}' error: ${err.message}`);
 				} else {
-					logger.error(err);
+					logger.error(`Service '${microservice}' error: ${err.message}`);
 				}
 				return false;
 			});
