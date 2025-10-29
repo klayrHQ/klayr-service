@@ -1073,6 +1073,9 @@ const findMissingBlocksInRange = async (fromHeight, toHeight) => {
 	const propBetweens = [{ property: 'height', from: fromHeight, to: toHeight }];
 	const indexedBlockCount = Number(await blocksTable.count({ propBetweens }));
 
+	const lastIndexedBlock = await getLastIndexedBlock();
+	const lastIndexedHeight = lastIndexedBlock ? lastIndexedBlock.height : -1;
+
 	// This block helps determine empty index
 	if (indexedBlockCount < 3) {
 		result.push({ from: fromHeight, to: toHeight });
@@ -1106,30 +1109,21 @@ const findMissingBlocksInRange = async (fromHeight, toHeight) => {
 
 			result.push(...missingExistingGapBlockRanges);
 
-			const missingBlocksAfterLatestHeightQueryStatement = `
-				SELECT
-					(COALESCE(MAX(b0.height), ${batchStartHeight} - 1) + 1) AS "from",
-					${batchEndHeight} AS "to"
-				FROM
-					(SELECT 1) AS dummy
-				LEFT JOIN
-					blocks AS b0 ON b0.height BETWEEN ${batchStartHeight} AND ${batchEndHeight}
-				HAVING
-					COALESCE(MAX(b0.height), ${batchStartHeight} - 1) < ${batchEndHeight}
-				LIMIT 1;
-			`;
-
 			logger.trace(
 				`Checking for trailing gap (from max indexed block) in range: ${batchStartHeight} - ${batchEndHeight}.`,
 			);
-			const missingBlockAfterLatestHeightRanges = await blocksTable.rawQuery(
-				missingBlocksAfterLatestHeightQueryStatement,
-			);
-			logger.trace(
-				`Trailing gap found: ${missingBlockAfterLatestHeightRanges.length} ranges. Details: ${missingBlockAfterLatestHeightRanges}.`,
-			);
 
-			result.push(...missingBlockAfterLatestHeightRanges);
+			if (lastIndexedHeight < batchStartHeight) {
+				logger.trace(`Trailing gap found from ${batchStartHeight} to ${batchEndHeight}.`);
+
+				result.push({ from: batchStartHeight, to: batchEndHeight });
+			}
+
+			if (lastIndexedHeight >= batchStartHeight) {
+				logger.trace(`Trailing gap found from ${lastIndexedHeight} to ${batchEndHeight}.`);
+
+				result.push({ from: lastIndexedHeight, to: batchEndHeight });
+			}
 		}
 	}
 
