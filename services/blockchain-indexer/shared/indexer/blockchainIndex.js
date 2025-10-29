@@ -1084,7 +1084,7 @@ const findMissingBlocksInRange = async (fromHeight, toHeight) => {
 			const batchStartHeight = fromHeight + i * BATCH_SIZE;
 			const batchEndHeight = Math.min(batchStartHeight + BATCH_SIZE, toHeight);
 
-			const missingBlocksQueryStatement = `
+			const missingExistingGapBlocksQueryStatement = `
 				SELECT
 					(SELECT COALESCE(MAX(b0.height + 1), ${batchStartHeight}) FROM blocks b0 WHERE b0.height < b1.height) AS 'from',
 					(b1.height - 1) AS 'to'
@@ -1095,14 +1095,41 @@ const findMissingBlocksInRange = async (fromHeight, toHeight) => {
 			`;
 
 			logger.trace(
-				`Checking for missing blocks between heights: ${batchStartHeight} - ${batchEndHeight}.`,
+				`Checking for internal block gaps in range: ${batchStartHeight} - ${batchEndHeight}.`,
 			);
-			const missingBlockRanges = await blocksTable.rawQuery(missingBlocksQueryStatement);
+			const missingExistingGapBlockRanges = await blocksTable.rawQuery(
+				missingExistingGapBlocksQueryStatement,
+			);
 			logger.trace(
-				`Found the following missing block ranges between heights: ${missingBlockRanges}.`,
+				`Internal gaps found: ${missingExistingGapBlockRanges.length} ranges. Details: ${missingExistingGapBlockRanges}.`,
 			);
 
-			result.push(...missingBlockRanges);
+			result.push(...missingExistingGapBlockRanges);
+
+			const missingBlocksAfterLatestHeightQueryStatement = `
+				SELECT
+					(COALESCE(MAX(b0.height), ${batchStartHeight} - 1) + 1) AS "from",
+					${batchEndHeight} AS "to"
+				FROM
+					(SELECT 1) AS dummy
+				LEFT JOIN
+					blocks AS b0 ON b0.height BETWEEN ${batchStartHeight} AND ${batchEndHeight}
+				HAVING
+					COALESCE(MAX(b0.height), ${batchStartHeight} - 1) < ${batchEndHeight}
+				LIMIT 1;
+			`;
+
+			logger.trace(
+				`Checking for trailing gap (from max indexed block) in range: ${batchStartHeight} - ${batchEndHeight}.`,
+			);
+			const missingBlockAfterLatestHeightRanges = await blocksTable.rawQuery(
+				missingBlocksAfterLatestHeightQueryStatement,
+			);
+			logger.trace(
+				`Trailing gap found: ${missingBlockAfterLatestHeightRanges.length} ranges. Details: ${missingBlockAfterLatestHeightRanges}.`,
+			);
+
+			result.push(...missingBlockAfterLatestHeightRanges);
 		}
 	}
 
