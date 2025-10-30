@@ -54,7 +54,7 @@ const increaseTokenLockedDB = async (address, tokenID, module, amount, dbTrx) =>
 	);
 
 	const tokenTotalLockedTable = await getTokenTotalLockedTable();
-	await tokenTotalLockedTable.increment(
+	const numTotalLockedRowsAffected = await tokenTotalLockedTable.increment(
 		{
 			increment: { total: amount },
 			where: { tokenID, module },
@@ -72,7 +72,9 @@ const increaseTokenLockedDB = async (address, tokenID, module, amount, dbTrx) =>
 			},
 			dbTrx,
 		);
+	}
 
+	if (numTotalLockedRowsAffected === 0) {
 		await tokenTotalLockedTable.upsert(
 			{
 				tokenID,
@@ -127,6 +129,8 @@ const commitTokenLockedIndex = async dbTrx => {
 			);
 
 			let numRowsAffected = 0;
+			let numTotalLockedRowsAffected = 0;
+
 			if (amount >= 0n) {
 				logger.debug(
 					`Incrementing locked balance for account: ${address}, tokenID: ${tokenID}, module: ${module} by ${amount}`,
@@ -138,7 +142,7 @@ const commitTokenLockedIndex = async dbTrx => {
 					},
 					dbTrx,
 				);
-				await tokenTotalLockedTable.increment(
+				numTotalLockedRowsAffected = await tokenTotalLockedTable.increment(
 					{
 						increment: { total: amount },
 						where: { tokenID, module },
@@ -159,7 +163,7 @@ const commitTokenLockedIndex = async dbTrx => {
 					},
 					dbTrx,
 				);
-				await tokenTotalLockedTable.decrement(
+				numTotalLockedRowsAffected = await tokenTotalLockedTable.decrement(
 					{
 						decrement: { total: amount * -1n },
 						where: { tokenID, module },
@@ -179,6 +183,11 @@ const commitTokenLockedIndex = async dbTrx => {
 						amount,
 					},
 					dbTrx,
+				);
+			}
+			if (numTotalLockedRowsAffected === 0) {
+				logger.debug(
+					`Creating new token total locked balance entry for tokenID: ${tokenID}, module: ${module} with total: ${amount}`,
 				);
 				await tokenTotalLockedTable.upsert(
 					{
