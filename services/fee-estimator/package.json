@@ -1,6 +1,6 @@
 {
 	"name": "klayr-service-fee-estimator",
-	"version": "0.8.0-alpha",
+	"version": "0.8.0-alpha.1",
 	"description": "Klayr Service Fee Estimator",
 	"keywords": [
 		"klayr",
