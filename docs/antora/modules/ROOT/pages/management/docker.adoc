@@ -274,49 +274,49 @@ NOTE: In case the database needs to be flushed please execute the `make down` co
 . Checkout the version with *`git checkout <tag>`*
 +
 ----
-git checkout v0.8.0-alpha
+git checkout v0.8.0-alpha.1
 ----
 
 . Update `docker-compose.yml` to download the specific image versions from the DockerHub as shown below.
-Update specified images with the desired version, for example `0.8.0-alpha`.
+Update specified images with the desired version, for example `0.8.0-alpha.1`.
 +
 .docker-compose.yml
 [source,yaml]
 ----
 blockchain-app-registry:
-    image: klayr/service_blockchain_app_registry:0.8.0-alpha
+    image: klayr/service_blockchain_app_registry:0.8.0-alpha.1
     ...
 
   blockchain-connector:
-    image: klayr/service_blockchain_connector:0.8.0-alpha
+    image: klayr/service_blockchain_connector:0.8.0-alpha.1
     ...
 
   blockchain-indexer:
-    image: klayr/service_blockchain_indexer:0.8.0-alpha
+    image: klayr/service_blockchain_indexer:0.8.0-alpha.1
     ...
 
   blockchain-coordinator:
-    image: klayr/service_blockchain_coordinator:0.8.0-alpha
+    image: klayr/service_blockchain_coordinator:0.8.0-alpha.1
     ...
 
   transaction-statistics:
-    image: klayr/service_transaction_statistics:0.8.0-alpha
+    image: klayr/service_transaction_statistics:0.8.0-alpha.1
     ...
 
   fee-estimator:
-    image: klayr/service_fee_estimator:0.8.0-alpha
+    image: klayr/service_fee_estimator:0.8.0-alpha.1
     ...
 
   gateway:
-    image: klayr/service_gateway:0.8.0-alpha
+    image: klayr/service_gateway:0.8.0-alpha.1
     ...
 
   market:
-    image: klayr/service_market:0.8.0-alpha
+    image: klayr/service_market:0.8.0-alpha.1
     ...
 
   export:
-    image: klayr/service_export:0.8.0-alpha
+    image: klayr/service_export:0.8.0-alpha.1
 
 ----
 
@@ -342,7 +342,7 @@ NOTE: In case the database needs to be flushed please execute the `make down` co
 . Checkout the version with *`git checkout <tag>`*
 +
 ----
-git checkout v0.8.0-alpha
+git checkout v0.8.0-alpha.1
 ----
 
 . Build the required updated Docker images

@@ -158,7 +158,7 @@ cd klayr-service
 Switch to the latest release branch.
 
 ----
-git checkout v0.8.0-alpha
+git checkout v0.8.0-alpha.1
 ----
 
 == Build Klayr Service

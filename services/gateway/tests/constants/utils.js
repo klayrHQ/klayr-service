@@ -215,7 +215,7 @@ const requireAllJsonExpectedResponse = {
 		swagger: '2.0',
 		info: {
 			title: 'Klayr Service API',
-			version: '0.8.0-alpha',
+			version: '0.8.0-alpha.1',
 			contact: {
 				email: 'admin@klayr.xyz',
 			},

@@ -2,7 +2,7 @@
 
 To prevent unauthorized access to the Redis database and mitigate unintended behavior associated with the use of Redis' passwordless `default` user.
 
-Starting with Klayr Service [v0.8.0-alpha](https://github.com/KlayrHQ/klayr-service/tree/v0.8.0-alpha), similar to our MySQL setup, we now enforce our custom authentication on Redis, by default, with the following credentials:
+Starting with Klayr Service [v0.8.0-alpha.1](https://github.com/KlayrHQ/klayr-service/tree/v0.8.0-alpha.1), similar to our MySQL setup, we now enforce our custom authentication on Redis, by default, with the following credentials:
 
 > **Username**: `klayr` <br>
 > **Password**: `password`

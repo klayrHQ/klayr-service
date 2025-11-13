@@ -58,19 +58,19 @@ pm2 start ecosystem.config.js
 [PM2] [klayr-service-market](7) ✓
 [PM2] Applying action restartProcessId on app [klayr-service-export](ids: [ 8 ])
 [PM2] [klayr-service-export](8) ✓
-┌----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┐
-│ id  │ name                                    │ namespace    │   version.    │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
-├----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┤
-│ 1   │ klayr-service-blockchain-app-registry    │ default     │ 0.8.0-alpha   │ fork    │ 33328    │ 0s     │ 16   │ online    │ 0%       │ 65.5mb   │ XYZ      │ disabled │
-│ 2   │ klayr-service-blockchain-connector       │ default     │ 0.8.0-alpha   │ fork    │ 33331    │ 0s     │ 0    │ online    │ 0%       │ 63.8mb   │ XYZ      │ disabled │
-│ 4   │ klayr-service-blockchain-coordinator     │ default     │ 0.8.0-alpha   │ fork    │ 33341    │ 0s     │ 0    │ online    │ 0%       │ 54.1mb   │ XYZ      │ disabled │
-│ 3   │ klayr-service-blockchain-indexer         │ default     │ 0.8.0-alpha   │ fork    │ 33338    │ 0s     │ 16   │ online    │ 0%       │ 54.3mb   │ XYZ      │ disabled │
-│ 8   │ klayr-service-export                     │ default     │ 0.8.0-alpha   │ fork    │ 33355    │ 0s     │ 15   │ online    │ 0%       │ 14.1mb   │ XYZ      │ disabled │
-│ 5   │ klayr-service-fee-estimator              │ default     │ 0.8.0-alpha   │ fork    │ 33346    │ 0s     │ 15   │ online    │ 0%       │ 46.9mb   │ XYZ      │ disabled │
-│ 0   │ klayr-service-gateway                    │ default     │ 0.8.0-alpha   │ fork    │ 33326    │ 0s     │ 15   │ online    │ 0%       │ 65.6mb   │ XYZ      │ disabled │
-│ 7   │ klayr-service-market                     │ default     │ 0.8.0-alpha   │ fork    │ 33351    │ 0s     │ 15   │ online    │ 0%       │ 36.9mb   │ XYZ      │ disabled │
-│ 6   │ klayr-service-transaction-statistics     │ default     │ 0.8.0-alpha   │ fork    │ 33348    │ 0s     │ 15   │ online    │ 0%       │ 43.5mb   │ XYZ      │ disabled │
-└----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┘
+┌-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┐
+│ id  │ name                                    │ namespace    │   version.      │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┤
+│ 1   │ klayr-service-blockchain-app-registry    │ default     │ 0.8.0-alpha.1   │ fork    │ 33328    │ 0s     │ 16   │ online    │ 0%       │ 65.5mb   │ XYZ      │ disabled │
+│ 2   │ klayr-service-blockchain-connector       │ default     │ 0.8.0-alpha.1   │ fork    │ 33331    │ 0s     │ 0    │ online    │ 0%       │ 63.8mb   │ XYZ      │ disabled │
+│ 4   │ klayr-service-blockchain-coordinator     │ default     │ 0.8.0-alpha.1   │ fork    │ 33341    │ 0s     │ 0    │ online    │ 0%       │ 54.1mb   │ XYZ      │ disabled │
+│ 3   │ klayr-service-blockchain-indexer         │ default     │ 0.8.0-alpha.1   │ fork    │ 33338    │ 0s     │ 16   │ online    │ 0%       │ 54.3mb   │ XYZ      │ disabled │
+│ 8   │ klayr-service-export                     │ default     │ 0.8.0-alpha.1   │ fork    │ 33355    │ 0s     │ 15   │ online    │ 0%       │ 14.1mb   │ XYZ      │ disabled │
+│ 5   │ klayr-service-fee-estimator              │ default     │ 0.8.0-alpha.1   │ fork    │ 33346    │ 0s     │ 15   │ online    │ 0%       │ 46.9mb   │ XYZ      │ disabled │
+│ 0   │ klayr-service-gateway                    │ default     │ 0.8.0-alpha.1   │ fork    │ 33326    │ 0s     │ 15   │ online    │ 0%       │ 65.6mb   │ XYZ      │ disabled │
+│ 7   │ klayr-service-market                     │ default     │ 0.8.0-alpha.1   │ fork    │ 33351    │ 0s     │ 15   │ online    │ 0%       │ 36.9mb   │ XYZ      │ disabled │
+│ 6   │ klayr-service-transaction-statistics     │ default     │ 0.8.0-alpha.1   │ fork    │ 33348    │ 0s     │ 15   │ online    │ 0%       │ 43.5mb   │ XYZ      │ disabled │
+└-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┘
 ----
 ====
 
@@ -87,19 +87,19 @@ pm2 list
 ====
 .Example output
 ----
-┌----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┐
-│ id  │ name                                    │ namespace   │    version.    │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
-├----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┤
-│ 1   │ klayr-service-blockchain-app-registry    │ default     │ 0.8.0-alpha   │ fork    │ 33328    │ 0s     │ 16   │ online    │ 0%       │ 65.5mb   │ XYZ      │ disabled │
-│ 2   │ klayr-service-blockchain-connector       │ default     │ 0.8.0-alpha   │ fork    │ 33331    │ 0s     │ 0    │ online    │ 0%       │ 63.8mb   │ XYZ      │ disabled │
-│ 4   │ klayr-service-blockchain-coordinator     │ default     │ 0.8.0-alpha   │ fork    │ 33341    │ 0s     │ 0    │ online    │ 0%       │ 54.1mb   │ XYZ      │ disabled │
-│ 3   │ klayr-service-blockchain-indexer         │ default     │ 0.8.0-alpha   │ fork    │ 33338    │ 0s     │ 16   │ online    │ 0%       │ 54.3mb   │ XYZ      │ disabled │
-│ 8   │ klayr-service-export                     │ default     │ 0.8.0-alpha   │ fork    │ 33355    │ 0s     │ 15   │ online    │ 0%       │ 14.1mb   │ XYZ      │ disabled │
-│ 5   │ klayr-service-fee-estimator              │ default     │ 0.8.0-alpha   │ fork    │ 33346    │ 0s     │ 15   │ online    │ 0%       │ 46.9mb   │ XYZ      │ disabled │
-│ 0   │ klayr-service-gateway                    │ default     │ 0.8.0-alpha   │ fork    │ 33326    │ 0s     │ 15   │ online    │ 0%       │ 65.6mb   │ XYZ      │ disabled │
-│ 7   │ klayr-service-market                     │ default     │ 0.8.0-alpha   │ fork    │ 33351    │ 0s     │ 15   │ online    │ 0%       │ 36.9mb   │ XYZ      │ disabled │
-│ 6   │ klayr-service-transaction-statistics     │ default     │ 0.8.0-alpha   │ fork    │ 33348    │ 0s     │ 15   │ online    │ 0%       │ 43.5mb   │ XYZ      │ disabled │
-└----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┘
+┌--------------------------------------------------------------------------i--------------------------------------------------------------------------------------------------┐
+│ id  │ name                                    │ namespace   │    version.      │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├----------------------------------------------------------------------i------------------------------------------------------------------------------------------------------┤
+│ 1   │ klayr-service-blockchain-app-registry    │ default     │ 0.8.0-alpha.1   │ fork    │ 33328    │ 0s     │ 16   │ online    │ 0%       │ 65.5mb   │ XYZ      │ disabled │
+│ 2   │ klayr-service-blockchain-connector       │ default     │ 0.8.0-alpha.1   │ fork    │ 33331    │ 0s     │ 0    │ online    │ 0%       │ 63.8mb   │ XYZ      │ disabled │
+│ 4   │ klayr-service-blockchain-coordinator     │ default     │ 0.8.0-alpha.1   │ fork    │ 33341    │ 0s     │ 0    │ online    │ 0%       │ 54.1mb   │ XYZ      │ disabled │
+│ 3   │ klayr-service-blockchain-indexer         │ default     │ 0.8.0-alpha.1   │ fork    │ 33338    │ 0s     │ 16   │ online    │ 0%       │ 54.3mb   │ XYZ      │ disabled │
+│ 8   │ klayr-service-export                     │ default     │ 0.8.0-alpha.1   │ fork    │ 33355    │ 0s     │ 15   │ online    │ 0%       │ 14.1mb   │ XYZ      │ disabled │
+│ 5   │ klayr-service-fee-estimator              │ default     │ 0.8.0-alpha.1   │ fork    │ 33346    │ 0s     │ 15   │ online    │ 0%       │ 46.9mb   │ XYZ      │ disabled │
+│ 0   │ klayr-service-gateway                    │ default     │ 0.8.0-alpha.1   │ fork    │ 33326    │ 0s     │ 15   │ online    │ 0%       │ 65.6mb   │ XYZ      │ disabled │
+│ 7   │ klayr-service-market                     │ default     │ 0.8.0-alpha.1   │ fork    │ 33351    │ 0s     │ 15   │ online    │ 0%       │ 36.9mb   │ XYZ      │ disabled │
+│ 6   │ klayr-service-transaction-statistics     │ default     │ 0.8.0-alpha.1   │ fork    │ 33348    │ 0s     │ 15   │ online    │ 0%       │ 43.5mb   │ XYZ      │ disabled │
+└-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┘
 ----
 ====
 
@@ -180,19 +180,19 @@ pm2 stop ecosystem.config.js
 [PM2] [klayr-service-transaction-statistics](6) ✓
 [PM2] [klayr-service-market](7) ✓
 [PM2] [klayr-service-export](8) ✓
-┌------------------------------------------------------------------------------------------------------------------------------------------------------------------------┐
-│ id  │ name                                    │ namespace   │     version.   │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem  │ user     │ watching │
-├------------------------------------------------------------------------------------------------------------------------------------------------------------------------┤
-│ 1   │ klayr-service-blockchain-app-registry    │ default     │ 0.8.0-alpha   │ fork    │ 0        │ 0      │ 32   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
-│ 2   │ klayr-service-blockchain-connector       │ default     │ 0.8.0-alpha   │ fork    │ 0        │ 0      │ 0    │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
-│ 4   │ klayr-service-blockchain-coordinator     │ default     │ 0.8.0-alpha   │ fork    │ 0        │ 0      │ 0    │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
-│ 3   │ klayr-service-blockchain-indexer         │ default     │ 0.8.0-alpha   │ fork    │ 0        │ 0      │ 32   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
-│ 8   │ klayr-service-export                     │ default     │ 0.8.0-alpha   │ fork    │ 0        │ 0      │ 30   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
-│ 5   │ klayr-service-fee-estimator              │ default     │ 0.8.0-alpha   │ fork    │ 0        │ 0      │ 30   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
-│ 0   │ klayr-service-gateway                    │ default     │ 0.8.0-alpha   │ fork    │ 0        │ 0      │ 30   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
-│ 7   │ klayr-service-market                     │ default     │ 0.8.0-alpha   │ fork    │ 0        │ 0      │ 30   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
-│ 6   │ klayr-service-transaction-statistics     │ default     │ 0.8.0-alpha   │ fork    │ 0        │ 0      │ 30   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
-└------------------------------------------------------------------------------------------------------------------------------------------------------------------------┘
+┌-------------------------------------------------------------------------------------------------------------------------------------------------------------------------┐
+│ id  │ name                                    │ namespace   │     version.     │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem  │ user     │ watching │
+├-------------------------------------------------------------------------------------------------------------------------------------------------------------------------┤
+│ 1   │ klayr-service-blockchain-app-registry    │ default     │ 0.8.0-alpha.1   │ fork    │ 0        │ 0      │ 32   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
+│ 2   │ klayr-service-blockchain-connector       │ default     │ 0.8.0-alpha.1   │ fork    │ 0        │ 0      │ 0    │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
+│ 4   │ klayr-service-blockchain-coordinator     │ default     │ 0.8.0-alpha.1   │ fork    │ 0        │ 0      │ 0    │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
+│ 3   │ klayr-service-blockchain-indexer         │ default     │ 0.8.0-alpha.1   │ fork    │ 0        │ 0      │ 32   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
+│ 8   │ klayr-service-export                     │ default     │ 0.8.0-alpha.1   │ fork    │ 0        │ 0      │ 30   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
+│ 5   │ klayr-service-fee-estimator              │ default     │ 0.8.0-alpha.1   │ fork    │ 0        │ 0      │ 30   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
+│ 0   │ klayr-service-gateway                    │ default     │ 0.8.0-alpha.1   │ fork    │ 0        │ 0      │ 30   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
+│ 7   │ klayr-service-market                     │ default     │ 0.8.0-alpha.1   │ fork    │ 0        │ 0      │ 30   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
+│ 6   │ klayr-service-transaction-statistics     │ default     │ 0.8.0-alpha.1   │ fork    │ 0        │ 0      │ 30   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
+└-------------------------------------------------------------------------------------------------------------------------------------------------------------------------┘
 ----
 ====
 
@@ -229,19 +229,19 @@ pm2 restart ecosystem.config.js
 [PM2] [klayr-service-market](7) ✓
 [PM2] Applying action restartProcessId on app [klayr-service-export](ids: [ 8 ])
 [PM2] [klayr-service-export](8) ✓
-┌----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┐
-│ id  │ name                                    │ namespace   │    version.    │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
-├----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┤
-│ 1   │ klayr-service-blockchain-app-registry    │ default     │ 0.8.0-alpha   │ fork    │ 33328    │ 0s     │ 16   │ online    │ 0%       │ 65.5mb   │ XYZ      │ disabled │
-│ 2   │ klayr-service-blockchain-connector       │ default     │ 0.8.0-alpha   │ fork    │ 33331    │ 0s     │ 0    │ online    │ 0%       │ 63.8mb   │ XYZ      │ disabled │
-│ 4   │ klayr-service-blockchain-coordinator     │ default     │ 0.8.0-alpha   │ fork    │ 33341    │ 0s     │ 0    │ online    │ 0%       │ 54.1mb   │ XYZ      │ disabled │
-│ 3   │ klayr-service-blockchain-indexer         │ default     │ 0.8.0-alpha   │ fork    │ 33338    │ 0s     │ 16   │ online    │ 0%       │ 54.3mb   │ XYZ      │ disabled │
-│ 8   │ klayr-service-export                     │ default     │ 0.8.0-alpha   │ fork    │ 33355    │ 0s     │ 15   │ online    │ 0%       │ 14.1mb   │ XYZ      │ disabled │
-│ 5   │ klayr-service-fee-estimator              │ default     │ 0.8.0-alpha   │ fork    │ 33346    │ 0s     │ 15   │ online    │ 0%       │ 46.9mb   │ XYZ      │ disabled │
-│ 0   │ klayr-service-gateway                    │ default     │ 0.8.0-alpha   │ fork    │ 33326    │ 0s     │ 15   │ online    │ 0%       │ 65.6mb   │ XYZ      │ disabled │
-│ 7   │ klayr-service-market                     │ default     │ 0.8.0-alpha   │ fork    │ 33351    │ 0s     │ 15   │ online    │ 0%       │ 36.9mb   │ XYZ      │ disabled │
-│ 6   │ klayr-service-transaction-statistics     │ default     │ 0.8.0-alpha   │ fork    │ 33348    │ 0s     │ 15   │ online    │ 0%       │ 43.5mb   │ XYZ      │ disabled │
-└----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┘
+┌-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┐
+│ id  │ name                                    │ namespace   │    version.      │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┤
+│ 1   │ klayr-service-blockchain-app-registry    │ default     │ 0.8.0-alpha.1   │ fork    │ 33328    │ 0s     │ 16   │ online    │ 0%       │ 65.5mb   │ XYZ      │ disabled │
+│ 2   │ klayr-service-blockchain-connector       │ default     │ 0.8.0-alpha.1   │ fork    │ 33331    │ 0s     │ 0    │ online    │ 0%       │ 63.8mb   │ XYZ      │ disabled │
+│ 4   │ klayr-service-blockchain-coordinator     │ default     │ 0.8.0-alpha.1   │ fork    │ 33341    │ 0s     │ 0    │ online    │ 0%       │ 54.1mb   │ XYZ      │ disabled │
+│ 3   │ klayr-service-blockchain-indexer         │ default     │ 0.8.0-alpha.1   │ fork    │ 33338    │ 0s     │ 16   │ online    │ 0%       │ 54.3mb   │ XYZ      │ disabled │
+│ 8   │ klayr-service-export                     │ default     │ 0.8.0-alpha.1   │ fork    │ 33355    │ 0s     │ 15   │ online    │ 0%       │ 14.1mb   │ XYZ      │ disabled │
+│ 5   │ klayr-service-fee-estimator              │ default     │ 0.8.0-alpha.1   │ fork    │ 33346    │ 0s     │ 15   │ online    │ 0%       │ 46.9mb   │ XYZ      │ disabled │
+│ 0   │ klayr-service-gateway                    │ default     │ 0.8.0-alpha.1   │ fork    │ 33326    │ 0s     │ 15   │ online    │ 0%       │ 65.6mb   │ XYZ      │ disabled │
+│ 7   │ klayr-service-market                     │ default     │ 0.8.0-alpha.1   │ fork    │ 33351    │ 0s     │ 15   │ online    │ 0%       │ 36.9mb   │ XYZ      │ disabled │
+│ 6   │ klayr-service-transaction-statistics     │ default     │ 0.8.0-alpha.1   │ fork    │ 33348    │ 0s     │ 15   │ online    │ 0%       │ 43.5mb   │ XYZ      │ disabled │
+└-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┘
 ----
 ====
 
@@ -402,26 +402,26 @@ pm2 stop ecosystem.config.js
 [PM2] [klayr-service-transaction-statistics](6) ✓
 [PM2] [klayr-service-market](7) ✓
 [PM2] [klayr-service-export](8) ✓
-┌------------------------------------------------------------------------------------------------------------------------------------------------------------------------┐
-│ id  │ name                                    │ namespace   │     version.   │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem  │ user     │ watching │
-├------------------------------------------------------------------------------------------------------------------------------------------------------------------------┤
-│ 1   │ klayr-service-blockchain-app-registry    │ default     │ 0.8.0-alpha   │ fork    │ 0        │ 0      │ 32   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
-│ 2   │ klayr-service-blockchain-connector       │ default     │ 0.8.0-alpha   │ fork    │ 0        │ 0      │ 0    │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
-│ 4   │ klayr-service-blockchain-coordinator     │ default     │ 0.8.0-alpha   │ fork    │ 0        │ 0      │ 0    │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
-│ 3   │ klayr-service-blockchain-indexer         │ default     │ 0.8.0-alpha   │ fork    │ 0        │ 0      │ 32   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
-│ 8   │ klayr-service-export                     │ default     │ 0.8.0-alpha   │ fork    │ 0        │ 0      │ 30   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
-│ 5   │ klayr-service-fee-estimator              │ default     │ 0.8.0-alpha   │ fork    │ 0        │ 0      │ 30   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
-│ 0   │ klayr-service-gateway                    │ default     │ 0.8.0-alpha   │ fork    │ 0        │ 0      │ 30   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
-│ 7   │ klayr-service-market                     │ default     │ 0.8.0-alpha   │ fork    │ 0        │ 0      │ 30   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
-│ 6   │ klayr-service-transaction-statistics     │ default     │ 0.8.0-alpha   │ fork    │ 0        │ 0      │ 30   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
-└------------------------------------------------------------------------------------------------------------------------------------------------------------------------┘
+┌-------------------------------------------------------------------------------------------------------------------------------------------------------------------------┐
+│ id  │ name                                    │ namespace   │     version.     │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem  │ user     │ watching │
+├-------------------------------------------------------------------------------------------------------------------------------------------------------------------------┤
+│ 1   │ klayr-service-blockchain-app-registry    │ default     │ 0.8.0-alpha.1   │ fork    │ 0        │ 0      │ 32   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
+│ 2   │ klayr-service-blockchain-connector       │ default     │ 0.8.0-alpha.1   │ fork    │ 0        │ 0      │ 0    │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
+│ 4   │ klayr-service-blockchain-coordinator     │ default     │ 0.8.0-alpha.1   │ fork    │ 0        │ 0      │ 0    │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
+│ 3   │ klayr-service-blockchain-indexer         │ default     │ 0.8.0-alpha.1   │ fork    │ 0        │ 0      │ 32   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
+│ 8   │ klayr-service-export                     │ default     │ 0.8.0-alpha.1   │ fork    │ 0        │ 0      │ 30   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
+│ 5   │ klayr-service-fee-estimator              │ default     │ 0.8.0-alpha.1   │ fork    │ 0        │ 0      │ 30   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
+│ 0   │ klayr-service-gateway                    │ default     │ 0.8.0-alpha.1   │ fork    │ 0        │ 0      │ 30   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
+│ 7   │ klayr-service-market                     │ default     │ 0.8.0-alpha.1   │ fork    │ 0        │ 0      │ 30   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
+│ 6   │ klayr-service-transaction-statistics     │ default     │ 0.8.0-alpha.1   │ fork    │ 0        │ 0      │ 30   │ stopped   │ 0%       │ 0b   │ XYZ      │ disabled │
+└-------------------------------------------------------------------------------------------------------------------------------------------------------------------------┘
 ----
 ====
 
 . Checkout the version with *`git checkout <tag>`*.
 +
 ----
-git checkout v0.8.0-alpha
+git checkout v0.8.0-alpha.1
 ----
 
 . Update the npm dependencies by executing the following command.
@@ -459,19 +459,19 @@ pm2 start ecosystem.config.js
 [PM2] [klayr-service-market](7) ✓
 [PM2] Applying action restartProcessId on app [klayr-service-export](ids: [ 8 ])
 [PM2] [klayr-service-export](8) ✓
-┌----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┐
-│ id  │ name                                    │ namespace   │    version.    │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
-├----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┤
-│ 1   │ klayr-service-blockchain-app-registry    │ default     │ 0.8.0-alpha   │ fork    │ 33328    │ 0s     │ 16   │ online    │ 0%       │ 65.5mb   │ XYZ      │ disabled │
-│ 2   │ klayr-service-blockchain-connector       │ default     │ 0.8.0-alpha   │ fork    │ 33331    │ 0s     │ 0    │ online    │ 0%       │ 63.8mb   │ XYZ      │ disabled │
-│ 4   │ klayr-service-blockchain-coordinator     │ default     │ 0.8.0-alpha   │ fork    │ 33341    │ 0s     │ 0    │ online    │ 0%       │ 54.1mb   │ XYZ      │ disabled │
-│ 3   │ klayr-service-blockchain-indexer         │ default     │ 0.8.0-alpha   │ fork    │ 33338    │ 0s     │ 16   │ online    │ 0%       │ 54.3mb   │ XYZ      │ disabled │
-│ 8   │ klayr-service-export                     │ default     │ 0.8.0-alpha   │ fork    │ 33355    │ 0s     │ 15   │ online    │ 0%       │ 14.1mb   │ XYZ      │ disabled │
-│ 5   │ klayr-service-fee-estimator              │ default     │ 0.8.0-alpha   │ fork    │ 33346    │ 0s     │ 15   │ online    │ 0%       │ 46.9mb   │ XYZ      │ disabled │
-│ 0   │ klayr-service-gateway                    │ default     │ 0.8.0-alpha   │ fork    │ 33326    │ 0s     │ 15   │ online    │ 0%       │ 65.6mb   │ XYZ      │ disabled │
-│ 7   │ klayr-service-market                     │ default     │ 0.8.0-alpha   │ fork    │ 33351    │ 0s     │ 15   │ online    │ 0%       │ 36.9mb   │ XYZ      │ disabled │
-│ 6   │ klayr-service-transaction-statistics     │ default     │ 0.8.0-alpha   │ fork    │ 33348    │ 0s     │ 15   │ online    │ 0%       │ 43.5mb   │ XYZ      │ disabled │
-└----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┘
+┌-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┐
+│ id  │ name                                    │ namespace   │    version.      │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┤
+│ 1   │ klayr-service-blockchain-app-registry    │ default     │ 0.8.0-alpha.1   │ fork    │ 33328    │ 0s     │ 16   │ online    │ 0%       │ 65.5mb   │ XYZ      │ disabled │
+│ 2   │ klayr-service-blockchain-connector       │ default     │ 0.8.0-alpha.1   │ fork    │ 33331    │ 0s     │ 0    │ online    │ 0%       │ 63.8mb   │ XYZ      │ disabled │
+│ 4   │ klayr-service-blockchain-coordinator     │ default     │ 0.8.0-alpha.1   │ fork    │ 33341    │ 0s     │ 0    │ online    │ 0%       │ 54.1mb   │ XYZ      │ disabled │
+│ 3   │ klayr-service-blockchain-indexer         │ default     │ 0.8.0-alpha.1   │ fork    │ 33338    │ 0s     │ 16   │ online    │ 0%       │ 54.3mb   │ XYZ      │ disabled │
+│ 8   │ klayr-service-export                     │ default     │ 0.8.0-alpha.1   │ fork    │ 33355    │ 0s     │ 15   │ online    │ 0%       │ 14.1mb   │ XYZ      │ disabled │
+│ 5   │ klayr-service-fee-estimator              │ default     │ 0.8.0-alpha.1   │ fork    │ 33346    │ 0s     │ 15   │ online    │ 0%       │ 46.9mb   │ XYZ      │ disabled │
+│ 0   │ klayr-service-gateway                    │ default     │ 0.8.0-alpha.1   │ fork    │ 33326    │ 0s     │ 15   │ online    │ 0%       │ 65.6mb   │ XYZ      │ disabled │
+│ 7   │ klayr-service-market                     │ default     │ 0.8.0-alpha.1   │ fork    │ 33351    │ 0s     │ 15   │ online    │ 0%       │ 36.9mb   │ XYZ      │ disabled │
+│ 6   │ klayr-service-transaction-statistics     │ default     │ 0.8.0-alpha.1   │ fork    │ 33348    │ 0s     │ 15   │ online    │ 0%       │ 43.5mb   │ XYZ      │ disabled │
+└-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------┘
 ----
 ====
 
