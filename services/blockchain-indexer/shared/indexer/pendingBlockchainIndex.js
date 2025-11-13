@@ -3,6 +3,8 @@ const {
 		MySQL: { getTableInstance },
 	},
 	Signals,
+	Queue,
+	CacheRedis,
 	Logger,
 } = require('klayr-service-framework');
 const { indexNewBlock } = require('./blockchainIndex');
@@ -22,15 +24,58 @@ const {
 
 const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
+const FIRST_PENDING_BLOCK_CACHE = 'firstPendingBlock';
+const FIRST_PENDING_BLOCK_KEY = 'firstPendingBlock';
+const firstPendingBlockCache = CacheRedis(FIRST_PENDING_BLOCK_CACHE, config.endpoints.cache);
+
 const getBlocksTable = () => getTableInstance(blocksTableSchema, MYSQL_ENDPOINT);
 
 const logger = Logger();
 
 let indexerLastCurrentHeight = -1;
 
-const pendingBlockToIndex = [];
+let numBlocksIndexedValue = 0;
 
-const getPendingBlockToIndexLength = () => pendingBlockToIndex.length;
+let firstPendingBlockJSON;
+
+const getFirstPendingBlock = async () => {
+	if (!firstPendingBlockJSON) {
+		const firstPendingBlock = await firstPendingBlockCache.get(FIRST_PENDING_BLOCK_KEY);
+		if (firstPendingBlock) firstPendingBlockJSON = JSON.parse(firstPendingBlock);
+	}
+
+	return firstPendingBlockJSON;
+};
+
+const indexPendingNewBlockWorker = async job => {
+	const { block } = job.data;
+
+	const firstPendingBlock = await getFirstPendingBlock();
+	const thereAreMissingBlocks = firstPendingBlock
+		? firstPendingBlock.header.height > numBlocksIndexedValue
+		: true;
+
+	try {
+		const skipMissingCheck =
+			firstPendingBlock && block.header.id === firstPendingBlock.header.id
+				? !thereAreMissingBlocks
+				: thereAreMissingBlocks;
+		logger.trace(
+			`Indexing pending block with id: ${block.header.id}` +
+				(skipMissingCheck ? ' with skipCheckingMissingBlock configured to true' : ''),
+		);
+		await indexNewBlock(block, skipMissingCheck);
+	} catch (err) {
+		logger.error(`Failed to index pending block ${block.header.id}: ${err.message}`);
+	}
+};
+
+const pendingBlocksQueue = Queue(
+	config.endpoints.cache,
+	config.queue.pendingBlocks.name,
+	indexPendingNewBlockWorker,
+	config.queue.pendingBlocks.concurrency,
+);
 
 const getIndexerLastCurrentHeight = () => indexerLastCurrentHeight;
 
@@ -47,29 +92,14 @@ const getNumBlocksIndexed = async () => {
 };
 
 const startIndexingPendingNewBlock = async numBlocksIndexed => {
-	logger.info('Start indexing pending blocks...');
-	pendingBlockToIndex.sort((h1, h2) => h1.header.height - h2.header.height); // sort heights in ascending order
+	if (await pendingBlocksQueue.queue.isPaused()) {
+		logger.info('Start scheduling indexing pending blocks...');
 
-	const thereAreMissingBlocks = pendingBlockToIndex[0].header.height > numBlocksIndexed;
+		numBlocksIndexedValue = numBlocksIndexed;
+		await pendingBlocksQueue.queue.resume();
 
-	for (let i = 0; i < pendingBlockToIndex.length; i++) {
-		try {
-			const block = pendingBlockToIndex[i];
-			const skipMissingCheck = i === 0 ? !thereAreMissingBlocks : thereAreMissingBlocks;
-			logger.trace(
-				`Indexing pending block with id: ${block.header.id}` +
-					(skipMissingCheck ? ' with skipCheckingMissingBlock configured to true' : ''),
-			);
-			await indexNewBlock(block, skipMissingCheck);
-		} catch (err) {
-			logger.error(
-				`Failed to index pending block ${pendingBlockToIndex[i].header.id}: ${err.message}`,
-			);
-		}
+		logger.info('Scheduling indexing pending blocks completed');
 	}
-
-	pendingBlockToIndex.length = 0;
-	logger.info('Indexing pending blocks completed, pendingBlockToIndex successfully cleared');
 };
 
 const indexPendingNewBlock = async block => {
@@ -89,15 +119,28 @@ const indexPendingNewBlock = async block => {
 			}
 		}
 
-		if (!pendingBlockToIndex.some(b => b.header.id === block.header.id)) {
-			logger.info(
-				`Block indexing is still in progress, block at height ${block.header.height} will be scheduled for indexing later...`,
-			);
-			pendingBlockToIndex.push(block);
-		} else {
-			logger.info(`Block at height ${block.header.height} is already pending for indexing.`);
-		}
+		await addPendingNewBlock(block);
 	}
+};
+
+const addPendingNewBlock = async block => {
+	if (!(await pendingBlocksQueue.queue.isPaused())) {
+		await pendingBlocksQueue.queue.pause();
+	}
+
+	const firstPendingBlock = await getFirstPendingBlock();
+	if (!firstPendingBlock) {
+		await firstPendingBlockCache.set(FIRST_PENDING_BLOCK_KEY, JSON.stringify(block));
+	}
+
+	logger.info(
+		`Block indexing is still in progress, block at height ${block.header.height} will be scheduled for indexing later...`,
+	);
+	await pendingBlocksQueue.queue.add(
+		config.queue.pendingBlocks.name,
+		{ block },
+		{ jobId: block.header.id },
+	);
 };
 
 const registerPendingIndexReadySignal = () => {
@@ -115,7 +158,6 @@ const registerPendingIndexReadySignal = () => {
 module.exports = {
 	indexPendingNewBlock,
 	startIndexingPendingNewBlock,
-	getPendingBlockToIndexLength,
 	getIndexerLastCurrentHeight,
 	setPendingIndexerLastCurrentHeight,
 	getNumBlocksIndexed,

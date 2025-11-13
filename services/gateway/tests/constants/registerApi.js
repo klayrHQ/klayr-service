@@ -814,6 +814,20 @@ const getAllAPIsExpectedResponse = {
 		swaggerApiPath: '/status',
 		version: '2.0',
 	},
+	health: {
+		envelope: {},
+		rpcMethod: 'get.health',
+		source: {
+			definition: {
+				health: '=',
+			},
+			method: 'gateway.health',
+			params: {},
+			type: 'moleculer',
+		},
+		swaggerApiPath: '/health',
+		version: '2.0',
+	},
 };
 
 module.exports = {

@@ -19,10 +19,14 @@ const {
 } = require('klayr-service-framework');
 
 const { getNodeInfo } = require('./cached_endpoints');
-const { getGenesisBlockFromFS } = require('./blocksUtils');
+const {
+	getGenesisBlockFromFS,
+	getGenesisBlockFromCache,
+	setGenesisBlockCache,
+} = require('./blocksUtils');
 
 const { TIMEOUT_REGEX, invokeEndpoint } = require('./client');
-const { formatBlock } = require('./formatter');
+const { formatBlock, formatAsset } = require('./formatter');
 
 const logger = Logger();
 
@@ -39,8 +43,18 @@ const getGenesisHeight = async () => {
 };
 
 const getGenesisBlock = async (isIncludeAssets = false) => {
+	const blockCache = await getGenesisBlockFromCache();
+	if (blockCache) {
+		return {
+			...blockCache,
+			assets: isIncludeAssets ? blockCache.assets : [],
+		};
+	}
+
 	try {
+		// NOTE: getGenesisBlockFromFS already call setGenesisBlockCache
 		const block = await getGenesisBlockFromFS();
+
 		// Filter out assets from genesis block and assign empty array
 		return {
 			...block,
@@ -55,7 +69,12 @@ const getGenesisBlock = async (isIncludeAssets = false) => {
 	const height = await getGenesisHeight();
 	try {
 		const block = await invokeEndpoint('chain_getBlockByHeight', { height });
-		return block;
+		await setGenesisBlockCache(block);
+
+		return {
+			...block,
+			assets: isIncludeAssets ? block.assets : [],
+		};
 	} catch (err) {
 		if (TIMEOUT_REGEX.test(err.message)) {
 			throw new TimeoutException("Request timed out when calling 'getGenesisBlock'.");
@@ -92,13 +111,50 @@ const getGenesisConfig = async () => {
 	}
 };
 
+const getGenesisAssetByModuleFormatted = async (params = {}) => {
+	if (!params.module) throw new Error("getGenesisAssetByModuleFormatted requires 'module' params.");
+
+	const rawGenesisBlock = await getGenesisBlock(true);
+	const rawAssetByModule = rawGenesisBlock.assets.find(asset => asset.module === params.module);
+	if (!rawAssetByModule) return [];
+
+	const assetByModule = formatAsset(rawAssetByModule);
+
+	if (params.subStore) {
+		let moduleData = assetByModule.data[params.subStore];
+
+		// Return empty array otherwise if passed subStore is not present
+		if (!moduleData) return [];
+
+		// Filter module data based on limit and offset
+		if (typeof params.offset !== 'undefined' && params.limit) {
+			moduleData = moduleData.slice(params.offset, params.offset + params.limit);
+		}
+
+		return [
+			{
+				...assetByModule,
+				data: {
+					[params.subStore]: moduleData,
+				},
+			},
+		];
+	}
+
+	return assetByModule ? [assetByModule] : [];
+};
+
 const getGenesisAssets = async (params = {}) => {
-	const genesisBlock = await getGenesisBlockFormatted(true);
+	if (!params.module && !params.subStore) {
+		const genesisBlock = await getGenesisBlockFormatted(true);
+		return genesisBlock.assets;
+	}
 
 	// Return all genesis block assets if no module / subStore key present in params
 	if (!params.module && !params.subStore) return genesisBlock.assets;
 
-	const assetByModule = genesisBlock.assets.find(asset => asset.module === params.module);
+	const [assetByModule] = await getGenesisAssetByModuleFormatted(params);
+	if (!assetByModule) return [];
 
 	// Filter data by subStore if passed in input
 	if (params.subStore) {
@@ -133,7 +189,7 @@ const getGenesisAssets = async (params = {}) => {
 }
 */
 const getGenesisAssetByModule = async (params = {}) => {
-	const [genesisAsset = {}] = await getGenesisAssets(params);
+	const [genesisAsset = {}] = await getGenesisAssetByModuleFormatted(params);
 	return genesisAsset.data ? genesisAsset.data : {};
 };
 

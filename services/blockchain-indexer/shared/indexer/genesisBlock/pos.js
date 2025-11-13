@@ -12,7 +12,6 @@ const { MODULE, MODULE_SUB_STORE, getGenesisHeight } = require('../../constants'
 const { updateTotalStake, updateTotalSelfStake } = require('../transactionProcessor/pos/stake');
 const { indexAccountPublicKey } = require('../accountIndex');
 
-const requestAll = require('../../utils/requestAll');
 const config = require('../../../config');
 const accountsTableSchema = require('../../database/schema/accounts');
 const stakesTableSchema = require('../../database/schema/stakes');
@@ -24,6 +23,8 @@ const { INVALID_ED25519_KEY } = require('../../constants');
 const logger = Logger();
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
+const BATCH_SIZE = 2000;
+const BATCH_RETRY_DELAY = 1000;
 
 const getStakesTable = () => getTableInstance(stakesTableSchema, MYSQL_ENDPOINT);
 const getAccountsTable = () => getTableInstance(accountsTableSchema, MYSQL_ENDPOINT);
@@ -37,41 +38,61 @@ const indexPosValidatorsInfo = async (numValidators, dbTrx) => {
 		const accountsTable = await getAccountsTable();
 		const commissionsTable = await getCommissionsTable();
 
-		const posModuleData = await requestAll(
-			requestConnector,
-			'getGenesisAssetByModule',
-			{ module: MODULE.POS, subStore: MODULE_SUB_STORE.POS.VALIDATORS, limit: 1000 },
-			numValidators,
-		);
+		for (let offset = 0; offset < numValidators; ) {
+			try {
+				const posModuleData = await requestConnector('getGenesisAssetByModule', {
+					module: MODULE.POS,
+					subStore: MODULE_SUB_STORE.POS.VALIDATORS,
+					limit: BATCH_SIZE,
+					offset,
+				});
 
-		const validators = posModuleData[MODULE_SUB_STORE.POS.VALIDATORS];
-		const genesisHeight = await getGenesisHeight();
+				const validators = posModuleData[MODULE_SUB_STORE.POS.VALIDATORS];
+				const genesisHeight = await getGenesisHeight();
 
-		const commissionEntries = await BluebirdPromise.map(
-			validators,
-			async validator => {
-				// Index all valid public keys
-				if (isGeneratorKeyValid(validator.generatorKey)) {
-					const account = {
-						address: getKlayr32AddressFromPublicKey(validator.generatorKey),
-						publicKey: validator.generatorKey,
-					};
+				const commissionEntries = await BluebirdPromise.map(
+					validators,
+					async validator => {
+						// Index all valid public keys
+						if (isGeneratorKeyValid(validator.generatorKey)) {
+							const account = {
+								address: getKlayr32AddressFromPublicKey(validator.generatorKey),
+								publicKey: validator.generatorKey,
+							};
 
-					await accountsTable
-						.upsert(account)
-						.catch(() => indexAccountPublicKey(validator.generatorKey));
-				}
+							await accountsTable
+								.upsert(account)
+								.catch(() => indexAccountPublicKey(validator.generatorKey));
+						}
 
-				return {
-					address: validator.address,
-					commission: validator.commission,
-					height: genesisHeight,
-				};
-			},
-			{ concurrency: validators.length },
-		);
+						return {
+							address: validator.address,
+							commission: validator.commission,
+							height: genesisHeight,
+						};
+					},
+					{ concurrency: validators.length },
+				);
 
-		await commissionsTable.upsert(commissionEntries, dbTrx);
+				await commissionsTable.upsert(commissionEntries, dbTrx);
+
+				const percent =
+					numValidators > 0
+						? Math.min((((offset + BATCH_SIZE) / numValidators) * 100).toFixed(1), 100)
+						: 0;
+				logger.info(
+					`Scheduled ${Math.min(
+						offset + BATCH_SIZE,
+						numValidators,
+					)} of ${numValidators} genesis validators item (${percent}%)`,
+				);
+
+				offset += BATCH_SIZE;
+			} catch (err) {
+				await new Promise(resolve => setTimeout(resolve, BATCH_RETRY_DELAY));
+				logger.warn(`Retrying indexPosValidatorsInfo batch starting at offset ${offset}...`);
+			}
+		}
 	}
 	logger.debug('Finished indexing the validators information from the genesis PoS module assets.');
 };
@@ -82,39 +103,63 @@ const indexPosStakesInfo = async (numStakers, dbTrx) => {
 	let totalSelfStake = BigInt(0);
 
 	if (numStakers > 0) {
+		let totalStakers = 0;
 		const stakesTable = await getStakesTable();
 
-		const posModuleData = await requestAll(
-			requestConnector,
-			'getGenesisAssetByModule',
-			{ module: MODULE.POS, subStore: MODULE_SUB_STORE.POS.STAKERS, limit: 1000 },
-			numStakers,
-		);
-		const stakers = posModuleData[MODULE_SUB_STORE.POS.STAKERS];
-
-		const allStakes = [];
-		for (let i = 0; i < stakers.length; i++) {
-			const stakerAddress = stakers[i].address;
-			const stakes = stakers[i].stakes;
-			for (let j = 0; j < stakes.length; j++) {
-				const validatorAddress = stakes[j].validatorAddress;
-				const amount = stakes[j].amount;
-
-				allStakes.push({
-					stakerAddress,
-					validatorAddress,
-					amount: BigInt(amount),
+		for (let offset = 0; offset < numStakers; ) {
+			try {
+				const posModuleData = await requestConnector('getGenesisAssetByModule', {
+					module: MODULE.POS,
+					subStore: MODULE_SUB_STORE.POS.STAKERS,
+					limit: BATCH_SIZE,
+					offset,
 				});
 
-				totalStake += BigInt(amount);
-				if (stakerAddress === validatorAddress) {
-					totalSelfStake += BigInt(amount);
+				const stakers = posModuleData[MODULE_SUB_STORE.POS.STAKERS];
+
+				const allStakes = [];
+				for (let i = 0; i < stakers.length; i++) {
+					const stakerAddress = stakers[i].address;
+					const stakes = stakers[i].stakes;
+					for (let j = 0; j < stakes.length; j++) {
+						const validatorAddress = stakes[j].validatorAddress;
+						const amount = stakes[j].amount;
+
+						allStakes.push({
+							stakerAddress,
+							validatorAddress,
+							amount: BigInt(amount),
+						});
+
+						totalStake += BigInt(amount);
+						if (stakerAddress === validatorAddress) {
+							totalSelfStake += BigInt(amount);
+						}
+					}
 				}
+				totalStakers += allStakes.length;
+
+				await stakesTable.upsert(allStakes, dbTrx);
+
+				const percent =
+					numStakers > 0
+						? Math.min((((offset + BATCH_SIZE) / numStakers) * 100).toFixed(1), 100)
+						: 0;
+				logger.info(
+					`Scheduled ${Math.min(
+						offset + BATCH_SIZE,
+						numStakers,
+					)} of ${numStakers} genesis stakers item (${percent}%)`,
+				);
+
+				offset += BATCH_SIZE;
+			} catch (err) {
+				await new Promise(resolve => setTimeout(resolve, BATCH_RETRY_DELAY));
+				logger.warn(`Retrying indexPosStakesInfo batch starting at offset ${offset}...`);
 			}
 		}
 
-		await stakesTable.upsert(allStakes, dbTrx);
-		logger.info(`Updated ${allStakes.length} stakes from the genesis block.`);
+		logger.info(`Updated ${totalStakers} stakes from the genesis block.`);
 	}
 
 	await updateTotalStake(totalStake, dbTrx);

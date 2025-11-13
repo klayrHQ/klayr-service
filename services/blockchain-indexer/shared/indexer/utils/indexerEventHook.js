@@ -10,12 +10,14 @@ let waitingEmptyFired = false;
 let onWaitingDrainedInitialized = false;
 
 // This hook is called when the queue is drained and there are no more jobs waiting
-async function onWaitingDrained(currentBlock) {
-	setIsOnWaitingDrainedBeenExecuted();
+async function onWaitingDrained(job) {
+	if (job.data.block) {
+		setIsOnWaitingDrainedBeenExecuted();
 
-	if (await shouldScheduleMissingBlocks(currentBlock)) {
-		logger.info(`Scheduling missing blocks indexing, since waiting queue is drained`);
-		await scheduleMissingBlocksOnCoordinator();
+		if (await shouldScheduleMissingBlocks(job.data.block)) {
+			logger.info(`Scheduling missing blocks indexing, since waiting queue is drained`);
+			await scheduleMissingBlocksOnCoordinator();
+		}
 	}
 }
 
@@ -29,7 +31,7 @@ const checkWaitingDrained = async job => {
 	if (isWaitingDrained()) {
 		waitingCount = 0;
 		waitingEmptyFired = true;
-		await onWaitingDrained(job.data.block);
+		await onWaitingDrained(job);
 	}
 };
 

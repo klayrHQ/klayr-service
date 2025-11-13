@@ -32,6 +32,7 @@ const { getLastIndexedBlock } = require('../lastIndexedBlock');
 const config = require('../../../config');
 
 const blocksTableSchema = require('../../database/schema/blocks');
+const { requestConnector } = require('../../utils/request');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
@@ -75,6 +76,16 @@ const createMissingBlockArray = (lastIndexedBlockHeight, newBlockHeight) => {
 		result.push(i);
 	}
 	return result;
+};
+
+const isBlockHeightExistsOnNode = async height => {
+	try {
+		const blockFromNode = await requestConnector('getBlockByHeight', { height });
+		if (blockFromNode) return true;
+		return false;
+	} catch (err) {
+		return false;
+	}
 };
 
 const fillMissingHeights = async blocks => {
@@ -212,6 +223,7 @@ const updateTotalLockedAmounts = async (tokenIDLockedAmountChangeMap, dbTrx) =>
 	);
 
 module.exports = {
+	isBlockHeightExistsOnNode,
 	reorderIndexBlocksQueueJobs,
 	activateReorderingMode,
 	updateTotalLockedAmounts,

@@ -56,13 +56,21 @@ const globalClientInstantiationStats = {
 
 let lastUsedIndex = 0;
 const nodeClientPool = [];
+const nodeUrlInReset = new Set();
+
+const checkIsClientAlive = client => client && client._channel && client._channel.isAlive;
 
 async function getNodeClientActiveSize(node) {
 	return node.url.startsWith('http')
 		? (await isReachable(`${node.url}/rpc`))
 			? 1
 			: 0
-		: node.clientPool.filter(client => client && client._channel && client._channel.isAlive).length;
+		: node.clientPool.filter(checkIsClientAlive).length;
+}
+
+async function getActiveNodeClientPoolCount() {
+	const activeNodes = await getActiveNodeClientActive();
+	return activeNodes.length;
 }
 
 async function getActiveNodeClientActive() {
@@ -70,6 +78,19 @@ async function getActiveNodeClientActive() {
 		nodeClientPool.map(async node => {
 			try {
 				const activeCount = await getNodeClientActiveSize(node);
+
+				if (activeCount === 0) {
+					for (let index = 0; index < node.clientPool.length; index++) {
+						const apiClient = node.clientPool[index];
+						if (!checkIsClientAlive(apiClient)) {
+							Signals.get('resetApiClient').dispatch(apiClient);
+							logger.debug(
+								`Dispatched 'resetApiClient' signal from getApiClient for API client ${apiClient.poolIndex} at ${apiClient.url}.`,
+							);
+						}
+					}
+				}
+
 				return { node, activeCount };
 			} catch (err) {
 				return { node, activeCount: 0 };
@@ -79,6 +100,28 @@ async function getActiveNodeClientActive() {
 
 	return checks.filter(c => c.activeCount > 0).map(c => c.node);
 }
+
+const waitForHealthyNode = (intervalMs = 1000) => {
+	return new Promise(resolve => {
+		const getHealthyNodes = async () => {
+			try {
+				const node = await getActiveNodeClientActive();
+				if (node.length > 0) {
+					return resolve(node);
+				}
+				logger.info(`Waiting ${intervalMs}ms for node to become healthy...`);
+			} catch (err) {
+				logger.info(`Waiting ${intervalMs}ms for node to become healthy...`);
+			}
+
+			// Schedule next retry
+			setTimeout(getHealthyNodes, intervalMs);
+		};
+
+		// Call immediately
+		getHealthyNodes();
+	});
+};
 
 function getEventSubscriberNodeURL() {
 	const isConfigValueExist =
@@ -165,11 +208,7 @@ async function getLeastLoadedNode() {
 	}
 
 	// 1. Filter only healthy nodes
-	const healthyNodes = await getActiveNodeClientActive();
-	if (healthyNodes.length === 0) {
-		logger.error('getLeastLoadedNode Error: No healthy nodes available!');
-		throw new Error('No healthy nodes available');
-	}
+	const healthyNodes = await waitForHealthyNode();
 
 	// 2. Find the minimum active requests
 	// eslint-disable-next-line no-unused-vars
@@ -198,8 +237,6 @@ async function getNodeClient(url) {
 	}
 	return node;
 }
-
-const checkIsClientAlive = client => client && client._channel && client._channel.isAlive;
 
 const getApiClientStats = async url => {
 	const node = await getNodeClient(url);
@@ -415,6 +452,14 @@ const getApiClient = async (url, poolIndex) => {
 };
 
 const resetApiClient = async (apiClient, isEventSubscriptionClient = false) => {
+	// skip reset if resetting in progress
+	if (nodeUrlInReset.has(`${apiClient.url}:${apiClient.poolIndex}`)) {
+		logger.debug(
+			`apiClient ${apiClient.poolIndex} at ${apiClient.url} is still in progress of resetting...`,
+		);
+		return;
+	}
+
 	// Replace the dead API client in the pool
 	if (!isObject(apiClient)) {
 		logger.warn(`apiClient is ${JSON.stringify(apiClient)}. Cannot reset.`);
@@ -423,6 +468,7 @@ const resetApiClient = async (apiClient, isEventSubscriptionClient = false) => {
 	}
 
 	const { url, poolIndex } = apiClient;
+	nodeUrlInReset.add(`${apiClient.url}:${apiClient.poolIndex}`);
 
 	// Do not attempt reset if last ping was within the acceptable threshold
 	// This is to avoid unnecessary socket creation
@@ -430,6 +476,7 @@ const resetApiClient = async (apiClient, isEventSubscriptionClient = false) => {
 		logger.debug(
 			`Not resetting apiClient ${poolIndex} at ${url}. Received a late ping from the server.`,
 		);
+		nodeUrlInReset.delete(`${apiClient.url}:${apiClient.poolIndex}`);
 		return;
 	}
 
@@ -465,6 +512,8 @@ const resetApiClient = async (apiClient, isEventSubscriptionClient = false) => {
 	if (node.isDedicatedEventSubscriber === true && newApiClient) {
 		Signals.get('newApiClient').dispatch(newApiClient.url, newApiClient.poolIndex);
 	}
+
+	nodeUrlInReset.delete(`${apiClient.url}:${apiClient.poolIndex}`);
 };
 Signals.get('resetApiClient').add(resetApiClient);
 
@@ -599,4 +648,5 @@ module.exports = {
 	getEventSubscriberNodeURL,
 	invokeEndpointOnSpecificNode,
 	invokeEndpointImmediate,
+	getActiveNodeClientPoolCount,
 };

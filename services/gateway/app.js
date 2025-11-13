@@ -110,6 +110,9 @@ tempApp.run().then(async () => {
 			status() {
 				return getStatus(this.broker);
 			},
+			health() {
+				return { health: 'OK' };
+			},
 			isBlockchainIndexReady() {
 				return getIndexStatus();
 			},

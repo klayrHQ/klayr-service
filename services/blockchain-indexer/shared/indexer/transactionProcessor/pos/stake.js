@@ -114,7 +114,7 @@ const incrementPendingUnlockTrx = async (
 
 	const amountBigInt = BigInt(amount);
 	const newAmount =
-		(existingPendingUnlocksData.amount || BigInt(0)) +
+		(existingPendingUnlocksData.amount ? BigInt(existingPendingUnlocksData.amount) : BigInt(0)) +
 		(amountBigInt < 0n ? -amountBigInt : amountBigInt);
 
 	await pendingUnlocksTable.upsert(
@@ -139,7 +139,7 @@ const decrementPendingUnlockTrx = async (
 
 	const amountBigInt = BigInt(amount);
 	const newAmount =
-		(existingPendingUnlocksData.amount || BigInt(0)) -
+		(existingPendingUnlocksData.amount ? BigInt(existingPendingUnlocksData.amount) : BigInt(0)) -
 		(amountBigInt < 0n ? -amountBigInt : amountBigInt);
 
 	await pendingUnlocksTable.upsert(

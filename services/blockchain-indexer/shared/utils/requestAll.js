@@ -13,17 +13,43 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { Utils } = require('klayr-service-framework');
+const { Utils, Logger } = require('klayr-service-framework');
+
+const logger = Logger();
+
+const RETRY_DELAY = 1000;
+
+const retryTimedOutRequest = async (fn, method, params, numRetries = -1) => {
+	let retriesLeft = numRetries;
+
+	while (true) {
+		try {
+			const result = await fn(method, params);
+			return result;
+		} catch (err) {
+			if (err.message.includes('timed out') && retriesLeft !== 0) {
+				if (retriesLeft > 0) retriesLeft--;
+				logger.warn(
+					`timeout detected while invoking ${fn.name}(${method}), will retry after ${
+						RETRY_DELAY / 1000
+					} seconds!`,
+				);
+				await new Promise(r => setTimeout(r, RETRY_DELAY));
+				continue;
+			} else {
+				logger.error(`Failed to invoke ${fn.name}(${method}): ${err.message}`);
+				throw err;
+			}
+		}
+	}
+};
 
 const requestAll = async (fn, method, params, limit) => {
 	const maxAmount = limit ?? Number.MAX_SAFE_INTEGER;
 	const oneRequestLimit = params.limit || 100;
-	const firstRequest = await fn(method, {
+	const firstRequest = await retryTimedOutRequest(fn, method, {
 		...params,
-		...{
-			limit: oneRequestLimit,
-			offset: 0,
-		},
+		...{ limit: oneRequestLimit, offset: 0 },
 	});
 	const totalResponse = firstRequest;
 	if (!totalResponse.error) {
@@ -31,12 +57,9 @@ const requestAll = async (fn, method, params, limit) => {
 			for (let page = 1; page < Math.ceil(maxAmount / oneRequestLimit); page++) {
 				const curOffset = oneRequestLimit * page;
 
-				const result = await fn(method, {
+				const result = await retryTimedOutRequest(fn, method, {
 					...params,
-					...{
-						limit: Math.min(oneRequestLimit, maxAmount - curOffset),
-						offset: curOffset,
-					},
+					...{ limit: Math.min(oneRequestLimit, maxAmount - curOffset), offset: curOffset },
 				});
 
 				// This check needs to be updated for dynamic exit based on emptiness of object properties

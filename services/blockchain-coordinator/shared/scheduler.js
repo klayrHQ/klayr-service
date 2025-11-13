@@ -27,6 +27,7 @@ const {
 	getIndexVerifiedHeight,
 	isGenesisBlockIndexed,
 	getLiveIndexingJobCount: getLiveIndexingJobCountFromIndexer,
+	getIsIndexerReordering,
 } = require('./sources/indexer');
 
 const { getAllPosValidators, getBlocksByHeightBetween } = require('./sources/connector');
@@ -69,13 +70,21 @@ const waitForJobCountToFallBelowThreshold = async () => {
 	/* eslint-disable no-constant-condition */
 	while (true) {
 		const count = await getLiveIndexingJobCount();
-		if (count < skipThreshold) return;
-		logger.info(
-			`In progress job count (${String(count).padStart(
-				5,
-				' ',
-			)}) not yet below the threshold (${skipThreshold}). Waiting for ${REFRESH_INTERVAL}ms to re-check the job count before scheduling the next batch.`,
-		);
+		const isReordering = await getIsIndexerReordering();
+		if (!isReordering && count < skipThreshold) return;
+
+		if (isReordering) {
+			logger.info(
+				`Indexer is currently in reordering process. Waiting for ${REFRESH_INTERVAL}ms to re-check the job count before scheduling the next batch.`,
+			);
+		} else {
+			logger.info(
+				`In progress job count (${String(count).padStart(
+					5,
+					' ',
+				)}) not yet below the threshold (${skipThreshold}). Waiting for ${REFRESH_INTERVAL}ms to re-check the job count before scheduling the next batch.`,
+			);
+		}
 		await delay(REFRESH_INTERVAL);
 	}
 	/* eslint-enable no-constant-condition */
@@ -159,6 +168,15 @@ const scheduleBlocksIndexing = async heights => {
 	}
 };
 
+const scheduleGenesisBlocksIndexing = async genesisHeight => {
+	const currentHeight = await getCurrentHeight();
+	await requestIndexer('setPendingIndexerLastCurrentHeight', { currentHeight });
+
+	logger.trace(`Scheduling indexing for genesis block at height: ${genesisHeight}.`);
+	await blockMessageQueue.add({ height: genesisHeight });
+	logger.debug(`Scheduled indexing for genesis block at height: ${genesisHeight}.`);
+};
+
 const scheduleValidatorsIndexing = async validators => {
 	await BluebirdPromise.map(
 		validators,
@@ -183,7 +201,7 @@ const indexGenesisBlock = async () => {
 
 	const genesisHeight = await getGenesisHeight();
 	logger.debug('Scheduling genesis block indexing.');
-	await scheduleBlocksIndexing(genesisHeight);
+	await scheduleGenesisBlocksIndexing(genesisHeight);
 	logger.info('Finished scheduling genesis block indexing.');
 
 	await waitForGenesisBlockIndexing().catch(async () => {
@@ -319,7 +337,7 @@ const scheduleMissingBlocksIndexing = async () => {
 // Batch into smaller ranges to avoid microservice/DB query timeouts
 const getMissingBlocksList = async (fromHeight, toHeight) => {
 	const missingBlocksByHeight = [];
-	const MAX_QUERY_RANGE = 10000;
+	const MAX_QUERY_RANGE = config.job.indexMissingBlocks.getMissingBlocksListQuerySize;
 	const NUM_BATCHES = Math.ceil((toHeight - fromHeight) / MAX_QUERY_RANGE);
 
 	// Batch into smaller ranges to avoid microservice/DB query timeouts

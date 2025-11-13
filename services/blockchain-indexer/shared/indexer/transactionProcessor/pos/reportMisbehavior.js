@@ -13,7 +13,12 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const { Logger } = require('klayr-service-framework');
+const {
+	Logger,
+	DB: {
+		MySQL: { getTableInstance },
+	},
+} = require('klayr-service-framework');
 const { codec } = require('@klayr/codec');
 const { reloadValidatorCache, getSchemas, getPosConstants } = require('../../../dataService');
 
@@ -70,7 +75,7 @@ const applyTransaction = async (blockHeader, tx, events, dbTrx) => {
 		{ stakerAddress: punishedAddress, validatorAddress: punishedAddress },
 		['amount'],
 	);
-	const selfStake = BigInt(punishedAddressData.amount) || BigInt(0);
+	const selfStake = punishedAddressData.amount ? BigInt(punishedAddressData.amount) : BigInt(0);
 
 	const reward =
 		BigInt(posConstants.reportMisbehaviorReward) > selfStake
@@ -123,7 +128,7 @@ const revertTransaction = async (blockHeader, tx, events, dbTrx) => {
 		{ stakerAddress: punishedAddress, validatorAddress: punishedAddress },
 		['amount'],
 	);
-	const selfStake = BigInt(punishedAddressData.amount) || BigInt(0);
+	const selfStake = punishedAddressData.amount ? BigInt(punishedAddressData.amount) : BigInt(0);
 
 	const reward =
 		BigInt(posConstants.reportMisbehaviorReward) > selfStake

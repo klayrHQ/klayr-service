@@ -52,7 +52,7 @@ const applyTransaction = async (blockHeader, tx, events, dbTrx) => {
 	const punishmentLockingPeriods = await getPosPunishmentLockingPeriods();
 	const roundLength = await getPosRoundLength();
 	const aggregateCommitHeight = blockHeader.aggregateCommit.height;
-	const genesisHeight = getGenesisHeight();
+	const genesisHeight = await getGenesisHeight();
 
 	const pendingUnlocksData = await pendingUnlocksTable.find({ stakerAddress: senderAddress }, [
 		'validatorAddress',

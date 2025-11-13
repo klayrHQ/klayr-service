@@ -62,6 +62,7 @@ const {
 	reorderIndexBlocksQueueJobs,
 	indexNewMissingBlock,
 	setLargestMissingBlockHeight,
+	isBlockHeightExistsOnNode,
 } = require('./utils/blockchainIndex');
 const {
 	startIndexSpeedRecord,
@@ -94,6 +95,7 @@ const {
 const { recordEvents, commitEvent } = require('./eventProcessor');
 const { recordNonceIncrease } = require('../dataService/recorder/auth/account');
 const { scheduleMissingBlocksOnCoordinator } = require('./utils/scheduler');
+const { initGenesisBlockQueues } = require('./genesisBlock/queue');
 
 const MYSQL_ENDPOINT = config.endpoints.mysql;
 
@@ -221,7 +223,7 @@ const indexBlock = async job => {
 	if (blockHeightFromJobData === undefined && blockFromJobData === undefined)
 		throw new Error('invalid indexBlock job.data');
 
-	let blockHeightToIndex = blockHeightFromJobData || blockFromJobData.header.height;
+	let blockHeightToIndex = blockHeightFromJobData ?? blockFromJobData.header.height;
 	let dbTrx;
 	let blockToIndexFromNode;
 
@@ -252,26 +254,18 @@ const indexBlock = async job => {
 					logger.warn(
 						`overriding blockHeightToIndex from ${blockHeightToIndex} to ${
 							lastIndexedBlock.height + 1
-						} on indexing by blocks`,
+						} on indexing by height`,
 					);
 				}
 				blockHeightToIndex = lastIndexedBlock.height + 1;
 			}
 
-			// if the height to be indexed does not exist yet, throw error so it would be retried later, while refreshing node info
-			// useful for fork recovery when node are lagging behind
+			// if the height to be indexed is larger than current height, we need to check if block to be indexed is indeed exists
+			// if not exist, skip indexing that block
 			if (currentHeight < blockHeightToIndex) {
-				await refreshNodeInfo();
-
-				// wait to ensure node info is refreshed
-				await new Promise(r => setTimeout(r, 200));
-
-				// check once more after refresh, only then throw error if currentHeight is still behind
-				currentHeight = await getCurrentHeight();
-				if (currentHeight < blockHeightToIndex) {
-					throw new Error(
-						`Block at height ${blockHeightToIndex} is larger than current cached node height at ${currentHeight}.`,
-					);
+				if (!(await isBlockHeightExistsOnNode(blockHeightToIndex))) {
+					logger.warn(`Block at height ${blockHeightToIndex} doesn't exist on node, skipping...`);
+					return;
 				}
 			}
 		}
@@ -364,7 +358,9 @@ const indexBlock = async job => {
 		let blockReward = BigInt('0');
 
 		if (blockToIndexFromNode.height === genesisHeight) {
-			await indexGenesisBlockAssets(dbTrx);
+			// pause indexing job until genesis block is successfully indexed
+			await pauseIndexBlocksQueue();
+			await indexGenesisBlockAssets(dbTrx, job, isGenesisBlockIndexed);
 		}
 
 		const events = await getEventsByHeight(blockToIndexFromNode.height);
@@ -907,6 +903,7 @@ const initBlockProcessingQueues = async () => {
 		config.queue.deleteIndexedBlocks.concurrency,
 	);
 
+	await initGenesisBlockQueues(resumeIndexBlocksQueue);
 	await registerIndexerEventHook(indexBlocksQueue);
 };
 
@@ -926,6 +923,10 @@ const resumeIndexBlocksQueue = async () => {
 		await indexBlocksQueue.queue.resume();
 		logger.info('Indexing blocks queue is resumed.');
 	}
+};
+
+const isIndexBlocksQueuePaused = async () => {
+	return indexBlocksQueue && indexBlocksQueue.queue && indexBlocksQueue.queue.isPaused();
 };
 
 const getLiveIndexingJobCount = async () => {
@@ -1072,6 +1073,9 @@ const findMissingBlocksInRange = async (fromHeight, toHeight) => {
 	const propBetweens = [{ property: 'height', from: fromHeight, to: toHeight }];
 	const indexedBlockCount = Number(await blocksTable.count({ propBetweens }));
 
+	const lastIndexedBlock = await getLastIndexedBlock();
+	const lastIndexedHeight = lastIndexedBlock ? lastIndexedBlock.height : -1;
+
 	// This block helps determine empty index
 	if (indexedBlockCount < 3) {
 		result.push({ from: fromHeight, to: toHeight });
@@ -1083,7 +1087,7 @@ const findMissingBlocksInRange = async (fromHeight, toHeight) => {
 			const batchStartHeight = fromHeight + i * BATCH_SIZE;
 			const batchEndHeight = Math.min(batchStartHeight + BATCH_SIZE, toHeight);
 
-			const missingBlocksQueryStatement = `
+			const missingExistingGapBlocksQueryStatement = `
 				SELECT
 					(SELECT COALESCE(MAX(b0.height + 1), ${batchStartHeight}) FROM blocks b0 WHERE b0.height < b1.height) AS 'from',
 					(b1.height - 1) AS 'to'
@@ -1094,14 +1098,32 @@ const findMissingBlocksInRange = async (fromHeight, toHeight) => {
 			`;
 
 			logger.trace(
-				`Checking for missing blocks between heights: ${batchStartHeight} - ${batchEndHeight}.`,
+				`Checking for internal block gaps in range: ${batchStartHeight} - ${batchEndHeight}.`,
 			);
-			const missingBlockRanges = await blocksTable.rawQuery(missingBlocksQueryStatement);
+			const missingExistingGapBlockRanges = await blocksTable.rawQuery(
+				missingExistingGapBlocksQueryStatement,
+			);
 			logger.trace(
-				`Found the following missing block ranges between heights: ${missingBlockRanges}.`,
+				`Internal gaps found: ${missingExistingGapBlockRanges.length} ranges. Details: ${missingExistingGapBlockRanges}.`,
 			);
 
-			result.push(...missingBlockRanges);
+			result.push(...missingExistingGapBlockRanges);
+
+			logger.trace(
+				`Checking for trailing gap (from max indexed block) in range: ${batchStartHeight} - ${batchEndHeight}.`,
+			);
+
+			if (lastIndexedHeight < batchStartHeight) {
+				logger.trace(`Trailing gap found from ${batchStartHeight} to ${batchEndHeight}.`);
+
+				result.push({ from: batchStartHeight, to: batchEndHeight });
+			}
+
+			if (lastIndexedHeight >= batchStartHeight) {
+				logger.trace(`Trailing gap found from ${lastIndexedHeight} to ${batchEndHeight}.`);
+
+				result.push({ from: lastIndexedHeight, to: batchEndHeight });
+			}
 		}
 	}
 
@@ -1188,4 +1210,5 @@ module.exports = {
 	unregisterIndexerEvent,
 	pauseIndexBlocksQueue,
 	resumeIndexBlocksQueue,
+	isIndexBlocksQueuePaused,
 };
