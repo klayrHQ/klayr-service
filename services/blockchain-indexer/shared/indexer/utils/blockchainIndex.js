@@ -34,7 +34,7 @@ const config = require('../../../config');
 const blocksTableSchema = require('../../database/schema/blocks');
 const { requestConnector } = require('../../utils/request');
 
-const MYSQL_ENDPOINT = config.endpoints.mysql;
+const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
 const logger = Logger();
 

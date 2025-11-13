@@ -41,7 +41,7 @@ const { getNameByAddress } = require('../../utils/validator');
 const config = require('../../../config');
 const { JSONParseDB } = require('../utils/json');
 
-const MYSQL_ENDPOINT = config.endpoints.mysql;
+const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
 const getBlocksTable = () => getTableInstance(blocksTableSchema, MYSQL_ENDPOINT);
 const getTransactionsTable = () => getTableInstance(transactionsTableSchema, MYSQL_ENDPOINT);

@@ -6,7 +6,7 @@ const {
 } = require('klayr-service-framework');
 
 const config = require('../../config');
-const MYSQL_ENDPOINT = config.endpoints.mysql;
+const MYSQL_ENDPOINT = config.endpoints.mysqlReplica;
 
 const blocksTableSchema = require('../database/schema/blocks');
 
