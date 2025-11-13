@@ -449,7 +449,8 @@ const updateValidatorListEveryBlock = () => {
 				}
 			}
 		} catch (err) {
-			logger.warn(`Unable to update the validator cache due to:\n${err.stack}`);
+			logger.warn(`Unable to update the validator cache due to: ${err.message}`);
+			logger.debug(`Unable to update the validator cache due to:\n${err.stack}`);
 		}
 	};
 

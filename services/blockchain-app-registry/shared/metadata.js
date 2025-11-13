@@ -608,7 +608,8 @@ const getBlockchainAppsTokensSupportedMetadata = async params => {
 
 		return tokenMetadata;
 	} catch (err) {
-		logger.warn(err.stack);
+		logger.warn(`Error executing getBlockchainAppsTokensSupportedMetadata: ${err.message}`);
+		logger.debug(err.stack);
 		return tokenMetadata;
 	}
 };

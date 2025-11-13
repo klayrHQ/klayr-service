@@ -32,6 +32,9 @@ module.exports = [
 						callback(restData);
 				} catch (err) {
 					logger.error(
+						`Error occurred when processing 'update.fee_estimates' event: ${err.message}`,
+					);
+					logger.debug(
 						`Error occurred when processing 'update.fee_estimates' event:\n${err.stack}`,
 					);
 				}

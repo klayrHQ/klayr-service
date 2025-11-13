@@ -464,16 +464,8 @@ function makeHandler(svc, handlerItem) {
 					svc.settings.log4XXResponses ||
 					(Utils.isProperObject(err) && !_.inRange(err.code, 400, 500))
 				) {
-					svc.logger.error(
-						'   Request error!',
-						err.name,
-						':',
-						err.message,
-						'\n',
-						err.stack,
-						'\nData:',
-						err.data,
-					);
+					svc.logger.error('   Request error!', err.name, ':', err.message, '\nData:', err.data);
+					svc.logger.debug('   ', err.stack);
 				}
 				if (typeof err.message === 'string') {
 					if (!err.code || err.code === 500) {

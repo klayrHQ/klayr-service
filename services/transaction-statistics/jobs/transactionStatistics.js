@@ -35,6 +35,9 @@ module.exports = [
 					await transactionStatistics.init(config.transactionStatistics.historyLengthDays);
 				} catch (err) {
 					logger.warn(
+						`Error occurred while running 'refresh.transactions.statistics' job: ${err.message}`,
+					);
+					logger.debug(
 						`Error occurred while running 'refresh.transactions.statistics' job:\n${err.stack}`,
 					);
 				}
@@ -48,6 +51,9 @@ module.exports = [
 				await transactionStatistics.updateTodayStats();
 			} catch (err) {
 				logger.warn(
+					`Error occurred while running 'refresh.transactions.statistics' job: ${err.message}`,
+				);
+				logger.debug(
 					`Error occurred while running 'refresh.transactions.statistics' job:\n${err.stack}`,
 				);
 			}

@@ -576,12 +576,14 @@ const invokeEndpointWrapped = async (
 				}
 				await delay(ENDPOINT_INVOKE_RETRY_DELAY);
 			} else {
+				const errorParamsString = Object.getOwnPropertyNames(params).length
+					? ` with params: ${JSON.stringify(params)}`
+					: '';
 				logger.warn(
-					Object.getOwnPropertyNames(params).length
-						? `Error invoking '${endpoint}' at ${node.url} with params:\n${JSON.stringify(
-								params,
-						  )}.\n${err.stack}`
-						: `Error invoking '${endpoint}' at ${node.url}.\n${err.stack}`,
+					`Error invoking '${endpoint}' at ${node.url}${errorParamsString}: ${err.message}`,
+				);
+				logger.debug(
+					`Error invoking '${endpoint}' at ${node.url}${errorParamsString}:\n${err.stack}`,
 				);
 
 				throw err;

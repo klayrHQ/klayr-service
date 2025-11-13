@@ -29,7 +29,8 @@ module.exports = [
 				logger.debug('Initializing peer list...');
 				peerCache.reload();
 			} catch (err) {
-				logger.warn(`Error occurred while running 'refresh.peers' job:\n${err.stack}`);
+				logger.warn(`Error occurred while running 'refresh.peers' job: ${err.message}`);
+				logger.debug(`Error occurred while running 'refresh.peers' job:\n${err.stack}`);
 			}
 		},
 		controller: () => {
@@ -37,7 +38,8 @@ module.exports = [
 				logger.debug('Scheduling peer list reload...');
 				peerCache.reload();
 			} catch (err) {
-				logger.warn(`Error occurred while running 'refresh.peers' job:\n${err.stack}`);
+				logger.warn(`Error occurred while running 'refresh.peers' job: ${err.message}`);
+				logger.debug(`Error occurred while running 'refresh.peers' job:\n${err.stack}`);
 			}
 		},
 	},

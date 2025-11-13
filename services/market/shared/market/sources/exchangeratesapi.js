@@ -61,7 +61,7 @@ const fetchAllCurrencyConversionRates = async () => {
 		return allMarketConversionRates;
 	} catch (err) {
 		logger.error(err.message);
-		logger.error(err.stack);
+		logger.debug(err.stack);
 		return err;
 	}
 };
