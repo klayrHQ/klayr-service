@@ -207,7 +207,7 @@ module.exports = {
 							res = (await handlerItem.onAfterCall.call(this, ctx, socket, request, res)) || res;
 						}
 						// Store transformed response in redis cache
-						if (isValidNonEmptyResponse(res)) {
+						if (isValidNonEmptyResponse(res) && ttl > 0) {
 							await setGatewayCache(rpcRequestCacheKey, JSON.stringify(res), ttl);
 						}
 					}

@@ -162,7 +162,7 @@ module.exports = {
 					}
 
 					// Save result to cache if enabled
-					if (cacheKey && isValidNonEmptyResponse(data)) {
+					if (cacheKey && isValidNonEmptyResponse(data) && ttl > 0) {
 						await setGatewayCache(cacheKey, JSON.stringify(data), ttl);
 					}
 				}
