@@ -156,7 +156,12 @@ const formatEvent = (event, skipDecode) => {
 				? codec.decodeJSON(eventDataSchema, Buffer.from(event.data, 'hex'))
 				: { data: event.data };
 		} catch (err) {
-			logger.warn(`Unable to decode data for ${event.name} (${event.module}) event:\n${err.stack}`);
+			logger.warn(
+				`Unable to decode data for ${event.name} (${event.module}) event: ${err.message}`,
+			);
+			logger.debug(
+				`Unable to decode data for ${event.name} (${event.module}) event:\n${err.stack}`,
+			);
 			return { data: event.data };
 		}
 

@@ -207,7 +207,7 @@ module.exports = {
 							res = (await handlerItem.onAfterCall.call(this, ctx, socket, request, res)) || res;
 						}
 						// Store transformed response in redis cache
-						if (isValidNonEmptyResponse(res)) {
+						if (isValidNonEmptyResponse(res) && ttl > 0) {
 							await setGatewayCache(rpcRequestCacheKey, JSON.stringify(res), ttl);
 						}
 					}
@@ -464,16 +464,8 @@ function makeHandler(svc, handlerItem) {
 					svc.settings.log4XXResponses ||
 					(Utils.isProperObject(err) && !_.inRange(err.code, 400, 500))
 				) {
-					svc.logger.error(
-						'   Request error!',
-						err.name,
-						':',
-						err.message,
-						'\n',
-						err.stack,
-						'\nData:',
-						err.data,
-					);
+					svc.logger.error('   Request error!', err.name, ':', err.message, '\nData:', err.data);
+					svc.logger.debug('   ', err.stack);
 				}
 				if (typeof err.message === 'string') {
 					if (!err.code || err.code === 500) {

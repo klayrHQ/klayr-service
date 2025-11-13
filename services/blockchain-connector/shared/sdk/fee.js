@@ -45,7 +45,8 @@ const cacheFeeConstants = async () => {
 		if (minFeePerByte === undefined) await cacheMinFeePerByte();
 		if (feeTokenID === undefined) await cacheFeeTokenID();
 	} catch (err) {
-		logger.warn(`Error occurred when calling 'cacheFeeConstants':\n${err.stack}`);
+		logger.warn(`Error occurred when calling 'cacheFeeConstants': ${err.message}`);
+		logger.debug(`Error occurred when calling 'cacheFeeConstants':\n${err.stack}`);
 	}
 };
 

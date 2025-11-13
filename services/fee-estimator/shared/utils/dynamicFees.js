@@ -108,7 +108,8 @@ const checkAndProcessExecution = async (fromHeight, toHeight, cacheKey) => {
 			executionStatus[cacheKey] = true;
 			result = await getEstimateFeePerByteForBatch(fromHeight, toHeight, cacheKey);
 		} catch (err) {
-			logger.error(err.stack || err.message);
+			logger.error(err.message);
+			logger.debug(err.stack);
 		} finally {
 			executionStatus[cacheKey] = false;
 		}

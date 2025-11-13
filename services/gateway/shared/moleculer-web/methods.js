@@ -58,10 +58,11 @@ module.exports = {
 						this.logger.error(
 							`<= ${this.coloringStatusCode(err.code)} Request error: ${err.name}: ${
 								err.message
-							} \n${err.stack} \nData: \nRequest params: ${util.inspect(
-								reqParams,
-							)} \nRequest body: ${util.inspect(req.body)}`,
+							} \nData: \nRequest params: ${util.inspect(reqParams)} \nRequest body: ${util.inspect(
+								req.body,
+							)}`,
 						);
+					this.logger.debug(err.stack);
 				}
 
 				if (err instanceof ValidationException) {
@@ -161,7 +162,7 @@ module.exports = {
 					}
 
 					// Save result to cache if enabled
-					if (cacheKey && isValidNonEmptyResponse(data)) {
+					if (cacheKey && isValidNonEmptyResponse(data) && ttl > 0) {
 						await setGatewayCache(cacheKey, JSON.stringify(data), ttl);
 					}
 				}

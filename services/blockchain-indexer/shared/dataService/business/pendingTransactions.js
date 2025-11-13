@@ -80,7 +80,8 @@ const loadAllPendingTransactions = async () => {
 			`Updated pending transaction cache with ${pendingTransactionsList.length} transactions.`,
 		);
 	} catch (err) {
-		logger.error(`Failed to update the 'pendingTransactionsList' due to:\n${err.stack}`);
+		logger.error(`Failed to update the 'pendingTransactionsList' due to: ${err.message}`);
+		logger.debug(`Failed to update the 'pendingTransactionsList' due to:\n${err.stack}`);
 	}
 };
 

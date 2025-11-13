@@ -114,7 +114,7 @@ config.websocket = {
 config.rpcCache = {
 	ttl: ['blockTime', 'block'].includes(process.env.REQUEST_CACHING_TTL)
 		? process.env.REQUEST_CACHING_TTL
-		: !isNaN(Number(process.env.REQUEST_CACHING_TTL))
+		: process.env.REQUEST_CACHING_TTL !== '' && !isNaN(Number(process.env.REQUEST_CACHING_TTL))
 		? Number(process.env.REQUEST_CACHING_TTL) // in seconds
 		: 'blockTime', // default to block time
 	enable: String(process.env.ENABLE_REQUEST_CACHING).toLowerCase() !== 'false', // default to true

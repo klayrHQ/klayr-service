@@ -52,7 +52,8 @@ module.exports = [
 						logger.warn(`Incorrect payload detected for 'newBlock' signal:\n${payloadStr}`);
 					}
 				} catch (err) {
-					logger.error(`Error occurred when processing 'block.new' event:\n${err.stack}`);
+					logger.error(`Error occurred when processing 'block.new' event: ${err.message}`);
+					logger.debug(`Error occurred when processing 'block.new' event:\n${err.stack}`);
 				}
 			};
 			Signals.get('newBlock').add(newBlockListener);
@@ -81,7 +82,8 @@ module.exports = [
 						logger.warn(`Incorrect payload detected for 'newBlock' signal:\n${payloadStr}`);
 					}
 				} catch (err) {
-					logger.error(`Error occurred when processing 'transactions.new' event:\n${err.stack}`);
+					logger.error(`Error occurred when processing 'transactions.new' event: ${err.message}`);
+					logger.debug(`Error occurred when processing 'transactions.new' event:\n${err.stack}`);
 				}
 			};
 
@@ -104,7 +106,8 @@ module.exports = [
 						logger.warn(`Incorrect payload detected for 'deleteBlock' signal:\n${payloadStr}`);
 					}
 				} catch (err) {
-					logger.error(`Error occurred when processing 'block.delete' event:\n${err.stack}`);
+					logger.error(`Error occurred when processing 'block.delete' event: ${err.message}`);
+					logger.debug(`Error occurred when processing 'block.delete' event:\n${err.stack}`);
 				}
 			};
 			Signals.get('deleteBlock').add(deleteBlockListener);
@@ -125,7 +128,10 @@ module.exports = [
 						);
 					}
 				} catch (err) {
-					logger.error(`Error occurred when processing 'transactions.delete' event:\n${err.stack}`);
+					logger.error(
+						`Error occurred when processing 'transactions.delete' event: ${err.message}`,
+					);
+					logger.debug(`Error occurred when processing 'transactions.delete' event:\n${err.stack}`);
 				}
 			};
 			Signals.get('deleteTransactions').add(deleteTransactionsListener);
@@ -141,7 +147,8 @@ module.exports = [
 					const generators = await getGenerators({ limit: config.getGeneratorsLimit, offset: 0 });
 					callback(generators);
 				} catch (err) {
-					logger.error(`Error occurred when processing 'generators.change' event:\n${err.stack}`);
+					logger.error(`Error occurred when processing 'generators.change' event: ${err.message}`);
+					logger.debug(`Error occurred when processing 'generators.change' event:\n${err.stack}`);
 				}
 			};
 			Signals.get('newBlock').add(generatorsChangeListener);
@@ -156,7 +163,8 @@ module.exports = [
 					logger.debug('Returning all forgers for the new round...');
 					callback(payload);
 				} catch (err) {
-					logger.error(`Error occurred when processing 'round.change' event:\n${err.stack}`);
+					logger.error(`Error occurred when processing 'round.change' event: ${err.message}`);
+					logger.debug(`Error occurred when processing 'round.change' event:\n${err.stack}`);
 				}
 			};
 			Signals.get('newRound').add(newRoundListener);
